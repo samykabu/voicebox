@@ -68,7 +68,14 @@ class HumeTadaBackend:
     def _get_device(self) -> str:
         # Force CPU on macOS — MPS has issues with flow matching
         # and large vocab lm_head (>65536 output channels)
-        return get_torch_device(force_cpu_on_mac=True, allow_xpu=True)
+        # TADA 3B is large enough that blindly using cuda:0 often fails on
+        # multi-GPU workstations where another engine already occupies GPU 0.
+        return get_torch_device(
+            force_cpu_on_mac=True,
+            allow_xpu=True,
+            cuda_device_env="VOICEBOX_TADA_CUDA_DEVICE",
+            prefer_cuda_with_most_free_memory=True,
+        )
 
     def is_loaded(self) -> bool:
         return self.model is not None
@@ -93,7 +100,13 @@ class HumeTadaBackend:
             if self.model is not None:
                 self.unload_model()
             self.model_size = model_size
-            await asyncio.to_thread(self._load_model_sync, model_size)
+            try:
+                await asyncio.to_thread(self._load_model_sync, model_size)
+            except Exception:
+                # A failed .to(device) may leave the encoder and CUDA allocator
+                # alive even though the model assignment never completed.
+                self.unload_model()
+                raise
 
     def _load_model_sync(self, model_size: str = "1B"):
         """Synchronous model loading with progress tracking."""
@@ -149,7 +162,7 @@ class HumeTadaBackend:
             # On ROCm/AMD, torch.cuda.is_bf16_supported() works via the HIP abstraction,
             # but we wrap it defensively in case an older build lacks the symbol.
             _bf16_ok = False
-            if device == "cuda":
+            if device.startswith("cuda"):
                 try:
                     _bf16_ok = torch.cuda.is_bf16_supported()
                 except Exception:
