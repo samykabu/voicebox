@@ -1,0 +1,6 @@
+# NVIDIA Docker ABI pins. Keep these versions aligned with PYTORCH_IMAGE in
+# Dockerfile.cuda. TorchCodec 0.7 is compatible with PyTorch 2.8.
+torch==2.8.0
+torchaudio==2.8.0
+torchvision==0.23.0
+torchcodec==0.7.0

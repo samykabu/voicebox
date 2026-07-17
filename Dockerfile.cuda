@@ -1,0 +1,97 @@
+# ============================================================
+# Voicebox — NVIDIA CUDA build for native F5-TTS / Habibi
+#
+# This image is intentionally separate from the default CPU Dockerfile and
+# the ROCm overlay.  PyTorch 2.8 + CUDA 12.8 supports current NVIDIA cards,
+# including RTX 50-series GPUs, without installing ML tooling on the host.
+# ============================================================
+
+ARG PYTORCH_IMAGE=pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime@sha256:417bd75df6365104c283ea4c1651fb3530d9eb5a4c2fafa51943cff2a94e6385
+
+# === Stage 1: Build frontend ===
+FROM oven/bun:1 AS frontend
+
+WORKDIR /build
+
+COPY package.json bun.lock CHANGELOG.md ./
+COPY app/ ./app/
+COPY web/ ./web/
+
+RUN sed -i '/"tauri"/d; /"landing"/d; s/"web",/"web"/' package.json
+RUN bun install --no-save
+RUN cd web && bunx --bun vite build
+
+
+# === Stage 2: CUDA runtime and Python dependencies ===
+FROM ${PYTORCH_IMAGE}
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG F5_TTS_VERSION=1.1.21
+ARG HABIBI_TTS_VERSION=0.1.1
+
+ENV PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HF_HOME=/home/voicebox/.cache/huggingface \
+    TORCH_HOME=/home/voicebox/.cache/torch \
+    NUMBA_CACHE_DIR=/tmp/numba_cache \
+    PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        ffmpeg \
+        git \
+        gosu \
+        build-essential \
+        libsndfile1 \
+        sox \
+        libsox-fmt-all \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY backend/requirements.txt /tmp/voicebox-requirements.txt
+COPY docker/cuda-constraints.txt /tmp/cuda-constraints.txt
+
+# Keep the complete Voicebox environment on the CUDA 12.8-compatible PyTorch
+# ABI. F5-TTS and Habibi are installed without dependency resolution because
+# Voicebox already owns and tests their shared dependency set.
+RUN python -m pip install --upgrade pip && \
+    python -m pip install \
+        --constraint /tmp/cuda-constraints.txt \
+        --requirement /tmp/voicebox-requirements.txt && \
+    python -m pip install \
+        --constraint /tmp/cuda-constraints.txt \
+        git+https://github.com/QwenLM/Qwen3-TTS.git && \
+    python -m pip install --no-deps \
+        chatterbox-tts \
+        hume-tada \
+        "f5-tts==${F5_TTS_VERSION}" \
+        "habibi-tts==${HABIBI_TTS_VERSION}" && \
+    python -m pip install --force-reinstall --no-deps "torchcodec==0.7.0" && \
+    python -c "import importlib.metadata as m, torch, torchaudio, torchcodec, f5_tts, habibi_tts; assert torch.__version__.split('+')[0] == '2.8.0', torch.__version__; assert torchaudio.__version__.split('+')[0] == '2.8.0', torchaudio.__version__; assert torch.version.cuda == '12.8', torch.version.cuda; assert m.version('torchcodec') == '0.7.0'; assert m.version('f5-tts') == '${F5_TTS_VERSION}'; assert m.version('habibi-tts') == '${HABIBI_TTS_VERSION}'; print('Validated CUDA ABI and native Arabic TTS imports')"
+
+RUN groupadd -r voicebox && \
+    useradd -r -g voicebox -m -s /bin/bash voicebox
+
+COPY --chown=voicebox:voicebox backend/ /app/backend/
+COPY --from=frontend --chown=voicebox:voicebox /build/web/dist /app/frontend/
+COPY --chmod=755 docker/nvidia-entrypoint.sh /usr/local/bin/voicebox-entrypoint
+
+RUN mkdir -p \
+        /app/data/generations \
+        /app/data/profiles \
+        /app/data/cache \
+        /home/voicebox/.cache/huggingface \
+        /home/voicebox/.cache/torch \
+        /tmp/numba_cache \
+    && chown -R voicebox:voicebox /app/data /home/voicebox/.cache /tmp/numba_cache
+
+EXPOSE 17493
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=5 --start-period=120s \
+    CMD curl -f http://localhost:17493/health || exit 1
+
+ENTRYPOINT ["/usr/local/bin/voicebox-entrypoint"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "17493"]

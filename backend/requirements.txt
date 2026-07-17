@@ -14,7 +14,8 @@ accelerate>=0.26.0
 huggingface_hub>=0.20.0
 qwen-tts>=0.0.5
 
-# F5-TTS sub-dependencies (installed --no-deps in setup to avoid resolution hell)
+# F5-TTS/Habibi sub-dependencies (both packages are installed --no-deps in
+# setup to avoid their Gradio/PyTorch constraints replacing Voicebox's stack)
 ema-pytorch>=0.5.2
 x-transformers>=1.31.14
 vocos

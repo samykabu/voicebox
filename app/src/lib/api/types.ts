@@ -1,5 +1,6 @@
 // API Types matching backend Pydantic models
 import type { LanguageCode } from '@/lib/constants/languages';
+import type { HabibiModelId } from '@/lib/constants/habibiModels';
 
 export type VoiceType = 'cloned' | 'preset' | 'designed';
 
@@ -70,7 +71,7 @@ export interface GenerationRequest {
   text: string;
   language: LanguageCode;
   seed?: number;
-  model_size?: '1.7B' | '0.6B' | '1B' | '3B' | 'f5-tts-ro';
+  model_size?: '1.7B' | '0.6B' | '1B' | '3B' | HabibiModelId;
   engine?:
     | 'qwen'
     | 'qwen_custom_voice'
@@ -332,6 +333,9 @@ export interface ModelStatus {
   downloading: boolean; // True if download is in progress
   size_mb?: number;
   loaded: boolean;
+  license_id?: string;
+  commercial_use?: boolean;
+  dialect?: string;
 }
 
 export interface HuggingFaceModelInfo {

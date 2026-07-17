@@ -309,6 +309,8 @@ def build_server(cuda=False, rocm=False):
             "--collect-all",
             "f5_tts",
             "--collect-all",
+            "habibi_tts",
+            "--collect-all",
             "vocos",
             "--collect-all",
             "ema_pytorch",

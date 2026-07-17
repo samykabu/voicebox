@@ -97,6 +97,12 @@ The two cloud incumbents sit on opposite halves of the voice I/O loop — Eleven
 | Windows               | [Download MSI](https://voicebox.sh/download/windows)   |
 | Docker                | `docker compose up`                                    |
 
+> **Arabic F5-TTS / Habibi on NVIDIA:** use
+> `docker compose -f docker-compose.yml -f docker-compose.cuda.yml up -d --build`.
+> This Docker-only path exposes all NVIDIA GPUs by default and keeps Python,
+> CUDA libraries, models, and FFmpeg off the host. See the
+> [Arabic CUDA deployment guide](docs/content/docs/overview/docker-arabic-f5-habibi.mdx).
+
 > **[View all binaries →](https://github.com/jamiepine/voicebox/releases/latest)**
 
 > **Linux** — Pre-built binaries are not yet available. See [voicebox.sh/linux-install](https://voicebox.sh/linux-install) for build-from-source instructions.

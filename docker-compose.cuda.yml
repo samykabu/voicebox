@@ -1,0 +1,43 @@
+# NVIDIA CUDA overlay for native F5-TTS / Habibi inference.
+#
+# Start with:
+#   docker compose -f docker-compose.yml -f docker-compose.cuda.yml up --build -d
+#
+# The default CPU Compose file and the ROCm overlay remain unchanged.
+
+services:
+  voicebox:
+    build:
+      context: .
+      dockerfile: Dockerfile.cuda
+      args:
+        F5_TTS_VERSION: ${F5_TTS_VERSION:-1.1.21}
+        HABIBI_TTS_VERSION: ${HABIBI_TTS_VERSION:-0.1.1}
+
+    environment:
+      # The device request below exposes every GPU. This variable may narrow
+      # visibility to a comma-separated list such as "0" or "0,1".
+      NVIDIA_VISIBLE_DEVICES: ${VOICEBOX_NVIDIA_VISIBLE_DEVICES:-all}
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+      HF_HOME: /home/voicebox/.cache/huggingface
+      TORCH_HOME: /home/voicebox/.cache/torch
+      PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+
+    volumes:
+      - pytorch-cache:/home/voicebox/.cache/torch
+
+    shm_size: ${VOICEBOX_SHM_SIZE:-2gb}
+
+    deploy:
+      resources:
+        limits:
+          cpus: ${VOICEBOX_CPU_LIMIT:-8}
+          memory: ${VOICEBOX_MEMORY_LIMIT:-16G}
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  pytorch-cache:

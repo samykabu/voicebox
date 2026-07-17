@@ -42,6 +42,11 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api/client';
 import type { ActiveDownloadTask, HuggingFaceModelInfo, ModelStatus } from '@/lib/api/types';
+import {
+  getHabibiModel,
+  HABIBI_MODELS,
+  isHabibiModelId,
+} from '@/lib/constants/habibiModels';
 import { useModelDownloadToast } from '@/lib/hooks/useModelDownloadToast';
 import { usePlatform } from '@/platform/PlatformContext';
 import { useServerStore } from '@/stores/serverStore';
@@ -69,8 +74,6 @@ const MODEL_DESCRIPTIONS: Record<string, string> = {
     'HumeAI TADA 3B Multilingual — built on Llama 3.2 3B. Supports 10 languages with high-fidelity voice cloning via text-acoustic dual alignment.',
   kokoro:
     'Kokoro 82M by hexgrad. Tiny 82M-parameter TTS that runs at CPU realtime. Supports 8 languages with pre-built voice styles. Apache 2.0 licensed.',
-  'f5-tts-ro':
-    'F5-TTS Romanian finetune by cdorob. High-quality voice cloning specifically tuned for the Romanian language.',
   'qwen-custom-voice-1.7B':
     'Qwen3-TTS CustomVoice 1.7B by Alibaba. 9 premium preset voices with instruct-based style control for tone, emotion, and prosody. Supports 10 languages.',
   'qwen-custom-voice-0.6B':
@@ -93,6 +96,10 @@ const MODEL_DESCRIPTIONS: Record<string, string> = {
     'Qwen3 4B — highest quality local refinement and longer-form reasoning. ~2.5 GB quantized on Apple Silicon, ~8 GB at full precision on PyTorch.',
 };
 
+for (const model of HABIBI_MODELS) {
+  MODEL_DESCRIPTIONS[model.id] = model.description;
+}
+
 function formatDownloads(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
@@ -106,6 +113,7 @@ function formatLicense(license: string): string {
     'cc-by-4.0': 'CC BY 4.0',
     'cc-by-sa-4.0': 'CC BY-SA 4.0',
     'cc-by-nc-4.0': 'CC BY-NC 4.0',
+    'cc-by-nc-sa-4.0': 'CC BY-NC-SA 4.0',
     'openrail++': 'OpenRAIL++',
     openrail: 'OpenRAIL',
   };
@@ -417,7 +425,8 @@ export function ModelManagement() {
         m.model_name.startsWith('chatterbox') ||
         m.model_name.startsWith('tada') ||
         m.model_name.startsWith('kokoro') ||
-        m.model_name.startsWith('f5-tts'),
+        m.model_name.startsWith('f5-tts') ||
+        m.model_name.startsWith('habibi-'),
     ) ?? [];
   const whisperModels = modelStatus?.models.filter((m) => m.model_name.startsWith('whisper')) ?? [];
   const llmModels = modelStatus?.models.filter((m) => m.model_name.startsWith('qwen3-')) ?? [];
@@ -443,6 +452,13 @@ export function ModelManagement() {
   const license =
     hfModelInfo?.cardData?.license ||
     hfModelInfo?.tags?.find((tag) => tag.startsWith('license:'))?.replace('license:', '');
+  const selectedHabibiModel =
+    freshSelectedModel && isHabibiModelId(freshSelectedModel.model_name)
+      ? getHabibiModel(freshSelectedModel.model_name)
+      : null;
+  const selectedLicense = freshSelectedModel?.license_id ?? selectedHabibiModel?.license;
+  const selectedCommercialUse =
+    freshSelectedModel?.commercial_use ?? selectedHabibiModel?.commercialUse;
 
   return (
     <div className="flex flex-col h-full">
@@ -714,6 +730,20 @@ export function ModelManagement() {
                       {t('common.error')}
                     </Badge>
                   )}
+                  {selectedHabibiModel && (
+                    <Badge
+                      variant="outline"
+                      className={
+                        selectedCommercialUse
+                          ? 'text-xs'
+                          : 'text-xs border-amber-500/50 text-amber-600 dark:text-amber-400'
+                      }
+                    >
+                      <Scale className="h-3 w-3 mr-1" />
+                      {selectedLicense}
+                      {selectedCommercialUse ? '' : ' · noncommercial'}
+                    </Badge>
+                  )}
                 </div>
 
                 {/* HuggingFace model card info */}
@@ -728,6 +758,13 @@ export function ModelManagement() {
                 {MODEL_DESCRIPTIONS[freshSelectedModel.model_name] && (
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {MODEL_DESCRIPTIONS[freshSelectedModel.model_name]}
+                  </p>
+                )}
+
+                {selectedHabibiModel && selectedCommercialUse === false && (
+                  <p className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-300">
+                    This checkpoint is restricted to noncommercial use. For commercial projects,
+                    choose an Apache-2.0 model: MSA, Algerian, Iraqi, Egyptian, or Moroccan.
                   </p>
                 )}
 

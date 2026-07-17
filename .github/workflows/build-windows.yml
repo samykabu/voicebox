@@ -23,6 +23,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
           pip install -r backend/requirements.txt
+          pip install --no-deps chatterbox-tts
+          pip install --no-deps hume-tada
+          pip install --no-deps "f5-tts==1.1.21"
+          pip install --no-deps "habibi-tts==0.1.1"
 
       - name: Build Python server
         shell: bash

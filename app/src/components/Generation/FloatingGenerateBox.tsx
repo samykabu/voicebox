@@ -16,6 +16,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api/client';
+import { DEFAULT_HABIBI_MODEL_ID, isHabibiModelId } from '@/lib/constants/habibiModels';
 import { getLanguageOptionsForEngine, type LanguageCode } from '@/lib/constants/languages';
 import { useGenerationForm } from '@/lib/hooks/useGenerationForm';
 import { useProfile, useProfiles } from '@/lib/hooks/useProfiles';
@@ -151,7 +152,8 @@ export function FloatingGenerateBox({
     | 'chatterbox_turbo'
     | 'tada'
     | 'kokoro'
-    | 'qwen_custom_voice';
+    | 'qwen_custom_voice'
+    | 'f5_tts';
   useEffect(() => {
     if (selectedProfile?.language) {
       form.setValue('language', selectedProfile.language as LanguageCode);
@@ -160,6 +162,14 @@ export function FloatingGenerateBox({
     const engine = selectedProfile?.default_engine ?? selectedProfile?.preset_engine;
     if (engine) {
       form.setValue('engine', engine as EngineValue);
+      if (engine === 'f5_tts') {
+        const currentModel = form.getValues('modelSize');
+        form.setValue(
+          'modelSize',
+          isHabibiModelId(currentModel) ? currentModel : DEFAULT_HABIBI_MODEL_ID,
+        );
+        form.setValue('language', 'ar');
+      }
     } else if (selectedProfile && selectedProfile.voice_type !== 'preset') {
       // Cloned/designed profile with no default — ensure a compatible (non-preset) engine
       const currentEngine = form.getValues('engine');
@@ -597,7 +607,7 @@ export function FloatingGenerateBox({
                   />
 
                   <FormItem className="flex-1 space-y-0">
-                    <EngineModelSelector form={form} compact />
+                    <EngineModelSelector form={form} compact selectedProfile={selectedProfile} />
                   </FormItem>
 
                   <FormItem className="flex-1 space-y-0">

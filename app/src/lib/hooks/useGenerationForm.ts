@@ -5,6 +5,11 @@ import * as z from 'zod';
 import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api/client';
 import type { EffectConfig } from '@/lib/api/types';
+import {
+  DEFAULT_HABIBI_MODEL_ID,
+  getHabibiModel,
+  HABIBI_MODEL_IDS,
+} from '@/lib/constants/habibiModels';
 import { LANGUAGE_CODES, type LanguageCode } from '@/lib/constants/languages';
 import { useGeneration } from '@/lib/hooks/useGeneration';
 import { useModelDownloadToast } from '@/lib/hooks/useModelDownloadToast';
@@ -16,7 +21,7 @@ const generationSchema = z.object({
   text: z.string().min(1, '').max(50000),
   language: z.enum(LANGUAGE_CODES as [LanguageCode, ...LanguageCode[]]),
   seed: z.number().int().optional(),
-  modelSize: z.enum(['1.7B', '0.6B', '1B', '3B', 'f5-tts-ro']).optional(),
+  modelSize: z.enum(['1.7B', '0.6B', '1B', '3B', ...HABIBI_MODEL_IDS]).optional(),
   instruct: z.string().max(500).optional(),
   engine: z
     .enum([
@@ -63,9 +68,9 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
     resolver: zodResolver(generationSchema),
     defaultValues: {
       text: '',
-      language: 'en',
+      language: selectedEngine === 'f5_tts' ? 'ar' : 'en',
       seed: undefined,
-      modelSize: '1.7B',
+      modelSize: selectedEngine === 'f5_tts' ? DEFAULT_HABIBI_MODEL_ID : '1.7B',
       instruct: '',
       engine: (selectedEngine as GenerationFormValues['engine']) || 'qwen',
       personality: false,
@@ -88,6 +93,8 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
 
     try {
       const engine = data.engine || 'qwen';
+      const selectedModelSize =
+        engine === 'f5_tts' ? getHabibiModel(data.modelSize).id : data.modelSize;
       const modelName =
         engine === 'luxtts'
           ? 'luxtts'
@@ -102,7 +109,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
                 : engine === 'kokoro'
                   ? 'kokoro'
                   : engine === 'f5_tts'
-                    ? 'f5-tts-ro'
+                    ? getHabibiModel(selectedModelSize).id
                     : engine === 'qwen_custom_voice'
                       ? `qwen-custom-voice-${data.modelSize}`
                     : `qwen-tts-${data.modelSize}`;
@@ -120,7 +127,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
                 : engine === 'kokoro'
                   ? 'Kokoro 82M'
                   : engine === 'f5_tts'
-                    ? 'F5-TTS Romanian'
+                    ? getHabibiModel(selectedModelSize).label
                     : engine === 'qwen_custom_voice'
                       ? data.modelSize === '1.7B'
                         ? 'Qwen CustomVoice 1.7B'
@@ -154,7 +161,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
         text: data.text,
         language: data.language,
         seed: data.seed,
-        model_size: hasModelSizes ? data.modelSize : undefined,
+        model_size: hasModelSizes ? selectedModelSize : undefined,
         engine,
         instruct: supportsInstruct ? data.instruct || undefined : undefined,
         personality: data.personality || undefined,
@@ -172,7 +179,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
         text: '',
         language: data.language,
         seed: undefined,
-        modelSize: data.modelSize,
+        modelSize: selectedModelSize,
         instruct: '',
         engine: data.engine,
         personality: data.personality,

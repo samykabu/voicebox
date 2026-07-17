@@ -1,0 +1,275 @@
+---
+title: "Arabic F5-TTS / Habibi on NVIDIA Docker"
+description: "Run Voicebox's native Arabic voice-cloning engines on NVIDIA GPUs without installing ML dependencies on the host"
+---
+
+## Overview
+
+The CUDA Compose overlay runs Voicebox's native F5-TTS and Habibi integration
+entirely in Docker. Python, PyTorch, CUDA user-space libraries, FFmpeg, F5-TTS,
+Habibi, model files, and generated data stay in the container or Docker volumes.
+
+This path is separate from the default CPU image and the existing ROCm overlay:
+
+| Deployment | Compose command | Intended hardware |
+|---|---|---|
+| Default | `docker compose up` | CPU |
+| AMD | Add `docker-compose.rocm.yml` | AMD ROCm |
+| Arabic F5/Habibi | Add `docker-compose.cuda.yml` | NVIDIA CUDA 12.8 |
+
+The CUDA image pins PyTorch 2.8, Torchaudio 2.8, TorchCodec 0.7, and CUDA 12.8.
+This combination supports current NVIDIA GPUs, including RTX 50-series cards.
+
+## Host requirements
+
+- Docker Desktop using Linux containers on Windows, or Docker Engine on Linux
+- Docker Compose v2 with GPU device-request support
+- A current NVIDIA driver
+- One or more NVIDIA GPUs with sufficient VRAM
+- Git, only for cloning and updating the repository
+
+You do **not** need host installations of Python, Conda, PyTorch, the CUDA
+Toolkit, FFmpeg, F5-TTS, or Habibi-TTS.
+
+Verify Docker and the host driver before building:
+
+```powershell
+docker version
+docker compose version
+nvidia-smi
+```
+
+On native Linux, configure the NVIDIA Container Toolkit for Docker first. On
+Windows, use a current Docker Desktop release with WSL 2 GPU support enabled.
+
+## First-time setup
+
+Clone your Voicebox fork and enter the checkout:
+
+```powershell
+git clone https://github.com/samykabu/voicebox.git
+Set-Location voicebox
+```
+
+Create the local environment file from the checked-in template:
+
+```powershell
+Copy-Item .env.cuda.example .env
+```
+
+Review the fully merged Compose configuration before starting:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml config
+```
+
+Build and start Voicebox:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml up --detach --build
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml ps
+```
+
+Open <http://127.0.0.1:17600>. The first image build is large, and the first
+use of each model downloads its checkpoint into the persistent Hugging Face
+cache. Both operations can take several minutes.
+
+Follow startup and model download activity:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml logs --follow voicebox
+```
+
+## Verify GPU access
+
+The overlay requests all NVIDIA GPUs. Confirm what PyTorch sees inside the
+container:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml exec voicebox python -c "import torch; print(torch.__version__); print(torch.version.cuda); print(torch.cuda.is_available()); print(torch.cuda.device_count()); print([torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())])"
+```
+
+You can also inspect live GPU processes:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml exec voicebox nvidia-smi
+```
+
+Giving the container access to several GPUs does not automatically split one
+model across them. Voicebox normally runs a model on one selected CUDA device;
+the additional devices are available for future scheduling and model-placement
+work.
+
+### Restrict Voicebox to selected GPUs
+
+By default `.env` contains:
+
+```dotenv
+VOICEBOX_NVIDIA_VISIBLE_DEVICES=all
+```
+
+Use a physical GPU index, GPU UUID, or comma-separated list when Voicebox must
+share the machine with other inference services:
+
+```dotenv
+VOICEBOX_NVIDIA_VISIBLE_DEVICES=0
+```
+
+Recreate the container after changing GPU visibility:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml up --detach --force-recreate
+```
+
+## Create and use an Arabic cloned voice
+
+1. Open Voicebox at <http://127.0.0.1:17600>.
+2. Create a cloned-voice profile.
+3. Record or upload a clean, single-speaker Arabic reference of about 5-12
+   seconds.
+4. Enter the exact Arabic transcript spoken in the reference.
+5. Select an Arabic F5-TTS or Habibi model and the intended language/dialect.
+6. Enter the Arabic text, generate, and review the output in History.
+
+Short, clean recordings with an exact transcript produce more reliable cloning.
+Only clone a voice with the speaker's authorization.
+
+## Persistent storage
+
+| Data | Container path | Storage |
+|---|---|---|
+| Profiles, database, and application cache | `/app/data` | `voicebox-data` volume |
+| Generated WAV files | `/app/data/generations` | `./output` bind mount |
+| Hugging Face checkpoints | `/home/voicebox/.cache/huggingface` | `huggingface-cache` volume |
+| PyTorch artifacts | `/home/voicebox/.cache/torch` | `pytorch-cache` volume |
+
+Rebuilding or recreating the container preserves these volumes. Do not add
+`--volumes` to `docker compose down` unless you intentionally want to remove
+profiles and downloaded models.
+
+## Start, stop, update, and remove
+
+Use both Compose files for every lifecycle command so the same merged project
+definition is applied.
+
+Stop while retaining the container:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml stop
+```
+
+Start it again:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml start
+```
+
+Remove and recreate the container while retaining data:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml down
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml up --detach
+```
+
+Pull base-image updates, rebuild, and recreate:
+
+```powershell
+git pull
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml build --pull
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml up --detach --force-recreate
+```
+
+## Existing F5-TTS and Habibi portals
+
+The standalone Arabic deployment in `arabicTTS` publishes F5-TTS at port 7860
+and Habibi at port 7861. Voicebox publishes at port 17600, so there is no port
+collision and the applications can remain installed side-by-side.
+
+They do compete for GPU memory. The standalone services default to GPU 0 and
+GPU 1, while native Voicebox normally selects its first visible GPU. Prefer one
+of these operating modes:
+
+- Stop both standalone portals while using native Voicebox inference.
+- Reserve a separate physical GPU for Voicebox with
+  `VOICEBOX_NVIDIA_VISIBLE_DEVICES`.
+- On a one-GPU machine, run only one model-loading application at a time.
+
+For example, stop the standalone portals from their repository:
+
+```powershell
+Set-Location ..\araboc-f5-tts
+docker compose stop
+Set-Location ..\voicebox
+```
+
+The two deployments deliberately use separate model-cache volumes. This avoids
+permission and package-version coupling, at the cost of downloading duplicate
+checkpoints. Do not mount one application's cache into the other without first
+verifying compatible Hugging Face layouts and ownership.
+
+## Configuration
+
+The `.env.cuda.example` template exposes these settings:
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `VOICEBOX_NVIDIA_VISIBLE_DEVICES` | `all` | GPUs visible inside Voicebox |
+| `VOICEBOX_CPU_LIMIT` | `8` | Runtime CPU limit |
+| `VOICEBOX_MEMORY_LIMIT` | `16G` | Runtime system-memory limit |
+| `VOICEBOX_SHM_SIZE` | `2gb` | Shared memory available to PyTorch workers |
+| `F5_TTS_VERSION` | `1.1.21` | Native F5-TTS package pin |
+| `HABIBI_TTS_VERSION` | `0.1.1` | Native Habibi package pin |
+
+The CUDA/PyTorch ABI is pinned in `Dockerfile.cuda` and
+`docker/cuda-constraints.txt`. Update the base image, Torch, Torchaudio,
+Torchvision, and TorchCodec pins together, then rerun GPU and generation tests.
+
+## Security and responsible use
+
+The base Compose file binds Voicebox to `127.0.0.1`; keep that default because
+the local API does not provide general-purpose public authentication. Voice
+references are biometric data. Protect the Docker volumes, backups, profiles,
+and generated output, and never expose this deployment directly to the public
+internet.
+
+Use only recordings you own or have explicit permission to clone. Do not create
+deceptive, fraudulent, harassing, or non-consensual speech.
+
+## Model licensing
+
+Code and checkpoint licenses are separate:
+
+- F5-TTS code is MIT. Official pretrained F5 weights are noncommercial.
+- Habibi code is MIT.
+- Habibi Unified, Saudi, and UAE weights are CC-BY-NC-SA-4.0.
+- Habibi specialized MSA, Algerian, Egyptian, Iraqi, and Moroccan weights are
+  documented as Apache-2.0.
+
+Confirm the license attached to the exact checkpoint before distribution or
+commercial use. Prefer the specialized Apache-2.0 MSA/dialect checkpoints when
+commercial use is a requirement.
+
+## Troubleshooting
+
+Show service health and recent logs:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml ps
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml logs --tail 200 voicebox
+```
+
+If `torch.cuda.is_available()` is false:
+
+1. Confirm `nvidia-smi` works on the host.
+2. Confirm the Compose GPU request is present with `docker compose ... config`.
+3. Update Docker Desktop/NVIDIA Container Toolkit and the NVIDIA driver.
+4. Recreate the container.
+
+If generation runs out of VRAM, stop the standalone Arabic portals, unload other
+Voicebox engines, shorten the request, or restrict Voicebox to an unused GPU.
+`PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` is already enabled to reduce
+allocator fragmentation.
+
+If the build fails while installing Python packages, do not remove the CUDA
+constraints as a first response. F5-TTS and Habibi share a sensitive Torch ABI;
+review dependency changes and update the pinned CUDA set together.
