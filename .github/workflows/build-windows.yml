@@ -74,7 +74,10 @@ jobs:
         uses: tauri-apps/tauri-action@1deb371b0cd8bd54025b384f1cd735e725c4060f # v1
         with:
           projectPath: tauri
-          args: --bundles msi
+          # PR/manual builds produce an installable MSI without requiring the
+          # updater-signing secret. Tagged releases keep signed updater
+          # artifacts enabled through the normal tauri.conf.json.
+          args: --bundles msi --config src-tauri/tauri.ci.conf.json
 
       - name: Verify MSI output
         shell: pwsh

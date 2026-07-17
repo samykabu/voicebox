@@ -136,7 +136,9 @@ repository's Actions page. The same workflow runs for pull requests that
 change the desktop app, backend, or packaging files. A successful run uploads
 `voicebox-windows-msi-<run number>` as a workflow artifact for 14 days. The
 artifact contains the WiX-generated `.msi` installer and does not create a
-GitHub release.
+GitHub release. Preview builds disable updater artifacts through
+`tauri/src-tauri/tauri.ci.conf.json`, so pull requests do not need access to
+the release updater's private signing key.
 
 Tagged releases also pass `--bundles msi` explicitly for Windows, so the
 release workflow uploads an MSI even if Tauri's default Windows bundle targets
