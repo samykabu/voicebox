@@ -159,10 +159,10 @@ Every model uses the matching `vocab.txt` from the same directory. The model reg
 - [x] Document every model's license and commercial-use restriction.
 - [x] Add a troubleshooting section for model downloads, ports, CUDA, VRAM, TorchCodec, and playback.
 - [x] Leave the generated changelog untouched and add the implementation/operator documentation instead.
-- [ ] Review the complete diff and exclude generated caches, model weights, audio, databases, and secrets.
-- [ ] Commit with an implementation-focused message.
-- [ ] Push `agent/arabic-f5-habibi` to `samykabu/voicebox`.
-- [ ] Open a draft PR against `samykabu/voicebox:main` with validation evidence and known limitations.
+- [x] Review the complete diff and exclude generated caches, model weights, audio, databases, and secrets.
+- [x] Commit with an implementation-focused message.
+- [x] Push `agent/arabic-f5-habibi` to `samykabu/voicebox`.
+- [x] Open [draft PR #2](https://github.com/samykabu/voicebox/pull/2) against `samykabu/voicebox:main` with validation evidence and known limitations.
 
 ## Release acceptance criteria
 
