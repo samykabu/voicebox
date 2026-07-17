@@ -131,6 +131,17 @@ Tauri looks for `voicebox-server-${PLATFORM}` in `src-tauri/binaries/` and bundl
 
 `.github/workflows/release.yml` automates the full build:
 
+For a Windows-only installer build, run **Build Windows MSI** from the
+repository's Actions page. The same workflow runs for pull requests that
+change the desktop app, backend, or packaging files. A successful run uploads
+`voicebox-windows-msi-<run number>` as a workflow artifact for 14 days. The
+artifact contains the WiX-generated `.msi` installer and does not create a
+GitHub release.
+
+Tagged releases also pass `--bundles msi` explicitly for Windows, so the
+release workflow uploads an MSI even if Tauri's default Windows bundle targets
+change in a future version.
+
 ### Matrix Strategy
 
 | Platform | Target | Backend | Notes |

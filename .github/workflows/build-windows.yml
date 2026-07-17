@@ -1,13 +1,27 @@
-name: Build Windows
+name: Build Windows MSI
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/build-windows.yml"
+      - "app/**"
+      - "backend/**"
+      - "tauri/**"
+      - "package.json"
+      - "bun.lock"
+
+concurrency:
+  group: windows-msi-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
-  build-windows:
-    permissions:
-      contents: write
+  build-msi:
     runs-on: windows-latest
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
@@ -28,20 +42,6 @@ jobs:
           pip install --no-deps "f5-tts==1.1.21"
           pip install --no-deps "habibi-tts==0.1.1"
 
-      - name: Build Python server
-        shell: bash
-        run: |
-          cd backend
-          python build_binary.py
-          python build_binary.py --shim
-
-          PLATFORM=$(rustc --print host-tuple)
-          mkdir -p ../tauri/src-tauri/binaries
-          cp dist/voicebox-server.exe ../tauri/src-tauri/binaries/voicebox-server-${PLATFORM}.exe
-          cp dist/voicebox-mcp.exe ../tauri/src-tauri/binaries/voicebox-mcp-${PLATFORM}.exe
-          echo "Built voicebox-server-${PLATFORM}.exe"
-          echo "Built voicebox-mcp-${PLATFORM}.exe"
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
@@ -53,18 +53,45 @@ jobs:
         with:
           workspaces: "./tauri/src-tauri -> target"
 
-      - name: Install dependencies
-        run: bun install
+      - name: Build Python server
+        shell: bash
+        run: |
+          cd backend
+          python build_binary.py
+          python build_binary.py --shim
 
-      - uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PLATFORM=$(rustc --print host-tuple)
+          mkdir -p ../tauri/src-tauri/binaries
+          cp dist/voicebox-server.exe "../tauri/src-tauri/binaries/voicebox-server-${PLATFORM}.exe"
+          cp dist/voicebox-mcp.exe "../tauri/src-tauri/binaries/voicebox-mcp-${PLATFORM}.exe"
+          echo "Built voicebox-server-${PLATFORM}.exe"
+          echo "Built voicebox-mcp-${PLATFORM}.exe"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build MSI installer
+        uses: tauri-apps/tauri-action@1deb371b0cd8bd54025b384f1cd735e725c4060f # v1
         with:
           projectPath: tauri
-          tagName: v__VERSION__
-          releaseName: "voicebox v__VERSION__ (test build)"
-          releaseBody: "Test build for audio export fix"
-          releaseDraft: true
-          prerelease: true
-          args: ""
-          includeUpdaterJson: false
+          args: --bundles msi
+
+      - name: Verify MSI output
+        shell: pwsh
+        run: |
+          $installers = @(Get-ChildItem "tauri/src-tauri/target/release/bundle/msi/*.msi")
+          if ($installers.Count -eq 0) {
+            throw "Tauri completed without producing an MSI installer"
+          }
+          $installers | ForEach-Object {
+            Write-Host "MSI: $($_.FullName) ($([math]::Round($_.Length / 1MB, 2)) MiB)"
+            Get-FileHash $_.FullName -Algorithm SHA256
+          }
+
+      - name: Upload MSI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: voicebox-windows-msi-${{ github.run_number }}
+          path: tauri/src-tauri/target/release/bundle/msi/*.msi
+          if-no-files-found: error
+          retention-days: 14

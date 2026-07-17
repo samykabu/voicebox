@@ -23,7 +23,10 @@ jobs:
             python-version: "3.12"
             backend: "pytorch"
           - platform: "windows-latest"
-            args: ""
+            # Produce the Windows installer documented by the project. Keeping
+            # this explicit prevents a Tauri default change from silently
+            # replacing the MSI with another Windows bundle format.
+            args: "--bundles msi"
             python-version: "3.12"
             backend: "pytorch"
 
