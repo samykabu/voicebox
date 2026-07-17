@@ -518,6 +518,7 @@ async def create_voice_prompt_for_profile(
     db: Session,
     use_cache: bool = True,
     engine: str = "qwen",
+    language: str = "en",
 ) -> dict:
     """
     Create a voice prompt from a profile.
@@ -531,6 +532,8 @@ async def create_voice_prompt_for_profile(
         db: Database session
         use_cache: Whether to use cached prompts
         engine: TTS engine to create prompt for
+        language: Target generation language. TADA uses this to select its
+                  language-specific forced aligner.
 
     Returns:
         Voice prompt dictionary
@@ -583,10 +586,13 @@ async def create_voice_prompt_for_profile(
         sample_audio_path = config.resolve_storage_path(sample.audio_path)
         if sample_audio_path is None:
             raise ValueError(f"Sample audio not found for profile {profile_id}")
+        prompt_kwargs = {"use_cache": use_cache}
+        if engine == "tada":
+            prompt_kwargs["language"] = language
         voice_prompt, _ = await tts_model.create_voice_prompt(
             str(sample_audio_path),
             sample.reference_text,
-            use_cache=use_cache,
+            **prompt_kwargs,
         )
         return voice_prompt
 
@@ -616,10 +622,13 @@ async def create_voice_prompt_for_profile(
 
     save_audio(combined_audio, str(combined_path), 24000)
 
+    prompt_kwargs = {"use_cache": use_cache}
+    if engine == "tada":
+        prompt_kwargs["language"] = language
     voice_prompt, _ = await tts_model.create_voice_prompt(
         str(combined_path),
         combined_text,
-        use_cache=use_cache,
+        **prompt_kwargs,
     )
     return voice_prompt
 

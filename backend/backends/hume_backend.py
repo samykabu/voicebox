@@ -43,6 +43,21 @@ TADA_MODEL_REPOS = {
     "3B": TADA_3B_ML_REPO,
 }
 
+# TADA names its Chinese aligner ``aligner-ch`` while Voicebox uses the
+# conventional ``zh`` language code in its API and UI.
+TADA_ALIGNER_LANGUAGE_MAP = {
+    "ar": "ar",
+    "zh": "ch",
+    "ch": "ch",
+    "de": "de",
+    "es": "es",
+    "fr": "fr",
+    "it": "it",
+    "ja": "ja",
+    "pl": "pl",
+    "pt": "pt",
+}
+
 # Key weight files for cache detection
 _TADA_MODEL_WEIGHT_FILES = [
     "model.safetensors",
@@ -61,6 +76,7 @@ class HumeTadaBackend:
     def __init__(self):
         self.model = None
         self.encoder = None
+        self._encoder_language = None
         self.model_size = "1B"  # default to 1B
         self._device = None
         self._model_load_lock = asyncio.Lock()
@@ -183,13 +199,6 @@ class HumeTadaBackend:
 
             AlignerConfig.tokenizer_name = tokenizer_path
 
-            # Load encoder (only needed for voice prompt encoding)
-            from tada.modules.encoder import Encoder
-
-            logger.info("Loading TADA encoder...")
-            self.encoder = Encoder.from_pretrained(TADA_CODEC_REPO, subfolder="encoder").to(device)
-            self.encoder.eval()
-
             # Load the causal LM (includes decoder for wav generation).
             # TadaForCausalLM.from_pretrained() calls
             #   getattr(config, "tokenizer_name", "meta-llama/Llama-3.2-1B")
@@ -213,6 +222,7 @@ class HumeTadaBackend:
         if self.encoder is not None:
             del self.encoder
             self.encoder = None
+        self._encoder_language = None
 
         device = self._device
         self._device = None
@@ -227,6 +237,7 @@ class HumeTadaBackend:
         audio_path: str,
         reference_text: str,
         use_cache: bool = True,
+        language: str = "en",
     ) -> Tuple[dict, bool]:
         """
         Create voice prompt from reference audio using TADA's encoder.
@@ -239,12 +250,30 @@ class HumeTadaBackend:
         """
         await self.load_model(self.model_size)
 
-        cache_key = ("tada_" + get_cache_key(audio_path, reference_text)) if use_cache else None
+        requested_language = (language or "en").lower()
+        aligner_language = TADA_ALIGNER_LANGUAGE_MAP.get(requested_language)
+        if requested_language != "en" and aligner_language is None:
+            raise ValueError(f"TADA does not provide an aligner for language '{language}'")
+        if aligner_language is not None and self.model_size != "3B":
+            raise ValueError("TADA multilingual generation requires the 3B model")
+        if aligner_language is not None and not reference_text.strip():
+            raise ValueError(
+                "TADA requires an exact reference transcript for non-English voice cloning"
+            )
+
+        cache_language = aligner_language or "en"
+        cache_key = (
+            f"tada_{cache_language}_" + get_cache_key(audio_path, reference_text)
+            if use_cache
+            else None
+        )
 
         if cache_key:
             cached = get_cached_voice_prompt(cache_key)
             if cached is not None and isinstance(cached, dict):
                 return cached, True
+
+        await asyncio.to_thread(self._ensure_encoder_loaded_sync, aligner_language)
 
         def _encode_sync():
             import torch
@@ -286,6 +315,37 @@ class HumeTadaBackend:
 
         return encoded, False
 
+    def _ensure_encoder_loaded_sync(self, aligner_language: Optional[str]) -> None:
+        """Load the encoder with the aligner required by the prompt language."""
+        encoder_key = aligner_language or "en"
+        with self._load_lock:
+            if self.encoder is not None and self._encoder_language == encoder_key:
+                return
+
+            if self.encoder is not None:
+                del self.encoder
+                self.encoder = None
+                if self._device:
+                    empty_device_cache(self._device)
+
+            from tada.modules.encoder import Encoder
+
+            logger.info("Loading TADA encoder with %s aligner...", encoder_key)
+            try:
+                encoder = Encoder.from_pretrained(
+                    TADA_CODEC_REPO,
+                    subfolder="encoder",
+                    language=aligner_language,
+                ).to(self._device)
+                encoder.eval()
+            except Exception:
+                if self._device:
+                    empty_device_cache(self._device)
+                raise
+
+            self.encoder = encoder
+            self._encoder_language = encoder_key
+
     async def combine_voice_prompts(
         self,
         audio_paths: List[str],
@@ -319,6 +379,7 @@ class HumeTadaBackend:
         def _generate_sync():
             import torch
             from tada.modules.encoder import EncoderOutput
+            from tada.modules.tada import InferenceOptions
 
             if seed is not None:
                 manual_seed(seed, self._device)
@@ -352,6 +413,14 @@ class HumeTadaBackend:
             output = self.model.generate(
                 prompt=prompt,
                 text=text,
+                # Hume's current reference app disables transition-token
+                # trimming. The library default of 5 removes most of short
+                # utterances (for example a seven-token Arabic phrase).
+                num_transition_steps=0,
+                # Match Hume's reference app quality setting. The package
+                # default is only 10 diffusion steps.
+                inference_options=InferenceOptions(num_flow_matching_steps=20),
+                system_prompt="",
             )
 
             # output.audio is a list of tensors (one per batch item)

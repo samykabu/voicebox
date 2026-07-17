@@ -68,6 +68,7 @@ async def run_generation(
             bg_db,
             use_cache=True,
             engine=engine,
+            language=language,
         )
 
         await history.update_generation_status(generation_id, "generating", bg_db)
@@ -282,6 +283,7 @@ async def generate_audio_sync(
             bg_db,
             use_cache=True,
             engine=engine,
+            language=language,
         )
     finally:
         bg_db.close()
