@@ -25,7 +25,8 @@ from backend.backends import (
     get_tts_model_configs,
     unload_model_by_config,
 )
-from backend.backends.f5tts_backend import MODELS, F5TTSBackend
+from backend.backends.base import is_model_cached
+from backend.backends.f5tts_backend import MODELS, F5TTSBackend, _safe_torchaudio_load
 from backend.models import GenerationRequest
 
 
@@ -101,6 +102,32 @@ def test_shared_repository_cache_status_checks_the_selected_variant(
     assert check_model_cached(configs["habibi-msa"]) is True
     assert check_model_cached(configs["habibi-egy"]) is False
     assert checked == ["habibi-msa", "habibi-egy"]
+
+
+def test_cache_requires_nested_files_from_the_same_snapshot(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from huggingface_hub import constants as hf_constants
+
+    monkeypatch.setattr(hf_constants, "HF_HUB_CACHE", str(tmp_path))
+    snapshots = tmp_path / "models--MuhammedAshraf--Habibi-TTS" / "snapshots"
+    first = snapshots / "first" / "Specialized" / "MSA"
+    second = snapshots / "second" / "Specialized" / "MSA"
+    first.mkdir(parents=True)
+    second.mkdir(parents=True)
+    (first / "model_200000.safetensors").write_bytes(b"weights")
+    (second / "vocab.txt").write_text("vocab", encoding="utf-8")
+    required = [
+        "Specialized/MSA/model_200000.safetensors",
+        "Specialized/MSA/vocab.txt",
+    ]
+
+    assert is_model_cached("MuhammedAshraf/Habibi-TTS", required_files=required) is False
+
+    (first / "vocab.txt").write_text("vocab", encoding="utf-8")
+
+    assert is_model_cached("MuhammedAshraf/Habibi-TTS", required_files=required) is True
 
 
 @pytest.mark.asyncio
@@ -312,13 +339,63 @@ def test_inference_passes_only_unified_dialect_token_and_normalizes_audio(
 
     for model_size, expected_token in (("habibi-unified", "⓪"), ("habibi-msa", None)):
         select(model_size)
-        audio, sample_rate = backend._generate_sync(
-            model_size, "reference.wav", "النص المرجعي", "النص الجديد", None
-        )
+        audio, sample_rate = backend._generate_sync(model_size, "reference.wav", "النص المرجعي", "النص الجديد", None)
         assert calls[-1]["dialect_id"] == expected_token
         assert audio.dtype == np.float32
         assert audio.shape == (2,)
         assert sample_rate == 24_000
+
+
+def test_safe_audio_loader_falls_back_to_pydub(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import soundfile
+    from pydub import AudioSegment
+
+    class FakeSegment:
+        channels = 2
+        sample_width = 2
+        frame_rate = 44_100
+
+        @staticmethod
+        def get_array_of_samples() -> list[int]:
+            return [16_384, -16_384, 8_192, -8_192]
+
+    monkeypatch.setattr(soundfile, "read", lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("no codec")))
+    monkeypatch.setattr(AudioSegment, "from_file", lambda *_args, **_kwargs: FakeSegment())
+
+    audio, sample_rate = _safe_torchaudio_load("reference.m4a")
+
+    assert sample_rate == 44_100
+    assert audio.shape == (2, 2)
+    assert audio.tolist() == [[0.5, 0.25], [-0.5, -0.25]]
+
+
+@pytest.mark.asyncio
+async def test_combining_references_decodes_each_duration_once(
+    backend: F5TTSBackend,
+    reference_file: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    duration_reads = 0
+
+    def duration(_path: str) -> float:
+        nonlocal duration_reads
+        duration_reads += 1
+        return 3.0
+
+    async def combine(_paths, texts, sample_rate):
+        assert sample_rate == 24_000
+        return np.array([0.0], dtype=np.float32), " ".join(texts)
+
+    monkeypatch.setattr("backend.backends.f5tts_backend._audio_duration_seconds", duration)
+    monkeypatch.setattr("backend.backends.f5tts_backend._combine_voice_prompts", combine)
+
+    audio, text = await backend.combine_voice_prompts([str(reference_file)], ["النص المرجعي"])
+
+    assert duration_reads == 1
+    assert audio.tolist() == [0.0]
+    assert text == "النص المرجعي"
 
 
 @pytest.mark.asyncio

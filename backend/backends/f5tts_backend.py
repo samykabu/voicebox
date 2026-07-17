@@ -137,8 +137,24 @@ def _safe_torchaudio_load(uri: str, **_: Any):
     import soundfile as sf
     import torch
 
-    audio, sample_rate = sf.read(uri, dtype="float32", always_2d=True)
-    return torch.from_numpy(audio.T), sample_rate
+    try:
+        audio, sample_rate = sf.read(uri, dtype="float32", always_2d=True)
+        return torch.from_numpy(audio.T), sample_rate
+    except Exception as soundfile_error:
+        # libsndfile support varies by platform. FFmpeg via pydub covers
+        # common compressed references such as MP3, AAC, and M4A.
+        try:
+            from pydub import AudioSegment
+
+            segment = AudioSegment.from_file(uri)
+            samples = np.asarray(segment.get_array_of_samples(), dtype=np.float32)
+            samples = samples.reshape((-1, segment.channels))
+            scale = float(1 << (8 * segment.sample_width - 1))
+            return torch.from_numpy((samples / scale).T.copy()), segment.frame_rate
+        except Exception as pydub_error:
+            raise ValueError(
+                f"Unable to decode reference audio '{uri}' with soundfile or FFmpeg: {pydub_error}"
+            ) from soundfile_error
 
 
 class F5TTSBackend:
@@ -247,7 +263,7 @@ class F5TTSBackend:
         with self._sync_state_lock:
             self._unload_model_sync()
 
-    def _validate_reference(self, audio_path: str, reference_text: str) -> tuple[str, str]:
+    def _validate_reference(self, audio_path: str, reference_text: str) -> tuple[str, str, float]:
         path = Path(audio_path)
         if not path.is_file():
             raise ValueError(f"Reference audio not found: {audio_path}")
@@ -265,7 +281,7 @@ class F5TTSBackend:
                 f"{MAX_REFERENCE_SECONDS:.0f}s. Trim the audio and update its transcript "
                 "so the prompt remains exactly aligned."
             )
-        return str(path), text
+        return str(path), text, duration
 
     async def create_voice_prompt(
         self,
@@ -275,7 +291,7 @@ class F5TTSBackend:
     ) -> tuple[dict, bool]:
         """Validate and defer reference processing until inference."""
         del use_cache  # A file path is intentionally cheap and deterministic.
-        audio_path, reference_text = await asyncio.to_thread(self._validate_reference, audio_path, reference_text)
+        audio_path, reference_text, _ = await asyncio.to_thread(self._validate_reference, audio_path, reference_text)
         requested = self._requested_model.get() or self._current_model_size or "habibi-msa"
         return {
             "ref_audio": audio_path,
@@ -295,10 +311,9 @@ class F5TTSBackend:
         selected_texts: list[str] = []
         total_duration = 0.0
         for audio_path, reference_text in zip(audio_paths, reference_texts, strict=True):
-            validated_path, validated_text = await asyncio.to_thread(
+            validated_path, validated_text, duration = await asyncio.to_thread(
                 self._validate_reference, audio_path, reference_text
             )
-            duration = await asyncio.to_thread(_audio_duration_seconds, validated_path)
             if total_duration + duration > MAX_REFERENCE_SECONDS:
                 logger.warning(
                     "Skipping reference sample %s because the combined F5 prompt would exceed 12s",
@@ -325,7 +340,7 @@ class F5TTSBackend:
         generation_text = (text or "").strip()
         if not generation_text:
             raise ValueError("Text to generate cannot be empty")
-        ref_audio, ref_text = await asyncio.to_thread(
+        ref_audio, ref_text, _ = await asyncio.to_thread(
             self._validate_reference,
             voice_prompt.get("ref_audio", ""),
             voice_prompt.get("ref_text", ""),

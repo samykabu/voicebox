@@ -28,6 +28,7 @@ FROM ${PYTORCH_IMAGE}
 ARG DEBIAN_FRONTEND=noninteractive
 ARG F5_TTS_VERSION=1.1.21
 ARG HABIBI_TTS_VERSION=0.1.1
+ARG QWEN3_TTS_COMMIT=022e286b98fbec7e1e916cb940cdf532cd9f488e
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
@@ -61,9 +62,8 @@ RUN python -m pip install --upgrade pip && \
     python -m pip install \
         --constraint /tmp/cuda-constraints.txt \
         --requirement /tmp/voicebox-requirements.txt && \
-    python -m pip install \
-        --constraint /tmp/cuda-constraints.txt \
-        git+https://github.com/QwenLM/Qwen3-TTS.git && \
+    python -m pip install --force-reinstall --no-deps \
+        "qwen-tts @ git+https://github.com/QwenLM/Qwen3-TTS.git@${QWEN3_TTS_COMMIT}" && \
     python -m pip install --no-deps \
         chatterbox-tts \
         hume-tada \

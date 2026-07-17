@@ -12,10 +12,12 @@ mkdir -p \
     /home/voicebox/.cache/torch \
     /tmp/numba_cache
 
-chown -R voicebox:voicebox \
-    /app/data \
-    /home/voicebox/.cache \
-    /tmp/numba_cache
+voicebox_owner="$(id -u voicebox):$(id -g voicebox)"
+for directory in /app/data /home/voicebox/.cache /tmp/numba_cache; do
+    if [ "$(stat -c '%u:%g' "$directory")" != "$voicebox_owner" ]; then
+        chown -R voicebox:voicebox "$directory"
+    fi
+done
 
 # This is the CUDA-only overlay: never silently run its multi-gigabyte ML stack
 # on the CPU when GPU passthrough is missing or misconfigured.

@@ -58,11 +58,13 @@ def is_model_cached(
             return False
 
         if required_files:
-            # Check that every required filename exists somewhere in snapshots
-            for fname in required_files:
-                if not any(snapshots_dir.rglob(fname)):
-                    return False
-            return True
+            # All files must belong to one complete snapshot. Checking each
+            # name independently could combine files from different revisions,
+            # and joining paths directly also supports nested checkpoint names.
+            return any(
+                snapshot.is_dir() and all((snapshot / filename).exists() for filename in required_files)
+                for snapshot in snapshots_dir.iterdir()
+            )
 
         # Check that at least one weight file exists
         for ext in weight_extensions:
