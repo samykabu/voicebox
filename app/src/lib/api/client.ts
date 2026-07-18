@@ -320,6 +320,17 @@ class ApiClient {
     });
   }
 
+  async deleteGenerations(request: {
+    generation_ids?: string[];
+    delete_all?: boolean;
+    excluded_ids?: string[];
+  }): Promise<{ deleted: number }> {
+    return this.request<{ deleted: number }>('/history/bulk-delete', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
   async clearFailedGenerations(): Promise<{ deleted: number }> {
     return this.request<{ deleted: number }>(`/history/failed`, {
       method: 'DELETE',

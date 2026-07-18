@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { AudioBars } from '@/components/AudioBars';
 import { EffectsChainEditor } from '@/components/Effects/EffectsChainEditor';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -48,6 +49,7 @@ import { BOTTOM_SAFE_AREA_PADDING } from '@/lib/constants/ui';
 import {
   useClearFailedGenerations,
   useDeleteGeneration,
+  useDeleteGenerations,
   useExportGeneration,
   useExportGenerationAudio,
   useHistory,
@@ -73,6 +75,14 @@ export function HistoryTable() {
   const [generationToDelete, setGenerationToDelete] = useState<{ id: string; name: string } | null>(
     null,
   );
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [selectedGenerationIds, setSelectedGenerationIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [allGenerationsSelected, setAllGenerationsSelected] = useState(false);
+  const [excludedGenerationIds, setExcludedGenerationIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [effectsDialogOpen, setEffectsDialogOpen] = useState(false);
   const [effectsTargetId, setEffectsTargetId] = useState<string | null>(null);
   const [effectsTargetVersions, setEffectsTargetVersions] = useState<GenerationVersionResponse[]>(
@@ -96,6 +106,7 @@ export function HistoryTable() {
   });
 
   const deleteGeneration = useDeleteGeneration();
+  const deleteGenerations = useDeleteGenerations();
   const clearFailed = useClearFailedGenerations();
   const [clearFailedDialogOpen, setClearFailedDialogOpen] = useState(false);
   const exportGeneration = useExportGeneration();
@@ -121,6 +132,7 @@ export function HistoryTable() {
   const addPendingGeneration = useGenerationStore((state) => state.addPendingGeneration);
   const setAudioWithAutoPlay = usePlayerStore((state) => state.setAudioWithAutoPlay);
   const restartCurrentAudio = usePlayerStore((state) => state.restartCurrentAudio);
+  const resetPlayer = usePlayerStore((state) => state.reset);
   const currentAudioId = usePlayerStore((state) => state.audioId);
   const isPlaying = usePlayerStore((state) => state.isPlaying);
   const audioUrl = usePlayerStore((state) => state.audioUrl);
@@ -148,11 +160,21 @@ export function HistoryTable() {
   const pendingCount = useGenerationStore((state) => state.pendingGenerationIds.size);
   const prevPendingCountRef = useRef(pendingCount);
   useEffect(() => {
-    if (deleteGeneration.isSuccess || importGeneration.isSuccess || clearFailed.isSuccess) {
+    if (
+      deleteGeneration.isSuccess ||
+      deleteGenerations.isSuccess ||
+      importGeneration.isSuccess ||
+      clearFailed.isSuccess
+    ) {
       setPage(0);
       setAllHistory([]);
     }
-  }, [deleteGeneration.isSuccess, importGeneration.isSuccess, clearFailed.isSuccess]);
+  }, [
+    deleteGeneration.isSuccess,
+    deleteGenerations.isSuccess,
+    importGeneration.isSuccess,
+    clearFailed.isSuccess,
+  ]);
 
   useEffect(() => {
     // A generation finished (pending count decreased) — scroll back to show it
@@ -251,10 +273,60 @@ export function HistoryTable() {
 
   const handleDeleteConfirm = () => {
     if (generationToDelete) {
-      deleteGeneration.mutate(generationToDelete.id);
+      const generationId = generationToDelete.id;
+      deleteGeneration.mutate(generationId, {
+        onSuccess: () => {
+          setSelectedGenerationIds((current) => {
+            const next = new Set(current);
+            next.delete(generationId);
+            return next;
+          });
+          setExcludedGenerationIds((current) => {
+            const next = new Set(current);
+            next.delete(generationId);
+            return next;
+          });
+          if (currentAudioId === generationId) resetPlayer();
+        },
+      });
       setDeleteDialogOpen(false);
       setGenerationToDelete(null);
     }
+  };
+
+  const clearBulkSelection = () => {
+    setAllGenerationsSelected(false);
+    setSelectedGenerationIds(new Set());
+    setExcludedGenerationIds(new Set());
+  };
+
+  const handleSelectAllChange = (checked: boolean) => {
+    if (checked) {
+      setAllGenerationsSelected(true);
+      setSelectedGenerationIds(new Set());
+      setExcludedGenerationIds(new Set());
+    } else {
+      clearBulkSelection();
+    }
+  };
+
+  const handleGenerationSelectionChange = (generationId: string, checked: boolean) => {
+    if (allGenerationsSelected) {
+      setExcludedGenerationIds((current) => {
+        const next = new Set(current);
+        if (checked) next.delete(generationId);
+        else next.add(generationId);
+        return next;
+      });
+      return;
+    }
+
+    setSelectedGenerationIds((current) => {
+      const next = new Set(current);
+      if (checked) next.add(generationId);
+      else next.delete(generationId);
+      return next;
+    });
   };
 
   const handleRetry = async (generationId: string) => {
@@ -407,6 +479,14 @@ export function HistoryTable() {
   const history = allHistory;
   const hasMore = allHistory.length < total;
   const failedCount = history.filter((g) => g.status === 'failed').length;
+  const hasBulkSelection = allGenerationsSelected || selectedGenerationIds.size > 0;
+  const everyGenerationSelected =
+    allGenerationsSelected && excludedGenerationIds.size === 0;
+  const selectionSummary = allGenerationsSelected
+    ? excludedGenerationIds.size > 0
+      ? t('history.bulkSelection.allExcept', { count: excludedGenerationIds.size })
+      : t('history.bulkSelection.allSelected')
+    : t('history.bulkSelection.selected', { count: selectedGenerationIds.size });
 
   const handleClearFailedConfirm = () => {
     clearFailed.mutate(undefined, {
@@ -428,6 +508,44 @@ export function HistoryTable() {
     });
   };
 
+  const handleBulkDeleteConfirm = () => {
+    const deletesCurrentAudio = currentAudioId
+      ? allGenerationsSelected
+        ? !excludedGenerationIds.has(currentAudioId)
+        : selectedGenerationIds.has(currentAudioId)
+      : false;
+
+    deleteGenerations.mutate(
+      allGenerationsSelected
+        ? {
+            delete_all: true,
+            excluded_ids: [...excludedGenerationIds],
+          }
+        : {
+            generation_ids: [...selectedGenerationIds],
+          },
+      {
+        onSuccess: (data) => {
+          if (deletesCurrentAudio) resetPlayer();
+          clearBulkSelection();
+          setBulkDeleteDialogOpen(false);
+          toast({
+            title: t('history.bulkDeleteDialog.successTitle'),
+            description: t('history.bulkDeleteDialog.successBody', { count: data.deleted }),
+          });
+        },
+        onError: (error) => {
+          setBulkDeleteDialogOpen(false);
+          toast({
+            title: t('history.bulkDeleteDialog.errorTitle'),
+            description: error instanceof Error ? error.message : t('common.error'),
+            variant: 'destructive',
+          });
+        },
+      },
+    );
+  };
+
   return (
     <div className="flex flex-col h-full min-h-0 relative">
       {history.length === 0 ? (
@@ -436,23 +554,71 @@ export function HistoryTable() {
         </div>
       ) : (
         <>
-          {failedCount > 0 && (
-            <div className="flex items-center justify-between px-1 pb-2">
-              <span className="text-xs text-muted-foreground">
-                {failedCount} failed {failedCount === 1 ? 'generation' : 'generations'}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 text-xs text-muted-foreground"
-                onClick={() => setClearFailedDialogOpen(true)}
-                disabled={clearFailed.isPending}
+          <div className="flex items-center justify-between gap-2 px-1 pb-2">
+            <div className="flex min-w-0 items-center gap-2">
+              <Checkbox
+                id="select-all-generations"
+                checked={everyGenerationSelected}
+                onCheckedChange={handleSelectAllChange}
+                disabled={deleteGenerations.isPending}
+                aria-label={t('history.bulkSelection.selectAll')}
+              />
+              <button
+                type="button"
+                className="shrink-0 text-xs font-medium hover:text-accent"
+                onClick={() => handleSelectAllChange(!everyGenerationSelected)}
+                disabled={deleteGenerations.isPending}
               >
-                <Trash2 className="h-3 w-3 mr-1.5" />
-                {clearFailed.isPending ? 'Clearing...' : 'Clear failed'}
+                {t('history.bulkSelection.selectAll')}
+              </button>
+              {hasBulkSelection && (
+                <>
+                  <span className="truncate text-xs text-muted-foreground">
+                    {selectionSummary}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-xs text-muted-foreground"
+                    onClick={clearBulkSelection}
+                    disabled={deleteGenerations.isPending}
+                  >
+                    {t('history.bulkSelection.clear')}
+                  </Button>
+                </>
+              )}
+            </div>
+            <div className="flex shrink-0 items-center gap-1">
+              {failedCount > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs text-muted-foreground"
+                  onClick={() => setClearFailedDialogOpen(true)}
+                  disabled={clearFailed.isPending || deleteGenerations.isPending}
+                >
+                  <Trash2 className="h-3 w-3" />
+                  {clearFailed.isPending
+                    ? t('history.clearFailedDialog.clearing')
+                    : t('history.clearFailedDialog.clearFailed')}
+                </Button>
+              )}
+              <Button
+                variant="destructive"
+                size="sm"
+                className="h-7 px-3 text-xs"
+                onClick={() => setBulkDeleteDialogOpen(true)}
+                disabled={!hasBulkSelection || deleteGenerations.isPending}
+              >
+                {deleteGenerations.isPending ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <Trash2 className="h-3 w-3" />
+                )}
+                {t('history.bulkSelection.deleteSelected')}
               </Button>
             </div>
-          )}
+          </div>
           {isScrolled && (
             <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
           )}
@@ -469,6 +635,12 @@ export function HistoryTable() {
               const isGenerating = isInProgress;
               const isFailed = gen.status === 'failed';
               const isPlayable = !isGenerating && !isFailed;
+              const isSelectable = !isGenerating;
+              const isSelected = isSelectable
+                ? allGenerationsSelected
+                  ? !excludedGenerationIds.has(gen.id)
+                  : selectedGenerationIds.has(gen.id)
+                : false;
               const hasVersions = gen.versions && gen.versions.length > 1;
               const isVersionsExpanded = expandedVersionsId === gen.id;
               const isCancelling =
@@ -479,6 +651,7 @@ export function HistoryTable() {
                   className={cn(
                     'border rounded-md bg-card transition-colors text-left w-full',
                     isCurrentlyPlaying && 'bg-muted/70',
+                    isSelected && 'border-accent bg-accent/5',
                   )}
                 >
                   {/* Main row */}
@@ -502,7 +675,11 @@ export function HistoryTable() {
                     onMouseDown={(e) => {
                       if (!isPlayable) return;
                       const target = e.target as HTMLElement;
-                      if (target.closest('textarea') || window.getSelection()?.toString()) {
+                      if (
+                        target.closest('textarea') ||
+                        target.closest('[role="checkbox"]') ||
+                        window.getSelection()?.toString()
+                      ) {
                         return;
                       }
                       handlePlay(gen.id, gen.text, gen.profile_id);
@@ -517,8 +694,18 @@ export function HistoryTable() {
                       }
                     }}
                   >
-                    {/* Status icon */}
-                    <div className="flex items-center shrink-0 w-10 justify-center overflow-hidden">
+                    {/* Selection and status */}
+                    <div className="flex w-16 shrink-0 items-center justify-center gap-2 overflow-hidden">
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={(checked) =>
+                          handleGenerationSelectionChange(gen.id, checked)
+                        }
+                        disabled={!isSelectable || deleteGenerations.isPending}
+                        aria-label={t('history.bulkSelection.selectGeneration', {
+                          name: gen.profile_name,
+                        })}
+                      />
                       <AudioBars
                         mode={isGenerating ? 'generating' : isCurrentlyPlaying ? 'playing' : 'idle'}
                       />
@@ -796,6 +983,43 @@ export function HistoryTable() {
               disabled={deleteGeneration.isPending}
             >
               {deleteGeneration.isPending ? t('history.deleteDialog.deleting') : t('common.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('history.bulkDeleteDialog.title')}</DialogTitle>
+            <DialogDescription>
+              {allGenerationsSelected
+                ? excludedGenerationIds.size > 0
+                  ? t('history.bulkDeleteDialog.bodyAllExcept', {
+                      count: excludedGenerationIds.size,
+                    })
+                  : t('history.bulkDeleteDialog.bodyAll')
+                : t('history.bulkDeleteDialog.bodySelected', {
+                    count: selectedGenerationIds.size,
+                  })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setBulkDeleteDialogOpen(false)}
+              disabled={deleteGenerations.isPending}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleBulkDeleteConfirm}
+              disabled={deleteGenerations.isPending}
+            >
+              {deleteGenerations.isPending
+                ? t('history.bulkDeleteDialog.deleting')
+                : t('history.bulkSelection.deleteSelected')}
             </Button>
           </DialogFooter>
         </DialogContent>

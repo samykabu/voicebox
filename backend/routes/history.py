@@ -69,6 +69,36 @@ async def clear_failed_generations(db: Session = Depends(get_db)):
     return {"deleted": count}
 
 
+@router.post("/history/bulk-delete")
+async def bulk_delete_generations(
+    request: models.HistoryBulkDeleteRequest,
+    db: Session = Depends(get_db),
+):
+    """Delete selected history entries, or all inactive entries except exclusions."""
+    if request.delete_all:
+        if request.generation_ids:
+            raise HTTPException(
+                status_code=400,
+                detail="generation_ids cannot be combined with delete_all",
+            )
+    else:
+        if request.excluded_ids:
+            raise HTTPException(
+                status_code=400,
+                detail="excluded_ids requires delete_all",
+            )
+        if not request.generation_ids:
+            raise HTTPException(status_code=400, detail="Select at least one generation to delete")
+
+    count = await history.delete_generations(
+        db,
+        generation_ids=request.generation_ids,
+        delete_all=request.delete_all,
+        excluded_ids=request.excluded_ids,
+    )
+    return {"deleted": count}
+
+
 @router.get("/history/{generation_id}", response_model=models.HistoryResponse)
 async def get_generation(
     generation_id: str,

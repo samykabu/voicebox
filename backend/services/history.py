@@ -270,6 +270,58 @@ async def delete_generation(
     return True
 
 
+async def delete_generations(
+    db: Session,
+    *,
+    generation_ids: List[str] | None = None,
+    delete_all: bool = False,
+    excluded_ids: List[str] | None = None,
+) -> int:
+    """Bulk-delete history while preserving active synthesis jobs."""
+    from . import versions as versions_mod
+
+    active_statuses = ("loading_model", "generating")
+    query = db.query(DBGeneration).filter(
+        or_(DBGeneration.status.is_(None), ~DBGeneration.status.in_(active_statuses))
+    )
+
+    if delete_all:
+        # Filter exclusions in Python so a large history does not exceed
+        # SQLite's bound-variable limit.
+        exclusions = set(excluded_ids or [])
+        generations = [
+            generation for generation in query.all() if generation.id not in exclusions
+        ]
+    else:
+        selected_ids = list(set(generation_ids or []))
+        if not selected_ids:
+            return 0
+
+        # SQLite builds one bound variable per ID. Keep each query safely
+        # below the common 999-variable limit.
+        generations = []
+        for start in range(0, len(selected_ids), 500):
+            chunk = selected_ids[start : start + 500]
+            generations.extend(query.filter(DBGeneration.id.in_(chunk)).all())
+    for generation in generations:
+        versions_mod.delete_versions_for_generation(generation.id, db)
+
+        if generation.audio_path:
+            audio_path = config.resolve_storage_path(generation.audio_path)
+            if audio_path is not None and audio_path.exists():
+                try:
+                    audio_path.unlink()
+                except OSError:
+                    # Match failed-history cleanup: a locked file should not
+                    # prevent the remaining selected rows from being removed.
+                    pass
+
+        db.delete(generation)
+
+    db.commit()
+    return len(generations)
+
+
 async def delete_failed_generations(db: Session) -> int:
     """
     Delete every generation whose status is 'failed'.
