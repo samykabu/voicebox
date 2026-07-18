@@ -58,6 +58,9 @@ class ModelConfig:
     needs_trim: bool = False
     supports_instruct: bool = False
     languages: list[str] = field(default_factory=lambda: ["en"])
+    license_id: Optional[str] = None
+    commercial_use: Optional[bool] = None
+    dialect: Optional[str] = None
 
 
 @runtime_checkable
@@ -215,6 +218,7 @@ TTS_ENGINES = {
     "chatterbox_turbo": "Chatterbox Turbo",
     "tada": "TADA",
     "kokoro": "Kokoro",
+    "f5_tts": "F5-TTS",
 }
 
 LLM_ENGINES = {
@@ -364,6 +368,102 @@ def _get_non_qwen_tts_configs() -> list[ModelConfig]:
             size_mb=350,
             languages=["en", "es", "fr", "hi", "it", "pt", "ja", "zh"],
         ),
+        ModelConfig(
+            model_name="habibi-msa",
+            display_name="Habibi Specialized MSA",
+            engine="f5_tts",
+            hf_repo_id="SWivid/Habibi-TTS",
+            model_size="habibi-msa",
+            size_mb=1300,
+            languages=["ar"],
+            license_id="Apache-2.0",
+            commercial_use=True,
+            dialect="MSA",
+        ),
+        ModelConfig(
+            model_name="habibi-unified",
+            display_name="Habibi Unified (Automatic Dialect)",
+            engine="f5_tts",
+            hf_repo_id="SWivid/Habibi-TTS",
+            model_size="habibi-unified",
+            size_mb=1300,
+            languages=["ar"],
+            license_id="CC-BY-NC-SA-4.0",
+            commercial_use=False,
+            dialect="UNK",
+        ),
+        ModelConfig(
+            model_name="habibi-sau",
+            display_name="Habibi Specialized Saudi",
+            engine="f5_tts",
+            hf_repo_id="SWivid/Habibi-TTS",
+            model_size="habibi-sau",
+            size_mb=1300,
+            languages=["ar"],
+            license_id="CC-BY-NC-SA-4.0",
+            commercial_use=False,
+            dialect="SAU",
+        ),
+        ModelConfig(
+            model_name="habibi-uae",
+            display_name="Habibi Specialized Emirati",
+            engine="f5_tts",
+            hf_repo_id="SWivid/Habibi-TTS",
+            model_size="habibi-uae",
+            size_mb=1300,
+            languages=["ar"],
+            license_id="CC-BY-NC-SA-4.0",
+            commercial_use=False,
+            dialect="UAE",
+        ),
+        ModelConfig(
+            model_name="habibi-alg",
+            display_name="Habibi Specialized Algerian",
+            engine="f5_tts",
+            hf_repo_id="SWivid/Habibi-TTS",
+            model_size="habibi-alg",
+            size_mb=1300,
+            languages=["ar"],
+            license_id="Apache-2.0",
+            commercial_use=True,
+            dialect="ALG",
+        ),
+        ModelConfig(
+            model_name="habibi-irq",
+            display_name="Habibi Specialized Iraqi",
+            engine="f5_tts",
+            hf_repo_id="SWivid/Habibi-TTS",
+            model_size="habibi-irq",
+            size_mb=1300,
+            languages=["ar"],
+            license_id="Apache-2.0",
+            commercial_use=True,
+            dialect="IRQ",
+        ),
+        ModelConfig(
+            model_name="habibi-egy",
+            display_name="Habibi Specialized Egyptian",
+            engine="f5_tts",
+            hf_repo_id="SWivid/Habibi-TTS",
+            model_size="habibi-egy",
+            size_mb=1300,
+            languages=["ar"],
+            license_id="Apache-2.0",
+            commercial_use=True,
+            dialect="EGY",
+        ),
+        ModelConfig(
+            model_name="habibi-mar",
+            display_name="Habibi Specialized Moroccan",
+            engine="f5_tts",
+            hf_repo_id="SWivid/Habibi-TTS",
+            model_size="habibi-mar",
+            size_mb=1300,
+            languages=["ar"],
+            license_id="Apache-2.0",
+            commercial_use=True,
+            dialect="MAR",
+        ),
     ]
 
 
@@ -510,12 +610,23 @@ def engine_has_model_sizes(engine: str) -> bool:
     return len(configs) > 1
 
 
+def get_default_model_size(engine: str) -> str:
+    """Return the registry-defined default variant for an engine.
+
+    Registry order is intentional: the first F5 entry is the commercial-safe
+    specialized MSA checkpoint, while Qwen and TADA retain their existing
+    1.7B and 1B defaults respectively.
+    """
+    configs = [c for c in get_tts_model_configs() if c.engine == engine]
+    return configs[0].model_size if configs else "default"
+
+
 async def load_engine_model(engine: str, model_size: str = "default") -> None:
     """Load a model for the given engine, handling engines with multiple model sizes."""
     backend = get_tts_backend_for_engine(engine)
     if engine in ("qwen", "qwen_custom_voice"):
         await backend.load_model_async(model_size)
-    elif engine == "tada":
+    elif engine in ("tada", "f5_tts"):
         await backend.load_model(model_size)
     else:
         await backend.load_model()
@@ -532,7 +643,7 @@ async def ensure_model_cached_or_raise(engine: str, model_size: str = "default")
             cfg = c
             break
 
-    if engine in ("qwen", "qwen_custom_voice", "tada"):
+    if engine in ("qwen", "qwen_custom_voice", "tada", "f5_tts"):
         if not backend._is_model_cached(model_size):
             raise HTTPException(
                 status_code=400,
@@ -575,7 +686,7 @@ def unload_model_by_config(config: ModelConfig) -> bool:
             return True
         return False
 
-    if config.engine == "qwen_custom_voice":
+    if config.engine in ("qwen_custom_voice", "f5_tts"):
         backend = get_tts_backend_for_engine(config.engine)
         loaded_size = getattr(backend, "_current_model_size", None) or getattr(backend, "model_size", None)
         if backend.is_loaded() and loaded_size == config.model_size:
@@ -611,13 +722,30 @@ def check_model_loaded(config: ModelConfig) -> bool:
             loaded_size = getattr(tts_model, "_current_model_size", None) or getattr(tts_model, "model_size", None)
             return tts_model.is_loaded() and loaded_size == config.model_size
 
-        if config.engine == "qwen_custom_voice":
+        if config.engine in ("qwen_custom_voice", "f5_tts"):
             backend = get_tts_backend_for_engine(config.engine)
             loaded_size = getattr(backend, "_current_model_size", None) or getattr(backend, "model_size", None)
             return backend.is_loaded() and loaded_size == config.model_size
 
         backend = get_tts_backend_for_engine(config.engine)
         return backend.is_loaded()
+    except Exception:
+        return False
+
+
+def check_model_cached(config: ModelConfig) -> Optional[bool]:
+    """Return a variant-specific cache result when an engine needs one.
+
+    Most Voicebox models live in separate Hugging Face repositories, so the
+    model-status route can use its generic repository scan. Habibi keeps eight
+    checkpoints in one repository; its backend must verify the selected
+    checkpoint, matching vocabulary, and shared Vocos files explicitly.
+    """
+    if config.engine != "f5_tts":
+        return None
+    try:
+        backend = get_tts_backend_for_engine(config.engine)
+        return bool(backend._is_model_cached(config.model_size))
     except Exception:
         return False
 
@@ -633,7 +761,7 @@ def get_model_load_func(config: ModelConfig):
     if config.engine == "qwen":
         return lambda: tts.get_tts_model().load_model(config.model_size)
 
-    if config.engine == "qwen_custom_voice":
+    if config.engine in ("qwen_custom_voice", "f5_tts"):
         return lambda: get_tts_backend_for_engine(config.engine).load_model(config.model_size)
 
     if config.engine == "qwen_llm":
@@ -704,6 +832,10 @@ def get_tts_backend_for_engine(engine: str) -> TTSBackend:
             from .kokoro_backend import KokoroTTSBackend
 
             backend = KokoroTTSBackend()
+        elif engine == "f5_tts":
+            from .f5tts_backend import F5TTSBackend
+
+            backend = F5TTSBackend()
         elif engine == "qwen_custom_voice":
             from .qwen_custom_voice_backend import QwenCustomVoiceBackend
 

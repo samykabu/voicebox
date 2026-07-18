@@ -9,6 +9,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { VoiceProfileResponse } from '@/lib/api/types';
+import {
+  DEFAULT_HABIBI_MODEL_ID,
+  getHabibiModel,
+  HABIBI_MODELS,
+  isHabibiModelId,
+} from '@/lib/constants/habibiModels';
 import { getLanguageOptionsForEngine } from '@/lib/constants/languages';
 import type { GenerationFormValues } from '@/lib/hooks/useGenerationForm';
 
@@ -27,6 +33,11 @@ const ENGINE_OPTIONS = [
   { value: 'tada:1B', label: 'TADA 1B', engine: 'tada' },
   { value: 'tada:3B', label: 'TADA 3B Multilingual', engine: 'tada' },
   { value: 'kokoro', label: 'Kokoro 82M', engine: 'kokoro' },
+  ...HABIBI_MODELS.map((model) => ({
+    value: `f5_tts:${model.id}`,
+    label: `${model.label}${model.commercialUse ? '' : ' — noncommercial'}`,
+    engine: 'f5_tts' as const,
+  })),
 ] as const;
 
 const ENGINE_DESCRIPTIONS: Record<string, string> = {
@@ -37,13 +48,14 @@ const ENGINE_DESCRIPTIONS: Record<string, string> = {
   chatterbox_turbo: 'English, [laugh] [cough] tags',
   tada: 'HumeAI, 700s+ coherent audio',
   kokoro: '82M params, CPU realtime, 8 langs',
+  f5_tts: 'Arabic F5 voice cloning with MSA and regional Habibi checkpoints',
 };
 
 /** Engines that only support English and should force language to 'en' on select. */
 const ENGLISH_ONLY_ENGINES = new Set(['luxtts', 'chatterbox_turbo']);
 
 /** Engines that support cloned (reference audio) profiles. */
-const CLONING_ENGINES = new Set(['qwen', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada']);
+const CLONING_ENGINES = new Set(['qwen', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'f5_tts']);
 
 function getAvailableOptions(selectedProfile?: VoiceProfileResponse | null) {
   if (!selectedProfile) return ENGINE_OPTIONS;
@@ -54,11 +66,18 @@ function getSelectValue(engine: string, modelSize?: string): string {
   if (engine === 'qwen') return `qwen:${modelSize || '1.7B'}`;
   if (engine === 'qwen_custom_voice') return `qwen_custom_voice:${modelSize || '1.7B'}`;
   if (engine === 'tada') return `tada:${modelSize || '1B'}`;
+  if (engine === 'f5_tts') return `f5_tts:${getHabibiModel(modelSize).id}`;
   return engine;
 }
 
 export function applyEngineSelection(form: UseFormReturn<GenerationFormValues>, value: string) {
-  if (value.startsWith('qwen_custom_voice:')) {
+  if (value.startsWith('f5_tts:')) {
+    const [, requestedModel] = value.split(':');
+    const model = getHabibiModel(requestedModel);
+    form.setValue('engine', 'f5_tts');
+    form.setValue('modelSize', model.id);
+    form.setValue('language', 'ar');
+  } else if (value.startsWith('qwen_custom_voice:')) {
     const [, modelSize] = value.split(':');
     form.setValue('engine', 'qwen_custom_voice');
     form.setValue('modelSize', modelSize as '1.7B' | '0.6B');
@@ -116,10 +135,23 @@ interface EngineModelSelectorProps {
 export function EngineModelSelector({ form, compact, selectedProfile }: EngineModelSelectorProps) {
   const engine = form.watch('engine') || 'qwen';
   const modelSize = form.watch('modelSize');
+  const language = form.watch('language');
   const selectValue = getSelectValue(engine, modelSize);
   const availableOptions = getAvailableOptions(selectedProfile);
+  const selectedHabibiModel = engine === 'f5_tts' ? getHabibiModel(modelSize) : null;
 
   const currentEngineAvailable = availableOptions.some((opt) => opt.value === selectValue);
+
+  useEffect(() => {
+    if (engine === 'f5_tts') {
+      if (!isHabibiModelId(modelSize)) {
+        form.setValue('modelSize', DEFAULT_HABIBI_MODEL_ID);
+      }
+      if (language !== 'ar') {
+        form.setValue('language', 'ar');
+      }
+    }
+  }, [engine, form, language, modelSize]);
 
   useEffect(() => {
     if (!currentEngineAvailable && availableOptions.length > 0) {
@@ -133,20 +165,33 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
     : undefined;
 
   return (
-    <Select value={selectValue} onValueChange={(v) => applyEngineSelection(form, v)}>
-      <FormControl>
-        <SelectTrigger className={triggerClass}>
-          <SelectValue />
-        </SelectTrigger>
-      </FormControl>
-      <SelectContent>
-        {availableOptions.map((opt) => (
-          <SelectItem key={opt.value} value={opt.value} className={itemClass}>
-            {opt.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="space-y-1">
+      <Select value={selectValue} onValueChange={(v) => applyEngineSelection(form, v)}>
+        <FormControl>
+          <SelectTrigger className={triggerClass}>
+            <SelectValue />
+          </SelectTrigger>
+        </FormControl>
+        <SelectContent>
+          {availableOptions.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value} className={itemClass}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {selectedHabibiModel && !selectedHabibiModel.commercialUse ? (
+        <p
+          className={
+            compact
+              ? 'px-2 text-[10px] text-amber-600 dark:text-amber-400'
+              : 'text-xs text-amber-600 dark:text-amber-400'
+          }
+        >
+          {selectedHabibiModel.license}: noncommercial use only.
+        </p>
+      ) : null}
+    </div>
   );
 }
 

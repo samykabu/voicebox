@@ -4,12 +4,10 @@ import asyncio
 import shutil
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
-from sqlalchemy.orm import Session
 
 from .. import models
-from ..utils.platform_detect import get_backend_type
 from ..services.task_queue import create_background_task
 from ..utils.progress import get_progress_manager
 from ..utils.tasks import get_task_manager
@@ -228,7 +226,6 @@ async def get_model_status():
     """Get status of all available models."""
     from huggingface_hub import constants as hf_constants
 
-    backend_type = get_backend_type()
     task_manager = get_task_manager()
 
     active_download_names = {task.model_name for task in task_manager.get_active_downloads()}
@@ -240,7 +237,7 @@ async def get_model_status():
     except ImportError:
         use_scan_cache = False
 
-    from ..backends import get_all_model_configs, check_model_loaded
+    from ..backends import check_model_cached, check_model_loaded, get_all_model_configs
 
     registry_configs = get_all_model_configs()
     model_configs = [
@@ -249,13 +246,15 @@ async def get_model_status():
             "display_name": cfg.display_name,
             "hf_repo_id": cfg.hf_repo_id,
             "model_size": cfg.model_size,
+            "license_id": cfg.license_id,
+            "commercial_use": cfg.commercial_use,
+            "dialect": cfg.dialect,
+            "declared_size_mb": cfg.size_mb,
             "check_loaded": lambda c=cfg: check_model_loaded(c),
+            "check_cached": lambda c=cfg: check_model_cached(c),
         }
         for cfg in registry_configs
     ]
-
-    model_to_repo = {cfg["model_name"]: cfg["hf_repo_id"] for cfg in model_configs}
-    active_download_repos = {model_to_repo.get(name) for name in active_download_names if name in model_to_repo}
 
     cache_info = None
     if use_scan_cache:
@@ -344,7 +343,15 @@ async def get_model_status():
             except Exception:
                 loaded = False
 
-            is_downloading = config["hf_repo_id"] in active_download_repos
+            # Repositories normally map one-to-one to models. Habibi is the
+            # exception: eight selectable checkpoints share one repository, so
+            # use the backend's exact checkpoint/vocab/Vocos cache predicate.
+            specific_cached = config["check_cached"]()
+            if specific_cached is not None:
+                downloaded = specific_cached
+                size_mb = config["declared_size_mb"] if downloaded else None
+
+            is_downloading = config["model_name"] in active_download_names
 
             if is_downloading:
                 downloaded = False
@@ -359,6 +366,9 @@ async def get_model_status():
                     downloading=is_downloading,
                     size_mb=size_mb,
                     loaded=loaded,
+                    license_id=config["license_id"],
+                    commercial_use=config["commercial_use"],
+                    dialect=config["dialect"],
                 )
             )
         except Exception:
@@ -367,7 +377,7 @@ async def get_model_status():
             except Exception:
                 loaded = False
 
-            is_downloading = config["hf_repo_id"] in active_download_repos
+            is_downloading = config["model_name"] in active_download_names
 
             statuses.append(
                 models.ModelStatus(
@@ -378,6 +388,9 @@ async def get_model_status():
                     downloading=is_downloading,
                     size_mb=None,
                     loaded=loaded,
+                    license_id=config["license_id"],
+                    commercial_use=config["commercial_use"],
+                    dialect=config["dialect"],
                 )
             )
 

@@ -6,6 +6,7 @@ voice prompt combination, and model loading progress tracking.
 """
 
 import logging
+import os
 import platform
 from contextlib import contextmanager
 from pathlib import Path
@@ -47,22 +48,23 @@ def is_model_cached(
         if not repo_cache.exists():
             return False
 
-        # Incomplete blobs mean a download is still in progress
+        snapshots_dir = repo_cache / "snapshots"
+        if not snapshots_dir.exists():
+            return False
+
         blobs_dir = repo_cache / "blobs"
         if blobs_dir.exists() and any(blobs_dir.glob("*.incomplete")):
             logger.debug(f"Found .incomplete files for {hf_repo}")
             return False
 
-        snapshots_dir = repo_cache / "snapshots"
-        if not snapshots_dir.exists():
-            return False
-
         if required_files:
-            # Check that every required filename exists somewhere in snapshots
-            for fname in required_files:
-                if not any(snapshots_dir.rglob(fname)):
-                    return False
-            return True
+            # All files must belong to one complete snapshot. Checking each
+            # name independently could combine files from different revisions,
+            # and joining paths directly also supports nested checkpoint names.
+            return any(
+                snapshot.is_dir() and all((snapshot / filename).exists() for filename in required_files)
+                for snapshot in snapshots_dir.iterdir()
+            )
 
         # Check that at least one weight file exists
         for ext in weight_extensions:
@@ -83,6 +85,8 @@ def get_torch_device(
     allow_directml: bool = False,
     allow_mps: bool = False,
     force_cpu_on_mac: bool = False,
+    cuda_device_env: Optional[str] = None,
+    prefer_cuda_with_most_free_memory: bool = False,
 ) -> str:
     """
     Detect the best available torch device.
@@ -92,6 +96,12 @@ def get_torch_device(
         allow_directml: Check for DirectML (Windows) support.
         allow_mps: Allow MPS (Apple Silicon). If False, MPS falls back to CPU.
         force_cpu_on_mac: Force CPU on macOS regardless of GPU availability.
+        cuda_device_env: Optional environment variable containing a CUDA device
+                         index (for example ``1`` or ``cuda:1``). ``auto`` uses
+                         the automatic selection policy.
+        prefer_cuda_with_most_free_memory: On multi-GPU systems, choose the CUDA
+                                           device with the most currently free
+                                           memory instead of always using GPU 0.
     """
     if force_cpu_on_mac and platform.system() == "Darwin":
         return "cpu"
@@ -99,6 +109,45 @@ def get_torch_device(
     import torch
 
     if torch.cuda.is_available():
+        override = os.environ.get(cuda_device_env, "").strip().lower() if cuda_device_env else ""
+        if override and override != "auto":
+            raw_index = override.removeprefix("cuda:")
+            try:
+                index = int(raw_index)
+            except ValueError:
+                logger.warning(
+                    "Ignoring invalid %s=%r; expected a CUDA device index or 'auto'",
+                    cuda_device_env,
+                    override,
+                )
+            else:
+                if 0 <= index < torch.cuda.device_count():
+                    return f"cuda:{index}"
+                logger.warning(
+                    "Ignoring %s=%s; only %s CUDA device(s) are visible",
+                    cuda_device_env,
+                    index,
+                    torch.cuda.device_count(),
+                )
+
+        if prefer_cuda_with_most_free_memory and torch.cuda.device_count() > 1:
+            candidates: list[tuple[int, int]] = []
+            for index in range(torch.cuda.device_count()):
+                try:
+                    free_bytes, _total_bytes = torch.cuda.mem_get_info(index)
+                    candidates.append((free_bytes, index))
+                except Exception as exc:
+                    logger.warning("Could not inspect CUDA device %s: %s", index, exc)
+            if candidates:
+                free_bytes, index = max(candidates)
+                logger.info(
+                    "Selected CUDA device %s (%s; %.1f GiB free)",
+                    index,
+                    torch.cuda.get_device_name(index),
+                    free_bytes / (1024**3),
+                )
+                return f"cuda:{index}"
+
         return "cuda"
 
     if allow_xpu:
@@ -178,8 +227,9 @@ def empty_device_cache(device: str) -> None:
     """
     import torch
 
-    if device == "cuda" and torch.cuda.is_available():
-        torch.cuda.empty_cache()
+    if str(device).startswith("cuda") and torch.cuda.is_available():
+        with torch.cuda.device(device):
+            torch.cuda.empty_cache()
     elif device == "xpu" and hasattr(torch, "xpu"):
         torch.xpu.empty_cache()
 
@@ -194,8 +244,8 @@ def manual_seed(seed: int, device: str) -> None:
     import torch
 
     torch.manual_seed(seed)
-    if device == "cuda" and torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
+    if str(device).startswith("cuda") and torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
     elif device == "xpu" and hasattr(torch, "xpu"):
         torch.xpu.manual_seed(seed)
 

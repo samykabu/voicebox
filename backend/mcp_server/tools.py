@@ -97,7 +97,7 @@ def register_tools(mcp: FastMCP) -> None:
                 profile_name=vp.name,
                 text=text,
                 engine=resolved_engine,
-                language=language,
+                language=language or vp.language,
                 personality=use_persona,
                 db=db,
             )

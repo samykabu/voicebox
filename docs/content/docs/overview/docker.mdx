@@ -111,6 +111,9 @@ The `huggingface-cache` volume is important -- without it, models would be re-do
 
 To use your NVIDIA GPU inside the container, install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) and add GPU access to your compose file:
 
+For the native Arabic F5-TTS/Habibi engine, use the pinned CUDA 12.8 image and
+Compose overlay described in [Arabic F5-TTS / Habibi on NVIDIA Docker](/overview/docker-arabic-f5-habibi).
+
 ```yaml
 services:
   voicebox:

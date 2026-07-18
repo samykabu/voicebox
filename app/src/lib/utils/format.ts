@@ -1,6 +1,7 @@
 import { formatDistance } from 'date-fns';
 import { ja, zhCN, zhTW, fr } from 'date-fns/locale';
 import i18n from '@/i18n';
+import { getHabibiModel } from '@/lib/constants/habibiModels';
 
 export function formatDuration(seconds: number): string {
   const mins = Math.floor(seconds / 60);
@@ -57,12 +58,16 @@ const ENGINE_DISPLAY_NAMES: Record<string, string> = {
   luxtts: 'LuxTTS',
   chatterbox: 'Chatterbox',
   chatterbox_turbo: 'Chatterbox Turbo',
+  f5_tts: 'Arabic F5 / Habibi',
 };
 
 export function formatEngineName(engine?: string, modelSize?: string): string {
   const name = ENGINE_DISPLAY_NAMES[engine ?? 'qwen'] ?? engine ?? 'Qwen';
   if (engine === 'qwen' && modelSize) {
     return `${name} ${modelSize}`;
+  }
+  if (engine === 'f5_tts') {
+    return getHabibiModel(modelSize).label;
   }
   return name;
 }
