@@ -29,6 +29,21 @@ export function useDeleteGeneration() {
   });
 }
 
+export function useDeleteGenerations() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (request: {
+      generation_ids?: string[];
+      delete_all?: boolean;
+      excluded_ids?: string[];
+    }) => apiClient.deleteGenerations(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['history'] });
+    },
+  });
+}
+
 export function useClearFailedGenerations() {
   const queryClient = useQueryClient();
 

@@ -2,12 +2,10 @@ import { Check } from 'lucide-react';
 import * as React from 'react';
 import { cn } from '@/lib/utils/cn';
 
-export interface CheckboxProps {
+export interface CheckboxProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> {
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
-  disabled?: boolean;
-  className?: string;
-  id?: string;
 }
 
 const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(

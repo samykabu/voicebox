@@ -139,6 +139,14 @@ class HistoryQuery(BaseModel):
     offset: int = Field(default=0, ge=0)
 
 
+class HistoryBulkDeleteRequest(BaseModel):
+    """Delete selected generations or every inactive history entry."""
+
+    generation_ids: List[str] = Field(default_factory=list, max_length=5000)
+    delete_all: bool = False
+    excluded_ids: List[str] = Field(default_factory=list, max_length=5000)
+
+
 class HistoryResponse(BaseModel):
     """Response model for history entry (includes profile name)."""
 

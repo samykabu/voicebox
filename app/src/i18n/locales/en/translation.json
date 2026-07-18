@@ -654,6 +654,30 @@
       "applyEffects": "Apply Effects",
       "regenerate": "Regenerate"
     },
+    "bulkSelection": {
+      "selectAll": "Select all",
+      "selectGeneration": "Select generation from {{name}}",
+      "clear": "Clear",
+      "selected_one": "{{count}} selected",
+      "selected_other": "{{count}} selected",
+      "allSelected": "All generations selected",
+      "allExcept_one": "All except {{count}} selected",
+      "allExcept_other": "All except {{count}} selected",
+      "deleteSelected": "Delete selected"
+    },
+    "bulkDeleteDialog": {
+      "title": "Delete selected generations?",
+      "bodySelected_one": "This will permanently delete the selected generation and its audio. This action cannot be undone.",
+      "bodySelected_other": "This will permanently delete {{count}} selected generations and their audio. This action cannot be undone.",
+      "bodyAll": "This will permanently delete all completed and failed generations. Active generations will be kept. This action cannot be undone.",
+      "bodyAllExcept_one": "This will permanently delete all completed and failed generations except the one you deselected. Active generations will be kept. This action cannot be undone.",
+      "bodyAllExcept_other": "This will permanently delete all completed and failed generations except the {{count}} you deselected. Active generations will be kept. This action cannot be undone.",
+      "deleting": "Deleting…",
+      "successTitle": "Generations deleted",
+      "successBody_one": "{{count}} generation was deleted.",
+      "successBody_other": "{{count}} generations were deleted.",
+      "errorTitle": "Bulk deletion failed"
+    },
     "deleteDialog": {
       "title": "Delete Generation",
       "body": "Are you sure you want to delete this generation from \"{{name}}\"? This action cannot be undone.",
