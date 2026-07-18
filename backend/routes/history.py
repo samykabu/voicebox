@@ -75,8 +75,20 @@ async def bulk_delete_generations(
     db: Session = Depends(get_db),
 ):
     """Delete selected history entries, or all inactive entries except exclusions."""
-    if not request.delete_all and not request.generation_ids:
-        raise HTTPException(status_code=400, detail="Select at least one generation to delete")
+    if request.delete_all:
+        if request.generation_ids:
+            raise HTTPException(
+                status_code=400,
+                detail="generation_ids cannot be combined with delete_all",
+            )
+    else:
+        if request.excluded_ids:
+            raise HTTPException(
+                status_code=400,
+                detail="excluded_ids requires delete_all",
+            )
+        if not request.generation_ids:
+            raise HTTPException(status_code=400, detail="Select at least one generation to delete")
 
     count = await history.delete_generations(
         db,

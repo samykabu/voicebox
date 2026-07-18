@@ -480,6 +480,8 @@ export function HistoryTable() {
   const hasMore = allHistory.length < total;
   const failedCount = history.filter((g) => g.status === 'failed').length;
   const hasBulkSelection = allGenerationsSelected || selectedGenerationIds.size > 0;
+  const everyGenerationSelected =
+    allGenerationsSelected && excludedGenerationIds.size === 0;
   const selectionSummary = allGenerationsSelected
     ? excludedGenerationIds.size > 0
       ? t('history.bulkSelection.allExcept', { count: excludedGenerationIds.size })
@@ -556,7 +558,7 @@ export function HistoryTable() {
             <div className="flex min-w-0 items-center gap-2">
               <Checkbox
                 id="select-all-generations"
-                checked={allGenerationsSelected}
+                checked={everyGenerationSelected}
                 onCheckedChange={handleSelectAllChange}
                 disabled={deleteGenerations.isPending}
                 aria-label={t('history.bulkSelection.selectAll')}
@@ -564,7 +566,7 @@ export function HistoryTable() {
               <button
                 type="button"
                 className="shrink-0 text-xs font-medium hover:text-accent"
-                onClick={() => handleSelectAllChange(!allGenerationsSelected)}
+                onClick={() => handleSelectAllChange(!everyGenerationSelected)}
                 disabled={deleteGenerations.isPending}
               >
                 {t('history.bulkSelection.selectAll')}
@@ -596,7 +598,9 @@ export function HistoryTable() {
                   disabled={clearFailed.isPending || deleteGenerations.isPending}
                 >
                   <Trash2 className="h-3 w-3" />
-                  {clearFailed.isPending ? 'Clearing...' : 'Clear failed'}
+                  {clearFailed.isPending
+                    ? t('history.clearFailedDialog.clearing')
+                    : t('history.clearFailedDialog.clearFailed')}
                 </Button>
               )}
               <Button

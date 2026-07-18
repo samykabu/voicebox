@@ -90,5 +90,59 @@ async def test_bulk_delete_removes_selected_files_and_preserves_active_jobs(
     assert session.get(Generation, "excluded") is not None
     assert not all_audio.exists()
 
+    many_ids = [f"bulk-{index}" for index in range(1200)]
+    session.add_all(
+        [
+            Generation(
+                id=generation_id,
+                profile_id=profile.id,
+                text=generation_id,
+                status="completed",
+            )
+            for generation_id in many_ids
+        ]
+    )
+    session.commit()
+
+    deleted = await delete_generations(session, generation_ids=many_ids)
+
+    assert deleted == len(many_ids)
+    assert (
+        session.query(Generation).filter(Generation.id.in_(many_ids[:500])).count()
+        == 0
+    )
+
+    many_exclusions = [f"excluded-{index}" for index in range(1200)]
+    session.add_all(
+        [
+            Generation(
+                id=generation_id,
+                profile_id=profile.id,
+                text=generation_id,
+                status="failed",
+            )
+            for generation_id in many_exclusions
+        ]
+        + [
+            Generation(
+                id="delete-all-target",
+                profile_id=profile.id,
+                text="delete all target",
+                status="completed",
+            )
+        ]
+    )
+    session.commit()
+
+    deleted = await delete_generations(
+        session,
+        delete_all=True,
+        excluded_ids=["excluded", *many_exclusions],
+    )
+
+    assert deleted == 1
+    assert session.get(Generation, "delete-all-target") is None
+    assert session.get(Generation, many_exclusions[-1]) is not None
+
     session.close()
     engine.dispose()

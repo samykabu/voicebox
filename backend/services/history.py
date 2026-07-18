@@ -286,16 +286,23 @@ async def delete_generations(
     )
 
     if delete_all:
+        # Filter exclusions in Python so a large history does not exceed
+        # SQLite's bound-variable limit.
         exclusions = set(excluded_ids or [])
-        if exclusions:
-            query = query.filter(~DBGeneration.id.in_(exclusions))
+        generations = [
+            generation for generation in query.all() if generation.id not in exclusions
+        ]
     else:
-        selected_ids = set(generation_ids or [])
+        selected_ids = list(set(generation_ids or []))
         if not selected_ids:
             return 0
-        query = query.filter(DBGeneration.id.in_(selected_ids))
 
-    generations = query.all()
+        # SQLite builds one bound variable per ID. Keep each query safely
+        # below the common 999-variable limit.
+        generations = []
+        for start in range(0, len(selected_ids), 500):
+            chunk = selected_ids[start : start + 500]
+            generations.extend(query.filter(DBGeneration.id.in_(chunk)).all())
     for generation in generations:
         versions_mod.delete_versions_for_generation(generation.id, db)
 

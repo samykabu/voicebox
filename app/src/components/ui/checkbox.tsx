@@ -3,7 +3,10 @@ import * as React from 'react';
 import { cn } from '@/lib/utils/cn';
 
 export interface CheckboxProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> {
+  extends Omit<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    'aria-checked' | 'onChange' | 'onClick' | 'role' | 'type'
+  > {
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
 }
@@ -12,6 +15,7 @@ const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
   ({ checked = false, onCheckedChange, disabled = false, className, id, ...props }, ref) => {
     return (
       <button
+        {...props}
         type="button"
         ref={ref}
         id={id}
@@ -30,7 +34,6 @@ const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
           !disabled && 'cursor-pointer',
           className,
         )}
-        {...props}
       >
         {checked && <Check className="h-3 w-3 text-accent-foreground" />}
       </button>

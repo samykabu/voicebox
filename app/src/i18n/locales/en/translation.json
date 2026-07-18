@@ -688,6 +688,7 @@
       "body_one": "This will permanently delete {{count}} failed generation from your history. This cannot be undone.",
       "body_other": "This will permanently delete {{count}} failed generations from your history. This cannot be undone.",
       "clearing": "Clearing…",
+      "clearFailed": "Clear failed",
       "clearAll": "Clear all"
     },
     "importDialog": {
