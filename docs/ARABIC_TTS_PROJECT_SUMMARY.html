@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Implementation summary and decision record for the Dockerized Arabic F5-TTS, Habibi-TTS, TADA, and Voicebox work."
+    />
+    <title>Arabic TTS &amp; Voicebox — Implementation Summary</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172033;
+        --muted: #667085;
+        --paper: #fffdf8;
+        --canvas: #f3f0e8;
+        --navy: #14213d;
+        --gold: #d7a93b;
+        --gold-soft: #f7edcf;
+        --green: #1f7a55;
+        --green-soft: #e9f7f0;
+        --blue-soft: #edf4ff;
+        --line: #ddd7ca;
+        --shadow: 0 18px 48px rgba(20, 33, 61, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--canvas);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        line-height: 1.62;
+      }
+
+      a {
+        color: #245aa5;
+        text-underline-offset: 0.18em;
+      }
+
+      a:hover {
+        color: #173f78;
+      }
+
+      .page {
+        width: min(1180px, calc(100% - 32px));
+        margin: 28px auto;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      header {
+        position: relative;
+        padding: 70px clamp(28px, 7vw, 92px) 58px;
+        color: white;
+        background:
+          radial-gradient(circle at 85% 8%, rgba(215, 169, 59, 0.32), transparent 30%),
+          linear-gradient(135deg, #0f1930 0%, #172a50 64%, #203d6f 100%);
+      }
+
+      header::after {
+        content: "";
+        position: absolute;
+        right: 6%;
+        bottom: 0;
+        width: 210px;
+        height: 5px;
+        background: var(--gold);
+        border-radius: 5px 5px 0 0;
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        color: #f6d987;
+        font-size: 0.78rem;
+        font-weight: 750;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 850px;
+        margin: 0;
+        font-size: clamp(2.35rem, 5vw, 4.7rem);
+        line-height: 1.02;
+        letter-spacing: -0.045em;
+      }
+
+      .subtitle {
+        max-width: 760px;
+        margin: 24px 0 0;
+        color: #d9e2f0;
+        font-size: clamp(1rem, 2vw, 1.22rem);
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 30px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 5px 11px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 999px;
+        color: #eef4ff;
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 0.78rem;
+        font-weight: 650;
+      }
+
+      main {
+        padding: 46px clamp(24px, 6vw, 76px) 72px;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-bottom: 48px;
+      }
+
+      nav a {
+        padding: 7px 11px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--ink);
+        background: white;
+        font-size: 0.83rem;
+        font-weight: 650;
+        text-decoration: none;
+      }
+
+      nav a:hover {
+        border-color: var(--gold);
+        background: var(--gold-soft);
+      }
+
+      section {
+        margin-top: 58px;
+        scroll-margin-top: 24px;
+      }
+
+      h2 {
+        margin: 0 0 18px;
+        color: var(--navy);
+        font-size: clamp(1.5rem, 2.6vw, 2.15rem);
+        line-height: 1.15;
+        letter-spacing: -0.025em;
+      }
+
+      h3 {
+        margin: 28px 0 10px;
+        color: #23375f;
+        font-size: 1.08rem;
+      }
+
+      p {
+        margin: 0 0 14px;
+      }
+
+      .lead {
+        max-width: 900px;
+        font-size: 1.08rem;
+      }
+
+      .callout {
+        margin: 24px 0;
+        padding: 20px 22px;
+        border-left: 5px solid var(--gold);
+        border-radius: 0 12px 12px 0;
+        background: var(--gold-soft);
+      }
+
+      .callout strong {
+        color: var(--navy);
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin: 30px 0;
+      }
+
+      .metric {
+        min-height: 130px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: white;
+      }
+
+      .metric .number {
+        display: block;
+        color: var(--navy);
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .metric .label {
+        display: block;
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: white;
+      }
+
+      .card h3 {
+        margin-top: 0;
+      }
+
+      ul,
+      ol {
+        padding-left: 1.25rem;
+      }
+
+      li + li {
+        margin-top: 7px;
+      }
+
+      .timeline {
+        margin: 26px 0 0;
+        padding: 0;
+        list-style: none;
+        counter-reset: phase;
+      }
+
+      .timeline li {
+        position: relative;
+        margin: 0 0 0 18px;
+        padding: 0 0 28px 34px;
+        border-left: 2px solid #d9d2c2;
+        counter-increment: phase;
+      }
+
+      .timeline li::before {
+        content: counter(phase);
+        position: absolute;
+        top: 0;
+        left: -16px;
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border-radius: 50%;
+        color: white;
+        background: var(--navy);
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .timeline li:last-child {
+        padding-bottom: 0;
+        border-left-color: transparent;
+      }
+
+      .timeline strong {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--navy);
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        margin: 22px 0;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: white;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+
+      th,
+      td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #ebe6dc;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: white;
+        background: var(--navy);
+        font-size: 0.78rem;
+        letter-spacing: 0.045em;
+        text-transform: uppercase;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .status {
+        display: inline-flex;
+        padding: 3px 8px;
+        border-radius: 999px;
+        color: var(--green);
+        background: var(--green-soft);
+        font-size: 0.75rem;
+        font-weight: 750;
+        white-space: nowrap;
+      }
+
+      .status.deferred {
+        color: #765b14;
+        background: #fff4cf;
+      }
+
+      code {
+        padding: 0.1em 0.35em;
+        border-radius: 5px;
+        color: #173e6d;
+        background: var(--blue-soft);
+        font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+        font-size: 0.9em;
+      }
+
+      pre {
+        overflow-x: auto;
+        margin: 18px 0;
+        padding: 18px;
+        border-radius: 12px;
+        color: #f4f7fb;
+        background: #101a2d;
+      }
+
+      pre code {
+        padding: 0;
+        color: inherit;
+        background: transparent;
+      }
+
+      .evidence {
+        padding: 18px 20px;
+        border: 1px solid #cfe5d9;
+        border-radius: 12px;
+        background: var(--green-soft);
+      }
+
+      .evidence strong {
+        color: var(--green);
+      }
+
+      footer {
+        padding: 26px clamp(24px, 6vw, 76px);
+        color: #cdd7e7;
+        background: var(--navy);
+        font-size: 0.82rem;
+      }
+
+      @media (max-width: 820px) {
+        .metrics,
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .page {
+          width: 100%;
+          margin: 0;
+          border: 0;
+          border-radius: 0;
+        }
+
+        header {
+          padding-top: 48px;
+        }
+
+        .metrics,
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media print {
+        body {
+          background: white;
+        }
+
+        .page {
+          width: 100%;
+          margin: 0;
+          border: 0;
+          border-radius: 0;
+          box-shadow: none;
+        }
+
+        nav {
+          display: none;
+        }
+
+        section,
+        .card,
+        .metric,
+        .table-wrap {
+          break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <article class="page">
+      <header>
+        <p class="eyebrow">Project record · 19 July 2026</p>
+        <h1>Arabic TTS &amp; Voicebox</h1>
+        <p class="subtitle">
+          A consolidated summary of the Docker deployment, Arabic voice-cloning integration,
+          GPU and quality fixes, Windows packaging, history management, and the architectural
+          decisions made along the way.
+        </p>
+        <div class="meta" aria-label="Report status">
+          <span class="pill">Implementation complete</span>
+          <span class="pill">Docker-first</span>
+          <span class="pill">NVIDIA CUDA</span>
+          <span class="pill">Arabic voice cloning</span>
+        </div>
+      </header>
+
+      <main>
+        <nav aria-label="Report contents">
+          <a href="#outcome">Outcome</a>
+          <a href="#journey">Journey</a>
+          <a href="#decisions">Decisions</a>
+          <a href="#implementation">Implementation</a>
+          <a href="#quality">Quality</a>
+          <a href="#delivery">Delivery</a>
+          <a href="#remaining">Remaining work</a>
+        </nav>
+
+        <section id="outcome">
+          <h2>Executive outcome</h2>
+          <p class="lead">
+            We delivered a Docker-only Arabic text-to-speech and zero-shot voice-cloning stack,
+            then integrated the same Arabic F5/Habibi model family natively into the Voicebox
+            application. The solution keeps Python, PyTorch, CUDA user-space libraries, FFmpeg,
+            TTS packages, and model weights off the Windows host while giving Voicebox a unified
+            workflow for profiles, generation, history, model management, and GPU execution.
+          </p>
+
+          <div class="metrics" aria-label="Key outcomes">
+            <div class="metric">
+              <span class="number">2</span>
+              <span class="label">Standalone Arabic WebUIs retained on ports 7860 and 7861</span>
+            </div>
+            <div class="metric">
+              <span class="number">8</span>
+              <span class="label">Arabic F5/Habibi model variants in one Voicebox engine family</span>
+            </div>
+            <div class="metric">
+              <span class="number">2</span>
+              <span class="label">NVIDIA GPUs visible inside the validated CUDA container</span>
+            </div>
+            <div class="metric">
+              <span class="number">0</span>
+              <span class="label">ML runtime packages required on the Windows host</span>
+            </div>
+          </div>
+
+          <div class="callout">
+            <strong>Final architecture:</strong> keep the proven standalone portals for direct
+            model work, and provide a native <code>f5_tts</code> engine inside the Dockerized
+            Voicebox runtime. This replaced the earlier remote-adapter recommendation after the
+            Romanian F5 implementation in upstream PR #833 demonstrated a practical native path.
+          </div>
+        </section>
+
+        <section id="journey">
+          <h2>What we did</h2>
+          <ol class="timeline">
+            <li>
+              <strong>Researched the Arabic TTS landscape.</strong>
+              Evaluated F5-TTS, Habibi-TTS, existing Arabic-capable Voicebox engines, dependency
+              constraints, licensing, voice-cloning requirements, and integration alternatives.
+            </li>
+            <li>
+              <strong>Built the standalone Docker deployment.</strong>
+              Created two GPU-enabled services: F5 Arabic MSA on port 7860 and Habibi Arabic on
+              port 7861, with persistent model and Gradio caches and no host-side ML installation.
+            </li>
+            <li>
+              <strong>Diagnosed and hardened both portals.</strong>
+              Fixed container startup issues, Arabic model selection, reference-audio clipping,
+              lazy checkpoint loading, microphone waveform visibility, and recorded-audio
+              playback behavior.
+            </li>
+            <li>
+              <strong>Compared Voicebox integration options.</strong>
+              Documented direct Gradio calls, a stable REST adapter, native embedding, and a
+              generic provider architecture. The initial recommendation favored a versioned REST
+              adapter because it minimized dependency risk.
+            </li>
+            <li>
+              <strong>Reviewed upstream F5 work and revised the plan.</strong>
+              Upstream PR #833 showed how F5-TTS could fit Voicebox's existing backend protocol.
+              We adopted that native pattern, removed Romanian assumptions, and hardened it for
+              an Arabic multi-checkpoint catalog while retaining Docker as the release gate.
+            </li>
+            <li>
+              <strong>Implemented native Arabic F5/Habibi support.</strong>
+              Added backend lifecycle management, exact Arabic prompt handling, model switching,
+              dialect conditioning, frontend model selection, model metadata, Docker packaging,
+              tests, and operator documentation.
+            </li>
+            <li>
+              <strong>Improved TADA and multi-GPU behavior.</strong>
+              Added available-memory CUDA device selection and language-specific prompt aligners
+              so Arabic generation is not forced through an English alignment path.
+            </li>
+            <li>
+              <strong>Added Windows MSI automation.</strong>
+              Built a GitHub Actions workflow for an installable Tauri MSI, then constrained it to
+              run only after a pull request is merged.
+            </li>
+            <li>
+              <strong>Added safe bulk history deletion.</strong>
+              Implemented per-row selection, server-wide select-all, exclusions, confirmation,
+              active-job protection, file cleanup, strict API validation, and SQLite-safe batching.
+            </li>
+            <li>
+              <strong>Closed the review loop.</strong>
+              Audited automated and human review comments, implemented valid feedback, replied
+              with evidence, resolved every conversation, and reran CI and container checks.
+            </li>
+          </ol>
+        </section>
+
+        <section id="decisions">
+          <h2>Decision record</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Area</th>
+                  <th scope="col">Decision</th>
+                  <th scope="col">Reason</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Host isolation</td>
+                  <td>Run the ML stack in Docker.</td>
+                  <td>Meets the no-host-install requirement and makes the CUDA/PyTorch ABI reproducible.</td>
+                  <td><span class="status">Adopted</span></td>
+                </tr>
+                <tr>
+                  <td>Voicebox integration</td>
+                  <td>Use a native backend in Docker, while preserving standalone portals.</td>
+                  <td>PR #833 supplied a workable native pattern; Docker contains the dependency risk.</td>
+                  <td><span class="status">Revised &amp; adopted</span></td>
+                </tr>
+                <tr>
+                  <td>Engine model</td>
+                  <td>Expose one <code>f5_tts</code> engine with model variants.</td>
+                  <td>Habibi builds on F5; one family avoids duplicated backend and UI logic.</td>
+                  <td><span class="status">Adopted</span></td>
+                </tr>
+                <tr>
+                  <td>Default model</td>
+                  <td>Use <code>habibi-msa</code> as the default.</td>
+                  <td>It is the specialized Arabic MSA checkpoint already proven in the standalone F5 portal.</td>
+                  <td><span class="status">Adopted</span></td>
+                </tr>
+                <tr>
+                  <td>Arabic text</td>
+                  <td>Preserve exact Arabic, including diacritics.</td>
+                  <td>Silent transliteration or letter normalization can change pronunciation and meaning.</td>
+                  <td><span class="status">Adopted</span></td>
+                </tr>
+                <tr>
+                  <td>TADA alignment</td>
+                  <td>Select prompt aligners by language.</td>
+                  <td>Arabic should not use an English-only alignment path.</td>
+                  <td><span class="status">Adopted</span></td>
+                </tr>
+                <tr>
+                  <td>GPU placement</td>
+                  <td>Expose all GPUs; choose a device using available memory.</td>
+                  <td>Visibility enables scheduling, while one inference process normally uses one GPU rather than pooling VRAM.</td>
+                  <td><span class="status">Adopted</span></td>
+                </tr>
+                <tr>
+                  <td>Dependency control</td>
+                  <td>Pin PyTorch 2.8, CUDA 12.8, Torchaudio 2.8, TorchCodec 0.7, F5-TTS 1.1.21, and Habibi-TTS 0.1.1.</td>
+                  <td>F5/Habibi and audio codecs are sensitive to binary compatibility changes.</td>
+                  <td><span class="status">Adopted</span></td>
+                </tr>
+                <tr>
+                  <td>MSI CI</td>
+                  <td>Build the Windows MSI only after a PR merge.</td>
+                  <td>Avoids expensive duplicate installers during review while still producing a post-merge artifact.</td>
+                  <td><span class="status">Adopted</span></td>
+                </tr>
+                <tr>
+                  <td>Bulk deletion</td>
+                  <td>Make select-all server-wide and protect active jobs.</td>
+                  <td>Infinite-scroll rows must not define deletion scope, and running synthesis must never be removed.</td>
+                  <td><span class="status">Adopted</span></td>
+                </tr>
+                <tr>
+                  <td>SQLite safety</td>
+                  <td>Query selected IDs in batches of 500 and filter large exclusions in Python.</td>
+                  <td>Prevents bound-variable limit failures on large histories.</td>
+                  <td><span class="status">Adopted</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="implementation">
+          <h2>Implemented solution</h2>
+          <div class="grid">
+            <article class="card">
+              <h3>Standalone Arabic deployment</h3>
+              <ul>
+                <li>F5 Arabic MSA WebUI on <code>127.0.0.1:7860</code>.</li>
+                <li>Habibi Arabic WebUI on <code>127.0.0.1:7861</code>.</li>
+                <li>Dedicated GPU defaults with all GPUs visible to both containers.</li>
+                <li>Persistent Hugging Face/Torch and Gradio temporary-file volumes.</li>
+                <li>Lazy Habibi checkpoint loading to prevent avoidable VRAM exhaustion.</li>
+                <li>Recorder waveform/playback fix using container-native temporary storage.</li>
+                <li>Reference clipping fix so audio and transcript stay aligned.</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <h3>Native Voicebox engine</h3>
+              <ul>
+                <li>One <code>f5_tts</code> backend and eight canonical Arabic model IDs.</li>
+                <li>MSA, Unified, Saudi, UAE, Algerian, Iraqi, Egyptian, and Moroccan variants.</li>
+                <li>Reference audio plus exact transcript required for cloning.</li>
+                <li>Arabic-aware long-text chunking and cross-fading.</li>
+                <li>Unified dialect conditioning; no token for specialized checkpoints.</li>
+                <li>Model switching, unloading, caching, health, retry, streaming, and history integration.</li>
+                <li>License metadata visible in model descriptions.</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <h3>CUDA and operational hardening</h3>
+              <ul>
+                <li>RTX 50-series-compatible CUDA 12.8 image.</li>
+                <li>Both RTX 5070 and RTX 5060 Ti verified inside Docker.</li>
+                <li>Expandable CUDA allocation and increased shared memory.</li>
+                <li>Available-memory device choice for TADA.</li>
+                <li>Inference locking around model switching and generation.</li>
+                <li>Persistent profiles, outputs, model cache, and database storage.</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <h3>Voicebox UX and safety</h3>
+              <ul>
+                <li>Arabic engine/model selection integrated into profile and generation forms.</li>
+                <li>History rows can be selected individually or across the entire dataset.</li>
+                <li>Partial select-all state is visually accurate.</li>
+                <li>Confirmation is required before destructive bulk actions.</li>
+                <li>Active generation jobs are excluded in both UI and backend.</li>
+                <li>Audio/version files and database rows are cleaned together.</li>
+                <li>The player resets if its active clip is deleted.</li>
+              </ul>
+            </article>
+          </div>
+
+          <h3>Normal CUDA startup</h3>
+          <pre><code>docker compose -f docker-compose.yml -f docker-compose.cuda.yml up -d --build</code></pre>
+          <p>
+            Voicebox is published at <code>http://127.0.0.1:17600</code>, avoiding conflicts with
+            the standalone portals. Model weights remain in Docker volumes and download on first use.
+          </p>
+        </section>
+
+        <section id="quality">
+          <h2>Quality and review evidence</h2>
+          <div class="evidence">
+            <strong>Validated:</strong> focused backend suites reported 24 passing tests; application
+            and web TypeScript checks passed; the production web build passed; the CUDA container
+            reported healthy with both intended GPUs; invalid bulk-delete request shapes returned
+            HTTP 400; and the updated GitHub frontend-quality workflow passed.
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Validation area</th>
+                  <th scope="col">Result</th>
+                  <th scope="col">Coverage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Arabic backend tests</td>
+                  <td><span class="status">Passed</span></td>
+                  <td>F5/Habibi model registry, lifecycle, dialect behavior, TADA alignment, and CUDA selection.</td>
+                </tr>
+                <tr>
+                  <td>Bulk history tests</td>
+                  <td><span class="status">Passed</span></td>
+                  <td>File cleanup, active-job protection, 1,200 selected IDs, and 1,200 exclusions.</td>
+                </tr>
+                <tr>
+                  <td>Frontend checks</td>
+                  <td><span class="status">Passed</span></td>
+                  <td>App/web TypeScript compilation and Vite production build.</td>
+                </tr>
+                <tr>
+                  <td>Live container</td>
+                  <td><span class="status">Healthy</span></td>
+                  <td>CUDA 12.8 runtime, two visible GPUs, health endpoint, and API request validation.</td>
+                </tr>
+                <tr>
+                  <td>Review conversations</td>
+                  <td><span class="status">Resolved</span></td>
+                  <td>Valid comments implemented, evidence posted, and all current threads closed.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="delivery">
+          <h2>Repositories, delivery, and CI</h2>
+          <div class="grid">
+            <article class="card">
+              <h3>Standalone deployment</h3>
+              <p>
+                <a href="https://github.com/samykabu/arabicTTS">samykabu/arabicTTS</a>
+                contains the Dockerized F5/Habibi portals, setup guide, and the original integration
+                research report.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Voicebox fork</h3>
+              <p>
+                <a href="https://github.com/samykabu/voicebox">samykabu/voicebox</a>
+                contains the native Arabic engine, CUDA deployment, TADA fixes, MSI workflow, and
+                bulk-history capability.
+              </p>
+            </article>
+          </div>
+
+          <p>
+            The Windows workflow builds the Python server and MCP shim, produces a Tauri MSI,
+            verifies that an installer exists, calculates its SHA-256 hash, and uploads it as a
+            14-day artifact. It is triggered only when a pull request affecting application,
+            backend, Tauri, or lock files is closed with <code>merged == true</code>.
+          </p>
+        </section>
+
+        <section id="remaining">
+          <h2>Known constraints and deferred work</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Item</th>
+                  <th scope="col">Current position</th>
+                  <th scope="col">Why deferred</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>External provider API</td>
+                  <td><span class="status deferred">Optional later</span></td>
+                  <td>The native Docker backend now meets the immediate product need; a generic provider remains useful for remote inference.</td>
+                </tr>
+                <tr>
+                  <td>All-checkpoint manual sweep</td>
+                  <td><span class="status deferred">Still recommended</span></td>
+                  <td>Automated metadata and switching tests exist, but every specialized checkpoint should still receive a final human audio-quality pass.</td>
+                </tr>
+                <tr>
+                  <td>Full upstream regression suite</td>
+                  <td><span class="status deferred">Follow-up</span></td>
+                  <td>A broader Docker run had one unrelated progress-tracker failure and two legacy collection-only harness cases.</td>
+                </tr>
+                <tr>
+                  <td>Cross-platform native bundling</td>
+                  <td><span class="status deferred">Best effort</span></td>
+                  <td>Docker remains the release gate until CUDA, Linux, CPU, and Apple Silicon packaging are covered consistently.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout">
+            <strong>Responsible-use note:</strong> cloned voices and reference recordings are
+            biometric data. Use only voices you are authorized to reproduce, protect persistent
+            volumes and backups, and verify the selected checkpoint's license before commercial use.
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        Prepared as the consolidated implementation and decision record for the Arabic TTS,
+        voice-cloning, Docker, Voicebox, GPU, CI/CD, and history-management work.
+      </footer>
+    </article>
+  </body>
+</html>
