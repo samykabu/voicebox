@@ -30,6 +30,7 @@ wandb
 datasets
 hydra-core
 unidecode
+
 # LuxTTS (voice cloning engine)
 # piper-phonemize needs custom index (no PyPI wheels)
 --find-links https://k2-fsa.github.io/icefall/piper_phonemize.html
@@ -69,6 +70,7 @@ en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_
 unidic-lite>=1.0.8
 
 # Audio processing
+audioop-lts>=0.2.1; python_version >= "3.13"
 librosa>=0.10.0
 soundfile>=0.12.0
 numpy>=1.24.0,<2.0

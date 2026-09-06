@@ -112,7 +112,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
                     ? getHabibiModel(selectedModelSize).id
                     : engine === 'qwen_custom_voice'
                       ? `qwen-custom-voice-${data.modelSize}`
-                    : `qwen-tts-${data.modelSize}`;
+                      : `qwen-tts-${data.modelSize}`;
       const displayName =
         engine === 'luxtts'
           ? 'LuxTTS'
@@ -150,7 +150,10 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
       }
 
       const hasModelSizes =
-        engine === 'qwen' || engine === 'qwen_custom_voice' || engine === 'tada' || engine === 'f5_tts';
+        engine === 'qwen' ||
+        engine === 'qwen_custom_voice' ||
+        engine === 'tada' ||
+        engine === 'f5_tts';
       // Only Qwen CustomVoice actually honors the instruct kwarg at model level.
       // Base Qwen3-TTS accepts the kwarg but ignores it.
       const supportsInstruct = engine === 'qwen_custom_voice';
