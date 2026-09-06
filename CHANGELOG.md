@@ -7,6 +7,20 @@
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-09-06
+
+### Windows
+
+- **GPU backend downloads work.** The CUDA and ROCm backends are fetched from this
+  repository's releases; 0.5.2 requested them from upstream, which has no matching
+  tag, so the download failed on the checksum step.
+
+### Upstream
+
+- **Merged 33 upstream commits** from jamiepine/voicebox: Korean, Spanish and
+  Italian locales, WAV transcoding before transcription, runaway audio guards for
+  Qwen, export filename disambiguation, macOS fn-key chords, and assorted fixes.
+- The MCP `voicebox.speak` tool's `model_size` accepts the Habibi Arabic variants.
 ## [0.5.2] - 2026-09-06
 
 ### Arabic TTS
@@ -769,6 +783,7 @@ The first public release of Voicebox — an open-source voice synthesis studio p
 
 Tauri v2, React, TypeScript, Tailwind CSS, FastAPI, Qwen3-TTS, Whisper, SQLite
 
+[0.5.3]: https://github.com/samykabu/voicebox/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/samykabu/voicebox/compare/v0.5.0...v0.5.2
 [0.5.0]: https://github.com/jamiepine/voicebox/compare/v0.4.5...v0.5.0
 [0.4.5]: https://github.com/jamiepine/voicebox/compare/v0.4.4...v0.4.5
