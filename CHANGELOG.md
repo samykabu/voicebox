@@ -7,6 +7,24 @@
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-09-06
+
+### Arabic TTS
+
+- **Native Arabic F5-TTS and Habibi voice cloning.** Two new engines for Arabic
+  speech: an Arabic-tuned F5-TTS model and Habibi voice cloning, selectable from
+  the engine picker with Arabic-aware text handling.
+
+### History
+
+- **Bulk selection and deletion.** Select many generations in the History tab and
+  delete them in one action.
+
+### Windows
+
+- **Signed Windows MSI releases.** Release builds are signed with this fork's own
+  updater key and check this repository for updates.
+
 ### Linux
 
 - **ROCm setup works on Linux AMD systems.** Docker ROCm builds now keep PyTorch
@@ -751,6 +769,7 @@ The first public release of Voicebox — an open-source voice synthesis studio p
 
 Tauri v2, React, TypeScript, Tailwind CSS, FastAPI, Qwen3-TTS, Whisper, SQLite
 
+[0.5.2]: https://github.com/samykabu/voicebox/compare/v0.5.0...v0.5.2
 [0.5.0]: https://github.com/jamiepine/voicebox/compare/v0.4.5...v0.5.0
 [0.4.5]: https://github.com/jamiepine/voicebox/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/jamiepine/voicebox/compare/v0.4.3...v0.4.4
