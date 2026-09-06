@@ -323,7 +323,9 @@ class HumeTadaBackend:
         """Load the encoder with the aligner required by the prompt language."""
         encoder_key = aligner_language or "en"
         with self._load_lock:
-            if self.encoder is not None and self._encoder_language == encoder_key:
+            # An encoder set without a language tag (e.g. by load_model or a
+            # test) is the default English aligner.
+            if self.encoder is not None and (self._encoder_language or "en") == encoder_key:
                 return
 
             if self.encoder is not None:
