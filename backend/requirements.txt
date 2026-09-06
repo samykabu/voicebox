@@ -30,6 +30,7 @@ wandb
 datasets
 hydra-core
 unidecode
+
 # LuxTTS (voice cloning engine)
 # piper-phonemize needs custom index (no PyPI wheels)
 --find-links https://k2-fsa.github.io/icefall/piper_phonemize.html
