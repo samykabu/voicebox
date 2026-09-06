@@ -137,18 +137,18 @@ async def test_download_rocm_binary_progress_reporting(mock_backends_dir, fake_t
     libs_sha = hashlib.sha256(fake_tar_gz).hexdigest()
 
     responses = {
-        "https://github.com/jamiepine/voicebox/releases/download/v0.2.3/voicebox-server-rocm.tar.gz": FakeResponse(
+        "https://github.com/samykabu/voicebox/releases/download/v0.2.3/voicebox-server-rocm.tar.gz": FakeResponse(
             content=fake_tar_gz,
             headers={"content-length": str(len(fake_tar_gz))},
         ),
-        "https://github.com/jamiepine/voicebox/releases/download/v0.2.3/voicebox-server-rocm.tar.gz.sha256": FakeResponse(
+        "https://github.com/samykabu/voicebox/releases/download/v0.2.3/voicebox-server-rocm.tar.gz.sha256": FakeResponse(
             content=f"{server_sha}  voicebox-server-rocm.tar.gz\n".encode(),
         ),
-        f"https://github.com/jamiepine/voicebox/releases/download/v0.2.3/rocm-libs-{rocm.ROCM_LIBS_VERSION}.tar.gz": FakeResponse(
+        f"https://github.com/samykabu/voicebox/releases/download/v0.2.3/rocm-libs-{rocm.ROCM_LIBS_VERSION}.tar.gz": FakeResponse(
             content=fake_tar_gz,
             headers={"content-length": str(len(fake_tar_gz))},
         ),
-        f"https://github.com/jamiepine/voicebox/releases/download/v0.2.3/rocm-libs-{rocm.ROCM_LIBS_VERSION}.tar.gz.sha256": FakeResponse(
+        f"https://github.com/samykabu/voicebox/releases/download/v0.2.3/rocm-libs-{rocm.ROCM_LIBS_VERSION}.tar.gz.sha256": FakeResponse(
             content=f"{libs_sha}  rocm-libs.tar.gz\n".encode(),
         ),
     }

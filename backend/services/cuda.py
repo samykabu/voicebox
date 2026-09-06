@@ -27,7 +27,7 @@ from ..utils.progress import get_progress_manager
 
 logger = logging.getLogger(__name__)
 
-GITHUB_RELEASES_URL = "https://github.com/jamiepine/voicebox/releases/download"
+GITHUB_RELEASES_URL = "https://github.com/samykabu/voicebox/releases/download"
 
 PROGRESS_KEY = "cuda-backend"
 
