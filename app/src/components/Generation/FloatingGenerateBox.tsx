@@ -565,7 +565,7 @@ export function FloatingGenerateBox({
                         <SelectTrigger className="h-8 text-xs bg-card border-border rounded-full hover:bg-background/50 transition-all w-full">
                           <SelectValue placeholder={t('generation.voiceSelector.placeholder')} />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent side="top">
                           {profiles?.map((profile) => (
                             <SelectItem key={profile.id} value={profile.id} className="text-xs">
                               {profile.name}
@@ -592,7 +592,7 @@ export function FloatingGenerateBox({
                                 <SelectValue />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent side="top">
                               {engineLangs.map((lang) => (
                                 <SelectItem key={lang.value} value={lang.value} className="text-xs">
                                   {lang.label}
@@ -620,7 +620,7 @@ export function FloatingGenerateBox({
                       <SelectTrigger className="h-8 text-xs bg-card border-border rounded-full hover:bg-background/50 transition-all">
                         <SelectValue placeholder={t('generation.effects.none')} />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent side="top">
                         <SelectItem value="none" className="text-xs">
                           {t('generation.effects.none')}
                         </SelectItem>
