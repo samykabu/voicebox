@@ -97,7 +97,7 @@ export function AboutPage() {
                 <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
               </a>
               <a
-                href="https://github.com/jamiepine/voicebox"
+                href="https://github.com/samykabu/voicebox"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 rounded-lg border border-border/60 px-4 py-2 text-sm transition-colors hover:bg-muted/50"
@@ -124,7 +124,7 @@ export function AboutPage() {
                   link: (
                     // biome-ignore lint/a11y/useAnchorContent: Trans fills content at runtime
                     <a
-                      href="https://github.com/jamiepine/voicebox/blob/main/LICENSE"
+                      href="https://github.com/samykabu/voicebox/blob/main/LICENSE"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:text-muted-foreground/60 transition-colors"
