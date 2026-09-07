@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from .. import config, models
+from .. import __version__, config, models
 from ..services import tts
 from ..database import get_db
 from ..utils.platform_detect import get_backend_type, is_amd_gpu_windows
@@ -178,6 +178,7 @@ async def health():
 
     return models.HealthResponse(
         status="healthy",
+        version=__version__,
         model_loaded=model_loaded,
         model_downloaded=model_downloaded,
         model_size=model_size,
