@@ -8,10 +8,11 @@ import { useAutoUpdater } from '@/hooks/useAutoUpdater';
 import { useThemeSync } from '@/hooks/useThemeSync';
 import { apiClient } from '@/lib/api/client';
 import type { HealthResponse } from '@/lib/api/types';
-import { useChordSync } from '@/lib/hooks/useChordSync';
 import { TOP_SAFE_AREA_PADDING } from '@/lib/constants/ui';
+import { useChordSync } from '@/lib/hooks/useChordSync';
 import { cn } from '@/lib/utils/cn';
 import { usePlatform } from '@/platform/PlatformContext';
+import type { Platform } from '@/platform/types';
 import { router } from '@/router';
 import { useLogStore } from '@/stores/logStore';
 import {
@@ -50,6 +51,25 @@ function isPortInUseError(error: unknown): boolean {
     msg.includes('EADDRINUSE') ||
     msg.includes('address already in use')
   );
+}
+
+/**
+ * A server left running across an app upgrade (keep-server-running) still
+ * answers on the port, so start_server reuses it and the UI talks to old
+ * backend code. Restart it when its version does not match the app.
+ */
+async function restartIfStaleServer(platform: Platform): Promise<void> {
+  try {
+    const [health, appVersion] = await Promise.all([
+      apiClient.getHealth(),
+      platform.metadata.getVersion(),
+    ]);
+    if (!health.version || health.version === appVersion) return;
+    console.warn(`Server ${health.version} does not match app ${appVersion}, restarting server...`);
+    await platform.lifecycle.restartServer();
+  } catch (error) {
+    console.error('Stale server check failed:', error);
+  }
 }
 
 const LOADING_MESSAGES = [
@@ -171,10 +191,13 @@ function MainApp() {
 
     platform.lifecycle
       .startServer(isRemote, customModelsDir)
-      .then((serverUrl) => {
+      .then(async (serverUrl) => {
         console.log('Server is ready at:', serverUrl);
         // Update the server URL in the store with the dynamically assigned port
         useServerStore.getState().setServerUrl(serverUrl);
+        if (!isRemote) {
+          await restartIfStaleServer(platform);
+        }
         setServerReady(true);
         // Mark that we started the server (so we know to stop it on close)
         window.__voiceboxServerStartedByApp = true;

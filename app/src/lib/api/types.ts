@@ -1,6 +1,7 @@
 // API Types matching backend Pydantic models
-import type { LanguageCode } from '@/lib/constants/languages';
+
 import type { HabibiModelId } from '@/lib/constants/habibiModels';
+import type { LanguageCode } from '@/lib/constants/languages';
 
 export type VoiceType = 'cloned' | 'preset' | 'designed';
 
@@ -264,6 +265,7 @@ export interface TranscriptionResponse {
 
 export interface HealthResponse {
   status: string;
+  version?: string;
   model_loaded: boolean;
   model_downloaded?: boolean;
   model_size?: string;

@@ -446,6 +446,7 @@ class HealthResponse(BaseModel):
     """Response model for health check."""
 
     status: str
+    version: Optional[str] = None  # Server version, lets the app detect a stale sidecar
     model_loaded: bool
     model_downloaded: Optional[bool] = None  # Whether model is cached/downloaded
     model_size: Optional[str] = None  # Current model size if loaded
