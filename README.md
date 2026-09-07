@@ -11,17 +11,17 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/jamiepine/voicebox/releases">
-    <img src="https://img.shields.io/github/downloads/jamiepine/voicebox/total?style=flat&color=blue" alt="Downloads" />
+  <a href="https://github.com/samykabu/voicebox/releases">
+    <img src="https://img.shields.io/github/downloads/samykabu/voicebox/total?style=flat&color=blue" alt="Downloads" />
   </a>
-  <a href="https://github.com/jamiepine/voicebox/releases/latest">
-    <img src="https://img.shields.io/github/v/release/jamiepine/voicebox?style=flat" alt="Release" />
+  <a href="https://github.com/samykabu/voicebox/releases/latest">
+    <img src="https://img.shields.io/github/v/release/samykabu/voicebox?style=flat" alt="Release" />
   </a>
-  <a href="https://github.com/jamiepine/voicebox/stargazers">
-    <img src="https://img.shields.io/github/stars/jamiepine/voicebox?style=flat" alt="Stars" />
+  <a href="https://github.com/samykabu/voicebox/stargazers">
+    <img src="https://img.shields.io/github/stars/samykabu/voicebox?style=flat" alt="Stars" />
   </a>
-  <a href="https://github.com/jamiepine/voicebox/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/jamiepine/voicebox?style=flat" alt="License" />
+  <a href="https://github.com/samykabu/voicebox/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/samykabu/voicebox?style=flat" alt="License" />
   </a>
   <a href="https://deepwiki.com/jamiepine/voicebox">
     <img src="https://img.shields.io/static/v1?label=Ask&message=DeepWiki&color=5B6EF7" alt="Ask DeepWiki" />
@@ -94,7 +94,7 @@ The two cloud incumbents sit on opposite halves of the voice I/O loop — Eleven
 | --------------------- | ------------------------------------------------------ |
 | macOS (Apple Silicon) | [Download DMG](https://voicebox.sh/download/mac-arm)   |
 | macOS (Intel)         | [Download DMG](https://voicebox.sh/download/mac-intel) |
-| Windows               | [Download MSI](https://voicebox.sh/download/windows)   |
+| Windows               | [Download MSI](https://github.com/samykabu/voicebox/releases/latest)   |
 | Docker                | `docker compose up`                                    |
 
 > **Arabic F5-TTS / Habibi on NVIDIA:** use
@@ -103,7 +103,7 @@ The two cloud incumbents sit on opposite halves of the voice I/O loop — Eleven
 > CUDA libraries, models, and FFmpeg off the host. See the
 > [Arabic CUDA deployment guide](docs/content/docs/overview/docker-arabic-f5-habibi.mdx).
 
-> **[View all binaries →](https://github.com/jamiepine/voicebox/releases/latest)**
+> **[View all binaries →](https://github.com/samykabu/voicebox/releases/latest)**
 
 > **Linux** — Pre-built binaries are not yet available. See [voicebox.sh/linux-install](https://voicebox.sh/linux-install) for build-from-source instructions.
 
@@ -414,7 +414,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed setup and contribution guide
 ### Quick Start
 
 ```bash
-git clone https://github.com/jamiepine/voicebox.git
+git clone https://github.com/samykabu/voicebox.git
 cd voicebox
 
 just setup   # creates Python venv, installs all deps
