@@ -365,19 +365,17 @@ async def _run_startup(application: FastAPI) -> None:
 def disable_hf_symlinks_if_unreadable(cache_dir: Path) -> bool:
     """Make huggingface_hub copy files when symlinks can be created but not read.
 
-    huggingface_hub only probes that a symlink can be *created*. On Windows a
-    link can be created yet not followed (SymlinkEvaluation policy, some AV or
-    sync tools), and opening a cached file then fails with
-    "[Errno 22] Invalid argument". Returns True when symlinks were disabled.
+    huggingface_hub only probes that a symlink can be *created*. On some Windows
+    machines a link can be created yet not opened (security/filter drivers,
+    SymlinkEvaluation policy), and loading a cached model then fails with
+    "[Errno 22] Invalid argument" on the snapshot file. huggingface_hub checks
+    support per model directory, so override the check itself rather than its
+    per-directory cache. Returns True when symlinks were disabled.
     """
     import os
     import tempfile
 
     from huggingface_hub import file_download
-
-    supported = getattr(file_download, "_are_symlinks_supported_in_dir", None)
-    if supported is None:
-        return False
 
     with tempfile.TemporaryDirectory(dir=cache_dir) as tmp:
         src = Path(tmp) / "src"
@@ -394,7 +392,7 @@ def disable_hf_symlinks_if_unreadable(cache_dir: Path) -> bool:
 
     if readable:
         return False
-    supported[str(cache_dir.expanduser().resolve())] = False
+    file_download.are_symlinks_supported = lambda cache_dir=None: False
     logger.warning(
         "Symlinks in %s can be created but not read; huggingface_hub will copy model files instead",
         cache_dir,

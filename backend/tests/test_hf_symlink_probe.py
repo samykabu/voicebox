@@ -1,4 +1,4 @@
-"""The HF cache symlink probe must disable symlinks when links cannot be read."""
+"""The HF cache symlink probe must switch huggingface_hub to copy mode when links cannot be read."""
 
 from pathlib import Path
 
@@ -8,21 +8,19 @@ from huggingface_hub import file_download
 from backend.app import disable_hf_symlinks_if_unreadable
 
 
-def _key(path: Path) -> str:
-    return str(path.expanduser().resolve())
+@pytest.fixture
+def restore_hf(monkeypatch):
+    monkeypatch.setattr(file_download, "are_symlinks_supported", file_download.are_symlinks_supported)
+    yield
 
 
-def test_readable_symlinks_leave_hf_alone(tmp_path):
-    before = dict(file_download._are_symlinks_supported_in_dir)
-    try:
-        assert disable_hf_symlinks_if_unreadable(tmp_path) is False
-        assert _key(tmp_path) not in file_download._are_symlinks_supported_in_dir
-    finally:
-        file_download._are_symlinks_supported_in_dir.clear()
-        file_download._are_symlinks_supported_in_dir.update(before)
+def test_readable_symlinks_leave_hf_alone(tmp_path, restore_hf):
+    original = file_download.are_symlinks_supported
+    assert disable_hf_symlinks_if_unreadable(tmp_path) is False
+    assert file_download.are_symlinks_supported is original
 
 
-def test_unreadable_symlinks_disable_hf_symlinks(tmp_path, monkeypatch):
+def test_unreadable_symlinks_make_hf_copy_files(tmp_path, restore_hf, monkeypatch):
     real_read_text = Path.read_text
 
     def failing_read_text(self, *args, **kwargs):
@@ -31,11 +29,16 @@ def test_unreadable_symlinks_disable_hf_symlinks(tmp_path, monkeypatch):
         return real_read_text(self, *args, **kwargs)
 
     monkeypatch.setattr(Path, "read_text", failing_read_text)
-    before = dict(file_download._are_symlinks_supported_in_dir)
-    try:
-        assert disable_hf_symlinks_if_unreadable(tmp_path) is True
-        assert file_download._are_symlinks_supported_in_dir[_key(tmp_path)] is False
-        assert file_download.are_symlinks_supported(tmp_path) is False
-    finally:
-        file_download._are_symlinks_supported_in_dir.clear()
-        file_download._are_symlinks_supported_in_dir.update(before)
+    assert disable_hf_symlinks_if_unreadable(tmp_path) is True
+    # huggingface_hub consults this per model directory; it must say no everywhere now.
+    assert file_download.are_symlinks_supported(tmp_path / "models--x--y") is False
+
+    # And _create_symlink must then produce a real file, not a link.
+    blob = tmp_path / "blobs" / "abc"
+    blob.parent.mkdir()
+    blob.write_text("payload")
+    pointer = tmp_path / "snapshots" / "sha" / "config.yaml"
+    pointer.parent.mkdir(parents=True)
+    file_download._create_symlink(str(blob), str(pointer), new_blob=False)
+    assert pointer.is_file() and not pointer.is_symlink()
+    assert pointer.read_text() == "payload"
