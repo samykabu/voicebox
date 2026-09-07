@@ -355,10 +355,51 @@ async def _run_startup(application: FastAPI) -> None:
         cache_dir = Path(hf_constants.HF_HUB_CACHE)
         cache_dir.mkdir(parents=True, exist_ok=True)
         logger.info("Model cache: %s", cache_dir)
+        disable_hf_symlinks_if_unreadable(cache_dir)
     except Exception as e:
         logger.warning("Could not create HuggingFace cache directory: %s", e)
 
     logger.info("Ready")
+
+
+def disable_hf_symlinks_if_unreadable(cache_dir: Path) -> bool:
+    """Make huggingface_hub copy files when symlinks can be created but not read.
+
+    huggingface_hub only probes that a symlink can be *created*. On Windows a
+    link can be created yet not followed (SymlinkEvaluation policy, some AV or
+    sync tools), and opening a cached file then fails with
+    "[Errno 22] Invalid argument". Returns True when symlinks were disabled.
+    """
+    import os
+    import tempfile
+
+    from huggingface_hub import file_download
+
+    supported = getattr(file_download, "_are_symlinks_supported_in_dir", None)
+    if supported is None:
+        return False
+
+    with tempfile.TemporaryDirectory(dir=cache_dir) as tmp:
+        src = Path(tmp) / "src"
+        dst = Path(tmp) / "dst"
+        src.write_text("ok")
+        try:
+            os.symlink(os.path.relpath(src, tmp), dst)
+        except OSError:
+            return False  # cannot create links: huggingface_hub already copies
+        try:
+            readable = dst.read_text() == "ok"
+        except OSError:
+            readable = False
+
+    if readable:
+        return False
+    supported[str(cache_dir.expanduser().resolve())] = False
+    logger.warning(
+        "Symlinks in %s can be created but not read; huggingface_hub will copy model files instead",
+        cache_dir,
+    )
+    return True
 
 
 async def _run_shutdown() -> None:
