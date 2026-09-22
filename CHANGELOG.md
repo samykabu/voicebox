@@ -7,6 +7,29 @@
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-09-22
+
+### Pronunciation dictionary
+
+- **Fix how names, brands and loanwords are spoken, once.** Save a rule such as
+  `Voicebox → فويس بوكس` and it is applied to every generation before the
+  voice model reads the text. History keeps the original wording. Rules can be
+  global or limited to a language or a voice profile. API only for now
+  (`/pronunciations`, with `/pronunciations/preview` to test a rule). From
+  upstream jamiepine/voicebox#1025.
+- **Works with real Arabic text.** Rules match with or without diacritics
+  (`محمد` / `مُحَمَّد`), across hamza and ta marbuta spellings (`أحمد` / `احمد`,
+  `مكة` / `مكه`), and behind attached prefixes (`الرياض` also matches `بالرياض`,
+  `والرياض` and `للرياض`). The prefix is kept.
+
+### Fixes
+
+- **Models load when Hugging Face cache symlinks can't be read.** The cache
+  files are copied instead.
+- **A server left running from the previous version is restarted** after an
+  upgrade, instead of the new app talking to the old server.
+- Release, license and clone links now point at this fork.
+
 ## [0.5.3] - 2026-09-06
 
 ### Windows
