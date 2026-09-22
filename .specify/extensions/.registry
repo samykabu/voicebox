@@ -1,0 +1,160 @@
+{
+  "schema_version": "1.0",
+  "extensions": {
+    "illustrate": {
+      "version": "2.1.2",
+      "source": "local",
+      "manifest_hash": "sha256:a2e8fc7cee518837ce0574d10289467b1ad6ecdcedc04641b2391724249ab58c",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.illustrate.generate",
+          "speckit.illustrate.export",
+          "speckit.illustrate.theme"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T16:51:48.874780+00:00"
+    },
+    "project": {
+      "version": "2.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:cfc3c67da40f6d2240127ff868439e56c2923b40fbd7da855b7021d682e49aae",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.project.init",
+          "speckit.project.sync"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T16:51:50.962027+00:00"
+    },
+    "assure": {
+      "version": "2.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:a49aa75a04a50311763fb2d30ab7cab8b50dac07069272f7f90cd0507c9db2d1",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.assure.init",
+          "speckit.assure.analyze",
+          "speckit.assure.document"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T16:51:53.123424+00:00"
+    },
+    "user-manual": {
+      "version": "1.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:0691dd6da42f4ae99bce6cb43a286420d7180fd1b57999f6831569e39671e795",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.user-manual.init",
+          "speckit.user-manual.analyze",
+          "speckit.user-manual.update",
+          "speckit.user-manual.release"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T16:51:55.214800+00:00"
+    },
+    "pr": {
+      "version": "4.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:a2a0cfa7c305ee0bd5915a8f6019bcdb142bff6a0def18b1ceabcea1210a7148",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.pr.generate",
+          "speckit.pr.review-feedback"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T16:51:57.077411+00:00"
+    },
+    "scope": {
+      "version": "1.4.0",
+      "source": "local",
+      "manifest_hash": "sha256:c91307314e468d84abe1db0d8b34b14fae07e2b0c8bf7d064c9ec7808f616e0b",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.scope.run",
+          "speckit.scope.guard",
+          "speckit.scope.bind",
+          "speckit.scope.reconcile",
+          "speckit.scope.plan",
+          "speckit.scope.after-specify",
+          "speckit.scope.plan-guard"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T16:51:59.218782+00:00"
+    },
+    "workflow": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:0eb92043a5dcb0aed81f2fa6c8688aa4ac421297c13270a7028c9f966fa036f9",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.workflow.init",
+          "speckit.workflow.scope",
+          "speckit.workflow.clarify",
+          "speckit.workflow.continue",
+          "speckit.workflow.finalize",
+          "speckit.workflow.status",
+          "speckit.workflow.doctor",
+          "speckit.workflow.reconcile"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T16:52:01.366426+00:00"
+    },
+    "speckit-superpowers-bridge": {
+      "version": "1.2.0",
+      "source": "local",
+      "manifest_hash": "sha256:fe7c8d353c87f90f48763c424f24c09bd02e572479b9313900ee341b5a858e89",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.speckit-superpowers-bridge.handoff",
+          "speckit.speckit-superpowers-bridge.guard",
+          "speckit.speckit-superpowers-bridge.execute",
+          "speckit.superpowers-bridge"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T17:04:57.886358+00:00"
+    },
+    "superspec": {
+      "version": "1.0.2",
+      "source": "local",
+      "manifest_hash": "sha256:6e23ee6c18f9e05d077293c7cd3ab8aaa982f1b7e35996267dc32b51e5fc8e54",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.superspec.status",
+          "speckit.superspec.brainstorm",
+          "speckit.superspec.tasks",
+          "speckit.superspec.execute",
+          "speckit.superspec.review"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T17:04:59.936926+00:00"
+    }
+  }
+}

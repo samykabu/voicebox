@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "host": "claude",
+  "processes": {
+    "qa": false,
+    "user_manual": false
+  },
+  "extensions": {
+    "illustrate": {
+      "version": "2.1.2",
+      "enabled": true,
+      "manifest_hash": "sha256:a2e8fc7cee518837ce0574d10289467b1ad6ecdcedc04641b2391724249ab58c",
+      "source": "local",
+      "release_url": "https://github.com/samykabu/sanduq/releases/download/illustrate-v2.1.2/illustrate.zip",
+      "distribution": "local-development"
+    },
+    "pr": {
+      "version": "4.1.0",
+      "enabled": true,
+      "manifest_hash": "sha256:a2a0cfa7c305ee0bd5915a8f6019bcdb142bff6a0def18b1ceabcea1210a7148",
+      "source": "local",
+      "release_url": "https://github.com/samykabu/sanduq/releases/download/pr-v4.1.0/pr.zip",
+      "distribution": "local-development"
+    },
+    "project": {
+      "version": "2.1.0",
+      "enabled": true,
+      "manifest_hash": "sha256:cfc3c67da40f6d2240127ff868439e56c2923b40fbd7da855b7021d682e49aae",
+      "source": "local",
+      "release_url": "https://github.com/samykabu/sanduq/releases/download/project-v2.1.0/project.zip",
+      "distribution": "local-development"
+    },
+    "scope": {
+      "version": "1.4.0",
+      "enabled": true,
+      "manifest_hash": "sha256:c91307314e468d84abe1db0d8b34b14fae07e2b0c8bf7d064c9ec7808f616e0b",
+      "source": "local",
+      "release_url": "https://github.com/samykabu/sanduq/releases/download/scope-v1.4.0/scope.zip",
+      "distribution": "local-development"
+    },
+    "workflow": {
+      "version": "1.0.0",
+      "enabled": true,
+      "manifest_hash": "sha256:0eb92043a5dcb0aed81f2fa6c8688aa4ac421297c13270a7028c9f966fa036f9",
+      "source": "local",
+      "release_url": "https://github.com/samykabu/sanduq/releases/download/workflow-v1.0.0/workflow.zip",
+      "distribution": "local-development"
+    }
+  },
+  "dependency_digest": "cbe49c54173803273109984b75d2a078de661d2a3d88389641a490d374554b65",
+  "aliases": {
+    ".agents/skills/speckit-scope/SKILL.md": "bfd463e13e19ae2c10da7016407a37333046fabe2c946648431af5016b03a64e",
+    ".claude/skills/speckit-scope/SKILL.md": "bfd463e13e19ae2c10da7016407a37333046fabe2c946648431af5016b03a64e",
+    ".agents/skills/speckit-superpowers-bridge/SKILL.md": "ff083bf852c9588e9d3b2b9865c54691d6e3d7bada0f868b0b8693fd4249c30f",
+    ".claude/skills/speckit-superpowers-bridge/SKILL.md": "ff083bf852c9588e9d3b2b9865c54691d6e3d7bada0f868b0b8693fd4249c30f"
+  },
+  "presets": {
+    "scope-gate": {
+      "version": "1.4.0",
+      "enabled": true,
+      "priority": 2,
+      "manifest_hash": "sha256:0a514cf8474dca3f3e0a4add96a346b28b93adff5b50261493eca5a75c4cf10e"
+    },
+    "scope-brainstorm": {
+      "version": "1.4.0",
+      "enabled": true,
+      "priority": 2,
+      "manifest_hash": "sha256:0314622993ce4373af0866c1d66dfd517051635fe95e24e512b6d7e9822200e5"
+    },
+    "workflow": {
+      "version": "1.0.0",
+      "enabled": true,
+      "priority": 1,
+      "manifest_hash": "sha256:ecfda8b2809a4433f51814a45aa77fab460af630f7c78d60bb468e670e7fe42e"
+    }
+  },
+  "tested_compatibility": {
+    "spec_kit": {
+      "version": "1.0.6.dev0",
+      "commit": "f21acc4a25ce3aa53ff8653357b49b9aafcf8026"
+    },
+    "upstream_optional": {
+      "superspec": {
+        "repository": "https://github.com/WangX0111/superspec",
+        "tested_version": "1.0.2",
+        "tested_commit": "c20ac6c1ba069cc9a72dacb8044b7b193d3dde81"
+      }
+    }
+  }
+}

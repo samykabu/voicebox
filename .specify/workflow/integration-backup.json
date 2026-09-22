@@ -1,0 +1,467 @@
+{
+  "schema_version": 1,
+  "entries": {
+    "after_specify:speckit.project.sync": {
+      "original": {
+        "extension": "project",
+        "command": "speckit.project.sync",
+        "enabled": true,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Create/refresh the GitHub Project feature issue (Status: open column)? Run: /speckit-project-sync open",
+        "description": "Create the parent feature issue on the configured Project after the spec is written",
+        "condition": null
+      },
+      "managed": {
+        "extension": "project",
+        "command": "speckit.project.sync",
+        "enabled": false,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Create/refresh the GitHub Project feature issue (Status: open column)? Run: /speckit-project-sync open",
+        "description": "Create the parent feature issue on the configured Project after the spec is written",
+        "condition": null
+      }
+    },
+    "after_specify:speckit.scope.after-specify": {
+      "original": {
+        "extension": "scope",
+        "command": "speckit.scope.after-specify",
+        "enabled": true,
+        "optional": false,
+        "priority": 30,
+        "prompt": "Execute speckit.scope.after-specify?",
+        "description": "Run unattended Brainstorm when available, otherwise Clarify, after the spec is created.",
+        "condition": null
+      },
+      "managed": {
+        "extension": "scope",
+        "command": "speckit.scope.after-specify",
+        "enabled": false,
+        "optional": false,
+        "priority": 30,
+        "prompt": "Execute speckit.scope.after-specify?",
+        "description": "Run unattended Brainstorm when available, otherwise Clarify, after the spec is created.",
+        "condition": null
+      }
+    },
+    "after_plan:speckit.project.sync": {
+      "original": {
+        "extension": "project",
+        "command": "speckit.project.sync",
+        "enabled": true,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Advance the GitHub Project card to the 'analysis' column? Run: /speckit-project-sync analysis",
+        "description": "Move the parent feature issue to the analysis column after planning",
+        "condition": null
+      },
+      "managed": {
+        "extension": "project",
+        "command": "speckit.project.sync",
+        "enabled": false,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Advance the GitHub Project card to the 'analysis' column? Run: /speckit-project-sync analysis",
+        "description": "Move the parent feature issue to the analysis column after planning",
+        "condition": null
+      }
+    },
+    "after_analyze:speckit.project.sync": {
+      "original": {
+        "extension": "project",
+        "command": "speckit.project.sync",
+        "enabled": true,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Advance the GitHub Project card to the 'engineer-review' column? Run: /speckit-project-sync engineer-review",
+        "description": "Move the parent feature issue to the engineer-review column after cross-artifact analysis",
+        "condition": null
+      },
+      "managed": {
+        "extension": "project",
+        "command": "speckit.project.sync",
+        "enabled": false,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Advance the GitHub Project card to the 'engineer-review' column? Run: /speckit-project-sync engineer-review",
+        "description": "Move the parent feature issue to the engineer-review column after cross-artifact analysis",
+        "condition": null
+      }
+    },
+    "after_tasks:speckit.project.sync": {
+      "original": {
+        "extension": "project",
+        "command": "speckit.project.sync",
+        "enabled": true,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Create one sub-issue per task and set the card to the 'ready' column? Run: /speckit-project-sync ready",
+        "description": "Create native task sub-issues and move the parent feature issue to the ready column after task generation",
+        "condition": null
+      },
+      "managed": {
+        "extension": "project",
+        "command": "speckit.project.sync",
+        "enabled": false,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Create one sub-issue per task and set the card to the 'ready' column? Run: /speckit-project-sync ready",
+        "description": "Create native task sub-issues and move the parent feature issue to the ready column after task generation",
+        "condition": null
+      }
+    },
+    "after_tasks:speckit.assure.analyze": {
+      "original": {
+        "extension": "assure",
+        "command": "speckit.assure.analyze",
+        "enabled": true,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Analyze the active feature for missing QA readiness tasks before implementation?",
+        "description": "Run early while missing tests and evidence tasks are still inexpensive to add",
+        "condition": null
+      },
+      "managed": {
+        "extension": "assure",
+        "command": "speckit.assure.analyze",
+        "enabled": false,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Analyze the active feature for missing QA readiness tasks before implementation?",
+        "description": "Run early while missing tests and evidence tasks are still inexpensive to add",
+        "condition": null
+      }
+    },
+    "after_tasks:speckit.user-manual.analyze": {
+      "original": {
+        "extension": "user-manual",
+        "command": "speckit.user-manual.analyze",
+        "enabled": true,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Analyze which User Manual modules and assets this feature must update?",
+        "description": "Add documentation and evidence work to tasks.md before implementation",
+        "condition": null
+      },
+      "managed": {
+        "extension": "user-manual",
+        "command": "speckit.user-manual.analyze",
+        "enabled": false,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Analyze which User Manual modules and assets this feature must update?",
+        "description": "Add documentation and evidence work to tasks.md before implementation",
+        "condition": null
+      }
+    },
+    "after_tasks:speckit.speckit-superpowers-bridge.handoff": {
+      "original": {
+        "extension": "speckit-superpowers-bridge",
+        "command": "speckit.speckit-superpowers-bridge.handoff",
+        "enabled": true,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Execute speckit.speckit-superpowers-bridge.handoff?",
+        "description": "Create the Superpowers handoff after Spec Kit task generation",
+        "condition": null
+      },
+      "managed": {
+        "extension": "speckit-superpowers-bridge",
+        "command": "speckit.speckit-superpowers-bridge.handoff",
+        "enabled": false,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Execute speckit.speckit-superpowers-bridge.handoff?",
+        "description": "Create the Superpowers handoff after Spec Kit task generation",
+        "condition": null
+      }
+    },
+    "after_tasks:speckit.superspec.tasks": {
+      "original": {
+        "extension": "superspec",
+        "command": "speckit.superspec.tasks",
+        "enabled": true,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Run enhanced Superpowers task decomposition and validation?",
+        "description": "Verify task coverage and add Superpowers execution markers after core task generation",
+        "condition": null
+      },
+      "managed": {
+        "extension": "superspec",
+        "command": "speckit.superspec.tasks",
+        "enabled": false,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Run enhanced Superpowers task decomposition and validation?",
+        "description": "Verify task coverage and add Superpowers execution markers after core task generation",
+        "condition": null
+      }
+    },
+    "before_implement:speckit.project.sync": {
+      "original": {
+        "extension": "project",
+        "command": "speckit.project.sync",
+        "enabled": true,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Mark the GitHub Project card 'in-progress' before implementation? Run: /speckit-project-sync in-progress",
+        "description": "Move the parent feature issue to the in-progress column as implementation begins",
+        "condition": null
+      },
+      "managed": {
+        "extension": "project",
+        "command": "speckit.project.sync",
+        "enabled": false,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Mark the GitHub Project card 'in-progress' before implementation? Run: /speckit-project-sync in-progress",
+        "description": "Move the parent feature issue to the in-progress column as implementation begins",
+        "condition": null
+      }
+    },
+    "before_implement:speckit.assure.analyze": {
+      "original": {
+        "extension": "assure",
+        "command": "speckit.assure.analyze",
+        "enabled": true,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Run the QA readiness gate before implementation? Assure.Init can make this mandatory.",
+        "description": "Mandatory in lifecycle-integrated mode; verifies or refreshes QA analysis before implementation",
+        "condition": null
+      },
+      "managed": {
+        "extension": "assure",
+        "command": "speckit.assure.analyze",
+        "enabled": false,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Run the QA readiness gate before implementation? Assure.Init can make this mandatory.",
+        "description": "Mandatory in lifecycle-integrated mode; verifies or refreshes QA analysis before implementation",
+        "condition": null
+      }
+    },
+    "before_implement:speckit.speckit-superpowers-bridge.guard": {
+      "original": {
+        "extension": "speckit-superpowers-bridge",
+        "command": "speckit.speckit-superpowers-bridge.guard",
+        "enabled": true,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Execute speckit.speckit-superpowers-bridge.guard?",
+        "description": "Block speckit.implement for features handed off to Superpowers",
+        "condition": null
+      },
+      "managed": {
+        "extension": "speckit-superpowers-bridge",
+        "command": "speckit.speckit-superpowers-bridge.guard",
+        "enabled": false,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Execute speckit.speckit-superpowers-bridge.guard?",
+        "description": "Block speckit.implement for features handed off to Superpowers",
+        "condition": null
+      }
+    },
+    "before_implement:speckit.superspec.execute": {
+      "original": {
+        "extension": "superspec",
+        "command": "speckit.superspec.execute",
+        "enabled": true,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Run Superpowers-guided implementation with TDD and checkpoints?",
+        "description": "Enforce TDD discipline and Superpowers execution guidance before core implementation",
+        "condition": null
+      },
+      "managed": {
+        "extension": "superspec",
+        "command": "speckit.superspec.execute",
+        "enabled": false,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Run Superpowers-guided implementation with TDD and checkpoints?",
+        "description": "Enforce TDD discipline and Superpowers execution guidance before core implementation",
+        "condition": null
+      }
+    },
+    "after_implement:speckit.project.sync": {
+      "original": {
+        "extension": "project",
+        "command": "speckit.project.sync",
+        "enabled": true,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Close completed task sub-issues and set 'in-review' if a PR is open? Run: /speckit-project-sync in-progress",
+        "description": "Close sub-issues for tasks checked off in tasks.md; advance to in-review when an open PR exists for the branch",
+        "condition": null
+      },
+      "managed": {
+        "extension": "project",
+        "command": "speckit.project.sync",
+        "enabled": false,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Close completed task sub-issues and set 'in-review' if a PR is open? Run: /speckit-project-sync in-progress",
+        "description": "Close sub-issues for tasks checked off in tasks.md; advance to in-review when an open PR exists for the branch",
+        "condition": null
+      }
+    },
+    "after_implement:speckit.assure.document": {
+      "original": {
+        "extension": "assure",
+        "command": "speckit.assure.document",
+        "enabled": true,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Generate or refresh the QA test manual now that implementation is complete?",
+        "description": "Optional early generation; PR generation performs a mandatory freshness preflight in lifecycle-integrated mode",
+        "condition": null
+      },
+      "managed": {
+        "extension": "assure",
+        "command": "speckit.assure.document",
+        "enabled": false,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Generate or refresh the QA test manual now that implementation is complete?",
+        "description": "Optional early generation; PR generation performs a mandatory freshness preflight in lifecycle-integrated mode",
+        "condition": null
+      }
+    },
+    "after_implement:speckit.user-manual.update": {
+      "original": {
+        "extension": "user-manual",
+        "command": "speckit.user-manual.update",
+        "enabled": true,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Update the audience-aware User Manual and generate a private preview?",
+        "description": "Update affected manual modules after implemented behavior can be observed",
+        "condition": null
+      },
+      "managed": {
+        "extension": "user-manual",
+        "command": "speckit.user-manual.update",
+        "enabled": false,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Update the audience-aware User Manual and generate a private preview?",
+        "description": "Update affected manual modules after implemented behavior can be observed",
+        "condition": null
+      }
+    },
+    "after_implement:speckit.pr.generate": {
+      "original": {
+        "extension": "pr",
+        "command": "speckit.pr.generate",
+        "enabled": true,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Generate the feature CHANGELOG + feature-details doc, diagram assets if needed, and update the PR description?",
+        "description": "Produce reviewer-facing docs, generate diagram assets when relevant, and inject the feature details into the PR description after implementation",
+        "condition": null
+      },
+      "managed": {
+        "extension": "pr",
+        "command": "speckit.pr.generate",
+        "enabled": false,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Generate the feature CHANGELOG + feature-details doc, diagram assets if needed, and update the PR description?",
+        "description": "Produce reviewer-facing docs, generate diagram assets when relevant, and inject the feature details into the PR description after implementation",
+        "condition": null
+      }
+    },
+    "after_implement:speckit.superspec.review": {
+      "original": {
+        "extension": "superspec",
+        "command": "speckit.superspec.review",
+        "enabled": true,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Run Superpowers review against the specification and implementation?",
+        "description": "Review implementation against the spec, plan, tasks, and constitution",
+        "condition": null
+      },
+      "managed": {
+        "extension": "superspec",
+        "command": "speckit.superspec.review",
+        "enabled": false,
+        "optional": true,
+        "priority": 10,
+        "prompt": "Run Superpowers review against the specification and implementation?",
+        "description": "Review implementation against the spec, plan, tasks, and constitution",
+        "condition": null
+      }
+    },
+    "before_plan:speckit.speckit-superpowers-bridge.guard": {
+      "original": {
+        "extension": "speckit-superpowers-bridge",
+        "command": "speckit.speckit-superpowers-bridge.guard",
+        "enabled": true,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Execute speckit.speckit-superpowers-bridge.guard?",
+        "description": "Prevent Spec Kit contract changes while Superpowers implementation is executing",
+        "condition": null
+      },
+      "managed": {
+        "extension": "speckit-superpowers-bridge",
+        "command": "speckit.speckit-superpowers-bridge.guard",
+        "enabled": false,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Execute speckit.speckit-superpowers-bridge.guard?",
+        "description": "Prevent Spec Kit contract changes while Superpowers implementation is executing",
+        "condition": null
+      }
+    },
+    "before_clarify:speckit.speckit-superpowers-bridge.guard": {
+      "original": {
+        "extension": "speckit-superpowers-bridge",
+        "command": "speckit.speckit-superpowers-bridge.guard",
+        "enabled": true,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Execute speckit.speckit-superpowers-bridge.guard?",
+        "description": "Prevent Spec Kit contract changes while Superpowers implementation is executing",
+        "condition": null
+      },
+      "managed": {
+        "extension": "speckit-superpowers-bridge",
+        "command": "speckit.speckit-superpowers-bridge.guard",
+        "enabled": false,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Execute speckit.speckit-superpowers-bridge.guard?",
+        "description": "Prevent Spec Kit contract changes while Superpowers implementation is executing",
+        "condition": null
+      }
+    },
+    "before_tasks:speckit.speckit-superpowers-bridge.guard": {
+      "original": {
+        "extension": "speckit-superpowers-bridge",
+        "command": "speckit.speckit-superpowers-bridge.guard",
+        "enabled": true,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Execute speckit.speckit-superpowers-bridge.guard?",
+        "description": "Prevent Spec Kit contract changes while Superpowers implementation is executing",
+        "condition": null
+      },
+      "managed": {
+        "extension": "speckit-superpowers-bridge",
+        "command": "speckit.speckit-superpowers-bridge.guard",
+        "enabled": false,
+        "optional": false,
+        "priority": 10,
+        "prompt": "Execute speckit.speckit-superpowers-bridge.guard?",
+        "description": "Prevent Spec Kit contract changes while Superpowers implementation is executing",
+        "condition": null
+      }
+    }
+  }
+}

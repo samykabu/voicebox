@@ -1,0 +1,56 @@
+{
+  "owner": "samykabu",
+  "ownerType": "user",
+  "hookMode": "required",
+  "projectNumber": 10,
+  "projectId": "PVT_kwHOABw-BM4BkVch",
+  "projectUrl": "https://github.com/users/samykabu/projects/10",
+  "statusFieldId": "PVTSSF_lAHOABw-BM4BkVchzhjGX5c",
+  "statusOptions": {
+    "Done": "935aff2a",
+    "In Progress": "be49ba6d",
+    "Feature Specification": "52fe005d",
+    "Todo": "ae625b11",
+    "Analysis": "74dde40f",
+    "Backlog": "ccc4c343",
+    "In review": "8f822d79",
+    "Need Clarifications": "9172a80f",
+    "Ready": "1ca3b1e1",
+    "Engineer-Review": "3975e8fc"
+  },
+  "phaseToStatus": {
+    "open": "Backlog",
+    "analysis": "Analysis",
+    "engineer-review": "Engineer-Review",
+    "ready": "Ready",
+    "in-progress": "In Progress",
+    "in-review": "In review",
+    "done": "Done"
+  },
+  "statusOrder": [
+    "Backlog",
+    "Analysis",
+    "Engineer-Review",
+    "Ready",
+    "In Progress",
+    "In review",
+    "Done"
+  ],
+  "parentIssue": {
+    "labels": [
+      "spec-feature"
+    ],
+    "titleTemplate": "[{slug}] {title}"
+  },
+  "subIssues": {
+    "enabled": true,
+    "granularity": "task",
+    "titleTemplate": "{slug} {taskId}: {desc}",
+    "labels": [
+      "spec-task"
+    ],
+    "warnAboveCount": 40,
+    "maxCount": 0
+  },
+  "stateFile": ".specify/project-sync-state.json"
+}
