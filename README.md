@@ -462,6 +462,12 @@ New and edited workflows in this repository target GitHub-hosted runners. Keep t
 in step with `.github/workflows/`, and amend the CI runner policy in
 `.specify/memory/constitution.md` in the same change if the runner story changes.
 
+The `workflow-evidence` job carries one local edit against the Sanduq template: it runs only
+when a PR changes `specs/` or `.specify/workflow/pr-features.json`. `ci_gate.py` requires at
+least one feature and has no empty-mapping path, so without that guard it fails every chore,
+fix, docs and upstream-merge PR. `install.py --apply` restores the template, so re-apply the
+guard and refresh `ci_sha256` in `.specify/workflow/install-receipt.json` after any install.
+
 ### Adding New Voice Models
 
 The multi-engine architecture makes adding new TTS engines straightforward. A [step-by-step guide](docs/content/docs/developer/tts-engines.mdx) covers the full process: dependency research, backend protocol implementation, frontend wiring, and PyInstaller bundling.
