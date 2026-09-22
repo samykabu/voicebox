@@ -148,6 +148,86 @@ def test_reports_what_it_changed(db):
     assert all(a["entry_id"] == entry.id for a in applied)
 
 
+# ── Arabic ───────────────────────────────────────────────────────────
+
+
+def test_arabic_term_matches_with_diacritics(db):
+    """A plain entry has to cover diacritized text, and the reverse."""
+    add(db, "محمد", "مُحَمَّد")
+    out, applied = apply_pronunciations("قال مُحَمَّد اليوم", "ar", db)
+    assert out == "قال مُحَمَّد اليوم"
+    assert len(applied) == 1
+
+    db.query(PronunciationEntry).delete()
+    add(db, "مُحَمَّد", "X")
+    assert apply_pronunciations("قال محمد", "ar", db)[0] == "قال X"
+
+
+def test_arabic_hamza_and_ta_marbuta_spellings_match(db):
+    add(db, "أحمد", "أَحْمَد")
+    add(db, "مكة", "مَكَّة")
+    out, applied = apply_pronunciations("زار احمد مكه", "ar", db)
+    assert out == "زار أَحْمَد مَكَّة"
+    assert len(applied) == 2
+
+
+def test_arabic_prefixes_are_kept_before_an_article_term(db):
+    add(db, "الرياض", "الرِّيَاض")
+    out, applied = apply_pronunciations("في الرياض وبالرياض والرياض", "ar", db)
+    assert out == "في الرِّيَاض وبالرِّيَاض والرِّيَاض"
+    assert len(applied) == 3
+
+
+def test_arabic_contracted_article_after_lam(db):
+    """ل + ال is written لل, so للرياض has to match an entry for الرياض."""
+    add(db, "الرياض", "الرِّيَاض")
+    assert apply_pronunciations("سافر للرياض", "ar", db)[0] == "سافر للرِّيَاض"
+
+
+def test_arabic_article_replacement_without_article(db):
+    """A respelling that drops the article keeps only the preposition."""
+    add(db, "الرياض", "Riyadh")
+    assert apply_pronunciations("بالرياض", "ar", db)[0] == "بRiyadh"
+    assert apply_pronunciations("للرياض", "ar", db)[0] == "لRiyadh"
+
+
+def test_latin_term_inside_arabic_text(db):
+    """The Arabic models cannot read Latin script — the main use of the dictionary."""
+    add(db, "Voicebox", "فويس بوكس")
+    out, _ = apply_pronunciations("جربت Voicebox اليوم", "ar", db)
+    assert out == "جربت فويس بوكس اليوم"
+
+
+def test_arabic_prepositions_before_a_long_term(db):
+    add(db, "فيسبوك", "فِيسْبُوك")
+    out, applied = apply_pronunciations("على فيسبوك ولفيسبوك وبالفيسبوك", "ar", db)
+    assert out == "على فِيسْبُوك ولفِيسْبُوك وبالفِيسْبُوك"
+    assert len(applied) == 3
+
+
+def test_short_arabic_term_is_not_matched_inside_a_prefixed_word(db):
+    """كمال is a name, not ك + مال — short terms take no bare preposition."""
+    add(db, "مال", "مَال")
+    out, applied = apply_pronunciations("كمال يحب المال", "ar", db)
+    assert out == "كمال يحب المَال"
+    assert len(applied) == 1
+
+
+def test_arabic_term_does_not_match_inside_a_longer_word(db):
+    add(db, "علم", "عِلْم")
+    out, applied = apply_pronunciations("المعلم هنا", "ar", db)
+    assert out == "المعلم هنا"
+    assert applied == []
+
+
+def test_arabic_and_latin_entries_together(db):
+    add(db, "الرياض", "الرِّيَاض")
+    add(db, "API", "إيه بي آي")
+    out, applied = apply_pronunciations("API في الرياض", "ar", db)
+    assert out == "إيه بي آي في الرِّيَاض"
+    assert len(applied) == 2
+
+
 # ── Scope ────────────────────────────────────────────────────────────
 
 

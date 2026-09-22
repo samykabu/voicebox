@@ -93,9 +93,118 @@ def build_pattern(terms: list[str]) -> re.Pattern | None:
     usable = [t for t in terms if t and t.strip()]
     if not usable:
         return None
-    ordered = sorted(set(usable), key=len, reverse=True)
-    alternation = "|".join(re.escape(t) for t in ordered)
-    return re.compile(rf"(?<!\w)(?:{alternation})(?!\w)", re.IGNORECASE | re.UNICODE)
+
+    plain = [t for t in usable if not _is_arabic(t)]
+    groups: list[str] = []
+
+    # Arabic terms, split by which attached prefixes they may carry. Each
+    # group's stems are folded and deduplicated, longest first.
+    stems: dict[str, set[str]] = {"art": set(), "long": set(), "short": set()}
+    for t in usable:
+        if not _is_arabic(t):
+            continue
+        category, stem = _arabic_category(t)
+        stems[category].add(stem)
+    for category in ("art", "long", "short"):
+        if not stems[category]:
+            continue
+        ordered = sorted(stems[category], key=len, reverse=True)
+        alternation = "|".join(_arabic_regex(s) for s in ordered)
+        groups.append(
+            rf"(?P<lead_{category}>{_ARABIC_LEADS[category]})(?P<core_{category}>{alternation})"
+        )
+
+    if plain:
+        ordered = sorted(set(plain), key=len, reverse=True)
+        groups.append(rf"(?P<plain>{'|'.join(re.escape(t) for t in ordered)})")
+
+    return re.compile(rf"(?<!\w)(?:{'|'.join(groups)})(?!\w)", re.IGNORECASE | re.UNICODE)
+
+
+# ── Arabic ───────────────────────────────────────────────────────────
+#
+# Plain word-boundary matching misses most Arabic in real text, for two
+# reasons. Diacritics: ``محمد`` must match ``مُحَمَّد``, and ``أحمد`` must match
+# the common hamza-less spelling ``احمد``. Attached prefixes: the conjunctions
+# و/ف, the prepositions ب/ل/ك and the article ال are written joined to the
+# next word, so ``الرياض`` also appears as ``بالرياض``, ``والرياض`` and
+# ``للرياض``. The prefix is kept in the output; only the term is replaced.
+#
+# Prefixes are ambiguous — ``كمال`` is a name, not ك + ``مال`` — so the bare
+# prepositions ب/ل/ك are only accepted before terms of four or more letters.
+# Short terms match on their own or behind the article, which is never
+# ambiguous.
+
+_ARABIC_LETTER = re.compile(r"[ء-يٱ-ۓ]")
+_ARABIC_MARKS = "ؐ-ًؚ-ٰٟۖ-ۭـ"
+_ARABIC_MARK_RE = re.compile(f"[{_ARABIC_MARKS}]")
+_M = f"[{_ARABIC_MARKS}]*"
+
+# Letters that are written interchangeably; folded for comparison and
+# matched as a class.
+_ARABIC_FOLD = str.maketrans({"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا", "ى": "ي", "ة": "ه"})  # noqa: RUF001
+_ARABIC_CLASS = {"ا": "[اأإآٱ]", "ي": "[يى]", "ه": "[هة]"}  # noqa: RUF001
+
+_WF = f"(?:[وف]{_M})?"
+_ARTICLE = f"(?:{_WF}(?:[بك]{_M})?[اٱ]{_M}ل{_M}|{_WF}ل{_M}ل{_M})"
+_ARABIC_LEADS = {
+    "art": _ARTICLE,
+    "long": f"(?:{_ARTICLE}|{_WF}(?:[بلك]{_M})?)",
+    "short": f"(?:{_ARTICLE})?",
+}
+
+# The article at the end of a matched prefix: ``ال`` or, after ل, just ``ل``.
+_TRAILING_ARTICLE = re.compile(f"(?:[اٱ]{_M})?ل{_M}$")
+_LEADING_ARTICLE = re.compile(f"^[اأٱ]{_M}ل{_M}")
+
+
+def _is_arabic(term: str) -> bool:
+    return bool(_ARABIC_LETTER.search(term))
+
+
+def _fold_arabic(text: str) -> str:
+    return _ARABIC_MARK_RE.sub("", text).translate(_ARABIC_FOLD)
+
+
+def _arabic_category(term: str) -> tuple[str, str]:
+    """Which prefixes a term may carry, and the stem the pattern matches."""
+    folded = _fold_arabic(term.strip())
+    if folded.startswith("ال") and len(folded) > 2:
+        return "art", folded[2:]
+    letters = sum(1 for c in folded if not c.isspace())
+    return ("long" if letters >= 4 else "short"), folded
+
+
+def _arabic_regex(folded: str) -> str:
+    """Match *folded* with any diacritics, and either spelling of a folded letter."""
+    return "".join(_ARABIC_CLASS.get(c, re.escape(c)) + _M for c in folded)
+
+
+def _term_key(term: str):
+    return ("ar", _fold_arabic(term.strip())) if _is_arabic(term) else term.lower()
+
+
+def _arabic_substitute(m: re.Match, by_term: dict) -> tuple[str, PronunciationEntry] | None:
+    groups = m.groupdict()
+    for category in ("art", "long", "short"):
+        core = groups.get(f"core_{category}")
+        if core is None:
+            continue
+        lead = groups.get(f"lead_{category}") or ""
+        stem = _fold_arabic(core)
+        if category == "art":
+            entry = by_term.get(("ar", "ال" + stem))
+            if entry is None:
+                return None
+            # The text already carries the article, possibly as ``لل``.
+            if _fold_arabic(entry.replacement).startswith("ال"):
+                return lead + _LEADING_ARTICLE.sub("", entry.replacement), entry
+            return _TRAILING_ARTICLE.sub("", lead) + entry.replacement, entry
+        entry = by_term.get(("ar", stem))
+        if entry is None:
+            return None
+        return lead + entry.replacement, entry
+    return None
 
 
 def apply_pronunciations(
@@ -125,7 +234,7 @@ def apply_pronunciations(
         entries,
         key=lambda e: ((e.profile_id is not None), (e.language is not None)),
     ):
-        by_term[e.term.lower()] = e
+        by_term[_term_key(e.term)] = e
 
     pattern = build_pattern([e.term for e in by_term.values()])
     if pattern is None:
@@ -137,6 +246,13 @@ def apply_pronunciations(
     def substitute(m: re.Match) -> str:
         if any(start <= m.start() < end for start, end in skip):
             return m.group(0)
+        if m.groupdict().get("plain") is None:
+            found = _arabic_substitute(m, by_term)
+            if found is None:
+                return m.group(0)
+            out, entry = found
+            applied.append({"term": m.group(0), "replacement": out, "entry_id": entry.id})
+            return out
         entry = by_term.get(m.group(0).lower())
         if entry is None:
             return m.group(0)
