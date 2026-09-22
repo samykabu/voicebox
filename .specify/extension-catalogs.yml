@@ -1,0 +1,6 @@
+catalogs:
+- name: sanduq
+  url: https://raw.githubusercontent.com/samykabu/sanduq/main/catalog.json
+  priority: 10
+  install_allowed: true
+  description: ''

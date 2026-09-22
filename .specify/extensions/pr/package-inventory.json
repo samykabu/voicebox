@@ -1,0 +1,8 @@
+{
+  "pr/CHANGELOG.md": "8f1f627f6fc2567597de3881457bdaeef46e57e4759c9683f5e4d8bba9c9540a",
+  "pr/README.md": "51457dbed16946d2d0a1202aad14ca2d67cae3ca4681f9c75fe1fa242526f22d",
+  "pr/commands/speckit.pr.generate.md": "5aaaae6b1a61518e50ec26530987d7128c16f8ee6f548e98e3d2540915778d3e",
+  "pr/commands/speckit.pr.review-feedback.md": "64124981dc58cdbcfe5f6247708edfef21e96e1c0403ea65922c2789dda834ca",
+  "pr/dependencies.yml": "aa095bd12870998d2c793334d5a3ae4e37b7ec041fc5210cbc894c351246d1c6",
+  "pr/extension.yml": "a2a0cfa7c305ee0bd5915a8f6019bcdb142bff6a0def18b1ceabcea1210a7148"
+}

@@ -1,0 +1,52 @@
+schema_version: "1.0"
+
+extension:
+  id: illustrate
+  name: "Illustrate"
+  version: "2.1.2"
+  description: "Generate and export twenty-seven technical, product, architecture, and process illustration types with tracked project-level light/dark color and font themes."
+  author: "Samy K. Abushanab"
+  repository: "https://github.com/samykabu/sanduq"
+  category: "documentation"
+  license: PolyForm-Noncommercial-1.0.0
+
+requires:
+  speckit_version: ">=0.2.0"
+  tools:
+    - name: git
+      required: false
+
+provides:
+  commands:
+    - name: speckit.illustrate.generate
+      file: commands/speckit.illustrate.generate.md
+      description: "Select and generate the right illustration from twenty-seven technical, product, data, process, and quantitative visual types"
+    - name: speckit.illustrate.export
+      file: commands/speckit.illustrate.export.md
+      description: "Export an Illustrate HTML source to standalone SVG and/or transparent PNG"
+    - name: speckit.illustrate.theme
+      file: commands/speckit.illustrate.theme.md
+      description: "Initialize, select, validate, or create a tracked project color and font theme"
+
+tags:
+  - "diagram"
+  - "architecture"
+  - "process-flow"
+  - "technical-color"
+  - "flowchart"
+  - "sequence"
+  - "state-machine"
+  - "er"
+  - "timeline"
+  - "swimlane"
+  - "radar"
+  - "gantt"
+  - "data-platform"
+  - "export"
+  - "png"
+  - "pdf"
+  - "svg"
+  - "visualization"
+  - "documentation"
+  - "project-theme"
+  - "custom-fonts"

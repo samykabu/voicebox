@@ -1,0 +1,12 @@
+{
+  "project/CHANGELOG.md": "00f1d00dc21f360835762cf3a5b086294139e701d7254e6c49f9f99773e4e638",
+  "project/README.md": "29465cd185c8a5da05440c895aee3fab82c3b9c05dd2aff4eaaa4cf49b1cb1c8",
+  "project/commands/speckit.project.init.md": "f24a6673c1f300434595c974cfd73ccae9d38b60c1c13ad2b6dc5a80dde8eafc",
+  "project/commands/speckit.project.sync.md": "a1b26f81659efb56ada6825dacda06ee9ddd4129f6aeea41507f3d495623dd7b",
+  "project/config.default.json": "c9758773da751b71d4eda268b2c3bdec632b74d6314e27cc84ff3bb46a7a485c",
+  "project/extension.yml": "cfc3c67da40f6d2240127ff868439e56c2923b40fbd7da855b7021d682e49aae",
+  "project/scripts/bash/project-init.sh": "64fc137ec46265ddb7bca8c09905478aa5c09ecb807379e666eed6eec54fa290",
+  "project/scripts/bash/project-sync.sh": "7875ae2d4873ad3ff33aeb636f245130ee3b23167f6582c8652df7819e46e67b",
+  "project/scripts/powershell/project-init.ps1": "227ae3f05d1b033d080379f3c57d4225abf2c50af802be677ee1c19bbbf2b450",
+  "project/scripts/powershell/project-sync.ps1": "71a81c2905c369741499866994e177d47d017dac7c5183bf12fa5d7f5faebd2b"
+}
