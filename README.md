@@ -457,6 +457,13 @@ $${\color{red}\text{and switch the three Windows jobs to its label. The macOS jo
 $${\color{red}\text{The two Linux-only jobs (ci.yml and release-notes) can move to homek8-general as soon as this repo can reach that scale}}$$
 $${\color{red}\text{set — by moving the repo into the abushanab-net org, or by registering the scale set against this repo.}}$$
 
+The Sanduq workflow gate (`.github/workflows/sanduq-workflow-gates.yml`, job `workflow-evidence`,
+running `.specify/extensions/workflow/scripts/ci_gate.py`) was removed for the same reason: it
+targeted `homek8-general`, which this repo cannot reach, so its check sat queued on every pull
+request and never ran. Restore it once a self-hosted Linux runner serves this repo — and keep the
+`homek8-general` label, because the Sanduq template ships `ubuntu-latest`, which this project does
+not allow.
+
 ### Adding New Voice Models
 
 The multi-engine architecture makes adding new TTS engines straightforward. A [step-by-step guide](docs/content/docs/developer/tts-engines.mdx) covers the full process: dependency research, backend protocol implementation, frontend wiring, and PyInstaller bundling.
