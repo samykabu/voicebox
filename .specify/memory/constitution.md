@@ -158,14 +158,26 @@ mode. `rustfmt` governs Rust, with errors handled explicitly rather than unwrapp
 behaviour. API changes MUST update `backend/README.md`. New engines MUST follow
 `docs/content/docs/developer/tts-engines.mdx`.
 
-**CI runner policy.** Every CI/CD job MUST run on the home-office self-hosted runners (the
-ARC scale sets `homek8-general` or `homek8-mobile`, or a self-hosted Windows label
-registered for this repo). GitHub-hosted runners (`ubuntu-latest`, `windows-latest`,
-`macos-*`) are permitted only for a job a self-hosted runner genuinely cannot execute, and
-only when that exception is documented in `README.md` in red — naming the workflow, the
-job, why the self-hosted runner cannot run it, and what would remove the exception. A
-tool missing from the runners is added to the runner image, not downloaded per job. Every
-new or edited workflow MUST be checked against this rule before it is committed.
+**CI runner policy.** This project runs its CI/CD jobs on **GitHub-hosted runners**
+(`ubuntu-latest`, `windows-latest`, `macos-*`). This is a deliberate, repository-scoped
+departure from the owner's default self-hosted-runner rule, and it is recorded in red in
+`README.md` as that rule requires.
+
+The reason is structural, not preference: the home-office ARC scale sets
+(`homek8-general`, `homek8-mobile`) are registered to the `abushanab-net` organisation,
+while this repository sits under the `samykabu` personal account, so no job here can ever
+reach them. A job targeting `homek8-general` does not fail — it queues forever and its
+check never reports, which is worse than not having the check. No self-hosted runner of
+any platform is registered for this repository.
+
+- A new or edited workflow MUST target a GitHub-hosted runner unless a self-hosted runner
+  is actually registered for this repository at that time.
+- `README.md` MUST keep listing every workflow and job with its runner, in red, together
+  with what would remove the departure.
+- If this repository moves into `abushanab-net`, or a scale set is registered against it,
+  the Linux-only jobs MUST move back to `homek8-general`, and this section MUST be amended
+  in the same change. The Windows and macOS jobs additionally need self-hosted runners of
+  those platforms, which do not exist today.
 
 **Release process.** Releases are cut with `bumpversion` (`.bumpversion.cfg`), which
 updates all eight version sites, commits, and tags `v{version}`. Pushing the tag triggers
@@ -211,4 +223,4 @@ the PR that introduces them.
 `backend/STYLE_GUIDE.md`, and `docs/PROJECT_STATUS.md`. Agents working in this repository
 read this constitution first.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-22 | **Last Amended**: 2026-09-22
+**Version**: 2.0.0 | **Ratified**: 2026-09-22 | **Last Amended**: 2026-09-22
