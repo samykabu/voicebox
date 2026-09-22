@@ -1,0 +1,29 @@
+schema_version: 1
+processes:
+  qa: false
+  user_manual: false
+execution:
+  engine: auto
+  checkpoints: required-only
+providers:
+  clarification: prefer-superspec
+  tasks: prefer-superspec
+issue_sync:
+  taskstoissues: required
+  parent_link: native-subissue
+clarification:
+  transport: github-comments
+  resume_on_reinvoke: reread-answers
+context:
+  mode: measured-only
+  max_fraction: 0.6
+  checkpoint_fraction: 0.5
+  reserve_fraction: 0.1
+scope:
+  statuses:
+    In progress: In Progress
+finalize:
+  create_pr: true
+  merge: false
+updates:
+  policy: reviewed

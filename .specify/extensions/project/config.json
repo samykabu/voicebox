@@ -7,23 +7,25 @@
   "projectUrl": "https://github.com/users/samykabu/projects/10",
   "statusFieldId": "PVTSSF_lAHOABw-BM4BkVchzhjGX5c",
   "statusOptions": {
-    "Todo": "f75ad846",
-    "In Progress": "47fc9ee4",
-    "Done": "98236657",
-    "Backlog": "91e29d7d",
-    "Analysis": "e647380b",
-    "Engineer-Review": "44b7b93e",
-    "Ready": "d57a27c5",
-    "In review": "876c69c6"
+    "Done": "935aff2a",
+    "In Progress": "be49ba6d",
+    "Feature Specification": "52fe005d",
+    "Todo": "ae625b11",
+    "Analysis": "74dde40f",
+    "Backlog": "ccc4c343",
+    "In review": "8f822d79",
+    "Need Clarifications": "9172a80f",
+    "Ready": "1ca3b1e1",
+    "Engineer-Review": "3975e8fc"
   },
   "phaseToStatus": {
-    "in-progress": "In Progress",
-    "done": "Done",
     "open": "Backlog",
     "analysis": "Analysis",
     "engineer-review": "Engineer-Review",
     "ready": "Ready",
-    "in-review": "In review"
+    "in-progress": "In Progress",
+    "in-review": "In review",
+    "done": "Done"
   },
   "statusOrder": [
     "Backlog",

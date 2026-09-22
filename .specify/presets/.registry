@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "presets": {
+    "scope-gate": {
+      "version": "1.4.0",
+      "source": "local",
+      "manifest_hash": "sha256:0a514cf8474dca3f3e0a4add96a346b28b93adff5b50261493eca5a75c4cf10e",
+      "enabled": true,
+      "priority": 2,
+      "registered_commands": {
+        "claude": [
+          "speckit.specify",
+          "speckit.clarify"
+        ]
+      },
+      "registered_skills": {
+        "claude": [
+          "speckit-specify",
+          "speckit-clarify"
+        ]
+      },
+      "installed_at": "2026-09-22T17:06:54.822265+00:00"
+    },
+    "scope-brainstorm": {
+      "version": "1.4.0",
+      "source": "local",
+      "manifest_hash": "sha256:0314622993ce4373af0866c1d66dfd517051635fe95e24e512b6d7e9822200e5",
+      "enabled": true,
+      "priority": 2,
+      "registered_commands": {
+        "claude": [
+          "speckit.superspec.brainstorm"
+        ]
+      },
+      "registered_skills": {
+        "claude": [
+          "speckit-superspec-brainstorm"
+        ]
+      },
+      "installed_at": "2026-09-22T17:06:55.885599+00:00"
+    },
+    "workflow": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:ecfda8b2809a4433f51814a45aa77fab460af630f7c78d60bb468e670e7fe42e",
+      "enabled": true,
+      "priority": 1,
+      "registered_commands": {
+        "claude": [
+          "speckit.scope.run",
+          "speckit.specify",
+          "speckit.clarify",
+          "speckit.plan",
+          "speckit.tasks",
+          "speckit.analyze",
+          "speckit.taskstoissues",
+          "speckit.implement",
+          "speckit.superspec.brainstorm",
+          "speckit.superspec.tasks",
+          "speckit.superspec.execute",
+          "speckit.superspec.review",
+          "speckit.speckit-superpowers-bridge.execute",
+          "speckit.speckit-superpowers-bridge.handoff",
+          "speckit.speckit-superpowers-bridge.guard"
+        ]
+      },
+      "registered_skills": {
+        "claude": [
+          "speckit-scope-run",
+          "speckit-specify",
+          "speckit-clarify",
+          "speckit-plan",
+          "speckit-tasks",
+          "speckit-analyze",
+          "speckit-taskstoissues",
+          "speckit-implement",
+          "speckit-superspec-brainstorm",
+          "speckit-superspec-tasks",
+          "speckit-superspec-execute",
+          "speckit-superspec-review",
+          "speckit-speckit-superpowers-bridge-execute",
+          "speckit-speckit-superpowers-bridge-handoff",
+          "speckit-speckit-superpowers-bridge-guard"
+        ]
+      },
+      "installed_at": "2026-09-22T17:06:57.595513+00:00"
+    }
+  }
+}

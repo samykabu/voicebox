@@ -1,5 +1,4 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Voicebox Constitution
 
 ## Project Tracking
 
@@ -15,48 +14,201 @@
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Local-First By Default (NON-NEGOTIABLE)
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Voice samples, generated audio, captures, transcripts, and model weights MUST remain on
+the user's machine unless the user has explicitly enabled a remote path for that specific
+data. Every feature MUST work with the network unavailable once its models are cached.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- The backend MUST bind to localhost by default; remote exposure is opt-in configuration.
+- No telemetry, analytics, crash reporting, or usage beacon may be added, and none may be
+  enabled by default if added under a future amendment.
+- Any code path that contacts a remote host MUST be reachable only through a setting the
+  user turned on, and MUST fail closed — degrade the feature rather than silently fall
+  back to a cloud service.
+- The offline guard in `backend/utils/hf_offline_patch.py` MUST keep working: cached
+  models load without contacting Hugging Face. Its tests are a release gate, not a
+  convenience.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+*Rationale*: Local-first is the product's reason to exist against ElevenLabs and
+WisprFlow, and biometric voice data is not recoverable once leaked. A regression here is
+a product failure, not a bug.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. Consent-Bound Voice Synthesis (NON-NEGOTIABLE)
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+`RESPONSIBLE_USE.md` is binding on this codebase, not advisory. The software cannot
+verify voice ownership, so the affordances that keep users honest MUST be preserved.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- No change may remove, bypass, or make harder to notice a responsible-use
+  acknowledgement, consent prompt, or AI-generated disclosure surface.
+- No feature may be built whose primary purpose is impersonation, voice-authentication
+  bypass, or concealing that audio is synthetic.
+- Features that broaden reach — batch generation, API surfaces, agent integrations —
+  MUST carry the same disclosure and consent affordances as the in-app path.
+- Profile import/export MUST preserve provenance metadata rather than stripping it.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+*Rationale*: Cloning quality is now good enough to cause real harm. The project accepts
+that capability, and in exchange accepts a hard floor on the safeguards shipped with it.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### III. Engine-Agnostic Backend Contract
+
+Every TTS and STT engine MUST be reachable only through the protocols defined in
+`backend/backends/base.py`. Engine identity MUST NOT leak upward.
+
+- Adding an engine MUST NOT require edits to route handlers, the shared React frontend,
+  or the MCP tool definitions beyond registration and capability declaration.
+- Engine-specific behaviour (paralinguistic tags, delivery instructions, preset voices,
+  language coverage) MUST be expressed as declared capabilities the caller queries, never
+  as `if engine == "..."` branching in `backend/routes/` or `app/`.
+- A new engine MUST declare its accelerator support and MUST degrade to CPU or report
+  unavailability rather than crash on an unsupported accelerator.
+- Heavy dependencies (torch, transformers, mlx) MUST be imported lazily inside functions,
+  marked `# lazy: heavy import`, so startup time does not scale with engine count.
+
+*Rationale*: Seven engines ship today and more are queued. The multi-engine architecture
+is only an asset while integration stays additive; the `add-tts-engine` agent skill can
+only work autonomously against a stable contract.
+
+### IV. Upstream-Trackable Fork Discipline
+
+This repository is a fork of `jamiepine/voicebox` and MUST remain mergeable with it.
+Divergence is permitted only where it is deliberate, minimal, and recorded.
+
+- Fork-specific changes MUST fall into a declared category: release and updater identity
+  (signing keys, endpoints, download links), fork-specific model support (Arabic F5-TTS /
+  Habibi), self-hosted CI wiring, or a feature offered upstream and not yet merged.
+- General bug fixes and features SHOULD be shaped so they can be contributed upstream;
+  gratuitous refactors that complicate future merges MUST NOT be committed.
+- Upstream merges MUST be performed on a dedicated `merge/upstream-main` branch, never
+  by rewriting history on `main`.
+- Conflicts resolved in favour of fork-specific behaviour MUST be justified in the merge
+  commit message so the next merge knows the divergence was intentional.
+
+*Rationale*: The fork carries changes upstream does not want and depends on upstream for
+engine work it cannot fund. Both remain true only if merges stay cheap.
+
+### V. Contract-First API And MCP Surface
+
+The REST API and the MCP server at `/mcp` are public product surfaces consumed by
+third-party agents and applications. They MUST be treated as contracts.
+
+- Endpoint or MCP tool changes MUST update the Pydantic models, regenerate the TypeScript
+  client via `bun run generate:api`, and update `backend/README.md` in the same change.
+- Removing or narrowing an endpoint, MCP tool, tool parameter, or response field is a
+  breaking change: it MUST be called out in `CHANGELOG.md` and MUST NOT ship in a patch
+  release.
+- New MCP tool parameters MUST be optional with a behaviour-preserving default so that
+  existing agent integrations keep working untouched.
+- The generated TypeScript client MUST NOT be hand-edited.
+
+*Rationale*: Agent integrations break silently and their users blame the app, not the
+agent. The generated client is the only mechanism keeping frontend and backend honest
+about the shape of the API.
+
+## Platform And Performance Constraints
+
+**Language and toolchain floors.** Python 3.12+ (`requires-python = ">=3.12"`),
+TypeScript strict mode, Rust stable, Bun as the sole JS package manager and runner. Raising
+a floor requires an amendment; lowering one requires an amendment and a migration note.
+
+**Accelerator matrix.** Every generation path MUST work on MLX/Metal (Apple Silicon),
+CUDA (NVIDIA), ROCm (AMD), XPU (Intel Arc), and CPU, or MUST declare and enforce its
+unsupported accelerators. CPU is the guaranteed fallback and MUST stay functional.
+
+**Startup and responsiveness.** Generation is asynchronous and MUST NOT block the UI. The
+serial execution queue preventing GPU contention is a design invariant. Generations
+orphaned by a crash MUST auto-recover on startup rather than remain stuck.
+
+**Model handling.** Models are downloaded on demand, cached, and reused. Model downloads
+MUST report progress, MUST be resumable or safely re-runnable, and MUST NOT be triggered
+implicitly by a code path the user did not ask for.
+
+**Native shell.** The desktop app is Tauri (Rust), not Electron. Global hotkey, paste
+injection, and focus introspection stay in the Rust shim. Platform-specific behaviour MUST
+degrade gracefully where parity does not yet exist rather than block the build.
+
+## Development Workflow And Quality Gates
+
+**Branching and commits.** Work happens on `feature/`, `fix/`, `docs/`, `chore/`, or
+`merge/` branches. `main` is protected in practice: changes land through pull requests.
+Commit subjects follow Conventional Commits with a scope — `feat(pronunciation):`,
+`fix(models):`, `docs:`.
+
+**Quality gates.** Before a PR is merged the following MUST pass:
+
+| Gate | Command |
+|---|---|
+| JS/TS lint + format + typecheck | `just check-js` (`bun run check`) |
+| TypeScript typecheck (app + web) | `bun run typecheck` |
+| Python lint + format | `just check-python` (`ruff check`, `ruff format --check`) |
+| Python tests | `just test` (`pytest backend/tests`) |
+| Web build smoke test | `bun run build:web` |
+
+Python tests are currently run locally rather than in CI. Until CI executes them, the
+author MUST run `just test` before requesting review and MUST say so in the PR. Closing
+this gap is a standing obligation, not an accepted permanent state.
+
+**Style.** `backend/STYLE_GUIDE.md` governs Python: ruff-enforced, 120-column, double
+quotes, built-in generics and `X | Y` unions (no `typing.List`, no
+`from __future__ import annotations`), relative imports within the `backend` package, no
+wildcard imports. Biome governs TypeScript: functional components, named exports, strict
+mode. `rustfmt` governs Rust, with errors handled explicitly rather than unwrapped.
+
+**Documentation.** `CHANGELOG.md` MUST be updated in the change that alters user-visible
+behaviour. API changes MUST update `backend/README.md`. New engines MUST follow
+`docs/content/docs/developer/tts-engines.mdx`.
+
+**CI runner policy.** Every CI/CD job MUST run on the home-office self-hosted runners (the
+ARC scale sets `homek8-general` or `homek8-mobile`, or a self-hosted Windows label
+registered for this repo). GitHub-hosted runners (`ubuntu-latest`, `windows-latest`,
+`macos-*`) are permitted only for a job a self-hosted runner genuinely cannot execute, and
+only when that exception is documented in `README.md` in red — naming the workflow, the
+job, why the self-hosted runner cannot run it, and what would remove the exception. A
+tool missing from the runners is added to the runner image, not downloaded per job. Every
+new or edited workflow MUST be checked against this rule before it is committed.
+
+**Release process.** Releases are cut with `bumpversion` (`.bumpversion.cfg`), which
+updates all eight version sites, commits, and tags `v{version}`. Pushing the tag triggers
+the release workflow. Release artifacts MUST be cryptographically signed with this fork's
+own key, and the updater MUST verify signatures over HTTPS before installing.
+
+**Spec Kit lifecycle.** Feature work follows the Spec Kit flow (specify → plan → tasks →
+implement). The `project` extension's sync hooks are `required`: the GitHub Project board
+named under Project Tracking is advanced automatically at each lifecycle event, and its
+card status is the authoritative view of feature state.
+
+**Security reporting.** Vulnerabilities go to `security@voicebox.sh` per `SECURITY.md` and
+MUST NOT be filed as public issues or described in a public PR before disclosure.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes conflicting guidance in `README.md`, `CONTRIBUTING.md`,
+`backend/STYLE_GUIDE.md`, agent skills, and prior practice. Where another document is
+merely more specific, it stands; where it contradicts a principle here, this document
+wins and the other document MUST be corrected.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Amendment procedure.** Amendments are proposed as a pull request that modifies this file
+and nothing else. The PR MUST state the version bump and its rationale, and MUST list any
+code, workflow, or documentation changes the amendment makes necessary. Amendments take
+effect on merge.
+
+**Versioning policy.** This document is versioned semantically and independently of the
+application:
+
+- **MAJOR** — a principle is removed or redefined in a way that permits what it previously
+  forbade, or a governance rule is relaxed.
+- **MINOR** — a principle or section is added, or existing guidance is materially expanded.
+- **PATCH** — clarification, wording, or formatting with no change in obligation.
+
+**Compliance review.** Every pull request MUST be reviewable against this document, and a
+reviewer MUST reject a change that violates a principle marked NON-NEGOTIABLE regardless
+of its other merits. Complexity that appears to conflict with a principle MUST be
+justified in the PR description rather than left for the reader to infer. Principles I and
+II admit no exceptions; III, IV, and V admit documented, time-boxed exceptions recorded in
+the PR that introduces them.
+
+**Runtime guidance.** Day-to-day development guidance lives in `CONTRIBUTING.md`,
+`backend/STYLE_GUIDE.md`, and `docs/PROJECT_STATUS.md`. Agents working in this repository
+read this constitution first.
+
+**Version**: 1.0.0 | **Ratified**: 2026-09-22 | **Last Amended**: 2026-09-22

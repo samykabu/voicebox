@@ -4,6 +4,8 @@ installed:
 - pr
 - project
 - scope
+- speckit-superpowers-bridge
+- superspec
 - user-manual
 - workflow
 settings:
@@ -12,7 +14,7 @@ hooks:
   after_specify:
   - extension: project
     command: speckit.project.sync
-    enabled: true
+    enabled: false
     optional: false
     priority: 10
     prompt: 'Create/refresh the GitHub Project feature issue (Status: open column)?
@@ -31,7 +33,7 @@ hooks:
     condition: null
   - extension: scope
     command: speckit.scope.after-specify
-    enabled: true
+    enabled: false
     optional: false
     priority: 30
     prompt: Execute speckit.scope.after-specify?
@@ -41,7 +43,7 @@ hooks:
   after_plan:
   - extension: project
     command: speckit.project.sync
-    enabled: true
+    enabled: false
     optional: false
     priority: 10
     prompt: 'Advance the GitHub Project card to the ''analysis'' column? Run: /speckit-project-sync
@@ -51,7 +53,7 @@ hooks:
   after_analyze:
   - extension: project
     command: speckit.project.sync
-    enabled: true
+    enabled: false
     optional: false
     priority: 10
     prompt: 'Advance the GitHub Project card to the ''engineer-review'' column? Run:
@@ -62,7 +64,7 @@ hooks:
   after_tasks:
   - extension: project
     command: speckit.project.sync
-    enabled: true
+    enabled: false
     optional: false
     priority: 10
     prompt: 'Create one sub-issue per task and set the card to the ''ready'' column?
@@ -72,7 +74,7 @@ hooks:
     condition: null
   - extension: assure
     command: speckit.assure.analyze
-    enabled: true
+    enabled: false
     optional: true
     priority: 10
     prompt: Analyze the active feature for missing QA readiness tasks before implementation?
@@ -81,16 +83,33 @@ hooks:
     condition: null
   - extension: user-manual
     command: speckit.user-manual.analyze
-    enabled: true
+    enabled: false
     optional: true
     priority: 10
     prompt: Analyze which User Manual modules and assets this feature must update?
     description: Add documentation and evidence work to tasks.md before implementation
     condition: null
+  - extension: speckit-superpowers-bridge
+    command: speckit.speckit-superpowers-bridge.handoff
+    enabled: false
+    optional: false
+    priority: 10
+    prompt: Execute speckit.speckit-superpowers-bridge.handoff?
+    description: Create the Superpowers handoff after Spec Kit task generation
+    condition: null
+  - extension: superspec
+    command: speckit.superspec.tasks
+    enabled: false
+    optional: true
+    priority: 10
+    prompt: Run enhanced Superpowers task decomposition and validation?
+    description: Verify task coverage and add Superpowers execution markers after
+      core task generation
+    condition: null
   before_implement:
   - extension: project
     command: speckit.project.sync
-    enabled: true
+    enabled: false
     optional: false
     priority: 10
     prompt: 'Mark the GitHub Project card ''in-progress'' before implementation? Run:
@@ -100,7 +119,7 @@ hooks:
     condition: null
   - extension: assure
     command: speckit.assure.analyze
-    enabled: true
+    enabled: false
     optional: true
     priority: 10
     prompt: Run the QA readiness gate before implementation? Assure.Init can make
@@ -108,10 +127,27 @@ hooks:
     description: Mandatory in lifecycle-integrated mode; verifies or refreshes QA
       analysis before implementation
     condition: null
+  - extension: speckit-superpowers-bridge
+    command: speckit.speckit-superpowers-bridge.guard
+    enabled: false
+    optional: false
+    priority: 10
+    prompt: Execute speckit.speckit-superpowers-bridge.guard?
+    description: Block speckit.implement for features handed off to Superpowers
+    condition: null
+  - extension: superspec
+    command: speckit.superspec.execute
+    enabled: false
+    optional: true
+    priority: 10
+    prompt: Run Superpowers-guided implementation with TDD and checkpoints?
+    description: Enforce TDD discipline and Superpowers execution guidance before
+      core implementation
+    condition: null
   after_implement:
   - extension: project
     command: speckit.project.sync
-    enabled: true
+    enabled: false
     optional: false
     priority: 10
     prompt: 'Close completed task sub-issues and set ''in-review'' if a PR is open?
@@ -121,7 +157,7 @@ hooks:
     condition: null
   - extension: assure
     command: speckit.assure.document
-    enabled: true
+    enabled: false
     optional: true
     priority: 10
     prompt: Generate or refresh the QA test manual now that implementation is complete?
@@ -130,7 +166,7 @@ hooks:
     condition: null
   - extension: user-manual
     command: speckit.user-manual.update
-    enabled: true
+    enabled: false
     optional: true
     priority: 10
     prompt: Update the audience-aware User Manual and generate a private preview?
@@ -139,7 +175,7 @@ hooks:
     condition: null
   - extension: pr
     command: speckit.pr.generate
-    enabled: true
+    enabled: false
     optional: true
     priority: 10
     prompt: Generate the feature CHANGELOG + feature-details doc, diagram assets if
@@ -154,6 +190,14 @@ hooks:
     priority: 30
     prompt: Execute speckit.scope.reconcile?
     description: Reconcile scope parents after Project sync updates child progress.
+    condition: null
+  - extension: superspec
+    command: speckit.superspec.review
+    enabled: false
+    optional: true
+    priority: 10
+    prompt: Run Superpowers review against the specification and implementation?
+    description: Review implementation against the spec, plan, tasks, and constitution
     condition: null
   before_specify:
   - extension: scope
@@ -174,4 +218,33 @@ hooks:
     prompt: Execute speckit.scope.plan-guard?
     description: Require Ready before technical planning; unresolved clarification
       must not be bypassed.
+    condition: null
+  - extension: speckit-superpowers-bridge
+    command: speckit.speckit-superpowers-bridge.guard
+    enabled: false
+    optional: false
+    priority: 10
+    prompt: Execute speckit.speckit-superpowers-bridge.guard?
+    description: Prevent Spec Kit contract changes while Superpowers implementation
+      is executing
+    condition: null
+  before_clarify:
+  - extension: speckit-superpowers-bridge
+    command: speckit.speckit-superpowers-bridge.guard
+    enabled: false
+    optional: false
+    priority: 10
+    prompt: Execute speckit.speckit-superpowers-bridge.guard?
+    description: Prevent Spec Kit contract changes while Superpowers implementation
+      is executing
+    condition: null
+  before_tasks:
+  - extension: speckit-superpowers-bridge
+    command: speckit.speckit-superpowers-bridge.guard
+    enabled: false
+    optional: false
+    priority: 10
+    prompt: Execute speckit.speckit-superpowers-bridge.guard?
+    description: Prevent Spec Kit contract changes while Superpowers implementation
+      is executing
     condition: null

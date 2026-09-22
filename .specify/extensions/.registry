@@ -120,6 +120,41 @@
       },
       "registered_skills": [],
       "installed_at": "2026-09-22T16:52:01.366426+00:00"
+    },
+    "speckit-superpowers-bridge": {
+      "version": "1.2.0",
+      "source": "local",
+      "manifest_hash": "sha256:fe7c8d353c87f90f48763c424f24c09bd02e572479b9313900ee341b5a858e89",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.speckit-superpowers-bridge.handoff",
+          "speckit.speckit-superpowers-bridge.guard",
+          "speckit.speckit-superpowers-bridge.execute",
+          "speckit.superpowers-bridge"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T17:04:57.886358+00:00"
+    },
+    "superspec": {
+      "version": "1.0.2",
+      "source": "local",
+      "manifest_hash": "sha256:6e23ee6c18f9e05d077293c7cd3ab8aaa982f1b7e35996267dc32b51e5fc8e54",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.superspec.status",
+          "speckit.superspec.brainstorm",
+          "speckit.superspec.tasks",
+          "speckit.superspec.execute",
+          "speckit.superspec.review"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T17:04:59.936926+00:00"
     }
   }
 }
