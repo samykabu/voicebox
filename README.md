@@ -434,6 +434,23 @@ just build          # Build CPU server binary + Tauri app
 just build-local    # (Windows) Build CPU + CUDA server binaries + Tauri app
 ```
 
+### CI runner exception
+
+$${\color{red}\text{Exception: the Release workflow runs on GitHub-hosted runners, not the home office self-hosted runners.}}$$
+
+| Workflow | Job | Runner |
+|---|---|---|
+| `.github/workflows/release.yml` | `release` (Windows MSI) | `windows-latest` |
+| `.github/workflows/release.yml` | `build-cuda-windows` | `windows-latest` |
+| `.github/workflows/release.yml` | `build-rocm-windows` | `windows-latest` |
+| `.github/workflows/release.yml` | `release` (macOS arm64 and x64) | `macos-latest`, `macos-15-intel` |
+
+$${\color{red}\text{Why: no self-hosted Windows or macOS runner is registered for this repo, and the homek8 ARC scale sets are Linux-only.}}$$
+$${\color{red}\text{The Windows jobs build the MSI and the CUDA/ROCm server binaries, so they need Windows. The macOS jobs need macOS and Xcode.}}$$
+
+$${\color{red}\text{What removes it: register a self-hosted Windows runner (with Python 3.12, Rust, Bun and the CUDA toolkit) for this repo}}$$
+$${\color{red}\text{and switch the three Windows jobs to its label. The macOS jobs need a self-hosted Mac runner, or they can be dropped.}}$$
+
 ### Adding New Voice Models
 
 The multi-engine architecture makes adding new TTS engines straightforward. A [step-by-step guide](docs/content/docs/developer/tts-engines.mdx) covers the full process: dependency research, backend protocol implementation, frontend wiring, and PyInstaller bundling.
