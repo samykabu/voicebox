@@ -434,35 +434,39 @@ just build          # Build CPU server binary + Tauri app
 just build-local    # (Windows) Build CPU + CUDA server binaries + Tauri app
 ```
 
-### CI runner exception
+### CI runner policy
 
-$${\color{red}\text{Exception: the Release workflow runs on GitHub-hosted runners, not the home office self-hosted runners.}}$$
+$${\color{red}\text{This repository runs every CI/CD job on GitHub-hosted runners, not the home office self-hosted runners.}}$$
 
 | Workflow | Job | Runner |
 |---|---|---|
+| `.github/workflows/ci.yml` | `frontend-quality` | `ubuntu-latest` |
+| `.github/workflows/sanduq-workflow-gates.yml` | `workflow-evidence` | `ubuntu-latest` |
+| `.github/workflows/build-windows.yml` | `build-msi` | `windows-latest` |
 | `.github/workflows/release.yml` | `release-notes` | `ubuntu-latest` |
 | `.github/workflows/release.yml` | `release` (Windows MSI) | `windows-latest` |
 | `.github/workflows/release.yml` | `build-cuda-windows` | `windows-latest` |
 | `.github/workflows/release.yml` | `build-rocm-windows` | `windows-latest` |
 | `.github/workflows/release.yml` | `release` (macOS arm64 and x64) | `macos-latest`, `macos-15-intel` |
-| `.github/workflows/ci.yml` | `frontend-quality` | `ubuntu-latest` |
-| `.github/workflows/build-windows.yml` | `build` | `windows-latest` |
 
-$${\color{red}\text{Why: the homek8 ARC scale sets are registered to the abushanab-net org, and this repo sits under the samykabu personal}}$$
-$${\color{red}\text{account, so its jobs cannot reach them. No self-hosted runner of any platform is registered for this repo.}}$$
-$${\color{red}\text{The Windows jobs build the MSI and the CUDA/ROCm server binaries, so they need Windows. The macOS jobs need macOS and Xcode.}}$$
+$${\color{red}\text{Why: the homek8 ARC scale sets are registered to the abushanab-net org, while this repo sits under the samykabu}}$$
+$${\color{red}\text{personal account, so no job here can reach them. A job targeting homek8-general does not fail - it queues forever}}$$
+$${\color{red}\text{and its check never reports. No self-hosted runner of any platform is registered for this repo.}}$$
+$${\color{red}\text{The Windows jobs build the MSI and the CUDA/ROCm server binaries, so they need Windows; the macOS jobs need Xcode.}}$$
 
-$${\color{red}\text{What removes it: register a self-hosted Windows runner (with Python 3.12, Rust, Bun and the CUDA toolkit) for this repo}}$$
-$${\color{red}\text{and switch the three Windows jobs to its label. The macOS jobs need a self-hosted Mac runner, or they can be dropped.}}$$
-$${\color{red}\text{The two Linux-only jobs (ci.yml and release-notes) can move to homek8-general as soon as this repo can reach that scale}}$$
-$${\color{red}\text{set — by moving the repo into the abushanab-net org, or by registering the scale set against this repo.}}$$
+$${\color{red}\text{What removes it: move this repo into the abushanab-net org, or register the ARC scale set against this repo, then}}$$
+$${\color{red}\text{switch the Linux-only jobs (ci.yml, sanduq-workflow-gates.yml, release-notes) to homek8-general. The Windows and macOS}}$$
+$${\color{red}\text{jobs additionally need self-hosted runners of those platforms, which do not exist today.}}$$
 
-The Sanduq workflow gate (`.github/workflows/sanduq-workflow-gates.yml`, job `workflow-evidence`,
-running `.specify/extensions/workflow/scripts/ci_gate.py`) was removed for the same reason: it
-targeted `homek8-general`, which this repo cannot reach, so its check sat queued on every pull
-request and never ran. Restore it once a self-hosted Linux runner serves this repo — and keep the
-`homek8-general` label, because the Sanduq template ships `ubuntu-latest`, which this project does
-not allow.
+New and edited workflows in this repository target GitHub-hosted runners. Keep the table above
+in step with `.github/workflows/`, and amend the CI runner policy in
+`.specify/memory/constitution.md` in the same change if the runner story changes.
+
+The `workflow-evidence` job carries one local edit against the Sanduq template: it runs only
+when a PR changes `specs/` or `.specify/workflow/pr-features.json`. `ci_gate.py` requires at
+least one feature and has no empty-mapping path, so without that guard it fails every chore,
+fix, docs and upstream-merge PR. `install.py --apply` restores the template, so re-apply the
+guard and refresh `ci_sha256` in `.specify/workflow/install-receipt.json` after any install.
 
 ### Adding New Voice Models
 
