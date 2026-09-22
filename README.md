@@ -440,16 +440,22 @@ $${\color{red}\text{Exception: the Release workflow runs on GitHub-hosted runner
 
 | Workflow | Job | Runner |
 |---|---|---|
+| `.github/workflows/release.yml` | `release-notes` | `ubuntu-latest` |
 | `.github/workflows/release.yml` | `release` (Windows MSI) | `windows-latest` |
 | `.github/workflows/release.yml` | `build-cuda-windows` | `windows-latest` |
 | `.github/workflows/release.yml` | `build-rocm-windows` | `windows-latest` |
 | `.github/workflows/release.yml` | `release` (macOS arm64 and x64) | `macos-latest`, `macos-15-intel` |
+| `.github/workflows/ci.yml` | `frontend-quality` | `ubuntu-latest` |
+| `.github/workflows/build-windows.yml` | `build` | `windows-latest` |
 
-$${\color{red}\text{Why: no self-hosted Windows or macOS runner is registered for this repo, and the homek8 ARC scale sets are Linux-only.}}$$
+$${\color{red}\text{Why: the homek8 ARC scale sets are registered to the abushanab-net org, and this repo sits under the samykabu personal}}$$
+$${\color{red}\text{account, so its jobs cannot reach them. No self-hosted runner of any platform is registered for this repo.}}$$
 $${\color{red}\text{The Windows jobs build the MSI and the CUDA/ROCm server binaries, so they need Windows. The macOS jobs need macOS and Xcode.}}$$
 
 $${\color{red}\text{What removes it: register a self-hosted Windows runner (with Python 3.12, Rust, Bun and the CUDA toolkit) for this repo}}$$
 $${\color{red}\text{and switch the three Windows jobs to its label. The macOS jobs need a self-hosted Mac runner, or they can be dropped.}}$$
+$${\color{red}\text{The two Linux-only jobs (ci.yml and release-notes) can move to homek8-general as soon as this repo can reach that scale}}$$
+$${\color{red}\text{set — by moving the repo into the abushanab-net org, or by registering the scale set against this repo.}}$$
 
 ### Adding New Voice Models
 
