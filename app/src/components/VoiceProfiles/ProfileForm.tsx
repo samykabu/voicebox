@@ -41,13 +41,14 @@ import { LANGUAGE_CODES, LANGUAGE_OPTIONS, type LanguageCode } from '@/lib/const
 import {
   declaredCloningEngineOptions,
   designPromptError,
+  engineNotice,
   MAX_DESIGN_PROMPT_CHARS,
   pickVoiceDesignEngine,
   voiceDesignEngineOptions,
 } from '@/lib/hooks/engineCapabilityRules';
 import { useAudioPlayer } from '@/lib/hooks/useAudioPlayer';
 import { useAudioRecording } from '@/lib/hooks/useAudioRecording';
-import { useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
+import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
 import {
   useAddSample,
   useCreateProfile,
@@ -60,6 +61,7 @@ import {
 import { useSystemAudioCapture } from '@/lib/hooks/useSystemAudioCapture';
 import { useTranscription } from '@/lib/hooks/useTranscription';
 import { convertToWav, formatAudioDuration, getAudioDuration } from '@/lib/utils/audio';
+import { cn } from '@/lib/utils/cn';
 import { usePlatform } from '@/platform/PlatformContext';
 import { useServerStore } from '@/stores/serverStore';
 import { type ProfileFormDraft, useUIStore } from '@/stores/uiStore';
@@ -336,6 +338,10 @@ export function ProfileForm() {
   // The engine a new designed profile is created for: the chosen default engine when it
   // declares voice design, otherwise the first available one that does.
   const designEngine = pickVoiceDesignEngine(designEngineOptions, defaultEngine);
+  const designEngineNotice = engineNotice(
+    findEngineCapability(engineCapabilities, designEngine),
+    t,
+  )?.text;
 
   // Leave the "Describe a voice" source if no engine declares voice design any more.
   useEffect(() => {
@@ -411,8 +417,10 @@ export function ProfileForm() {
         referenceText: profileFormDraft.referenceText,
         sampleFile: undefined,
         avatarFile: undefined,
+        designPrompt: profileFormDraft.designPrompt ?? '',
       });
       setSampleMode(profileFormDraft.sampleMode);
+      setVoiceSource(profileFormDraft.voiceSource ?? 'clone');
       // Restore the file if we have it saved
       if (
         profileFormDraft.sampleFileData &&
@@ -869,7 +877,11 @@ export function ProfileForm() {
       // Save draft when closing the create modal
       const values = form.getValues();
       const hasContent =
-        values.name || values.description || values.referenceText || values.sampleFile;
+        values.name ||
+        values.description ||
+        values.referenceText ||
+        values.sampleFile ||
+        values.designPrompt;
 
       if (hasContent) {
         const draft: ProfileFormDraft = {
@@ -879,6 +891,8 @@ export function ProfileForm() {
           personality: values.personality || '',
           referenceText: values.referenceText || '',
           sampleMode,
+          voiceSource,
+          designPrompt: values.designPrompt || '',
         };
 
         // Save file as base64 if present
@@ -1040,17 +1054,46 @@ export function ProfileForm() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {designEngineOptions.map((option) => (
-                                  <SelectItem
-                                    key={option.value}
-                                    value={option.value}
-                                    disabled={!option.available}
-                                  >
-                                    {option.label}
-                                  </SelectItem>
-                                ))}
+                                {designEngineOptions.map((option) => {
+                                  // FR-003: an unavailable engine stays listed, greyed out,
+                                  // with why it cannot run (as in EngineModelSelector).
+                                  const notice = engineNotice(
+                                    findEngineCapability(engineCapabilities, option.value),
+                                    t,
+                                  );
+                                  return (
+                                    <SelectItem
+                                      key={option.value}
+                                      value={option.value}
+                                      // Only the label is greyed out, so the reason stays readable.
+                                      className="data-[disabled]:opacity-100"
+                                      disabled={!option.available}
+                                    >
+                                      <span className={option.available ? undefined : 'opacity-50'}>
+                                        {option.label}
+                                      </span>
+                                      {notice ? (
+                                        <span
+                                          className={cn(
+                                            'block text-[10px]',
+                                            notice.kind === 'reason'
+                                              ? 'text-muted-foreground'
+                                              : 'text-amber-600 dark:text-amber-400',
+                                          )}
+                                        >
+                                          {notice.text}
+                                        </span>
+                                      ) : null}
+                                    </SelectItem>
+                                  );
+                                })}
                               </SelectContent>
                             </Select>
+                            {designEngineNotice ? (
+                              <p className="text-xs text-amber-600 dark:text-amber-400">
+                                {designEngineNotice}
+                              </p>
+                            ) : null}
                           </FormItem>
 
                           <FormField

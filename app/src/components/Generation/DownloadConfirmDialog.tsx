@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +35,13 @@ export function DownloadConfirmDialog({
   // Every way of closing (Download, Cancel, Escape, overlay) goes through onOpenChange once;
   // the ref records whether that close was the Download button.
   const confirmedRef = useRef(false);
+  const { t } = useTranslation();
+  const licenseKey =
+    details?.commercialUse === true
+      ? 'downloadConfirm.licenseCommercial'
+      : details?.commercialUse === false
+        ? 'downloadConfirm.licenseNoncommercial'
+        : 'downloadConfirm.license';
   return (
     <AlertDialog
       open={!!details}
@@ -47,20 +55,14 @@ export function DownloadConfirmDialog({
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Download {details?.displayName}?</AlertDialogTitle>
+          <AlertDialogTitle>
+            {t('downloadConfirm.title', { name: details?.displayName ?? '' })}
+          </AlertDialogTitle>
           <AlertDialogDescription>
             {details
-              ? `This downloads about ${formatDownloadSize(details.sizeMb)} before it can be used.`
+              ? t('downloadConfirm.size', { size: formatDownloadSize(details.sizeMb) })
               : null}
-            {details?.licenseId
-              ? ` Licence: ${details.licenseId}${
-                  details.commercialUse === true
-                    ? ', commercial use allowed.'
-                    : details.commercialUse === false
-                      ? ', noncommercial use only.'
-                      : '.'
-                }`
-              : null}
+            {details?.licenseId ? ` ${t(licenseKey, { license: details.licenseId })}` : null}
           </AlertDialogDescription>
           {/* C1Q4: advisory only; Download stays enabled. */}
           {details?.warning ? (
@@ -68,13 +70,13 @@ export function DownloadConfirmDialog({
           ) : null}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
               confirmedRef.current = true;
             }}
           >
-            Download
+            {t('downloadConfirm.download')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

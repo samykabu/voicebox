@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { type QueryClient, useQuery } from '@tanstack/react-query';
 import { OpenAPI } from '@/lib/api/core/OpenAPI';
 import { request } from '@/lib/api/core/request';
 import type { EngineCapabilitiesResponse } from '@/lib/api/models/EngineCapabilitiesResponse';
@@ -29,11 +29,36 @@ export function useEngineCapabilities() {
   const serverUrl = useServerStore((state) => state.serverUrl);
 
   return useQuery({
+    ...engineCapabilitiesQueryOptions(serverUrl),
+    enabled: !!serverUrl,
+  });
+}
+
+/** The query key, function and freshness shared by the hook and `loadEngineCapabilities`. */
+export function engineCapabilitiesQueryOptions(serverUrl: string) {
+  return {
     queryKey: ['engine-capabilities', serverUrl],
     queryFn: () => fetchEngineCapabilities(serverUrl),
-    enabled: !!serverUrl,
     staleTime: 1000 * 60,
-  });
+  };
+}
+
+/**
+ * The capability list for a decision that must not guess (FR-018): the cached list when it is
+ * fresh, otherwise fetched now through the same query. Resolves to undefined when it cannot be
+ * loaded, so the caller can fail closed.
+ */
+export async function loadEngineCapabilities(
+  queryClient: QueryClient,
+  serverUrl: string,
+): Promise<EngineCapabilitiesResponse | undefined> {
+  if (!serverUrl) return undefined;
+  try {
+    return await queryClient.fetchQuery(engineCapabilitiesQueryOptions(serverUrl));
+  } catch (error) {
+    console.error('Failed to load engine capabilities:', error);
+    return undefined;
+  }
 }
 
 /** Find one engine's capabilities by its id, or undefined when it is not reported. */

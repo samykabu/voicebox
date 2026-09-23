@@ -52,10 +52,15 @@ import {
 import {
   type DownloadConfirmationDetails,
   downloadConfirmationDetails,
+  downloadDecision,
   engineNotice,
-  needsDownloadConfirmation,
+  PRE_CAPABILITY_ENGINES,
 } from '@/lib/hooks/engineCapabilityRules';
-import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
+import {
+  findEngineCapability,
+  loadEngineCapabilities,
+  useEngineCapabilities,
+} from '@/lib/hooks/useEngineCapabilities';
 import { useModelDownloadToast } from '@/lib/hooks/useModelDownloadToast';
 import { usePlatform } from '@/platform/PlatformContext';
 import { useServerStore } from '@/stores/serverStore';
@@ -160,6 +165,7 @@ export function ModelManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const platform = usePlatform();
+  const serverUrl = useServerStore((state) => state.serverUrl);
   const customModelsDir = useServerStore((state) => state.customModelsDir);
   const setCustomModelsDir = useServerStore((state) => state.setCustomModelsDir);
   const [migrating, setMigrating] = useState(false);
@@ -294,10 +300,29 @@ export function ModelManagement() {
   >(null);
 
   // FR-018 / C1Q7: engines whose capability requires it are confirmed before downloading.
-  const handleDownload = (modelName: string) => {
-    const capability = getModelCapability(modelName);
+  // It fails closed: a model whose engine depends on a capability that cannot be loaded is
+  // not downloaded. The list is loaded first when it has not arrived yet (cold start).
+  const handleDownload = async (modelName: string) => {
+    const engine = MODEL_ENGINES[modelName];
+    const capability =
+      getModelCapability(modelName) ??
+      findEngineCapability(
+        engine ? await loadEngineCapabilities(queryClient, serverUrl) : undefined,
+        engine,
+      );
     const model = modelStatus?.models.find((m) => m.model_name === modelName);
-    if (capability && needsDownloadConfirmation(capability, model)) {
+    const decision = downloadDecision(engine, capability, model, PRE_CAPABILITY_ENGINES);
+    if (decision === 'refuse') {
+      toast({
+        title: t('engines.detailsUnavailable.title'),
+        description: t('engines.detailsUnavailable.description', {
+          name: model?.display_name || modelName,
+        }),
+        variant: 'destructive',
+      });
+      return;
+    }
+    if (decision === 'confirm' && capability) {
       setPendingDownload({
         ...downloadConfirmationDetails(capability, model?.display_name),
         modelName,
@@ -504,7 +529,7 @@ export function ModelManagement() {
   const selectedCapability = freshSelectedModel
     ? getModelCapability(freshSelectedModel.model_name)
     : undefined;
-  const selectedNotice = engineNotice(selectedCapability);
+  const selectedNotice = engineNotice(selectedCapability, t);
 
   return (
     <div className="flex flex-col h-full">
@@ -921,7 +946,7 @@ export function ModelManagement() {
                     <>
                       <Button
                         size="sm"
-                        onClick={() => handleDownload(freshSelectedModel.model_name)}
+                        onClick={() => void handleDownload(freshSelectedModel.model_name)}
                         variant="outline"
                         className="flex-1"
                       >
@@ -1019,7 +1044,7 @@ export function ModelManagement() {
                   ) : (
                     <Button
                       size="sm"
-                      onClick={() => handleDownload(freshSelectedModel.model_name)}
+                      onClick={() => void handleDownload(freshSelectedModel.model_name)}
                       className="flex-1"
                     >
                       <Download className="h-4 w-4 mr-2" />

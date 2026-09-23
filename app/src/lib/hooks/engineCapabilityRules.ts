@@ -1,6 +1,7 @@
 import type { EngineAdvancedSettingResponse } from '@/lib/api/models/EngineAdvancedSettingResponse';
 import type { EngineCapabilitiesResponse } from '@/lib/api/models/EngineCapabilitiesResponse';
 import type { EngineCapabilityResponse } from '@/lib/api/models/EngineCapabilityResponse';
+import { ENGINE_LANGUAGES } from '@/lib/constants/languages';
 
 /**
  * Pure decisions the UI derives from an engine's declared capabilities
@@ -15,6 +16,27 @@ export function isEngineSelectable(capability: EngineCapabilityResponse | undefi
   return capability ? capability.available : true;
 }
 
+/**
+ * The UI's translate function (i18next's `t`), passed in so these rules stay free of hooks.
+ */
+export type TranslateFn = (key: string, params?: Record<string, string>) => string;
+
+/** An i18n key and its interpolation values, for callers that translate later. */
+export interface TranslatableMessage {
+  key: string;
+  params: Record<string, string>;
+}
+
+/**
+ * The message for an unavailable engine whose capability gives no `reason`: the
+ * `engines.cannotRunHere` key, filled with the engine's declared display name.
+ */
+export function engineUnavailableFallback(
+  capability: EngineCapabilityResponse,
+): TranslatableMessage {
+  return { key: 'engines.cannotRunHere', params: { name: capability.display_name } };
+}
+
 /** A line shown next to an engine: why it cannot run, or an advisory warning. */
 export interface EngineNotice {
   kind: 'reason' | 'warning';
@@ -23,19 +45,20 @@ export interface EngineNotice {
 
 /**
  * What to show next to an engine (FR-003, C1Q3, C1Q4). An unavailable engine shows its
- * `reason`, falling back to a sentence built from its display name so a greyed-out engine
- * always explains itself; an available engine shows its `warning`. A warning is advisory
+ * `reason`, falling back to a translated sentence built from its display name
+ * (`engineUnavailableFallback`) so a greyed-out engine always explains itself; an available
+ * engine shows its `warning`. A warning is advisory
  * only: it never changes `isEngineSelectable`.
  */
 export function engineNotice(
   capability: EngineCapabilityResponse | undefined,
+  t: TranslateFn,
 ): EngineNotice | null {
   if (!capability) return null;
   if (!capability.available) {
-    return {
-      kind: 'reason',
-      text: capability.reason || `${capability.display_name} can't run on this machine.`,
-    };
+    if (capability.reason) return { kind: 'reason', text: capability.reason };
+    const fallback = engineUnavailableFallback(capability);
+    return { kind: 'reason', text: t(fallback.key, fallback.params) };
   }
   return capability.warning ? { kind: 'warning', text: capability.warning } : null;
 }
@@ -79,6 +102,60 @@ export function needsDownloadConfirmation(
 ): boolean {
   if (!capability?.requires_download_confirmation || !model) return false;
   return !model.downloaded && !model.downloading;
+}
+
+/**
+ * Engines that predate the capability channel: the ones with an app-side language list
+ * (contracts/engine-capabilities.md, "Scope boundary"). Without a capability they keep
+ * today's behaviour; every other engine depends on its capability.
+ */
+export const PRE_CAPABILITY_ENGINES: ReadonlySet<string> = new Set(Object.keys(ENGINE_LANGUAGES));
+
+/** What to do before a model download may start (FR-018). */
+export type DownloadDecision = 'confirm' | 'proceed' | 'refuse';
+
+/**
+ * Whether a download may start, must be confirmed first, or must be refused (FR-018, C1Q7).
+ *
+ * It fails closed: when an engine outside `preCapabilityEngines` has no capability (for
+ * example GET /models/engines could not be loaded), the app cannot know whether the download
+ * needs confirmation, so it is refused unless the model is already downloaded or downloading.
+ * A capability that requires confirmation is also asked for when the model's state is unknown.
+ * A model with no engine (`engine` undefined, for example a transcription model) and a
+ * pre-capability engine without a capability keep today's behaviour and proceed.
+ */
+export function downloadDecision(
+  engine: string | undefined,
+  capability: EngineCapabilityResponse | undefined,
+  model: { downloaded: boolean; downloading?: boolean } | undefined,
+  preCapabilityEngines: ReadonlySet<string>,
+): DownloadDecision {
+  const noDownload = !!model && (model.downloaded || !!model.downloading);
+  if (noDownload) return 'proceed';
+  if (!capability) {
+    return !engine || preCapabilityEngines.has(engine) ? 'proceed' : 'refuse';
+  }
+  if (!capability.requires_download_confirmation) return 'proceed';
+  return 'confirm';
+}
+
+/**
+ * Whether the generate box should switch away from the selected engine because the selected
+ * profile cannot use it.
+ *
+ * Until the capability list has loaded, only engines in `appSideEngines` are judged: their
+ * compatibility is known app-side. Any other engine's compatibility comes from its capability,
+ * so switching it away on a cold start would drop a valid choice.
+ */
+export function shouldFallBackFromEngine(args: {
+  engine: string;
+  currentEngineAvailable: boolean;
+  optionCount: number;
+  capabilitiesLoaded: boolean;
+  appSideEngines: ReadonlySet<string>;
+}): boolean {
+  if (args.currentEngineAvailable || args.optionCount === 0) return false;
+  return args.capabilitiesLoaded || args.appSideEngines.has(args.engine);
 }
 
 /** What a download confirmation shows, filled from the engine's capability declaration. */

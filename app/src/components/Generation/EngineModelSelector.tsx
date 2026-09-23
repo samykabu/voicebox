@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { FormControl } from '@/components/ui/form';
 import {
   Select,
@@ -21,6 +22,7 @@ import { getLanguageOptionsForEngine } from '@/lib/constants/languages';
 import {
   engineNotice,
   isEngineSelectable,
+  shouldFallBackFromEngine,
   supportsCloning,
   supportsVoiceDesign,
 } from '@/lib/hooks/engineCapabilityRules';
@@ -164,11 +166,12 @@ interface EngineModelSelectorProps {
 }
 
 export function EngineModelSelector({ form, compact, selectedProfile }: EngineModelSelectorProps) {
+  const { t } = useTranslation();
   const engine = form.watch('engine') || 'qwen';
   const modelSize = form.watch('modelSize');
   const language = form.watch('language');
   const selectValue = getSelectValue(engine, modelSize);
-  const { data: capabilities } = useEngineCapabilities();
+  const { data: capabilities, isSuccess: capabilitiesLoaded } = useEngineCapabilities();
   const availableOptions = getAvailableOptions(selectedProfile, capabilities);
   const selectedHabibiModel = engine === 'f5_tts' ? getHabibiModel(modelSize) : null;
   const selectedCapability = findEngineCapability(capabilities, engine);
@@ -176,7 +179,7 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
   // backend's reason. A warning is advisory only and never disables anything. An engine
   // that was selected and has since become unavailable stays selected with its reason;
   // generating with it is refused with that reason (useGenerationForm).
-  const selectedNotice = engineNotice(selectedCapability)?.text;
+  const selectedNotice = engineNotice(selectedCapability, t)?.text;
 
   const currentEngineAvailable = availableOptions.some((opt) => opt.value === selectValue);
 
@@ -192,7 +195,18 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
   }, [engine, form, language, modelSize]);
 
   useEffect(() => {
-    if (!currentEngineAvailable && availableOptions.length > 0) {
+    // Before GET /models/engines loads, only an app-side engine's compatibility is known, so a
+    // capability-declared engine (for example a cloned profile's cloning engine) is not
+    // switched away on a cold start (the same guard as ProfileForm's default engine).
+    if (
+      shouldFallBackFromEngine({
+        engine,
+        currentEngineAvailable,
+        optionCount: availableOptions.length,
+        capabilitiesLoaded,
+        appSideEngines: CLONING_ENGINES,
+      })
+    ) {
       // Prefer an engine this machine can run; the list order is otherwise kept.
       const fallback =
         availableOptions.find((opt) =>
@@ -200,7 +214,7 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
         ) ?? availableOptions[0];
       applyEngineSelection(form, fallback.value, capabilities);
     }
-  }, [availableOptions, currentEngineAvailable, form, capabilities]);
+  }, [availableOptions, currentEngineAvailable, form, capabilities, capabilitiesLoaded, engine]);
 
   const itemClass = compact ? 'text-xs text-muted-foreground' : undefined;
   const triggerClass = compact
@@ -222,7 +236,7 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
           {availableOptions.map((opt) => {
             const capability = findEngineCapability(capabilities, opt.engine);
             const selectable = isEngineSelectable(capability);
-            const notice = engineNotice(capability);
+            const notice = engineNotice(capability, t);
             return (
               <SelectItem
                 key={opt.value}

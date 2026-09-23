@@ -1,6 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api/client';
@@ -16,14 +18,20 @@ import {
   buildVoiceDescriptionPayload,
   type DownloadConfirmationDetails,
   downloadConfirmationDetails,
+  downloadDecision,
   isEngineSelectable,
-  needsDownloadConfirmation,
+  PRE_CAPABILITY_ENGINES,
 } from '@/lib/hooks/engineCapabilityRules';
-import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
+import {
+  findEngineCapability,
+  loadEngineCapabilities,
+  useEngineCapabilities,
+} from '@/lib/hooks/useEngineCapabilities';
 import { useGeneration } from '@/lib/hooks/useGeneration';
 import { useModelDownloadToast } from '@/lib/hooks/useModelDownloadToast';
 import { useGenerationSettings } from '@/lib/hooks/useSettings';
 import { useGenerationStore } from '@/stores/generationStore';
+import { useServerStore } from '@/stores/serverStore';
 import { useUIStore } from '@/stores/uiStore';
 
 const generationSchema = z.object({
@@ -61,7 +69,10 @@ interface UseGenerationFormOptions {
 }
 
 export function useGenerationForm(options: UseGenerationFormOptions = {}) {
+  const { t } = useTranslation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const serverUrl = useServerStore((state) => state.serverUrl);
   const generation = useGeneration();
   const addPendingGeneration = useGenerationStore((state) => state.addPendingGeneration);
   const { settings: genSettings } = useGenerationSettings();
@@ -120,11 +131,15 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
     }
 
     const engine = data.engine || 'qwen';
-    const capability = findEngineCapability(engineCapabilities, engine);
+    // Decide from the capability, not from its absence: on a cold start the list may not have
+    // loaded yet, so load it through the same query before deciding (FR-003, FR-018).
+    const capability =
+      findEngineCapability(engineCapabilities, engine) ??
+      findEngineCapability(await loadEngineCapabilities(queryClient, serverUrl), engine);
     // FR-003: an engine this machine cannot run must not lead to a failed generation.
     if (!isEngineSelectable(capability)) {
       toast({
-        title: `${capability?.display_name ?? engine} is unavailable`,
+        title: t('engines.unavailableTitle', { name: capability?.display_name ?? engine }),
         description: capability?.reason ?? undefined,
         variant: 'destructive',
       });
@@ -180,25 +195,36 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
                           : 'Qwen TTS 0.6B';
 
       // Check if model needs downloading
+      let model: { downloaded: boolean; downloading?: boolean } | undefined;
       try {
         const modelStatus = await apiClient.getModelStatus();
-        const model = modelStatus.models.find((m) => m.model_name === modelName);
-
-        // FR-018 / C1Q7: /generate starts the download itself, so ask first when the
-        // engine's capability requires it. Declining cancels this generation.
-        if (capability && needsDownloadConfirmation(capability, model)) {
-          const confirmed = await requestDownloadConfirmation(
-            downloadConfirmationDetails(capability, displayName),
-          );
-          if (!confirmed) return;
-        }
-
-        if (model && !model.downloaded) {
-          setDownloadingModelName(modelName);
-          setDownloadingDisplayName(displayName);
-        }
+        model = modelStatus.models.find((m) => m.model_name === modelName);
       } catch (error) {
         console.error('Failed to check model status:', error);
+      }
+
+      // FR-018 / C1Q7: /generate starts the download itself, so ask first when the engine's
+      // capability requires it; declining cancels this generation. It fails closed: without
+      // a capability for an engine that depends on one, the download is not started.
+      const decision = downloadDecision(engine, capability, model, PRE_CAPABILITY_ENGINES);
+      if (decision === 'refuse') {
+        toast({
+          title: t('engines.detailsUnavailable.title'),
+          description: t('engines.detailsUnavailable.description', { name: displayName }),
+          variant: 'destructive',
+        });
+        return;
+      }
+      if (decision === 'confirm' && capability) {
+        const confirmed = await requestDownloadConfirmation(
+          downloadConfirmationDetails(capability, displayName),
+        );
+        if (!confirmed) return;
+      }
+
+      if (model && !model.downloaded) {
+        setDownloadingModelName(modelName);
+        setDownloadingDisplayName(displayName);
       }
 
       const hasModelSizes =

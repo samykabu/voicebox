@@ -22,6 +22,10 @@ export interface ProfileFormDraft {
   personality: string;
   referenceText: string;
   sampleMode: 'upload' | 'record' | 'system';
+  /** The chosen profile source; absent in drafts saved before "Describe a voice" existed. */
+  voiceSource?: 'clone' | 'builtin' | 'design';
+  /** The written description for a designed profile (FR-015a). */
+  designPrompt?: string;
   // Note: File objects can't be persisted, so we store metadata
   sampleFileName?: string;
   sampleFileType?: string;

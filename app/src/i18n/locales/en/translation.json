@@ -762,7 +762,8 @@
       "tooltipInactive": "Speak in character",
       "ariaLabelActive": "Speaking in character",
       "ariaLabelInactive": "Speak in character"
-    }
+    },
+    "advancedSettings": "Advanced settings"
   },
   "main": {
     "importVoice": "Import Voice",
@@ -1266,7 +1267,8 @@
       "license": "License",
       "languagesCount": "{{count}} languages supported",
       "languagesList": "Languages: {{list}}",
-      "onDisk": "{{size}} on disk"
+      "onDisk": "{{size}} on disk",
+      "downloadSize": "Download size: {{size}}"
     },
     "actions": {
       "download": "Download",
@@ -1313,5 +1315,21 @@
       "migrationFailedGeneric": "Failed to migrate models",
       "migrationConnectionLost": "Lost connection during migration"
     }
+  },
+  "engines": {
+    "cannotRunHere": "{{name}} can't run on this machine.",
+    "unavailableTitle": "{{name}} is unavailable",
+    "detailsUnavailable": {
+      "title": "Can't confirm the download",
+      "description": "{{name}}'s engine details couldn't be loaded, so the download can't be confirmed. Check the server connection and try again."
+    }
+  },
+  "downloadConfirm": {
+    "title": "Download {{name}}?",
+    "size": "This downloads about {{size}} before it can be used.",
+    "license": "Licence: {{license}}.",
+    "licenseCommercial": "Licence: {{license}}, commercial use allowed.",
+    "licenseNoncommercial": "Licence: {{license}}, noncommercial use only.",
+    "download": "Download"
   }
 }
