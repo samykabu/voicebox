@@ -117,30 +117,46 @@ class GenerationRequest(BaseModel):
 
     @model_validator(mode="after")
     def _check_advanced_settings(self) -> "GenerationRequest":
-        """Reject advanced settings the engine does not declare, or values outside their bounds (422)."""
-        if not self.advanced_settings:
+        """Reject advanced settings the engine does not declare, or values outside their bounds (422).
+
+        A null ``engine`` names no engine, so the check is left to the route, which runs
+        ``advanced_settings_error`` once it has resolved the engine from the profile.
+        """
+        if self.engine is None:
             return self
-
-        # lazy: avoid circular import (models.py must not import the backends package at module scope)
-        from .backends import get_default_model_size, get_tts_model_configs
-
-        engine = self.engine or "qwen"
-        default_size = get_default_model_size(engine)
-        config = next(
-            (c for c in get_tts_model_configs() if c.engine == engine and c.model_size == default_size),
-            None,
-        )
-        declared = {s.name: s for s in config.advanced_settings} if config else {}
-
-        for name, value in self.advanced_settings.items():
-            setting = declared.get(name)
-            if setting is None:
-                raise ValueError(f"Engine '{engine}' does not declare an advanced setting named '{name}'")
-            if not setting.min <= value <= setting.max:
-                raise ValueError(
-                    f"Advanced setting '{name}' must be between {setting.min} and {setting.max} for engine '{engine}'"
-                )
+        error = advanced_settings_error(self.engine, self.advanced_settings)
+        if error:
+            raise ValueError(error)
         return self
+
+
+def advanced_settings_error(engine: str, advanced_settings: dict[str, float] | None) -> str | None:
+    """Return why *advanced_settings* are invalid for *engine*, or None when they are valid (FR-010).
+
+    Only names the engine's default-size config declares are allowed, within their bounds.
+    Shared by the ``GenerationRequest`` validator and the generation routes, which call it
+    after resolving a null request engine, so both give the same message.
+    """
+    if not advanced_settings:
+        return None
+
+    # lazy: avoid circular import (models.py must not import the backends package at module scope)
+    from .backends import get_default_model_size, get_tts_model_configs
+
+    default_size = get_default_model_size(engine)
+    config = next(
+        (c for c in get_tts_model_configs() if c.engine == engine and c.model_size == default_size),
+        None,
+    )
+    declared = {s.name: s for s in config.advanced_settings} if config else {}
+
+    for name, value in advanced_settings.items():
+        setting = declared.get(name)
+        if setting is None:
+            return f"Engine '{engine}' does not declare an advanced setting named '{name}'"
+        if not setting.min <= value <= setting.max:
+            return f"Advanced setting '{name}' must be between {setting.min} and {setting.max} for engine '{engine}'"
+    return None
 
 
 class GenerationResponse(BaseModel):

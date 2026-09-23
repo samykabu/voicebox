@@ -869,7 +869,8 @@ def test_model_config_declares_the_data_model_values() -> None:
     assert config.model_size == "default"
     assert config.size_mb == 4961
     assert config.needs_trim is False
-    assert config.retries_runaway is True
+    # The vendor retries runaway output itself (retry_badcase), so Voicebox must not (protocol rule 4).
+    assert config.retries_runaway is False
     assert config.supports_instruct is False
     assert config.supports_voice_design is True
     assert config.requires_download_confirmation is True

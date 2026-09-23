@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="29" skipped="0" tests="44" time="4.475" timestamp="2026-09-23T21:08:28.200670+03:00" hostname="DevelopmentPC"><testcase classname="tests.test_review_generation_description" name="test_generation_model_declares_a_nullable_voice_description_column" time="0.001"><failure message="assert None is not None">def test_generation_model_declares_a_nullable_voice_description_column() -&gt; None:
+        from backend.database import Generation
+    
+        column = Generation.__table__.c.get("voice_description")
+    
+&gt;       assert column is not None
+E       assert None is not None
+
+backend\tests\test_review_generation_description.py:36: AssertionError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_migration_adds_the_column_to_an_old_database_idempotently" time="0.024"><failure message="AssertionError: assert 'voice_description' in {'audio_path', 'created_at', 'duration', 'engine', 'error', 'id', ...}&#10; +  where {'audio_path', 'created_at', 'duration', 'engine', 'error', 'id', ...} = _generation_columns(Engine(sqlite:///C:\Users\sabus\AppData\Local\Temp\pytest-of-sabus\pytest-80\test_migration_adds_the_column0\old.db))">tmp_path = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-80/test_migration_adds_the_column0')
+
+    def test_migration_adds_the_column_to_an_old_database_idempotently(tmp_path) -&gt; None:
+        from backend.database.migrations import run_migrations
+    
+        engine = create_engine(f"sqlite:///{tmp_path / 'old.db'}")
+        with engine.connect() as conn:
+            conn.execute(text(_OLD_GENERATIONS_TABLE))
+            conn.execute(
+                text(
+                    "INSERT INTO generations (id, profile_id, text, language, instruct, engine, status) "
+                    "VALUES ('old-1', 'p1', 'Hello.', 'en', 'calm', 'voxcpm', 'completed')"
+                )
+            )
+            conn.commit()
+        assert "voice_description" not in _generation_columns(engine)
+    
+        run_migrations(engine)
+        run_migrations(engine)  # a second startup must be a no-op, not a duplicate-column error
+    
+&gt;       assert "voice_description" in _generation_columns(engine)
+E       AssertionError: assert 'voice_description' in {'audio_path', 'created_at', 'duration', 'engine', 'error', 'id', ...}
+E        +  where {'audio_path', 'created_at', 'duration', 'engine', 'error', 'id', ...} = _generation_columns(Engine(sqlite:///C:\Users\sabus\AppData\Local\Temp\pytest-of-sabus\pytest-80\test_migration_adds_the_column0\old.db))
+
+backend\tests\test_review_generation_description.py:85: AssertionError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_history_create_generation_persists_the_description" time="0.090"><failure message="TypeError: create_generation() got an unexpected keyword argument 'voice_description'">tmp_path = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-80/test_history_create_generation0')
+
+    @pytest.mark.asyncio
+    async def test_history_create_generation_persists_the_description(tmp_path) -&gt; None:
+        from backend.database import Base, Generation
+        from backend.services import history
+    
+        engine = create_engine(f"sqlite:///{tmp_path / 'fresh.db'}")
+        Base.metadata.create_all(engine)
+        db = sessionmaker(bind=engine)()
+        try:
+&gt;           await history.create_generation(
+                profile_id="p1",
+                text="Hello.",
+                language="en",
+                audio_path="",
+                duration=0,
+                seed=None,
+                db=db,
+                generation_id="g-desc",
+                status="generating",
+                engine="voxcpm",
+                voice_description=DESCRIPTION,
+            )
+E           TypeError: create_generation() got an unexpected keyword argument 'voice_description'
+
+backend\tests\test_review_generation_description.py:101: TypeError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_stored_description_only_for_voice_design_engines[voxcpm-A warm, low voice with a slight rasp-A warm, low voice with a slight rasp]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'">engine = 'voxcpm', raw = 'A warm, low voice with a slight rasp'
+stored = 'A warm, low voice with a slight rasp'
+
+    @pytest.mark.parametrize(
+        ("engine", "raw", "stored"),
+        [
+            ("voxcpm", DESCRIPTION, DESCRIPTION),
+            ("voxcpm", f"  {DESCRIPTION}\n", DESCRIPTION),
+            ("voxcpm", "   ", None),
+            ("voxcpm", None, None),
+            ("qwen", DESCRIPTION, None),
+            ("kokoro", DESCRIPTION, None),
+            ("chatterbox", DESCRIPTION, None),
+            ("not_an_engine", DESCRIPTION, None),
+        ],
+    )
+    def test_stored_description_only_for_voice_design_engines(engine, raw, stored) -&gt; None:
+&gt;       assert generation_service.stored_voice_description(engine, raw) == stored
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'
+
+backend\tests\test_review_generation_description.py:151: AttributeError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_stored_description_only_for_voice_design_engines[voxcpm-  A warm, low voice with a slight rasp\n-A warm, low voice with a slight rasp]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'">engine = 'voxcpm', raw = '  A warm, low voice with a slight rasp\n'
+stored = 'A warm, low voice with a slight rasp'
+
+    @pytest.mark.parametrize(
+        ("engine", "raw", "stored"),
+        [
+            ("voxcpm", DESCRIPTION, DESCRIPTION),
+            ("voxcpm", f"  {DESCRIPTION}\n", DESCRIPTION),
+            ("voxcpm", "   ", None),
+            ("voxcpm", None, None),
+            ("qwen", DESCRIPTION, None),
+            ("kokoro", DESCRIPTION, None),
+            ("chatterbox", DESCRIPTION, None),
+            ("not_an_engine", DESCRIPTION, None),
+        ],
+    )
+    def test_stored_description_only_for_voice_design_engines(engine, raw, stored) -&gt; None:
+&gt;       assert generation_service.stored_voice_description(engine, raw) == stored
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'
+
+backend\tests\test_review_generation_description.py:151: AttributeError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_stored_description_only_for_voice_design_engines[voxcpm-   -None]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'">engine = 'voxcpm', raw = '   ', stored = None
+
+    @pytest.mark.parametrize(
+        ("engine", "raw", "stored"),
+        [
+            ("voxcpm", DESCRIPTION, DESCRIPTION),
+            ("voxcpm", f"  {DESCRIPTION}\n", DESCRIPTION),
+            ("voxcpm", "   ", None),
+            ("voxcpm", None, None),
+            ("qwen", DESCRIPTION, None),
+            ("kokoro", DESCRIPTION, None),
+            ("chatterbox", DESCRIPTION, None),
+            ("not_an_engine", DESCRIPTION, None),
+        ],
+    )
+    def test_stored_description_only_for_voice_design_engines(engine, raw, stored) -&gt; None:
+&gt;       assert generation_service.stored_voice_description(engine, raw) == stored
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'
+
+backend\tests\test_review_generation_description.py:151: AttributeError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_stored_description_only_for_voice_design_engines[voxcpm-None-None]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'">engine = 'voxcpm', raw = None, stored = None
+
+    @pytest.mark.parametrize(
+        ("engine", "raw", "stored"),
+        [
+            ("voxcpm", DESCRIPTION, DESCRIPTION),
+            ("voxcpm", f"  {DESCRIPTION}\n", DESCRIPTION),
+            ("voxcpm", "   ", None),
+            ("voxcpm", None, None),
+            ("qwen", DESCRIPTION, None),
+            ("kokoro", DESCRIPTION, None),
+            ("chatterbox", DESCRIPTION, None),
+            ("not_an_engine", DESCRIPTION, None),
+        ],
+    )
+    def test_stored_description_only_for_voice_design_engines(engine, raw, stored) -&gt; None:
+&gt;       assert generation_service.stored_voice_description(engine, raw) == stored
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'
+
+backend\tests\test_review_generation_description.py:151: AttributeError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_stored_description_only_for_voice_design_engines[qwen-A warm, low voice with a slight rasp-None]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'">engine = 'qwen', raw = 'A warm, low voice with a slight rasp', stored = None
+
+    @pytest.mark.parametrize(
+        ("engine", "raw", "stored"),
+        [
+            ("voxcpm", DESCRIPTION, DESCRIPTION),
+            ("voxcpm", f"  {DESCRIPTION}\n", DESCRIPTION),
+            ("voxcpm", "   ", None),
+            ("voxcpm", None, None),
+            ("qwen", DESCRIPTION, None),
+            ("kokoro", DESCRIPTION, None),
+            ("chatterbox", DESCRIPTION, None),
+            ("not_an_engine", DESCRIPTION, None),
+        ],
+    )
+    def test_stored_description_only_for_voice_design_engines(engine, raw, stored) -&gt; None:
+&gt;       assert generation_service.stored_voice_description(engine, raw) == stored
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'
+
+backend\tests\test_review_generation_description.py:151: AttributeError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_stored_description_only_for_voice_design_engines[kokoro-A warm, low voice with a slight rasp-None]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'">engine = 'kokoro', raw = 'A warm, low voice with a slight rasp', stored = None
+
+    @pytest.mark.parametrize(
+        ("engine", "raw", "stored"),
+        [
+            ("voxcpm", DESCRIPTION, DESCRIPTION),
+            ("voxcpm", f"  {DESCRIPTION}\n", DESCRIPTION),
+            ("voxcpm", "   ", None),
+            ("voxcpm", None, None),
+            ("qwen", DESCRIPTION, None),
+            ("kokoro", DESCRIPTION, None),
+            ("chatterbox", DESCRIPTION, None),
+            ("not_an_engine", DESCRIPTION, None),
+        ],
+    )
+    def test_stored_description_only_for_voice_design_engines(engine, raw, stored) -&gt; None:
+&gt;       assert generation_service.stored_voice_description(engine, raw) == stored
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'
+
+backend\tests\test_review_generation_description.py:151: AttributeError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_stored_description_only_for_voice_design_engines[chatterbox-A warm, low voice with a slight rasp-None]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'">engine = 'chatterbox', raw = 'A warm, low voice with a slight rasp'
+stored = None
+
+    @pytest.mark.parametrize(
+        ("engine", "raw", "stored"),
+        [
+            ("voxcpm", DESCRIPTION, DESCRIPTION),
+            ("voxcpm", f"  {DESCRIPTION}\n", DESCRIPTION),
+            ("voxcpm", "   ", None),
+            ("voxcpm", None, None),
+            ("qwen", DESCRIPTION, None),
+            ("kokoro", DESCRIPTION, None),
+            ("chatterbox", DESCRIPTION, None),
+            ("not_an_engine", DESCRIPTION, None),
+        ],
+    )
+    def test_stored_description_only_for_voice_design_engines(engine, raw, stored) -&gt; None:
+&gt;       assert generation_service.stored_voice_description(engine, raw) == stored
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'
+
+backend\tests\test_review_generation_description.py:151: AttributeError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_stored_description_only_for_voice_design_engines[not_an_engine-A warm, low voice with a slight rasp-None]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'">engine = 'not_an_engine', raw = 'A warm, low voice with a slight rasp'
+stored = None
+
+    @pytest.mark.parametrize(
+        ("engine", "raw", "stored"),
+        [
+            ("voxcpm", DESCRIPTION, DESCRIPTION),
+            ("voxcpm", f"  {DESCRIPTION}\n", DESCRIPTION),
+            ("voxcpm", "   ", None),
+            ("voxcpm", None, None),
+            ("qwen", DESCRIPTION, None),
+            ("kokoro", DESCRIPTION, None),
+            ("chatterbox", DESCRIPTION, None),
+            ("not_an_engine", DESCRIPTION, None),
+        ],
+    )
+    def test_stored_description_only_for_voice_design_engines(engine, raw, stored) -&gt; None:
+&gt;       assert generation_service.stored_voice_description(engine, raw) == stored
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'stored_voice_description'
+
+backend\tests\test_review_generation_description.py:151: AttributeError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_generate_with_voxcpm_stores_the_trimmed_description" time="1.131"><failure message="KeyError: 'voice_description'">generate_route = namespace(created={'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', 'duration': 0, 'seed': No... routes=&lt;module 'backend.routes.generations' from 'D:\\Projects\\Personal\\voicebox\\backend\\routes\\generations.py'&gt;)
+
+    @pytest.mark.asyncio
+    async def test_generate_with_voxcpm_stores_the_trimmed_description(generate_route) -&gt; None:
+        data = models.GenerationRequest(
+            profile_id="p1", text="Hello.", engine="voxcpm", instruct="slowly", voice_description=f"  {DESCRIPTION} "
+        )
+    
+        await generate_route.routes.generate_speech(data, db=generate_route.db)
+    
+&gt;       assert generate_route.created["voice_description"] == DESCRIPTION
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'voice_description'
+
+backend\tests\test_review_generation_description.py:200: KeyError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_generate_with_a_non_voice_design_engine_stores_null[qwen]" time="0.002"><failure message="AssertionError: assert 'voice_description' in {'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', ...}&#10; +  where {'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', ...} = namespace(created={'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', 'duration': 0, 'seed': No... routes=&lt;module 'backend.routes.generations' from 'D:\\Projects\\Personal\\voicebox\\backend\\routes\\generations.py'&gt;).created">generate_route = namespace(created={'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', 'duration': 0, 'seed': No... routes=&lt;module 'backend.routes.generations' from 'D:\\Projects\\Personal\\voicebox\\backend\\routes\\generations.py'&gt;)
+engine = 'qwen'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", ["qwen", "kokoro", "luxtts"])
+    async def test_generate_with_a_non_voice_design_engine_stores_null(generate_route, engine) -&gt; None:
+        data = models.GenerationRequest(profile_id="p1", text="Hello.", engine=engine, voice_description=DESCRIPTION)
+    
+        await generate_route.routes.generate_speech(data, db=generate_route.db)
+    
+&gt;       assert "voice_description" in generate_route.created
+E       AssertionError: assert 'voice_description' in {'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', ...}
+E        +  where {'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', ...} = namespace(created={'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', 'duration': 0, 'seed': No... routes=&lt;module 'backend.routes.generations' from 'D:\\Projects\\Personal\\voicebox\\backend\\routes\\generations.py'&gt;).created
+
+backend\tests\test_review_generation_description.py:212: AssertionError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_generate_with_a_non_voice_design_engine_stores_null[kokoro]" time="0.003"><failure message="AssertionError: assert 'voice_description' in {'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', ...}&#10; +  where {'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', ...} = namespace(created={'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', 'duration': 0, 'seed': No... routes=&lt;module 'backend.routes.generations' from 'D:\\Projects\\Personal\\voicebox\\backend\\routes\\generations.py'&gt;).created">generate_route = namespace(created={'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', 'duration': 0, 'seed': No... routes=&lt;module 'backend.routes.generations' from 'D:\\Projects\\Personal\\voicebox\\backend\\routes\\generations.py'&gt;)
+engine = 'kokoro'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", ["qwen", "kokoro", "luxtts"])
+    async def test_generate_with_a_non_voice_design_engine_stores_null(generate_route, engine) -&gt; None:
+        data = models.GenerationRequest(profile_id="p1", text="Hello.", engine=engine, voice_description=DESCRIPTION)
+    
+        await generate_route.routes.generate_speech(data, db=generate_route.db)
+    
+&gt;       assert "voice_description" in generate_route.created
+E       AssertionError: assert 'voice_description' in {'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', ...}
+E        +  where {'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', ...} = namespace(created={'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', 'duration': 0, 'seed': No... routes=&lt;module 'backend.routes.generations' from 'D:\\Projects\\Personal\\voicebox\\backend\\routes\\generations.py'&gt;).created
+
+backend\tests\test_review_generation_description.py:212: AssertionError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_generate_with_a_non_voice_design_engine_stores_null[luxtts]" time="0.002"><failure message="AssertionError: assert 'voice_description' in {'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', ...}&#10; +  where {'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', ...} = namespace(created={'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', 'duration': 0, 'seed': No... routes=&lt;module 'backend.routes.generations' from 'D:\\Projects\\Personal\\voicebox\\backend\\routes\\generations.py'&gt;).created">generate_route = namespace(created={'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', 'duration': 0, 'seed': No... routes=&lt;module 'backend.routes.generations' from 'D:\\Projects\\Personal\\voicebox\\backend\\routes\\generations.py'&gt;)
+engine = 'luxtts'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", ["qwen", "kokoro", "luxtts"])
+    async def test_generate_with_a_non_voice_design_engine_stores_null(generate_route, engine) -&gt; None:
+        data = models.GenerationRequest(profile_id="p1", text="Hello.", engine=engine, voice_description=DESCRIPTION)
+    
+        await generate_route.routes.generate_speech(data, db=generate_route.db)
+    
+&gt;       assert "voice_description" in generate_route.created
+E       AssertionError: assert 'voice_description' in {'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', ...}
+E        +  where {'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', ...} = namespace(created={'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', 'duration': 0, 'seed': No... routes=&lt;module 'backend.routes.generations' from 'D:\\Projects\\Personal\\voicebox\\backend\\routes\\generations.py'&gt;).created
+
+backend\tests\test_review_generation_description.py:212: AssertionError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_generate_resolving_voxcpm_from_the_profile_stores_the_description" time="0.002"><failure message="KeyError: 'voice_description'">generate_route = namespace(created={'profile_id': 'p1', 'text': 'Hello.', 'language': 'en', 'audio_path': '', 'duration': 0, 'seed': No... routes=&lt;module 'backend.routes.generations' from 'D:\\Projects\\Personal\\voicebox\\backend\\routes\\generations.py'&gt;)
+
+    @pytest.mark.asyncio
+    async def test_generate_resolving_voxcpm_from_the_profile_stores_the_description(generate_route) -&gt; None:
+        generate_route.profile.default_engine = "voxcpm"
+        data = models.GenerationRequest(profile_id="p1", text="Hello.", engine=None, voice_description=DESCRIPTION)
+    
+        await generate_route.routes.generate_speech(data, db=generate_route.db)
+    
+        assert generate_route.created["engine"] == "voxcpm"
+&gt;       assert generate_route.created["voice_description"] == DESCRIPTION
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'voice_description'
+
+backend\tests\test_review_generation_description.py:224: KeyError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_replay_passes_the_stored_description[retry-failed]" time="0.003"><failure message="KeyError: 'voice_description'">replay_route = namespace(row=namespace(id='gen-1', profile_id='p1', text='Hello there.', language='en', audio_path='', duration=0, se...play_route.&lt;locals&gt;.&lt;lambda&gt; at 0x00000191B4BD6B60&gt;), call=&lt;function replay_route.&lt;locals&gt;.call at 0x00000191B4C18040&gt;)
+mode = 'retry', status = 'failed'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(("mode", "status"), _MODES)
+    async def test_replay_passes_the_stored_description(replay_route, mode, status) -&gt; None:
+        replay_route.row = _row(status, voice_description=DESCRIPTION)
+    
+        await replay_route.call(mode)
+    
+        assert replay_route.run["mode"] == mode
+&gt;       assert replay_route.run["voice_description"] == DESCRIPTION
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'voice_description'
+
+backend\tests\test_review_generation_description.py:297: KeyError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_replay_passes_the_stored_description[regenerate-completed]" time="0.002"><failure message="KeyError: 'voice_description'">replay_route = namespace(row=namespace(id='gen-1', profile_id='p1', text='Hello there.', language='en', audio_path='generations/gen-1...play_route.&lt;locals&gt;.&lt;lambda&gt; at 0x00000191B4BD7D80&gt;), call=&lt;function replay_route.&lt;locals&gt;.call at 0x00000191B4C184A0&gt;)
+mode = 'regenerate', status = 'completed'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(("mode", "status"), _MODES)
+    async def test_replay_passes_the_stored_description(replay_route, mode, status) -&gt; None:
+        replay_route.row = _row(status, voice_description=DESCRIPTION)
+    
+        await replay_route.call(mode)
+    
+        assert replay_route.run["mode"] == mode
+&gt;       assert replay_route.run["voice_description"] == DESCRIPTION
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'voice_description'
+
+backend\tests\test_review_generation_description.py:297: KeyError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_replay_of_an_old_row_passes_no_description[attribute-missing-retry-failed]" time="0.002" /><testcase classname="tests.test_review_generation_description" name="test_replay_of_an_old_row_passes_no_description[attribute-missing-regenerate-completed]" time="0.002" /><testcase classname="tests.test_review_generation_description" name="test_replay_of_an_old_row_passes_no_description[column-null-retry-failed]" time="0.002" /><testcase classname="tests.test_review_generation_description" name="test_replay_of_an_old_row_passes_no_description[column-null-regenerate-completed]" time="0.001" /><testcase classname="tests.test_review_generation_description" name="test_replayed_description_reaches_the_backend_over_the_design_prompt[retry-failed]" time="0.928"><failure message="AssertionError: assert 'A bright, young narrator' == 'A warm, low ...a slight rasp'&#10;  &#10;  - A warm, low voice with a slight rasp&#10;  + A bright, young narrator">replay_route = namespace(row=namespace(id='gen-1', profile_id='p1', text='Hello there.', language='en', audio_path='', duration=0, se...play_route.&lt;locals&gt;.&lt;lambda&gt; at 0x00000191B4C19940&gt;), call=&lt;function replay_route.&lt;locals&gt;.call at 0x00000191B4C19C60&gt;)
+service = namespace(backend=&lt;backend.tests.test_review_generation_description._RecordingBackend object at 0x00000191B4C46240&gt;, v..._type': 'designed', 'design_prompt': 'A bright, young narrator'}, statuses=[('generating', None), ('completed', None)])
+mode = 'retry', status = 'failed'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(("mode", "status"), _MODES)
+    async def test_replayed_description_reaches_the_backend_over_the_design_prompt(
+        replay_route, service, mode, status
+    ) -&gt; None:
+        replay_route.row = _row(status, voice_description=DESCRIPTION)
+        service.voice_prompt = _DESIGNED_PROMPT
+        await replay_route.call(mode)
+    
+        await generation_service.run_generation(**replay_route.run)
+    
+        assert service.statuses[-1] == ("completed", None), service.statuses
+&gt;       assert service.backend.calls[0]["instruct"] == DESCRIPTION
+E       AssertionError: assert 'A bright, young narrator' == 'A warm, low ...a slight rasp'
+E         
+E         - A warm, low voice with a slight rasp
+E         + A bright, young narrator
+
+backend\tests\test_review_generation_description.py:378: AssertionError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_replayed_description_reaches_the_backend_over_the_design_prompt[regenerate-completed]" time="0.003"><failure message="AssertionError: assert 'A bright, young narrator' == 'A warm, low ...a slight rasp'&#10;  &#10;  - A warm, low voice with a slight rasp&#10;  + A bright, young narrator">replay_route = namespace(row=namespace(id='gen-1', profile_id='p1', text='Hello there.', language='en', audio_path='generations/gen-1...play_route.&lt;locals&gt;.&lt;lambda&gt; at 0x00000191B4C1A200&gt;), call=&lt;function replay_route.&lt;locals&gt;.call at 0x00000191B4C18EA0&gt;)
+service = namespace(backend=&lt;backend.tests.test_review_generation_description._RecordingBackend object at 0x00000191B5522EA0&gt;, v..._type': 'designed', 'design_prompt': 'A bright, young narrator'}, statuses=[('generating', None), ('completed', None)])
+mode = 'regenerate', status = 'completed'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(("mode", "status"), _MODES)
+    async def test_replayed_description_reaches_the_backend_over_the_design_prompt(
+        replay_route, service, mode, status
+    ) -&gt; None:
+        replay_route.row = _row(status, voice_description=DESCRIPTION)
+        service.voice_prompt = _DESIGNED_PROMPT
+        await replay_route.call(mode)
+    
+        await generation_service.run_generation(**replay_route.run)
+    
+        assert service.statuses[-1] == ("completed", None), service.statuses
+&gt;       assert service.backend.calls[0]["instruct"] == DESCRIPTION
+E       AssertionError: assert 'A bright, young narrator' == 'A warm, low ...a slight rasp'
+E         
+E         - A warm, low voice with a slight rasp
+E         + A bright, young narrator
+
+backend\tests\test_review_generation_description.py:378: AssertionError</failure></testcase><testcase classname="tests.test_review_generation_description" name="test_designed_profile_without_a_stored_description_falls_back_to_its_design_prompt[retry-failed]" time="0.002" /><testcase classname="tests.test_review_generation_description" name="test_designed_profile_without_a_stored_description_falls_back_to_its_design_prompt[regenerate-completed]" time="0.003" /><testcase classname="tests.test_review_advanced_settings_engine" name="test_null_engine_defers_the_check_to_the_route" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest&#10;  Value error, Engine 'qwen' does not declare an advanced setting named 'cfg_value' [type=value_error, input_value={'profile_id': 'p1', 'tex...ue': 9.0, 'bogus': 1.0}}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/value_error">def test_null_engine_defers_the_check_to_the_route() -&gt; None:
+&gt;       request = models.GenerationRequest(**BASE, engine=None, advanced_settings={"cfg_value": 9.0, "bogus": 1.0})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest
+E         Value error, Engine 'qwen' does not declare an advanced setting named 'cfg_value' [type=value_error, input_value={'profile_id': 'p1', 'tex...ue': 9.0, 'bogus': 1.0}}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.13/v/value_error
+
+backend\tests\test_review_advanced_settings_engine.py:121: ValidationError</failure></testcase><testcase classname="tests.test_review_advanced_settings_engine" name="test_the_shared_check_returns_the_validator_messages[settings0-Advanced setting 'cfg_value' must be between]" time="0.001"><failure message="AttributeError: module 'backend.models' has no attribute 'advanced_settings_error'">settings = {'cfg_value': 9.0}
+message = "Advanced setting 'cfg_value' must be between"
+
+    @pytest.mark.parametrize(
+        ("settings", "message"),
+        [
+            ({"cfg_value": 9.0}, "Advanced setting 'cfg_value' must be between"),
+            ({"bogus": 1.0}, "Engine 'voxcpm' does not declare an advanced setting named 'bogus'"),
+        ],
+    )
+    def test_the_shared_check_returns_the_validator_messages(settings, message) -&gt; None:
+&gt;       assert message in models.advanced_settings_error("voxcpm", settings)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.models' has no attribute 'advanced_settings_error'
+
+backend\tests\test_review_advanced_settings_engine.py:134: AttributeError</failure></testcase><testcase classname="tests.test_review_advanced_settings_engine" name="test_the_shared_check_returns_the_validator_messages[settings1-Engine 'voxcpm' does not declare an advanced setting named 'bogus']" time="0.001"><failure message="AttributeError: module 'backend.models' has no attribute 'advanced_settings_error'">settings = {'bogus': 1.0}
+message = "Engine 'voxcpm' does not declare an advanced setting named 'bogus'"
+
+    @pytest.mark.parametrize(
+        ("settings", "message"),
+        [
+            ({"cfg_value": 9.0}, "Advanced setting 'cfg_value' must be between"),
+            ({"bogus": 1.0}, "Engine 'voxcpm' does not declare an advanced setting named 'bogus'"),
+        ],
+    )
+    def test_the_shared_check_returns_the_validator_messages(settings, message) -&gt; None:
+&gt;       assert message in models.advanced_settings_error("voxcpm", settings)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.models' has no attribute 'advanced_settings_error'
+
+backend\tests\test_review_advanced_settings_engine.py:134: AttributeError</failure></testcase><testcase classname="tests.test_review_advanced_settings_engine" name="test_null_engine_on_a_voxcpm_profile_accepts_voxcpm_settings" time="0.014"><failure message="AssertionError: {&quot;detail&quot;:[{&quot;type&quot;:&quot;value_error&quot;,&quot;loc&quot;:[&quot;body&quot;],&quot;msg&quot;:&quot;Value error, Engine 'qwen' does not declare an advanced setting named 'cfg_value'&quot;,&quot;input&quot;:{&quot;profile_id&quot;:&quot;p1&quot;,&quot;text&quot;:&quot;Hello.&quot;,&quot;engine&quot;:null,&quot;advanced_settings&quot;:{&quot;cfg_value&quot;:2.0}},&quot;ctx&quot;:{&quot;error&quot;:{}}}]}&#10;assert 422 == 200&#10; +  where 422 = &lt;Response [422 Unprocessable Entity]&gt;.status_code">app_state = namespace(profile=namespace(id='p1', default_engine='voxcpm', preset_engine=None, personality=None, effects_chain=None...e._OptionsBackend object at 0x00000191B5E22C90&gt;, client=&lt;starlette.testclient.TestClient object at 0x00000191B5E237A0&gt;)
+
+    def test_null_engine_on_a_voxcpm_profile_accepts_voxcpm_settings(app_state) -&gt; None:
+        response = app_state.client.post(
+            "/generate", json={**BASE, "engine": None, "advanced_settings": {"cfg_value": 2.0}}
+        )
+    
+&gt;       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, Engine 'qwen' does not declare an advanced setting named 'cfg_value'","input":{"profile_id":"p1","text":"Hello.","engine":null,"advanced_settings":{"cfg_value":2.0}},"ctx":{"error":{}}}]}
+E       assert 422 == 200
+E        +  where 422 = &lt;Response [422 Unprocessable Entity]&gt;.status_code
+
+backend\tests\test_review_advanced_settings_engine.py:147: AssertionError</failure></testcase><testcase classname="tests.test_review_advanced_settings_engine" name="test_null_engine_on_a_voxcpm_profile_rejects_out_of_bounds_values" time="0.009"><failure message="assert &quot;Advanced setting 'cfg_value' must be between&quot; in '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': &quot;Value error, Engine \'qwen\' does not declare an advanced...p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'cfg_value\': 9.0}}, \'ctx\': {\'error\': {}}}]'&#10; +  where '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': &quot;Value error, Engine \'qwen\' does not declare an advanced...p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'cfg_value\': 9.0}}, \'ctx\': {\'error\': {}}}]' = _detail(&lt;Response [422 Unprocessable Entity]&gt;)">app_state = namespace(profile=namespace(id='p1', default_engine='voxcpm', preset_engine=None, personality=None, effects_chain=None...e._OptionsBackend object at 0x00000191B5E22D50&gt;, client=&lt;starlette.testclient.TestClient object at 0x00000191B5E23140&gt;)
+
+    def test_null_engine_on_a_voxcpm_profile_rejects_out_of_bounds_values(app_state) -&gt; None:
+        response = app_state.client.post(
+            "/generate", json={**BASE, "engine": None, "advanced_settings": {"cfg_value": 9.0}}
+        )
+    
+        assert response.status_code == 422, response.text
+&gt;       assert "Advanced setting 'cfg_value' must be between" in _detail(response)
+E       assert "Advanced setting 'cfg_value' must be between" in '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': "Value error, Engine \'qwen\' does not declare an advanced...p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'cfg_value\': 9.0}}, \'ctx\': {\'error\': {}}}]'
+E        +  where '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': "Value error, Engine \'qwen\' does not declare an advanced...p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'cfg_value\': 9.0}}, \'ctx\': {\'error\': {}}}]' = _detail(&lt;Response [422 Unprocessable Entity]&gt;)
+
+backend\tests\test_review_advanced_settings_engine.py:158: AssertionError</failure></testcase><testcase classname="tests.test_review_advanced_settings_engine" name="test_null_engine_on_a_voxcpm_profile_rejects_an_unknown_setting" time="0.011"><failure message="assert &quot;Engine 'voxcpm' does not declare an advanced setting named 'bogus'&quot; in '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': &quot;Value error, Engine \'qwen\' does not declare an advanced...: \'p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'bogus\': 1.0}}, \'ctx\': {\'error\': {}}}]'&#10; +  where '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': &quot;Value error, Engine \'qwen\' does not declare an advanced...: \'p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'bogus\': 1.0}}, \'ctx\': {\'error\': {}}}]' = _detail(&lt;Response [422 Unprocessable Entity]&gt;)">app_state = namespace(profile=namespace(id='p1', default_engine='voxcpm', preset_engine=None, personality=None, effects_chain=None...e._OptionsBackend object at 0x00000191B5E6F5F0&gt;, client=&lt;starlette.testclient.TestClient object at 0x00000191B5E6DD90&gt;)
+
+    def test_null_engine_on_a_voxcpm_profile_rejects_an_unknown_setting(app_state) -&gt; None:
+        response = app_state.client.post(
+            "/generate", json={**BASE, "engine": None, "advanced_settings": {"bogus": 1.0}}
+        )
+    
+        assert response.status_code == 422, response.text
+&gt;       assert "Engine 'voxcpm' does not declare an advanced setting named 'bogus'" in _detail(response)
+E       assert "Engine 'voxcpm' does not declare an advanced setting named 'bogus'" in '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': "Value error, Engine \'qwen\' does not declare an advanced...: \'p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'bogus\': 1.0}}, \'ctx\': {\'error\': {}}}]'
+E        +  where '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': "Value error, Engine \'qwen\' does not declare an advanced...: \'p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'bogus\': 1.0}}, \'ctx\': {\'error\': {}}}]' = _detail(&lt;Response [422 Unprocessable Entity]&gt;)
+
+backend\tests\test_review_advanced_settings_engine.py:169: AssertionError</failure></testcase><testcase classname="tests.test_review_advanced_settings_engine" name="test_null_engine_on_a_qwen_profile_still_rejects_any_setting[qwen]" time="0.008" /><testcase classname="tests.test_review_advanced_settings_engine" name="test_null_engine_on_a_qwen_profile_still_rejects_any_setting[None]" time="0.011" /><testcase classname="tests.test_review_advanced_settings_engine" name="test_null_engine_without_settings_is_unaffected" time="0.011" /><testcase classname="tests.test_review_advanced_settings_engine" name="test_explicit_voxcpm_is_accepted_whatever_the_profile_default" time="0.013" /><testcase classname="tests.test_review_advanced_settings_engine" name="test_explicit_engine_is_still_rejected_by_the_schema[body0]" time="0.011" /><testcase classname="tests.test_review_advanced_settings_engine" name="test_explicit_engine_is_still_rejected_by_the_schema[body1]" time="0.014" /><testcase classname="tests.test_review_advanced_settings_engine" name="test_explicit_engine_is_still_rejected_by_the_schema[body2]" time="0.012" /><testcase classname="tests.test_review_advanced_settings_engine" name="test_explicit_engine_is_still_rejected_by_the_schema[body3]" time="0.012" /><testcase classname="tests.test_review_advanced_settings_engine" name="test_stream_null_engine_on_a_voxcpm_profile_passes_the_settings" time="0.011"><failure message="AssertionError: {&quot;detail&quot;:[{&quot;type&quot;:&quot;value_error&quot;,&quot;loc&quot;:[&quot;body&quot;],&quot;msg&quot;:&quot;Value error, Engine 'qwen' does not declare an advanced setting named 'cfg_value'&quot;,&quot;input&quot;:{&quot;profile_id&quot;:&quot;p1&quot;,&quot;text&quot;:&quot;Hello.&quot;,&quot;engine&quot;:null,&quot;advanced_settings&quot;:{&quot;cfg_value&quot;:2.0}},&quot;ctx&quot;:{&quot;error&quot;:{}}}]}&#10;assert 422 == 200&#10; +  where 422 = &lt;Response [422 Unprocessable Entity]&gt;.status_code">app_state = namespace(profile=namespace(id='p1', default_engine='voxcpm', preset_engine=None, personality=None, effects_chain=None...e._OptionsBackend object at 0x00000191B5E549E0&gt;, client=&lt;starlette.testclient.TestClient object at 0x00000191B5E6F8C0&gt;)
+
+    def test_stream_null_engine_on_a_voxcpm_profile_passes_the_settings(app_state) -&gt; None:
+        response = app_state.client.post(
+            "/generate/stream", json={**BASE, "engine": None, "advanced_settings": {"cfg_value": 2.0}}
+        )
+    
+&gt;       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, Engine 'qwen' does not declare an advanced setting named 'cfg_value'","input":{"profile_id":"p1","text":"Hello.","engine":null,"advanced_settings":{"cfg_value":2.0}},"ctx":{"error":{}}}]}
+E       assert 422 == 200
+E        +  where 422 = &lt;Response [422 Unprocessable Entity]&gt;.status_code
+
+backend\tests\test_review_advanced_settings_engine.py:234: AssertionError</failure></testcase><testcase classname="tests.test_review_advanced_settings_engine" name="test_stream_null_engine_rejects_invalid_settings_before_any_load[voxcpm-settings0-Advanced setting 'cfg_value' must be between]" time="0.011"><failure message="assert &quot;Advanced setting 'cfg_value' must be between&quot; in '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': &quot;Value error, Engine \'qwen\' does not declare an advanced...p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'cfg_value\': 9.0}}, \'ctx\': {\'error\': {}}}]'&#10; +  where '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': &quot;Value error, Engine \'qwen\' does not declare an advanced...p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'cfg_value\': 9.0}}, \'ctx\': {\'error\': {}}}]' = _detail(&lt;Response [422 Unprocessable Entity]&gt;)">app_state = namespace(profile=namespace(id='p1', default_engine='voxcpm', preset_engine=None, personality=None, effects_chain=None...e._OptionsBackend object at 0x00000191B5E6E5A0&gt;, client=&lt;starlette.testclient.TestClient object at 0x00000191B5E6C260&gt;)
+default_engine = 'voxcpm', settings = {'cfg_value': 9.0}
+message = "Advanced setting 'cfg_value' must be between"
+
+    @pytest.mark.parametrize(
+        ("default_engine", "settings", "message"),
+        [
+            ("voxcpm", {"cfg_value": 9.0}, "Advanced setting 'cfg_value' must be between"),
+            ("voxcpm", {"bogus": 1.0}, "Engine 'voxcpm' does not declare an advanced setting named 'bogus'"),
+            ("qwen", {"cfg_value": 2.0}, "Engine 'qwen' does not declare an advanced setting named 'cfg_value'"),
+        ],
+    )
+    def test_stream_null_engine_rejects_invalid_settings_before_any_load(app_state, default_engine, settings, message) -&gt; None:
+        app_state.profile.default_engine = default_engine
+    
+        response = app_state.client.post(
+            "/generate/stream", json={**BASE, "engine": None, "advanced_settings": settings}
+        )
+    
+        assert response.status_code == 422, response.text
+&gt;       assert message in _detail(response)
+E       assert "Advanced setting 'cfg_value' must be between" in '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': "Value error, Engine \'qwen\' does not declare an advanced...p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'cfg_value\': 9.0}}, \'ctx\': {\'error\': {}}}]'
+E        +  where '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': "Value error, Engine \'qwen\' does not declare an advanced...p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'cfg_value\': 9.0}}, \'ctx\': {\'error\': {}}}]' = _detail(&lt;Response [422 Unprocessable Entity]&gt;)
+
+backend\tests\test_review_advanced_settings_engine.py:254: AssertionError</failure></testcase><testcase classname="tests.test_review_advanced_settings_engine" name="test_stream_null_engine_rejects_invalid_settings_before_any_load[voxcpm-settings1-Engine 'voxcpm' does not declare an advanced setting named 'bogus']" time="0.012"><failure message="assert &quot;Engine 'voxcpm' does not declare an advanced setting named 'bogus'&quot; in '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': &quot;Value error, Engine \'qwen\' does not declare an advanced...: \'p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'bogus\': 1.0}}, \'ctx\': {\'error\': {}}}]'&#10; +  where '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': &quot;Value error, Engine \'qwen\' does not declare an advanced...: \'p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'bogus\': 1.0}}, \'ctx\': {\'error\': {}}}]' = _detail(&lt;Response [422 Unprocessable Entity]&gt;)">app_state = namespace(profile=namespace(id='p1', default_engine='voxcpm', preset_engine=None, personality=None, effects_chain=None...e._OptionsBackend object at 0x00000191B5E23EC0&gt;, client=&lt;starlette.testclient.TestClient object at 0x00000191B5E22E10&gt;)
+default_engine = 'voxcpm', settings = {'bogus': 1.0}
+message = "Engine 'voxcpm' does not declare an advanced setting named 'bogus'"
+
+    @pytest.mark.parametrize(
+        ("default_engine", "settings", "message"),
+        [
+            ("voxcpm", {"cfg_value": 9.0}, "Advanced setting 'cfg_value' must be between"),
+            ("voxcpm", {"bogus": 1.0}, "Engine 'voxcpm' does not declare an advanced setting named 'bogus'"),
+            ("qwen", {"cfg_value": 2.0}, "Engine 'qwen' does not declare an advanced setting named 'cfg_value'"),
+        ],
+    )
+    def test_stream_null_engine_rejects_invalid_settings_before_any_load(app_state, default_engine, settings, message) -&gt; None:
+        app_state.profile.default_engine = default_engine
+    
+        response = app_state.client.post(
+            "/generate/stream", json={**BASE, "engine": None, "advanced_settings": settings}
+        )
+    
+        assert response.status_code == 422, response.text
+&gt;       assert message in _detail(response)
+E       assert "Engine 'voxcpm' does not declare an advanced setting named 'bogus'" in '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': "Value error, Engine \'qwen\' does not declare an advanced...: \'p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'bogus\': 1.0}}, \'ctx\': {\'error\': {}}}]'
+E        +  where '[{\'type\': \'value_error\', \'loc\': [\'body\'], \'msg\': "Value error, Engine \'qwen\' does not declare an advanced...: \'p1\', \'text\': \'Hello.\', \'engine\': None, \'advanced_settings\': {\'bogus\': 1.0}}, \'ctx\': {\'error\': {}}}]' = _detail(&lt;Response [422 Unprocessable Entity]&gt;)
+
+backend\tests\test_review_advanced_settings_engine.py:254: AssertionError</failure></testcase><testcase classname="tests.test_review_advanced_settings_engine" name="test_stream_null_engine_rejects_invalid_settings_before_any_load[qwen-settings2-Engine 'qwen' does not declare an advanced setting named 'cfg_value']" time="0.012" /></testsuite></testsuites>

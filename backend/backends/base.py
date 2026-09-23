@@ -222,9 +222,7 @@ def check_cuda_compatibility() -> tuple[bool, str | None]:
     return True, None
 
 
-# ---------------------------------------------------------------------------
-# Engine availability (FR-002, FR-003, FR-004; contracts/engine-capabilities.md)
-# ---------------------------------------------------------------------------
+# Engine availability (FR-002, FR-003, FR-004; contracts/engine-capabilities.md).
 
 _ACCELERATOR_LABELS = {
     "cuda": "CUDA",

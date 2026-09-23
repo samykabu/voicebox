@@ -9,6 +9,7 @@ Short text (≤ max_chunk_chars) uses the single-shot fast path with zero
 overhead.
 """
 
+import asyncio
 import logging
 import re
 from typing import List, Tuple
@@ -246,6 +247,14 @@ async def generate_chunked(
         Optional ``(audio, sample_rate) -> bool`` detector. When it flags
         unstable output, the affected text is split in half and retried.
 
+    A backend may define ``continuation_voice_prompt(voice_prompt, instruct,
+    chunk_text, chunk_audio, sample_rate) -> dict | None``. When the text needs
+    more than one chunk it is called once, after the first chunk, and a returned
+    prompt replaces *voice_prompt* for every later chunk (so an engine can keep
+    the speaker it sampled for chunk 0). The backend's optional
+    ``release_continuation_voice_prompt(prompt)`` is called once generation ends,
+    successfully or not.
+
     Returns
     -------
     (audio, sample_rate) : Tuple[np.ndarray, int]
@@ -253,11 +262,12 @@ async def generate_chunked(
     async def generate_one(
         chunk_text: str,
         chunk_seed: int | None,
+        chunk_prompt: dict,
         retry_depth: int = 0,
     ) -> tuple[np.ndarray, int]:
         chunk_audio, chunk_sr = await backend.generate(
             chunk_text,
-            voice_prompt,
+            chunk_prompt,
             language,
             chunk_seed,
             instruct,
@@ -289,6 +299,7 @@ async def generate_chunked(
                 audio, sample_rate = await generate_one(
                     retry_text,
                     retry_seed,
+                    chunk_prompt,
                     retry_depth + 1,
                 )
                 retry_audio.append(np.asarray(audio, dtype=np.float32))
@@ -310,7 +321,7 @@ async def generate_chunked(
 
     if len(chunks) <= 1:
         # Short text — single-shot fast path
-        return await generate_one(text, seed)
+        return await generate_one(text, seed, voice_prompt)
 
     # Long text — chunked generation
     logger.info(
@@ -321,27 +332,60 @@ async def generate_chunked(
     )
     audio_chunks: List[np.ndarray] = []
     sample_rate: int | None = None
+    chunk_prompt = voice_prompt
+    continuation_prompt: dict | None = None
 
-    for i, chunk_text in enumerate(chunks):
-        logger.info(
-            "Generating chunk %d/%d (%d chars)",
-            i + 1,
-            len(chunks),
-            len(chunk_text),
-        )
-        # Vary the seed per chunk to avoid correlated RNG artefacts,
-        # but keep it deterministic so the same (text, seed) pair
-        # always produces the same output.
-        chunk_seed = (seed + i) if seed is not None else None
+    try:
+        for i, chunk_text in enumerate(chunks):
+            logger.info(
+                "Generating chunk %d/%d (%d chars)",
+                i + 1,
+                len(chunks),
+                len(chunk_text),
+            )
+            # Vary the seed per chunk to avoid correlated RNG artefacts,
+            # but keep it deterministic so the same (text, seed) pair
+            # always produces the same output.
+            chunk_seed = (seed + i) if seed is not None else None
 
-        chunk_audio, chunk_sr = await generate_one(
-            chunk_text,
-            chunk_seed,
-        )
+            chunk_audio, chunk_sr = await generate_one(
+                chunk_text,
+                chunk_seed,
+                chunk_prompt,
+            )
 
-        audio_chunks.append(chunk_audio)
-        if sample_rate is None:
-            sample_rate = chunk_sr
+            audio_chunks.append(chunk_audio)
+            if sample_rate is None:
+                sample_rate = chunk_sr
+
+            if i == 0:
+                continuation_prompt = await _continuation_prompt(
+                    backend, voice_prompt, instruct, chunk_text, chunk_audio, chunk_sr
+                )
+                if continuation_prompt is not None:
+                    chunk_prompt = continuation_prompt
+    finally:
+        if continuation_prompt is not None:
+            release = getattr(backend, "release_continuation_voice_prompt", None)
+            if callable(release):
+                await asyncio.to_thread(release, continuation_prompt)
 
     audio = concatenate_audio_chunks(audio_chunks, sample_rate, crossfade_ms=crossfade_ms)
     return audio, sample_rate
+
+
+async def _continuation_prompt(
+    backend,
+    voice_prompt: dict,
+    instruct: str | None,
+    chunk_text: str,
+    chunk_audio: np.ndarray,
+    sample_rate: int,
+) -> dict | None:
+    """Ask the backend's optional hook for the prompt later chunks should use."""
+    hook = getattr(backend, "continuation_voice_prompt", None)
+    if not callable(hook):
+        return None
+    # The hook may write a file, so it runs off the event loop.
+    prompt = await asyncio.to_thread(hook, voice_prompt, instruct, chunk_text, chunk_audio, sample_rate)
+    return prompt if isinstance(prompt, dict) else None

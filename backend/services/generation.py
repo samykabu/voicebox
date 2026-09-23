@@ -101,20 +101,40 @@ def resolve_backend_instruct(
     Precedence against reference audio (C1Q6) is the backend's job: it ignores the
     description when the voice prompt carries a recording.
     """
-    from ..backends import get_default_model_size, get_tts_model_configs
-
-    variants = [c for c in get_tts_model_configs() if c.engine == engine]
-    if not variants:
-        return instruct
-    default_size = get_default_model_size(engine)
-    config = next((c for c in variants if c.model_size == default_size), variants[0])
-    if not config.supports_voice_design:
+    config = _default_config(engine)
+    if config is None or not config.supports_voice_design:
         return instruct
 
     description = (voice_description or "").strip() or (profile_design_prompt or "").strip()
     if description:
         return description
     return instruct if config.supports_instruct else None
+
+
+def _default_config(engine: str):
+    """Return *engine*'s default-size ``ModelConfig``, or None for an unknown engine."""
+    from ..backends import get_default_model_size, get_tts_model_configs
+
+    variants = [c for c in get_tts_model_configs() if c.engine == engine]
+    if not variants:
+        return None
+    default_size = get_default_model_size(engine)
+    return next((c for c in variants if c.model_size == default_size), variants[0])
+
+
+def stored_voice_description(engine: str, voice_description: str | None) -> str | None:
+    """Return the voice description to store on a generation row, or None (FR-015).
+
+    The request's description, stripped, only when *engine* declares ``supports_voice_design``
+    (the same capability ``resolve_backend_instruct`` reads), so retry and regenerate can
+    replay it. Every other engine, an unknown engine, and a blank description store None.
+    A designed profile's ``design_prompt`` is not copied here: it stays the fallback at run
+    time, so a later edit to the profile still applies to a row that stored None.
+    """
+    config = _default_config(engine)
+    if config is None or not config.supports_voice_design:
+        return None
+    return (voice_description or "").strip() or None
 
 
 def engine_declares_advanced_settings(engine: str) -> bool:

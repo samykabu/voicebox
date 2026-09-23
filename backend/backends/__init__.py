@@ -497,7 +497,9 @@ def _get_non_qwen_tts_configs() -> list[ModelConfig]:
             model_size="default",
             size_mb=4961,
             needs_trim=False,  # the vendor trims silence internally
-            retries_runaway=True,  # the vendor retries runaway output itself (retry_badcase=True)
+            # False: the vendor already retries runaway output (retry_badcase=True), so Voicebox
+            # must not add its own split-and-retry on top (protocol rule 4, research.md R5.5).
+            retries_runaway=False,
             supports_instruct=False,
             supports_voice_design=True,
             requires_download_confirmation=True,

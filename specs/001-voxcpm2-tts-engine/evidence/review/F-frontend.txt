@@ -1,0 +1,127 @@
+# Review F1-F5 frontend fixes. Generated 2026-09-23T21:15+03:00
+Base: HEAD e1399a2 plus the working tree. Only files in the F-worker's ownership were edited.
+Test file: copy of evidence/phase6/T049-capability-logic.test.ts with the review cases added at the end
+(final copy: F-capability-logic.test.ts). The existing engineNotice calls now pass a stand-in `t`
+(fakeT), because engineNotice takes the UI's translate function (F3). Their assertions are unchanged.
+Run from the scratchpad: <scratchpad>/review-fe/capability-logic.test.ts, which imports the app modules by absolute path.
+
+## 1. Fixes, with file:line (working tree)
+
+### F1 (cold-start engine fallback)
+- app/src/lib/hooks/engineCapabilityRules.ts:150 shouldFallBackFromEngine({engine, currentEngineAvailable,
+  optionCount, capabilitiesLoaded, appSideEngines}): no fallback while the engine is offered or there is nothing
+  to fall back to. Before capabilities load, only an engine in appSideEngines is judged.
+- app/src/components/Generation/EngineModelSelector.tsx:174 reads isSuccess from useEngineCapabilities as
+  capabilitiesLoaded. :198-217 the fallback useEffect now runs only when shouldFallBackFromEngine(...)
+  with appSideEngines = CLONING_ENGINES, the app-side set. This mirrors ProfileForm's guard
+  `(LISTED_DEFAULT_ENGINES.has(defaultEngine) || engineCapabilitiesLoaded)` (ProfileForm.tsx ~:459).
+  A cloned profile on voxcpm is no longer switched to qwen before /models/engines arrives.
+
+### F2 (FR-018 fails closed)
+- engineCapabilityRules.ts:112 PRE_CAPABILITY_ENGINES = the keys of ENGINE_LANGUAGES (qwen, luxtts, chatterbox,
+  chatterbox_turbo, tada, kokoro, qwen_custom_voice, f5_tts). This is the set that
+  contracts/engine-capabilities.md "Scope boundary" and languages.ts already treat as not yet on the
+  capability channel. No engine name is hard-coded.
+- engineCapabilityRules.ts:127 downloadDecision(engine, capability, model, preCapabilityEngines) returns
+  'confirm' | 'proceed' | 'refuse':
+    model downloaded/downloading -> proceed;
+    no capability -> proceed for a pre-capability engine or a model with no engine, otherwise refuse;
+    capability without requires_download_confirmation -> proceed;
+    otherwise confirm, including when the model state is unknown.
+- app/src/lib/hooks/useEngineCapabilities.ts:38 engineCapabilitiesQueryOptions(serverUrl) is shared by the
+  hook and :51 loadEngineCapabilities(queryClient, serverUrl), which calls queryClient.fetchQuery with the same
+  key and fn. It returns the cached list when fresh and undefined on failure.
+- app/src/lib/hooks/useGenerationForm.ts:136-138: when the engine is missing from the loaded list, the list is
+  fetched before the FR-003 selectable check and the download decision.
+  :198-226: model status is read (a failure leaves the model unknown), then downloadDecision:
+  'refuse' -> destructive toast engines.detailsUnavailable.{title,description} and return;
+  'confirm' -> the existing dialog. Before, `capability && needsDownloadConfirmation(...)` let
+  generation, and so the download, go ahead with no capability.
+- app/src/components/ServerSettings/ModelManagement.tsx:305-333 handleDownload is now async, with the same
+  logic: engine = MODEL_ENGINES[modelName]. It loads capabilities only for a model with an engine, then
+  refuse -> the same toast, confirm -> the dialog, otherwise download. Whisper and other models with no
+  engine are unchanged. :949 and :1047 call `void handleDownload(...)`.
+
+### F3 (i18n)
+- engineCapabilityRules.ts:19 TranslateFn type. :34 engineUnavailableFallback(capability) returns
+  {key: 'engines.cannotRunHere', params: {name: display_name}}. :53 engineNotice(capability, t): the backend
+  reason is kept as is. The fallback is t(key, params). Callers pass i18next's t:
+  EngineModelSelector.tsx:182, :239; ModelManagement.tsx:532; ProfileForm.tsx:341, :1060.
+- app/src/components/Generation/DownloadConfirmDialog.tsx:38-45 picks the licence key. :59 title, :63 size,
+  :65 licence, :73 Cancel (common.cancel), :79 Download. All go through t() with interpolation.
+  formatDownloadSize still outputs "4.8 GB" / "512 MB" (number + unit).
+- app/src/components/Generation/FloatingGenerateBox.tsx:574 aria-label, :580 tooltip -> t('generation.advancedSettings').
+- useGenerationForm.ts:142 unavailable toast title -> t('engines.unavailableTitle', {name}).
+- en/translation.json new keys: generation.advancedSettings (:766), models.detail.downloadSize (:1271,
+  used by ModelManagement.tsx:909, previously missing), engines.* (:1319), downloadConfirm.* (:1327).
+
+### F4 (draft keeps the description)
+- app/src/stores/uiStore.ts:25-28 ProfileFormDraft gains optional voiceSource and designPrompt. The draft is not
+  persisted (partialize keeps only selectedProfileId and theme), so there is no migration.
+- app/src/components/VoiceProfiles/ProfileForm.tsx:879-884 hasContent includes values.designPrompt.
+  :894-895 the draft saves voiceSource and designPrompt. :420 restore resets designPrompt from the draft.
+  :423 setVoiceSource(draft.voiceSource ?? 'clone'). The existing effect still leaves 'design' if no engine
+  declares voice design.
+
+### F5 (unavailable design engine explains itself)
+- ProfileForm.tsx:1057-1089 each "Describe a voice" engine item shows engineNotice(capability, t) under its label.
+  The styling matches EngineModelSelector: the item has data-[disabled]:opacity-100, the label gets opacity-50
+  when unavailable, and the notice is `block text-[10px]`, muted for a reason and amber for a warning.
+  :341 designEngineNotice, rendered at :1092-1096 under the selector as `text-xs text-amber-600
+  dark:text-amber-400` (EngineModelSelector's non-compact selected notice).
+
+## 2. i18n approach and fallback finding
+app/src/i18n/index.ts: fallbackLng: 'en', load: 'currentOnly'. Other locales fall back to en for missing
+keys. The project adds new keys to en only: en has 1317 lines and the others 1241-1274, and this
+branch's earlier i18n changes touched only locales/en. So the keys were added to
+locales/en/translation.json only. Other locales show the English text until they are translated.
+The en file was edited with a JSON round-trip written back with CRLF. One pre-existing malformed line
+(`},      "remove": {`, the file's pre-existing Biome format error) was put back byte for byte, so
+the diff contains only the new keys (24 +/- lines).
+
+## 3. RED, timestamp 2026-09-23T21:08:21+03:00 (F-red.xml)
+Setup: signature-only stubs in engineCapabilityRules.ts. downloadDecision, shouldFallBackFromEngine and
+engineUnavailableFallback threw 'not implemented', PRE_CAPABILITY_ENGINES was an empty set, and engineNotice
+took a t argument but kept the HEAD body.
+$ bun test ./capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/review-fe/F-red.xml
+69 tests: 55 pass, 14 fail. exit=1.
+  F2 PRE_CAPABILITY_ENGINES 1/1 failed, F2 downloadDecision 7/7, F1 shouldFallBackFromEngine 4/4,
+  F3 engineUnavailableFallback 2/2. All T019-T049 suites had 0 failures.
+
+## 4. GREEN, timestamp 2026-09-23T21:11:50+03:00 (F-green.xml)
+69 tests: 69 pass, 0 fail. exit=0. Every suite has 0 failures, including F2 PRE_CAPABILITY_ENGINES 1,
+F2 downloadDecision 7, F1 shouldFallBackFromEngine 4 and F3 engineUnavailableFallback 2.
+
+## 5. bun run typecheck (from D:/Projects/Personal/voicebox)
+$ bunx tsc -p app/tsconfig.json --noEmit && cd web && bunx tsc --noEmit
+exit=0
+
+## 6. bun run build:web
+exit=0. Built in 6.87s. Only the existing chunk-size (>500 kB) warning appeared. git status showed no new files from the build.
+
+## 7. Biome, HEAD vs working, for every touched file
+Method: LF-normalised copies of the HEAD blob and the working file, each beside the repo's biome.json.
+node_modules/.bin/biome.exe check --vcs-enabled=false <file> was run on both. format --write was run on
+further copies, and the formatter diffs were compared without their line-number headers.
+  DownloadConfirmDialog.tsx   head 0 / work 0 errors; formatter diff empty/empty
+  EngineModelSelector.tsx     head 1 / work 1 (format); formatter diffs identical (11 lines each)
+  FloatingGenerateBox.tsx     head 1 / work 1 (format); identical (16 lines)
+  ModelManagement.tsx         head 1 error + 2 warnings / work 1 + 2; identical formatter diff (8 lines);
+                              warnings are the same two pre-existing lint/complexity/useOptionalChain
+                              (HEAD :636, :951 -> working :661, :976, shifted by the new lines)
+  ProfileForm.tsx             head 1 / work 1 (format); identical (6 lines)
+  en/translation.json         head 1 / work 1 (format); identical (5 lines)
+  engineCapabilityRules.ts, useEngineCapabilities.ts, useGenerationForm.ts, uiStore.ts: clean in both
+Result: no new Biome findings (format or lint).
+
+## 8. No engine-name capability branching added
+$ git diff -U0 -- app/ | grep '^+' | grep -cE "(===|!==) *'(voxcpm|kokoro|qwen|...|f5_tts)'|'voxcpm'"
+0
+The pre-capability set is derived from ENGINE_LANGUAGES. The F1 guard uses the existing CLONING_ENGINES set.
+Model to engine still comes from the existing MODEL_ENGINES registration.
+
+## 9. Notes
+- If GET /models/engines keeps failing, the F1 guard keeps a capability-declared engine selected, because
+  isSuccess never becomes true. Generating with it is then refused by F2 unless its model is already downloaded.
+- F2 also asks for confirmation when the capability requires it but GET /models/status failed. Before,
+  that case went ahead without asking.

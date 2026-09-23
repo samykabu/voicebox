@@ -66,6 +66,7 @@ async def create_generation(
     engine: Optional[str] = "qwen",
     model_size: Optional[str] = None,
     source: str = "manual",
+    voice_description: str | None = None,
 ) -> GenerationResponse:
     """
     Create a new generation history entry.
@@ -87,6 +88,8 @@ async def create_generation(
             /generate calls; ``"personality_speak"`` for rows created
             by the /profiles/{id}/speak endpoint. Enables filtering the
             history view for personality-driven output.
+        voice_description: Written voice description to replay on retry and
+            regenerate. The caller stores it only for voice-design engines.
 
     Returns:
         Created generation entry
@@ -100,6 +103,7 @@ async def create_generation(
         duration=duration,
         seed=seed,
         instruct=instruct,
+        voice_description=voice_description,
         engine=engine,
         model_size=model_size,
         status=status,

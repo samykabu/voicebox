@@ -20,6 +20,7 @@ from ..services.generation import (
     profile_design_prompt,
     resolve_backend_instruct,
     run_generation,
+    stored_voice_description,
 )
 from ..services.task_queue import cancel_generation as cancel_generation_job, enqueue_generation
 from ..utils.audio import load_audio
@@ -61,6 +62,18 @@ def _resolve_generation_engine(data: models.GenerationRequest, profile) -> str:
     return data.engine or getattr(profile, "default_engine", None) or getattr(profile, "preset_engine", None) or "qwen"
 
 
+def _require_valid_advanced_settings(data: models.GenerationRequest, engine: str) -> None:
+    """Check ``advanced_settings`` against the resolved *engine* (FR-010).
+
+    ``GenerationRequest`` checks them itself when the request names an engine. With a null
+    engine it cannot know which engine applies, so every route that takes the request calls
+    this once the engine is resolved: same rule, same message, still a 422.
+    """
+    error = models.advanced_settings_error(engine, data.advanced_settings)
+    if error:
+        raise HTTPException(status_code=422, detail=error)
+
+
 def _require_available_engine(engine: str) -> None:
     """Refuse, with the resolver's reason, an engine this machine cannot run (FR-003).
 
@@ -90,6 +103,7 @@ async def generate_speech(
     from ..backends import engine_has_model_sizes
 
     engine = _resolve_generation_engine(data, profile)
+    _require_valid_advanced_settings(data, engine)
     try:
         profiles.validate_profile_engine(profile, engine)
     except ValueError as e:
@@ -124,6 +138,7 @@ async def generate_speech(
         engine=engine,
         model_size=model_size if engine_has_model_sizes(engine) else None,
         source=source,
+        voice_description=stored_voice_description(engine, data.voice_description),
     )
 
     task_manager.start_generation(
@@ -207,6 +222,7 @@ async def retry_generation(generation_id: str, db: Session = Depends(get_db)):
             seed=gen.seed,
             instruct=gen.instruct,
             mode="retry",
+            voice_description=getattr(gen, "voice_description", None),
         )
     )
 
@@ -254,6 +270,7 @@ async def regenerate_generation(generation_id: str, db: Session = Depends(get_db
             instruct=gen.instruct,
             mode="regenerate",
             version_id=version_id,
+            voice_description=getattr(gen, "voice_description", None),
         )
     )
 
@@ -362,6 +379,7 @@ async def stream_speech(
         raise HTTPException(status_code=404, detail="Profile not found")
 
     engine = _resolve_generation_engine(data, profile)
+    _require_valid_advanced_settings(data, engine)
     try:
         profiles.validate_profile_engine(profile, engine)
     except ValueError as e:

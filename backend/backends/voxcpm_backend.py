@@ -15,6 +15,10 @@ Contract: specs/001-voxcpm2-tts-engine/contracts/tts-backend-protocol.md.
 
 import asyncio
 import logging
+import os
+import tempfile
+import threading
+from typing import ClassVar
 
 import numpy as np
 
@@ -53,10 +57,20 @@ COMBINE_SAMPLE_RATE = 24000
 class VoxCPMBackend:
     """VoxCPM2 backend for voice cloning and voice design."""
 
+    # /generate/stream and /models/download reach load_model() outside the serial
+    # generation queue. Without this, two callers could each run from_pretrained
+    # (about 5.9 GB of GPU memory apiece); _load_model_sync re-checks under it.
+    _load_lock: ClassVar[threading.Lock] = threading.Lock()
+
     def __init__(self):
         self.model = None
         self.model_size = "default"  # VoxCPM2 has only one model size
         self._device = None
+        self._model_load_lock = asyncio.Lock()
+        # The vendor model is not safe to call from two threads at once, and
+        # /generate/stream runs outside the serial queue.
+        self._inference_lock = asyncio.Lock()
+        self._sync_inference_lock = threading.Lock()
 
     def _get_device(self) -> str:
         # No allow_xpu / allow_directml: voxcpm's resolve_runtime_device() accepts only
@@ -83,36 +97,40 @@ class VoxCPMBackend:
         """Load the VoxCPM2 model. Idempotent."""
         if self.model is not None:
             return
-
-        await asyncio.to_thread(self._load_model_sync)
+        async with self._model_load_lock:
+            if self.model is not None:
+                return
+            await asyncio.to_thread(self._load_model_sync)
 
     def _load_model_sync(self) -> None:
-        if self.model is not None:
-            return
+        with VoxCPMBackend._load_lock:
+            # Re-check: another thread may have finished loading while this one waited.
+            if self.model is not None:
+                return
 
-        is_cached = self._is_model_cached()
+            is_cached = self._is_model_cached()
 
-        with model_load_progress(VOXCPM_MODEL_NAME, is_cached):
-            from voxcpm import VoxCPM  # lazy: heavy import
+            with model_load_progress(VOXCPM_MODEL_NAME, is_cached):
+                from voxcpm import VoxCPM  # lazy: heavy import
 
-            device = self.device
-            logger.info(f"Loading VoxCPM2 on {device}...")
+                device = self.device
+                logger.info("Loading VoxCPM2 on %s...", device)
 
-            # Principle I (T047): once cached, load with HF offline mode forced on and
-            # local_files_only, so the model resolves from the local HuggingFace cache only.
-            # load_denoiser=False keeps the ModelScope hub out entirely.
-            with force_offline_if_cached(is_cached, "VoxCPM2"):
-                self.model = VoxCPM.from_pretrained(
-                    VOXCPM_HF_REPO,
-                    # Upstream defaults to True, which loads a ModelScope denoiser over the network.
-                    load_denoiser=False,
-                    # Resolve from the local HuggingFace cache only once downloaded.
-                    local_files_only=is_cached,
-                    # Explicit, never None/"auto": our device policy stays authoritative.
-                    device=device,
-                )
+                # Principle I (T047): once cached, load with HF offline mode forced on and
+                # local_files_only, so the model resolves from the local HuggingFace cache only.
+                # load_denoiser=False keeps the ModelScope hub out entirely.
+                with force_offline_if_cached(is_cached, "VoxCPM2"):
+                    self.model = VoxCPM.from_pretrained(
+                        VOXCPM_HF_REPO,
+                        # Upstream defaults to True, which loads a ModelScope denoiser over the network.
+                        load_denoiser=False,
+                        # Resolve from the local HuggingFace cache only once downloaded.
+                        local_files_only=is_cached,
+                        # Explicit, never None/"auto": our device policy stays authoritative.
+                        device=device,
+                    )
 
-        logger.info("VoxCPM2 loaded successfully")
+            logger.info("VoxCPM2 loaded successfully")
 
     def unload_model(self) -> None:
         """Unload the model to free memory."""
@@ -199,24 +217,76 @@ class VoxCPMBackend:
         await self.load_model()
 
         def _generate_sync():
-            if seed is not None:
-                manual_seed(seed, self.device)
+            # The thread lock also covers callers on another event loop, which the
+            # asyncio lock cannot see; seeding sits inside it so a concurrent call
+            # cannot reseed the RNG between manual_seed() and the vendor call.
+            with self._sync_inference_lock:
+                model = self.model
+                if seed is not None:
+                    manual_seed(seed, self.device)
 
-            audio = self.model.generate(
-                text=final_text,
-                prompt_wav_path=prompt_wav_path,
-                prompt_text=prompt_text,
-                cfg_value=cfg_value,
-                inference_timesteps=inference_timesteps,
-                # Upstream normalization would undo our pronunciation-dictionary output (FR-008).
-                normalize=False,
-            )
+                audio = model.generate(
+                    text=final_text,
+                    prompt_wav_path=prompt_wav_path,
+                    prompt_text=prompt_text,
+                    cfg_value=cfg_value,
+                    inference_timesteps=inference_timesteps,
+                    # Upstream normalization would undo our pronunciation-dictionary output (FR-008).
+                    normalize=False,
+                )
 
-            # generate() returns a bare float32 1-D CPU ndarray; pair it with the model's
-            # own output rate rather than a literal (research.md R5.2).
-            return np.asarray(audio, dtype=np.float32), int(self.model.tts_model.sample_rate)
+                # generate() returns a bare float32 1-D CPU ndarray; pair it with the model's
+                # own output rate rather than a literal (research.md R5.2).
+                return np.asarray(audio, dtype=np.float32), int(model.tts_model.sample_rate)
 
-        return await asyncio.to_thread(_generate_sync)
+        async with self._inference_lock:
+            return await asyncio.to_thread(_generate_sync)
+
+    def continuation_voice_prompt(
+        self,
+        voice_prompt: dict | None,
+        instruct: str | None,
+        chunk_text: str,
+        chunk_audio: np.ndarray,
+        sample_rate: int,
+    ) -> dict | None:
+        """Pin a designed voice across chunks by continuing from the first chunk.
+
+        Called by ``generate_chunked`` after chunk 0 of a long text. In voice design
+        (a description and no reference pair) every chunk would otherwise sample a
+        new speaker, so chunk 0's audio and text become the prompt pair for the rest.
+        With a prompt pair present, ``generate()`` drops the description prefix.
+
+        Args:
+            voice_prompt: The prompt chunk 0 was generated with.
+            instruct: The voice description chunk 0 was generated with.
+            chunk_text: Chunk 0's text, without the description prefix.
+            chunk_audio: Chunk 0's audio.
+            sample_rate: Chunk 0's sample rate.
+
+        Returns:
+            ``{"prompt_wav_path", "prompt_text"}`` pointing at a temporary WAV, or None
+            outside design mode (a cloned profile keeps its own reference).
+        """
+        prompt_wav_path, _prompt_text = _prompt_pair(voice_prompt)
+        if prompt_wav_path is not None or not (instruct or "").strip():
+            return None
+
+        from ..utils.audio import save_audio  # lazy: pulls in librosa
+
+        fd, path = tempfile.mkstemp(prefix="voxcpm_continuation_", suffix=".wav")
+        os.close(fd)
+        try:
+            # A transient internal prompt, never shown to the user: no AI disclosure tag.
+            save_audio(np.asarray(chunk_audio, dtype=np.float32), path, sample_rate, disclosure=None)
+        except Exception:
+            _remove_quietly(path)
+            raise
+        return {"prompt_wav_path": path, "prompt_text": chunk_text}
+
+    def release_continuation_voice_prompt(self, voice_prompt: dict) -> None:
+        """Delete the temporary WAV behind a prompt from continuation_voice_prompt()."""
+        _remove_quietly(voice_prompt.get("prompt_wav_path"))
 
 
 def _prompt_pair(voice_prompt: dict | None) -> tuple[str | None, str | None]:
@@ -234,6 +304,17 @@ def _prompt_pair(voice_prompt: dict | None) -> tuple[str | None, str | None]:
         )
 
     return prompt_wav_path, prompt_text
+
+
+def _remove_quietly(path: str | None) -> None:
+    if not path:
+        return
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
+    except OSError:
+        logger.warning("Could not remove the temporary continuation prompt %s", path, exc_info=True)
 
 
 def _apply_voice_description(text: str, instruct: str | None, *, has_reference: bool) -> str:

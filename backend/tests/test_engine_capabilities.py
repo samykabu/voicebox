@@ -711,7 +711,9 @@ def test_empty_advanced_settings_pass_for_every_engine(engine, value):
     assert request.advanced_settings == value
 
 
-@pytest.mark.parametrize("engine", [None, "qwen", "luxtts", "chatterbox", "tada", "kokoro", "f5_tts"])
+# A null engine is checked by the route after it resolves the engine (review S1); see
+# test_review_advanced_settings_engine.py for the null-engine-on-a-qwen-profile 422.
+@pytest.mark.parametrize("engine", ["qwen", "luxtts", "chatterbox", "tada", "kokoro", "f5_tts"])
 def test_existing_engines_reject_any_advanced_setting(engine):
     from backend.models import GenerationRequest
 

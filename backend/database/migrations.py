@@ -243,6 +243,9 @@ def _migrate_generations(engine, inspector, tables: set[str]) -> None:
             "source VARCHAR NOT NULL DEFAULT 'manual'",
             "source",
         )
+    # VoxCPM2 voice design: the description retry and regenerate replay (FR-015)
+    if "voice_description" not in columns:
+        _add_column(engine, "generations", "voice_description TEXT", "voice_description")
 
 
 def _migrate_effect_presets(engine, inspector, tables: set[str]) -> None:

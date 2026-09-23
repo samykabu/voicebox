@@ -1,0 +1,26 @@
+S2: section-divider banner removed from backend/backends/base.py (STYLE_GUIDE.md 'No section dividers').
+git diff:
+diff --git a/backend/backends/base.py b/backend/backends/base.py
+index ad3aa24..1d93b94 100644
+--- a/backend/backends/base.py
++++ b/backend/backends/base.py
+@@ -222,9 +222,7 @@ def check_cuda_compatibility() -> tuple[bool, str | None]:
+     return True, None
+ 
+ 
+-# ---------------------------------------------------------------------------
+-# Engine availability (FR-002, FR-003, FR-004; contracts/engine-capabilities.md)
+-# ---------------------------------------------------------------------------
++# Engine availability (FR-002, FR-003, FR-004; contracts/engine-capabilities.md).
+ 
+ _ACCELERATOR_LABELS = {
+     "cuda": "CUDA",
+
+remaining '# ----' divider lines in base.py: 0
+
+S3: f-string logging replaced with %s placeholders in backend/backends/voxcpm_backend.py (STYLE_GUIDE.md 'Logging').
+logger calls with f-strings now: 0
+117:                logger.info("Loading VoxCPM2 on %s...", device)
+133:            logger.info("VoxCPM2 loaded successfully")
+145:            logger.info("VoxCPM2 unloaded")
+317:        logger.warning("Could not remove the temporary continuation prompt %s", path, exc_info=True)

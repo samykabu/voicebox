@@ -1,0 +1,48 @@
+ruff 0.16.8; config backend/pyproject.toml. HEAD copies from 'git show HEAD:<path>' in the scratchpad.
+
+file                             HEAD-check NOW-check  HEAD-format      NOW-format      
+backends/voxcpm_backend.py       0          0          formatted        formatted       
+backends/__init__.py             28         28         would reformat   would reformat  
+backends/base.py                 13         13         formatted        formatted       
+utils/chunked_tts.py             10         10         would reformat   would reformat  
+tests/test_voxcpm_backend.py     0          0          formatted        formatted       
+tests/test_voxcpm_review.py      (new)      0          (new)            formatted       
+
+Rule-code comparison (sorted rule codes, HEAD vs now) per file:
+backends/voxcpm_backend.py: identical
+backends/__init__.py: identical
+backends/base.py: identical
+utils/chunked_tts.py: identical
+tests/test_voxcpm_backend.py: identical
+
+The two files that 'would reformat' (backends/__init__.py, utils/chunked_tts.py) would also reformat at HEAD; the hunks are pre-existing lines, none of them in the code changed here:
+-    def unload_model(self) -> None:
+-        ...
++    def unload_model(self) -> None: ...
+-    def is_loaded(self) -> bool:
+-        ...
++    def is_loaded(self) -> bool: ...
+-        "en", "zh", "ja", "ko", "de", "fr", "ru", "pt", "es", "it",
++        "en",
++        "zh",
++        "ja",
++        "ko",
++        "de",
++        "fr",
++        "ru",
++        "pt",
++        "es",
++        "it",
+-                raise RuntimeError(
+-                    "TTS output remained unstable after retrying smaller text chunks"
+-                )
++                raise RuntimeError("TTS output remained unstable after retrying smaller text chunks")
+-                retry_seed = (
+-                    chunk_seed + ((retry_depth + 1) * 1000) + i
+-                    if chunk_seed is not None
+-                    else None
+-                )
++                retry_seed = chunk_seed + ((retry_depth + 1) * 1000) + i if chunk_seed is not None else None
+
+Full check output for the new and fully-owned files:
+All checks passed!
