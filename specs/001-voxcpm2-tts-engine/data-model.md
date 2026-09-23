@@ -2,9 +2,10 @@
 
 **Feature**: `specs/001-voxcpm2-tts-engine` | **Date**: 2026-09-22
 
-This feature stores no new persistent data. It extends one existing in-memory descriptor,
-adds two transient runtime shapes, and reuses the existing Voice Profile and cache entities
-unchanged. There is no database migration.
+This feature adds no new table or column, so there is no database migration. It extends
+one existing in-memory descriptor and adds two transient runtime shapes. It puts existing
+Voice Profile columns to new use (the designed source, §3), writes a disclosure tag into
+generated WAV files (§6), and moves the profile export manifest to version 1.1 (§7).
 
 ---
 
@@ -40,13 +41,13 @@ carries `model_name`, `display_name`, `engine`, `hf_repo_id`, `model_size`, `siz
 | `supports_instruct` | `False` | VoxCPM2 takes no delivery instructions; keeps the existing instruction box off for it (C1Q5) |
 | `supports_voice_design` | `True` | FR-015 |
 | `requires_download_confirmation` | `True` | FR-018, C1Q7 |
-| `advanced_settings` | `cfg_value` (default 2.0), `inference_timesteps` (default 10) | FR-010, C1Q8; defaults from upstream, bounds confirmed by the probe (T001) |
-| `languages` | 30 codes including `ar` | FR-007; exact list confirmed by the probe |
+| `advanced_settings` | `cfg_value` (default 2.0, range 1.0–3.0), `inference_timesteps` (default 10, range 4–30) | FR-010, C1Q8; the "recommended" ranges in voxcpm 2.0.3 `cli.py` |
+| `languages` | 30 codes including `ar`, in model-card order | FR-007; evidence/probe/15-language-list.txt |
 | `license_id` | `Apache-2.0` | confirmed via the HuggingFace API |
 | `commercial_use` | `True` | the premise of the whole feature |
 | `dialect` | `None` | multi-dialect, not a single-dialect checkpoint |
 | `accelerators` | `("cuda", "mps", "cpu")` | research.md R2 — vendor documents all three |
-| `min_memory_mb` | set in T016 from the probe (peak about 5.9 GB of GPU memory on short text) | C1Q4; evidence/probe.md Q8 |
+| `min_memory_mb` | `6144` (the probe's peak of about 5.9 GB of GPU memory on short text, rounded up) | C1Q4; evidence/probe.md Q8 |
 
 **Validation**: `engine` must match the four regex patterns in
 [backend/models.py](../../backend/models.py) at lines 92, 413, 432 and 451. All four take
@@ -74,8 +75,18 @@ declared accelerators empty            -> available, no warning        (all exis
 detected accelerator in declared set
     and memory looks sufficient        -> available, no warning
     and memory looks marginal          -> available, warning           (C1Q4)
-detected accelerator not in set        -> unavailable, reason          (FR-003)
+detected accelerator not in set,
+    but "cpu" is declared              -> available, warning that it   (FR-023)
+                                          runs on the processor
+detected accelerator not in set,
+    and "cpu" is not declared          -> unavailable, reason          (FR-003)
 ```
+
+The processor-fallback row is what happens to VoxCPM2 on an Intel XPU or DirectML machine.
+The detector reports that accelerator, but VoxCPM2 picks its own device without XPU or
+DirectML, so it really does run on the processor. It is offered, with a warning that it will
+be slower; the graphics-memory warning does not apply there. No registered engine currently
+reaches the unavailable row; it stays as a guard for an engine that declares no processor path.
 
 Memory is deliberately **not** a hard gate (C1Q4 answered B): free memory changes with
 whatever else is running, so a threshold would wrongly exclude machines that would have
@@ -84,29 +95,37 @@ is cheap to act on.
 
 ---
 
-## 3. `VoiceDescription` — new, transient
+## 3. Voice description and the designed profile
 
-The written description of a voice, used when no reference audio is supplied (FR-015).
+Every generation needs a Voice Profile, so voice design (FR-015) is reached through a
+**designed profile** (FR-015a). A written description can come from two places:
 
-| Field | Type | Rules |
+| Source | Where it lives | Stored? |
 | --- | --- | --- |
-| `text` | `str` | Free text. Any language is accepted (C1Q9); no language match with the spoken text is required. |
-| `active` | `bool` | False when a Voice Profile with reference audio is also selected — the recording wins (C1Q6) and the interface must say the description is unused. |
+| Designed profile | Voice Profile with `voice_type = "designed"` and a required `design_prompt` (up to 2000 characters). Created with the "Describe a voice" source in the profile dialog. | Yes, in the existing `design_prompt` column. No new column, no migration. |
+| One-off request description | The optional `voice_description` field on the generation request (up to 500 characters). | No. It is not saved with the generation. Retry and regenerate re-run with the stored `instruct` only, so a one-off description is not reapplied; a designed profile's `design_prompt` is. |
 
-Not persisted as its own record in v1. It travels in a new optional `voice_description`
-field on the generation request, never in `instruct`, which stays the delivery-instruction
-channel (C1Q5). The service passes it to the backend only for engines whose
-`supports_voice_design` is true, and the backend encodes it into the prompt text; the exact
-encoding is confirmed by the probe (research.md R6).
+Rules for both:
 
-**Precedence**, resolving the C1Q6 edge case:
+- Any language is accepted (C1Q9); it does not have to match the spoken text.
+- The description never travels in `instruct`, which stays the delivery-instruction channel
+  (C1Q5). `resolve_backend_instruct` in `backend/services/generation.py` puts it into the
+  backend's `instruct` parameter only for engines whose `supports_voice_design` is true.
+  Other engines get `instruct` unchanged, exactly as before.
+- VoxCPM2 encodes it as the `"(description)text"` prefix (probe Q9).
+
+**Precedence** (T048, resolving the C1Q6 edge case):
 
 ```text
-profile with reference audio + description  -> clone from audio; description inactive, stated in the UI
-profile with reference audio, no description -> clone from audio
-description only, no profile                 -> design the voice from the description
-neither                                      -> default voice for the engine
+profile with reference audio (cloned)       -> clone from the audio; any description is unused,
+                                               and the generate box says so
+request voice_description, not blank        -> design the voice from the request description
+designed profile, blank request description -> design the voice from the profile's design_prompt
 ```
+
+The first row is enforced in the backend: VoxCPM2 ignores the description whenever the voice
+prompt carries a recording. The other two are decided in `resolve_backend_instruct`, which
+falls back to `profile_design_prompt(voice_prompt)` when the request description is blank.
 
 ---
 
@@ -129,16 +148,80 @@ generation time, so the cached value must carry it.
 
 ---
 
-## 5. Reused unchanged
+## 5. Reused, with the changes this feature made
 
 - **Voice Profile** and its reference clips — no schema change. Multi-clip profiles go
-  through the shared `combine_voice_prompts` helper (FR-012).
+  through the shared `combine_voice_prompts` helper (FR-012), combined at 24000 Hz to match
+  the combined reference `backend/services/profiles.py` saves. The designed source (§3) uses
+  existing columns. The profile service now saves reference samples and the combined
+  reference with `disclosure=None` (§6).
 - **Pronunciation dictionary** — applied to input text before generation (FR-008). Upstream
   normalization stays off (`normalize=False`) so it cannot undo the Arabic diacritics
   handling from PR #11.
 - **Model download progress** and the HuggingFace cache — reused via `model_load_progress`
   (FR-016).
-- **Generation queue, history and effects** — untouched.
+- **Generation queue and history** — the queue is unchanged. Generations are stored as
+  before; the one-off `voice_description` and the advanced settings are not stored with them.
+- **Audio writing** — changed. `save_audio` in `backend/utils/audio.py` now writes the
+  AI-generated disclosure by default, and a new `wav_bytes()` helper does the same for audio
+  that is never saved to disk (§6).
+- **Effects** — the effect chain itself is unchanged, but the effects preview route
+  (`backend/routes/effects.py`) now encodes its WAV with `wav_bytes()`, so a preview carries
+  the disclosure. Processed versions are saved through `save_audio` and are tagged too.
+
+---
+
+## 6. AI-generated disclosure metadata (FR-026)
+
+Generated audio carries a disclosure in the WAV's RIFF `LIST`/`INFO` chunk:
+
+| INFO tag | Value written | Value read back |
+| --- | --- | --- |
+| `ICMT` (comment) | `AI-generated by Voicebox` (`AI_GENERATED_DISCLOSURE`) | the same |
+| `ISFT` (software) | `Voicebox` | libsndfile appends its version, e.g. `Voicebox (libsndfile-1.2.2)` |
+
+Source: `_write_wav` in `backend/utils/audio.py`. The read-back values are from a real run,
+evidence/phase6/realrun-t051-tag.txt. The audio samples are unchanged; only the metadata is
+added.
+
+Where it is written:
+
+| Surface | Writer | Tagged? |
+| --- | --- | --- |
+| Saved generations and processed versions, including `/speak` and MCP speak (both go through `generate_speech`) | `save_audio(...)`, disclosure on by default | Yes |
+| `/generate/stream` | `tts.audio_to_wav_bytes` → `wav_bytes()` | Yes |
+| Effects preview | `wav_bytes()` in `routes/effects.py` | Yes |
+| Profile reference samples | `save_audio(..., disclosure=None)` in `services/profiles.py` | No |
+| Combined multi-clip reference | `save_audio(..., 24000, disclosure=None)` in `services/profiles.py` | No |
+| Transcription re-encode of the user's upload | `save_audio(..., disclosure=None)` in `routes/transcription.py` | No |
+
+With `disclosure=None` no comment and no software tag are set, so libsndfile writes no INFO
+chunk at all. The user's own recordings are never labelled AI-generated.
+
+---
+
+## 7. Profile export manifest 1.1 (FR-027)
+
+`backend/services/export_import.py` writes `manifest.json` with `"version": "1.1"`. The
+`profile` object gains five fields next to `name`, `description` and `language`:
+
+| Field | Meaning |
+| --- | --- |
+| `voice_type` | `cloned`, `preset` or `designed` |
+| `preset_engine` | The engine of a preset voice; null otherwise |
+| `preset_voice_id` | The preset voice's id; null otherwise |
+| `design_prompt` | A designed profile's written description; null otherwise |
+| `default_engine` | The profile's default engine, or null |
+
+- All five are existing profile columns, so there is no migration.
+- On import, each field present and not null is restored, and `create_profile` validates the
+  combination. An invalid one (for example a designed profile with a blank description) is
+  refused, not silently turned into a cloned profile.
+- A 1.0 manifest has none of these fields and imports as a cloned profile with no default
+  engine, as before.
+- A cloned profile still needs at least one sample to export. Designed and preset profiles
+  can be exported with no samples, since their metadata fully describes them.
+- The profile's personality text is not carried by the export.
 
 ---
 
@@ -151,8 +234,9 @@ ModelConfig(engine="voxcpm", accelerators=("cuda","mps","cpu"))
       │
       └── selected by ──> GenerationRequest
                                │
-                               ├── VoiceProfile ──> VoxCPM2VoicePrompt  (cached)
-                               │                        └── prompt_wav_path + prompt_text
+                               ├── VoiceProfile (cloned) ──> VoxCPM2VoicePrompt  (cached)
+                               │                                └── prompt_wav_path + prompt_text
+                               ├── VoiceProfile (designed) ──> design_prompt  (stored)
                                │
-                               └── VoiceDescription  (inactive when a profile is present)
+                               └── voice_description  (one-off, not stored; unused with a cloned profile)
 ```

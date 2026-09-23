@@ -260,3 +260,22 @@ Follow-ups (pre-existing, not fixed here):
   - WSL ~/voicebox-setupcheck (8.9 GB), ~/tc (1.6 GB), ~/.cache/pip (3.7 GB)
   - backend/dist/voicebox-server.exe (gitignored)
 - Phase 7 commit `2b1aa153590ad3d4eedfdb077f7272fb3b68cbb5`, pushed `b69d377..2b1aa15`; ls-remote matches. The scratch worktree was removed. Final torch check: 2.11.0+cu128, CUDA True. Stopped before T045.
+- Analyze revalidation drift (user approved fixing all of it inside the Execute claim):
+  - H1 (FR-023 processor fallback on XPU and DirectML) and L3 (torchaudio floor) → `ab7a9a8bd75155e2e`. Owns backend/backends/base.py, the generation.py refusal path if needed, requirements.txt and the availability tests.
+  - H2, M1–M6, L1, L2, L4, L5 → `aa35eec7f3b23fe77`. Owns spec.md, plan.md, data-model.md, quickstart.md, tasks.md detail and closing lines, contracts/ and checklists/requirements.md.
+  - Evidence: `evidence/revalidation/`. No new task ID; H1 is recorded as a follow-up under FR-023.
+- Revalidation results.
+  - The first H1 and docs workers (`ab7a9a8bd75155e2e`, `aa35eec7f3b23fe77`) were NOT terminated. Their output files were empty, but they finished.
+  - Retry workers `a486109342c5df525` (H1) and `a452cfc602978598f` (docs) overlapped with them. The H1 retry re-ran red, green and the full suite on the first worker's code. The docs retry stood down without editing.
+  - H1 commit `699f362`:
+    - base.py fallback, the torchaudio>=2.5.0 floor, test_cpu_fallback.py, and 5 existing tests in test_engine_capabilities.py moved to a test engine without "cpu".
+    - The orchestrator corrected the wav_bytes docstring: /speak saves through save_audio.
+    - JUnit: red 402/30, green 544/0. Orchestrator re-run: 544/0. Full suite: 1069 tests / 1 failure (baseline) / 9 skipped.
+    - T044's DirectML and XPU evidence is superseded (`evidence/revalidation/T044-directml-xpu-superseded.md`).
+  - Docs fixes are reviewed. The orchestrator corrected "non-persisted /speak" in data-model §6 and the plan.md Principle II row.
+  - Flags for the dispatcher:
+    - L5: there is no automatic unloading when two engines don't fit. The load fails, the generation is marked failed, and the user unloads through Model Management. Decide whether that meets the spec edge case.
+    - The warning shows the model display name "VoxCPM2 (Multilingual, Voice Design)" rather than "VoxCPM2".
+    - The Principle V checkboxes in engine-capabilities.md are still unchecked.
+    - The Key Entities text now names a code field (supports_voice_design).
+    - The tasks.md T054 detail and spec FR-026 still mention "non-persisted /speak" or "non-persisted API responses". This is dispatcher-owned task text and was left alone.

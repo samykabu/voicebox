@@ -41,7 +41,7 @@ checkbox selection; see the round-2 review log appended to spec.md for the audit
 
 | Was open | Resolved as | Applied to |
 | --- | --- | --- |
-| Ship an accelerator-only engine at all? | Ship on supported hardware; declared exception to processor fallback | FR-023 |
+| Ship an accelerator-only engine at all? | Ship on supported hardware; declared exception to processor fallback. **Superseded at T002** (2026-09-23): the exception is withdrawn and FR-023 now requires processor fallback | FR-023 |
 | Build the capability channel or record a divergence? | Build the smallest workable channel, VoxCPM2 only | FR-024, SC-009 |
 | Voice description input: reuse or separate? | Its own labelled input, shown only where supported | FR-015 |
 | Download size unmeasured | Measure it, and confirm before downloading | FR-018, SC-006 |

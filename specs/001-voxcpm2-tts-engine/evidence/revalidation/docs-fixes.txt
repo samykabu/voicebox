@@ -1,0 +1,101 @@
+# Documentation fixes after revalidation, 2026-09-23
+# Spec folder only. No code, docs/, .specify/, .agents/ or .claude/ touched. No task ID changed; all 56 boxes stay [x].
+# Format: finding -> file:line changed -> summary -> code source used to verify
+# Availability text describes the behaviour after the parallel H1 fix (processor fallback on XPU/DirectML),
+# taken from backend/tests/test_cpu_fallback.py (H1's test) and voxcpm_backend.py:62-65 (no allow_xpu/allow_directml).
+
+H2  data-model.md:98-130 (§3)
+    Rewritten around the designed profile. Two sources: designed profile (stored design_prompt, max 2000) and one-off request
+    voice_description (max 500, not stored; retry/regenerate reuse only instruct). Precedence per T048: recording > request
+    description > profile design_prompt. Dropped the "description only, no profile" and "neither" rows.
+    Verified: services/generation.py:69-120 (profile_design_prompt, resolve_backend_instruct), :227, :456;
+    routes/generations.py:121,165 and retry/regenerate (instruct=gen.instruct only); services/profiles.py:566-572;
+    backends/voxcpm_backend.py:239-244 (_apply_voice_description ignores it with a reference); models.py:108-111 (max 500);
+    backend models.py:28 (design_prompt max 2000); app/src/lib/hooks/engineCapabilityRules.ts:225.
+H2  data-model.md:228-240 (entity relationships) -> designed profile and one-off description shown separately.
+H2  quickstart.md:100-110 (Step 6)
+    Starts with "Describe a voice" in the profile dialog, then generates without and with a one-off description, then with a
+    cloned profile for the "not used" notice, and checks retry/regenerate.
+    Verified: ProfileForm.tsx:167,311-352,611-613; FloatingGenerateBox.tsx:168-171,683-685; translation.json:248,745.
+
+M1  contracts/tts-backend-protocol.md:6-9 -> protocol link fixed to #L85; notes the extra options keyword is not in the Protocol.
+M1  contracts/tts-backend-protocol.md:70 -> options is a VoxCPM2-specific keyword, not in TTSBackend; injected by
+    backend_with_generation_options only for engines declaring advanced_settings and only when settings are sent.
+M1  plan.md:48 (Principle III row) -> same correction.
+    Verified: backends/__init__.py:85,122-129 (Protocol generate has no options); services/generation.py:123-160;
+    voxcpm_backend.py:164-172.
+
+M2  tasks.md:131 (T025 detail) -> combines at 24000 Hz to match profiles.py's combined reference (contract amended 2026-09-23).
+    Verified: voxcpm_backend.py:47-50,162 (COMBINE_SAMPLE_RATE = 24000); services/profiles.py:625.
+
+M3  contracts/engine-capabilities.md:3 -> status "implemented; contract shape reviewed at T010".
+M3  contracts/engine-capabilities.md:47-57 -> example JSON: cfg_value max 3.0, float numbers, languages start zh/en/ar,
+    warning text in the resolver's real wording (uses the model display name).
+M3  contracts/engine-capabilities.md:81 -> removed "placeholders until the probe"; states the real bounds and source.
+M3  contracts/engine-capabilities.md:121-126 -> open item closed with the 30 codes, citing evidence/probe/15-language-list.txt.
+    Also :72, :74, :93 -> available/warning/invariant 6 describe the FR-023 processor fallback.
+    Verified: backends/__init__.py:548-549; backend/venv/.../voxcpm/cli.py:43-47,382,388 ("recommended 1.0–3.0", "4–30");
+    evidence/phase7/T042-registered.txt (field names and float serialisation); evidence/probe/15-language-list.txt:36
+    (count 30); backends/base.py:277-340 (_format_memory, warning wording); routes/models.py:424-440 (resolver gets the
+    default ModelConfig, so the warning names "VoxCPM2 (Multilingual, Voice Design)").
+
+M4  plan.md:31 -> memory constraint uses the probe figures (5.9 GB GPU peak, ~11 GB CPU RSS). Source: evidence/probe.md:48,127.
+M4  plan.md:33-38 -> "seven unknowns remain" replaced with the T002 decisions. Source: evidence/probe.md:131-146.
+M4  plan.md:47 (Principle II row) -> FR-026 covers every generated-audio surface; user recordings never tagged.
+    Verified: utils/audio.py:10-11,70-104,106-142; services/tts.py:27-31; routes/effects.py:50-53;
+    services/profiles.py:236-237,624-625; routes/transcription.py:55-56.
+M4  plan.md:51 (accelerator row) -> ROCm presents as CUDA; XPU/DirectML run VoxCPM2 on the processor with a warning.
+    Verified: voxcpm_backend.py:62-65; backend/tests/test_cpu_fallback.py.
+M4  plan.md:55 (CI row) -> release.yml edited in install steps only; runs-on unchanged; README red exception unaffected.
+    Verified: .github/workflows/release.yml:135,344,421 (the only diff vs main, 3 lines); runs-on at :18,:75,:322,:398
+    unchanged; README.md:439-455 (red exception).
+M4  plan.md:88-130 (Project Structure) -> added routes/generations.py, effects.py, transcription.py; services/generation.py,
+    tts.py, export_import.py; utils/audio.py; three new test files; ProfileForm.tsx designed source; Dockerfile; release.yml.
+    Verified: git diff main --name-only; Dockerfile:66.
+M4  plan.md:182-190 (post-design re-check) -> manifest 1.1, additive, 1.0 still imports; WAV INFO chunk added.
+    Verified: services/export_import.py:45-55,102-111,188-205.
+M4  plan.md:203-206 -> "two specification changes not made" replaced with what was decided at T002.
+
+M5  data-model.md:5-8 (intro) -> no longer claims "reused unchanged"; names §3, §6, §7.
+M5  data-model.md:151-172 (§5) -> "Reused, with the changes this feature made": save_audio and the effects preview writer
+    changed; processed versions are tagged; queue unchanged. Verified: services/generation.py:336,366,392,495.
+M5  data-model.md:174-201 (§6, new) -> RIFF LIST/INFO ICMT "AI-generated by Voicebox", ISFT "Voicebox" read back as
+    "Voicebox (libsndfile-1.2.2)"; table of tagged and untagged surfaces; disclosure=None writes no INFO chunk.
+    Verified: utils/audio.py:70-142; evidence/phase6/realrun-t051-tag.txt:108-113; local read-back with the project venv
+    (wav_bytes with disclosure=None -> comment '' software ''; default -> 'AI-generated by Voicebox',
+    'Voicebox (libsndfile-1.2.2)').
+M5  data-model.md:203-226 (§7, new) -> manifest 1.1 fields, no migration, 1.0 imports as cloned, designed/preset export
+    with no samples, personality not carried. Verified: services/export_import.py:45-55,78-84,102-111,188-205;
+    database/models.py:48-57 (existing columns, also present on main).
+M5  quickstart.md:112-126 (Step 6b, new) -> FR-025 sentence and link for all three sources; FR-026 soundfile one-liner,
+    tagged vs untagged files; FR-027 round-trip for cloned/designed/preset and a 1.0 manifest.
+    Verified: ProfileForm.tsx:72-73,926-944; translation.json:241; as for §6 and §7 above.
+
+M6  tasks.md:289 -> closing note replaced with "Decided at T002: US3 → P2, FR-023 exception withdrawn."
+M6  checklists/requirements.md:44 -> "Superseded at T002" note on the FR-023 row.
+M6  spec.md:206 -> one-line pointer under C1Q1: superseded at T002, FR-023 now requires processor fallback.
+    Source: evidence/probe.md:131-146; spec.md:144 (FR-023).
+
+L1  spec.md:7 -> Status: Implemented.
+
+L2  tasks.md:67 (T009 detail) -> adds min_memory_mb. Verified: backends/__init__.py:81.
+L2  tasks.md:240-245 (dependency block) -> T048-T054 and T055/T056 added, matching workflow/task-dependencies.json
+    (not edited).
+L2  tasks.md:260-262 (parallel table) -> rows for T048/T049, T050/T051/T052 (T053/T054 after T051), T055/T056.
+
+L4  spec.md:155-157 (Key Entities) -> three profile sources (cloned, preset, designed) and the voice-design capability.
+    Verified: database/models.py:32-51 (voice_type cloned|preset|designed); backends/__init__.py:78.
+
+L5  tasks.md:291-294 (Notes) -> "covered by existing mechanism" notes.
+    Language switch: EngineModelSelector.tsx:97-154 (applyEngineSelection keeps or resets to the first declared language);
+    lib/constants/languages.ts:98-106 (no voxcpm entry, so the declared list is used; Qwen list before capabilities load).
+    Two engines in memory: backends/__init__.py:717-726 (load_engine_model), :876-945 (one cached backend per engine, no
+    eviction), :754-793 (unload_model_by_config); voxcpm_backend.py:81-111 (self.model set only on success);
+    services/generation.py run_generation except-block (status "failed" with the error); routes/models.py:73-86;
+    ModelManagement.tsx:419-425 (unload in the UI).
+
+Also corrected while verifying (not in the brief):
+- data-model.md:44-45,50 -> VoxCPM2 instance rows: real advanced-setting ranges, language source, min_memory_mb = 6144
+  (backends/__init__.py:508,545-549).
+- data-model.md:73-90 (§2) and quickstart.md:96-97 (Step 5) -> FR-023 processor-fallback row, and the unavailable path now
+  exercised only through injected configs in the resolver tests.

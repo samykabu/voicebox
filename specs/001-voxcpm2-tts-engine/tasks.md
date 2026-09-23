@@ -64,7 +64,7 @@ beneath it.
 - [x] T008 [TDD] Test engine availability resolution in backend/tests/test_engine_capabilities.py
   - Write `backend/tests/test_engine_capabilities.py` covering availability resolution per [data-model.md](./data-model.md) §2 and the invariants in [contracts/engine-capabilities.md](./contracts/engine-capabilities.md): empty `accelerators` → available with no reason; detected accelerator in the declared set → available; not in the set → unavailable **with** a reason; supported but marginal memory → available with a warning, never blocked (C1Q4); `available == false` always implies `reason != null`. Use injected device and memory values — no torch. Watch it fail. **Covers**: FR-002, FR-003, FR-004.
 - [x] T009 Add capability fields to ModelConfig and the availability resolver in backends/base.py
-  - Add `accelerators: tuple[str, ...] = ()`, `supports_voice_design: bool = False`, `requires_download_confirmation: bool = False` and `advanced_settings: tuple[AdvancedSetting, ...] = ()` to `ModelConfig` in `backend/backends/__init__.py` per [data-model.md](./data-model.md) §1, and implement the availability resolver in `backend/backends/base.py` with torch imported lazily (`# lazy: heavy import`). Every default preserves today's behaviour, so all seven existing engines are unchanged. T008 passes. **Covers**: FR-002, FR-004, FR-024.
+  - Add `accelerators: tuple[str, ...] = ()`, `supports_voice_design: bool = False`, `requires_download_confirmation: bool = False`, `advanced_settings: tuple[AdvancedSetting, ...] = ()` and `min_memory_mb: int | None = None` (added after the T010 code review, drives the C1Q4 memory warning) to `ModelConfig` in `backend/backends/__init__.py` per [data-model.md](./data-model.md) §1, and implement the availability resolver in `backend/backends/base.py` with torch imported lazily (`# lazy: heavy import`). Every default preserves today's behaviour, so all seven existing engines are unchanged. T008 passes. **Covers**: FR-002, FR-004, FR-024.
 - [x] T010 [REVIEW] Add GET /models/engines and the optional GenerationRequest fields
   - Add the Pydantic response models to `backend/models.py` and `GET /models/engines` to `backend/routes/models.py`, per [contracts/engine-capabilities.md](./contracts/engine-capabilities.md). Add the two optional `GenerationRequest` fields from the contract, `voice_description` and `advanced_settings`, both defaulting to `None`, with 422 validation against the engine's declared bounds. Extend `test_engine_capabilities.py` with a route test and a validation test. The endpoint must never load a model or trigger a download. **Review the contract shape before T011** — it is a public surface under Principle V and plan.md Human Checkpoint 2. **Covers**: FR-004, FR-024.
 - [x] T011 Regenerate the TypeScript client with bun run generate:api
@@ -128,7 +128,7 @@ beneath it.
 **Independent Test**: [quickstart.md](./quickstart.md) Step 4.
 
 - [x] T025 [TDD] [US2] Test VoxCPM2 voice prompt caching, pairing and seeding
-  - Extend `backend/tests/test_voxcpm_backend.py`: `create_voice_prompt` uses the `"voxcpm_"` cache-key prefix, returns both `prompt_wav_path` and `prompt_text`, and reports `was_cached=True` on the second call; `generate` never passes exactly one of the pair (the vendor raises); `combine_voice_prompts` uses the model's encode rate, not a literal; the same seed produces identical fake output. Watch it fail. **Covers**: FR-009, FR-011, FR-012, FR-013.
+  - Extend `backend/tests/test_voxcpm_backend.py`: `create_voice_prompt` uses the `"voxcpm_"` cache-key prefix, returns both `prompt_wav_path` and `prompt_text`, and reports `was_cached=True` on the second call; `generate` never passes exactly one of the pair (the vendor raises); `combine_voice_prompts` combines at 24000 Hz, matching the combined reference `backend/services/profiles.py` saves (contract amended 2026-09-23; this replaces the earlier "model's encode rate" rule, and VoxCPM2 resamples its prompt to 16 kHz itself); the same seed produces identical fake output. Watch it fail. **Covers**: FR-009, FR-011, FR-012, FR-013.
 - [x] T026 [US2] Implement VoxCPM2 voice prompts, multi-clip combining and seeding
   - Implement `create_voice_prompt`, `combine_voice_prompts` (delegating to the shared helper in `backends/base.py`) and seeding with `manual_seed` in `backend/backends/voxcpm_backend.py`. T025 passes. **Covers**: FR-009, FR-011, FR-012, FR-013.
 - [x] T027 [P] [US2] Add voxcpm to CLONING_ENGINES in backend/services/profiles.py
@@ -238,8 +238,11 @@ Phase 3 US1 (T014 → T015 → T016; T017, T018 parallel; T019–T023 after T013
 Phase 4 US2 (T025 → T026; T027 parallel; T028 after T013)      needs T015
 Phase 5 US3 (T029 → T030; T031, T032 after T013; T033 last)    needs T009, T016
 Phase 6 US4 (T034 → T035 → T036 → T037)                         needs T015 and T001's prompt form
+            T048 after T035; T049 after T036 + T013; T050 and T052 after T049;
+            T051 after T015; T053 and T054 after T051; T037 closes after T048–T052
       ↓
-Phase 7 (T038–T040 parallel any time after T016; T041–T045 after all stories)
+Phase 7 (T038–T040 parallel any time after T016; T055 after T004 + T005; T056 after T038–T040;
+         T041–T044 after all stories; T045 last, after T055 and T056)
 ```
 
 ### Within each story
@@ -254,6 +257,9 @@ Phase 7 (T038–T040 parallel any time after T016; T041–T045 after all stories
 | Frozen build | T017 | Only `build_binary.py` |
 | Docs | T038, T039, T040 | No code files |
 | Cloning backend vs. availability refusal | T025–T027 vs. T029–T030 | Different files, both only need Phase 2 and T015 |
+| Designed profile | T048 vs. T049 | Backend `services/generation.py` vs. frontend `ProfileForm.tsx` |
+| Principle II follow-ups (T037) | T050 vs. T051 vs. T052 | `ProfileForm.tsx` vs. `utils/audio.py` vs. `services/export_import.py`. T053 and T054 follow T051, since they extend the same writer |
+| Release and remaining docs | T055 vs. T056 | `release.yml` and `Dockerfile` vs. docs only |
 
 Backend engine work (T014–T016) and install plumbing (T003–T005) are the plan's named parallel pair after the probe.
 
@@ -280,4 +286,9 @@ Per the project's standing preference, execution commits and pushes at each phas
 
 **Offline load added during Analyze (finding C1).** Principle I requires a cached model to load with no network. `voxcpm` depends on `modelscope`, which the existing HuggingFace offline switch does not cover, and `force_offline_if_cached` had no backend caller. T046 and T047 close that gap. Their IDs follow T045 to keep existing IDs stable, and they sit in Phase 3 where they belong.
 
-**Research recommendations still pending a human decision (T002).** User Story 3's P1 rating and FR-023's exception both rest on a CUDA-only risk that research R2 showed is not real. They are left as written here — changing them is a spec decision, not a task-generation one.
+**Decided at T002: US3 → P2, FR-023 exception withdrawn.** Recorded in [evidence/probe.md](./evidence/probe.md), "T002 decisions", with the `voxcpm==2.0.3` pin and the effort re-score from 13 to 8.
+
+**Edge cases covered by existing mechanisms** (spec.md, Edge Cases). No task was added for these two; this note records what actually happens.
+
+- *Switching to VoxCPM2 with a language it does not list.* `applyEngineSelection` in `app/src/components/Generation/EngineModelSelector.tsx` (about lines 97-154) keeps the current language when VoxCPM2's declared list contains it and otherwise resets it to the first declared language (`zh`, model-card order), or `en` if the list is empty. The list comes from `getLanguageOptionsForEngine` with the capability's `languages` (T020). Before the capabilities load, it falls back to the Qwen list.
+- *Two engines that do not both fit in memory.* There is no automatic unloading. Each engine keeps its own backend instance (`get_tts_backend_for_engine` in `backend/backends/__init__.py`), and `load_engine_model` loads VoxCPM2 without unloading the engine already loaded. The serial queue (`services/task_queue.py`) runs one inference at a time. If VoxCPM2 does not fit, its load raises, the generation is marked failed with the error, and VoxCPM2 stays not loaded, because `self.model` is set only after a successful load. The engine that was already loaded keeps working. The user frees memory by unloading a model in Model Management (`POST /models/{model_name}/unload`, FR-017), and the memory warning (C1Q4) flags a marginal machine before the download.

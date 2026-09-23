@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-22
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: GitHub issue [samykabu/voicebox#13](https://github.com/samykabu/voicebox/issues/13) — scoped at effort 13, kept whole as a single executable issue by explicit user decision.
 
@@ -152,9 +152,9 @@ A user who wants a particular kind of voice but has nothing to clone from writes
 
 ### Key Entities
 
-- **Speech engine**: A named way of turning text into audio. Carries its own identity, display name, licence and commercial-use status, supported languages, download size, and — new with this feature — the hardware it can run on and whether it can clone.
-- **Voice profile**: A user-created voice, holding one or more reference audio clips and their transcripts. Existing entity; this feature makes it usable with a new engine.
-- **Voice description**: A short written description of a desired voice, used in place of reference audio. New with this feature.
+- **Speech engine**: A named way of turning text into audio. Carries its own identity, display name, licence and commercial-use status, supported languages, download size, and — new with this feature — the hardware it can run on, whether it can clone, and whether it can design a voice from a written description (its voice-design capability, `supports_voice_design`).
+- **Voice profile**: A user-created voice. Existing entity, with three sources: cloned (one or more reference audio clips and their transcripts), preset (a built-in voice of a specific engine), and designed (a written description, new in use with this feature, offered only for engines with the voice-design capability). This feature makes cloned and designed profiles usable with the new engine.
+- **Voice description**: A short written description of a desired voice, used in place of reference audio. It is either stored on a designed profile or supplied once with a generation. New with this feature.
 - **Prepared voice reference**: The reusable result of processing a profile's reference audio for a particular engine, kept so the same work is not repeated.
 
 ## Success Criteria *(mandatory)*
@@ -203,6 +203,7 @@ A user who wants a particular kind of voice but has nothing to clone from writes
 
 - C1Q1: answered. Checkbox selection A, exactly one original option checked on the question comment. Ship on supported hardware with a clear unavailable state everywhere else. Resolves FR-023: an accelerator-only engine is accepted as a deliberate, declared exception to the processor-fallback expectation, conditional on the unavailable state being explicit. Applied to FR-023 and reinforced by the FR-003 edit. Evidence: https://github.com/samykabu/voicebox/issues/13#issuecomment-5781571879
   Checkbox selection observed: A — Ship it on supported hardware, with a clear unavailable state everywhere else.
+  Superseded at T002 (2026-09-23): the exception is withdrawn, and FR-023 now requires processor fallback, because the probe confirmed a working processor path (evidence/probe.md, "T002 decisions").
 - C1Q2: answered. Checkbox selection A, exactly one original option checked on the question comment. Build the smallest real capability channel and use it for VoxCPM2 only. Resolves FR-024: the feature builds the declared-capability mechanism rather than recording a divergence, and explicitly does not migrate the seven existing engines. Applied to FR-024 and to SC-009, whose conditional qualifier is now removed. Evidence: https://github.com/samykabu/voicebox/issues/13#issuecomment-5781572294
   Checkbox selection observed: A — Build the smallest real channel and use it for VoxCPM2 only.
 - C1Q3: answered. Checkbox selection A, exactly one original option checked on the question comment. Show the engine greyed out everywhere with a specific reason. Resolves the hidden-or-disabled ambiguity that made User Story 3 untestable. Applied to FR-003, which previously permitted either behaviour. Evidence: https://github.com/samykabu/voicebox/issues/13#issuecomment-5781572643

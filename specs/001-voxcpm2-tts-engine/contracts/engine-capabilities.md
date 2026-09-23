@@ -1,6 +1,6 @@
 # Contract: Engine Capabilities
 
-**Feature**: `specs/001-voxcpm2-tts-engine` | **Status**: proposed, requires review before implementation
+**Feature**: `specs/001-voxcpm2-tts-engine` | **Status**: implemented; contract shape reviewed at T010 (2026-09-23)
 
 This is the capability channel required by FR-004 and FR-024 and settled by clarification
 C1Q2 ("build the smallest real channel and use it for VoxCPM2 only"). It exists because
@@ -44,16 +44,16 @@ Read-only. No parameters. No authentication beyond whatever the backend already 
       "display_name": "VoxCPM2",
       "available": true,
       "reason": null,
-      "warning": "This machine has about 6 GB of graphics memory. VoxCPM2 usually needs more, so generation may fail.",
+      "warning": "This machine has about 4 GB of graphics memory. VoxCPM2 (Multilingual, Voice Design) usually needs about 6 GB, so generation may fail.",
       "supported_accelerators": ["cuda", "mps", "cpu"],
       "detected_accelerator": "cuda",
-      "languages": ["ar", "en", "zh", "..."],
+      "languages": ["zh", "en", "ar", "..."],
       "supports_cloning": true,
       "supports_voice_design": true,
       "requires_download_confirmation": true,
       "advanced_settings": [
-        {"name": "cfg_value", "label": "Guidance", "default": 2.0, "min": 1.0, "max": 5.0},
-        {"name": "inference_timesteps", "label": "Quality steps", "default": 10, "min": 4, "max": 30}
+        {"name": "cfg_value", "label": "Guidance", "default": 2.0, "min": 1.0, "max": 3.0},
+        {"name": "inference_timesteps", "label": "Quality steps", "default": 10.0, "min": 4.0, "max": 30.0}
       ],
       "size_mb": 4961,
       "license_id": "Apache-2.0",
@@ -69,16 +69,16 @@ Read-only. No parameters. No authentication beyond whatever the backend already 
 | --- | --- | --- |
 | `engine` | `string` | Stable identifier. Matches the engine regex in `backend/models.py`. |
 | `display_name` | `string` | The engine's name from `TTS_ENGINES` (for example "TADA"), not a model variant's name. |
-| `available` | `boolean` | False only when the detected accelerator is not in `supported_accelerators`. Memory is never a hard gate (C1Q4). |
+| `available` | `boolean` | False only when the detected accelerator is not in `supported_accelerators` **and** `"cpu"` is not declared either. When `"cpu"` is declared, the engine stays available and runs on the processor, with a `warning` saying so (FR-023; VoxCPM2 on an Intel XPU or DirectML machine). Memory is never a hard gate (C1Q4). |
 | `reason` | `string \| null` | Non-null **if and only if** `available` is false. A specific, user-facing sentence — FR-003 forbids a bare disabled control with no explanation. |
-| `warning` | `string \| null` | Non-null when the engine is usable but the machine looks marginal. Advisory only; never blocks. |
+| `warning` | `string \| null` | Non-null when the engine is usable but the machine looks marginal: memory below `min_memory_mb`, or a processor fallback because the detected accelerator is not declared. Advisory only; never blocks. |
 | `supported_accelerators` | `string[]` | Echo of the declaration. An **empty array means unconstrained**, which is how all seven existing engines report, preserving today's behaviour exactly. |
 | `detected_accelerator` | `string` | What this machine actually resolved to via `get_torch_device`. Lets the UI explain the mismatch. |
 | `languages` | `string[]` | The union of languages across **all** of the engine's model variants, in a stable order. Replaces the app's hardcoded per-engine map for this engine (FR-007). |
 | `supports_cloning` | `boolean` | Derived from `CLONING_ENGINES`. |
 | `supports_voice_design` | `boolean` | True only for engines accepting a written voice description. Drives whether the FR-015 input is shown at all. |
 | `requires_download_confirmation` | `boolean` | When true, the app asks the user to confirm before downloading (FR-018, C1Q7). False for every existing engine. |
-| `advanced_settings` | `object[]` | Settings the app may show as advanced controls, each with `name`, `label`, `default`, `min`, `max` (FR-010, C1Q8). Empty for every existing engine. Bounds are placeholders until the probe (T001) confirms them. |
+| `advanced_settings` | `object[]` | Settings the app may show as advanced controls, each with `name`, `label`, `default`, `min`, `max`, all numbers serialised as floats (FR-010, C1Q8). Empty for every existing engine. VoxCPM2 declares `cfg_value` 1.0–3.0 (default 2.0) and `inference_timesteps` 4–30 (default 10): the "recommended" ranges in voxcpm 2.0.3 `cli.py`, declared at `backend/backends/__init__.py:548-549`. |
 | `size_mb` | `integer` | Download size of the engine's **default** variant, the one downloaded by default. Shown in the FR-018 confirmation dialog. |
 | `license_id` | `string \| null` | The value shared by all of the engine's variants; `null` when they disagree (for example F5-TTS, whose Habibi variants mix Apache-2.0 and CC-BY-NC-SA-4.0), so no caller is told a variant is commercial when it is not. |
 | `commercial_use` | `boolean \| null` | Same rule as `license_id`. |
@@ -90,7 +90,7 @@ Read-only. No parameters. No authentication beyond whatever the backend already 
 3. `warning` and `reason` are independent: an unavailable engine carries a reason, not a warning.
 4. The endpoint never triggers a model download, never loads a model, and never imports torch at module scope — availability is computed from already-detected device state (Principle III, lazy heavy imports).
 5. The response is stable within a process run for a given machine; it is not user-specific.
-6. `warning` is produced only when the engine's default variant declares `min_memory_mb` and the detected memory is below it. Engines that declare none never warn.
+6. `warning` has two sources. A memory warning is produced only when the engine's default variant declares `min_memory_mb` and the detected memory is below it. A processor-fallback warning is produced when the detected accelerator is not declared but `"cpu"` is; the memory warning does not apply then (FR-023). Engines that declare no accelerators never warn.
 7. Every field describes the **engine**, aggregated across its variants as stated above. Amended after the T010 code review on 2026-09-23.
 
 ---
@@ -118,7 +118,9 @@ Adding this endpoint requires **all of the following in the same change**:
 
 ---
 
-## Open item
+## Closed item: the 30-language list
 
-The exact 30-language list is confirmed by the dependency probe before this contract is
-implemented. `ar` is required to be present (FR-007); the rest come from upstream.
+Closed by the dependency probe. The model card lists 30 codes, `ar` among them (FR-007):
+zh, en, ar, my, da, nl, fi, fr, de, el, he, hi, id, it, ja, km, ko, lo, ms, no, pl, pt, ru,
+es, sw, sv, tl, th, tr, vi. VoxCPM2 declares them in that order. Source:
+evidence/probe/15-language-list.txt; the served list is in evidence/phase7/T042-registered.txt.

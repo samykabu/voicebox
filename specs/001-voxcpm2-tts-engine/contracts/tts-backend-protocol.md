@@ -3,9 +3,10 @@
 **Feature**: `specs/001-voxcpm2-tts-engine` | **Date**: 2026-09-22
 
 How `backend/backends/voxcpm_backend.py` satisfies the existing protocol in
-[backend/backends/__init__.py](../../../backend/backends/__init__.py#L68). The protocol is
+[backend/backends/__init__.py](../../../backend/backends/__init__.py#L85). The protocol is
 unchanged by this feature — this is a conformance contract for a new implementation, not a
-protocol revision.
+protocol revision. VoxCPM2's `generate` takes one extra keyword, `options`, that is not part
+of the `TTSBackend` Protocol (see below).
 
 Signatures below are verified against upstream `main` (research.md R5), not assumed from
 the source issue.
@@ -66,7 +67,7 @@ Four rules this call must respect:
 
 `instruct` carries the written voice description (FR-015). The API keeps the two apart: the request's `voice_description` field, not its `instruct` field. The generation service maps `voice_description` into this parameter only for engines declaring `supports_voice_design`, and VoxCPM2 declares `supports_instruct=False`, so delivery instructions never reach it. Existing backends see no change. The exact encoding into `text` (the documented `"(description)text"` prefix) is confirmed by the probe before this is written (research.md R6). When a voice profile with reference audio is present, the description is inactive (C1Q6).
 
-`options: dict[str, float] | None = None` is an **additive, optional** protocol parameter carrying the request's `advanced_settings` (FR-010). The generation service passes it only to engines whose `ModelConfig.advanced_settings` is non-empty, so the eight existing backends are never called with it and need no change. VoxCPM2 maps `cfg_value` and `inference_timesteps` from it, falling back to the declared defaults.
+`options: dict[str, float] | None = None` is a **backend-specific keyword** on VoxCPM2's `generate`, carrying the request's `advanced_settings` (FR-010). It is **not** part of the `TTSBackend` Protocol, whose `generate` signature is unchanged. The generation service injects it: `backend_with_generation_options` in `backend/services/generation.py` wraps the backend so that `generate` receives `options=...`, and does so only for engines whose `ModelConfig.advanced_settings` is non-empty and only when the request carries settings. The eight existing backends are never wrapped, never called with it, and need no change. VoxCPM2 maps `cfg_value` and `inference_timesteps` from it, falling back to the declared defaults.
 
 ## `unload_model() -> None`
 
