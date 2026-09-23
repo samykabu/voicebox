@@ -1,21 +1,26 @@
 ---
 title: "Creating Voice Profiles"
-description: "How to create voice profiles, both cloning-based and preset-based"
+description: "How to create voice profiles: cloned, preset and designed from a description"
 ---
 
 ## Overview
 
-A **voice profile** is a saved voice you can reuse across generations, stories, and the API. As of 0.4, Voicebox profiles come in two flavors that map to two different ways of getting a voice:
+A **voice profile** is a saved voice you can reuse across generations, stories, and the API. Voicebox profiles come in three flavors that map to three different ways of getting a voice. In the profile dialog they are the three sources: **Clone from audio**, **Built-in voice** and **Describe a voice**.
 
 | Profile type   | What it stores                                       | Use when…                                                |
 | -------------- | ---------------------------------------------------- | -------------------------------------------------------- |
 | **Cloned**     | One or more reference audio samples + a voice embedding | You want to replicate a specific person's voice          |
 | **Preset**     | A reference to a pre-built voice in a specific engine | You want a curated, production-ready voice with no audio prep |
+| **Designed**   | A written description of the voice                    | You want a new voice and have no recording to clone from |
 
-Both types live in the same Profiles tab and behave the same way at generation time — pick the type that matches your goal and follow the workflow below.
+All three types live in the same Profiles tab and behave the same way at generation time — pick the type that matches your goal and follow the workflow below.
 
 <Callout type="info">
-  Not sure which to use? Cloning gives you a *specific* voice but needs clean audio. Preset gives you *good* voices instantly but you don't get to choose who they sound like.
+  Not sure which to use? Cloning gives you a *specific* voice but needs clean audio. Preset gives you *good* voices instantly but you don't get to choose who they sound like. Designed lets you describe the voice you want, but the result varies from one generation to the next more than a clone does.
+</Callout>
+
+<Callout type="warn">
+  The profile dialog shows this line for every source: "Only create voices you have the right to use." It links to the [Responsible Use](https://github.com/samykabu/voicebox/blob/main/RESPONSIBLE_USE.md) guide. Read it before cloning anyone's voice.
 </Callout>
 
 ## Workflow A — Cloned Profiles
@@ -27,10 +32,10 @@ Use this when you want to replicate a specific person's voice from a recording.
     10-30 seconds of clear speech, minimal background noise. See [Voice Cloning](/overview/voice-cloning) for the engine catalog.
   </Step>
   <Step title="Create Profile">
-    **Profiles** → **+ New Profile** → choose a cloning engine (Qwen3-TTS, Chatterbox Multilingual, Chatterbox Turbo, LuxTTS, or TADA)
+    **Profiles** → **+ New Profile** → choose a cloning engine (Qwen3-TTS, Chatterbox Multilingual, Chatterbox Turbo, LuxTTS, TADA, F5-TTS or VoxCPM2)
   </Step>
   <Step title="Upload or Record Sample">
-    Drag in an audio file, or record directly with the in-app recorder
+    Drag in an audio file, or record directly with the in-app recorder. Enter the exact words spoken in the sample. VoxCPM2 cannot clone without this transcript
   </Step>
   <Step title="Generate to Test">
     Use the profile to generate a test phrase. If quality is poor, add more samples
@@ -225,6 +230,29 @@ Preset voices in Qwen CustomVoice support **delivery instructions** — natural-
 
 See [Preset Voices → Using Instruct Mode](/overview/preset-voices#using-instruct-mode) for examples.
 
+## Workflow C — Designed Profiles
+
+Use this when you want a new voice and have nothing to clone from. You write a description and the engine creates a voice that matches it. Only engines that support voice design offer this source. Today that is **VoxCPM2**.
+
+<Steps>
+  <Step title="Choose the Source">
+    **Profiles** → **+ New Profile** → **Describe a voice**. The option appears only when an engine supports voice design
+  </Step>
+  <Step title="Describe the Voice">
+    Write how it should sound: age, gender, tone, pace, accent. For example, "A calm older woman with a low, warm voice". Any language works. Up to 2000 characters
+  </Step>
+  <Step title="Name and Save">
+    No audio sample is needed. The description can't be changed later; create a new profile to try a different one
+  </Step>
+  <Step title="Generate">
+    Pick the profile with VoxCPM2 and generate. Each generation uses the saved description
+  </Step>
+</Steps>
+
+<Callout type="info">
+  The same text and seed give the same audio. A different seed may give a noticeably different voice from the same description.
+</Callout>
+
 ## Advanced Tips
 
 ### Celebrity / Character Voices (Cloning)
@@ -265,10 +293,14 @@ For Qwen CustomVoice presets, use the **instruct** field instead of relying on s
 
 ### Export / Import
 
-- **Export** profiles to share or backup
+- **Export** profiles to share or backup. The file is a ZIP
 - **Import** from colleagues or teammates
-- **Cloned profiles** export with their voice embeddings (not the original audio)
+- **Cloned profiles** export with their audio samples and reference text
 - **Preset profiles** export as engine + voice ID metadata only — the importer must have that engine's model installed
+- **Designed profiles** export with their written description and no audio
+- Every export keeps how the voice was made: its type, its description and its default engine. Import restores them, so a designed or preset profile does not come back as a clone
+- Profiles exported by older versions still import, as cloned profiles
+- The personality is not exported
 
 ## Next Steps
 

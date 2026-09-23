@@ -5,7 +5,7 @@ description: "How text-to-speech generation works across Voicebox's multi-engine
 
 ## Overview
 
-Voicebox ships seven TTS engines — Qwen3-TTS, Qwen CustomVoice, LuxTTS, Chatterbox Multilingual, Chatterbox Turbo, TADA, and Kokoro — behind a single `TTSBackend` Protocol. All of them expose the same async interface so the routes and services don't need per-engine branching.
+Voicebox ships nine TTS engines — Qwen3-TTS, Qwen CustomVoice, LuxTTS, Chatterbox Multilingual, Chatterbox Turbo, TADA, Kokoro, F5-TTS and VoxCPM2 — behind a single `TTSBackend` Protocol. All of them expose the same async interface so the routes and services don't need per-engine branching.
 
 This page covers how generation flows through that abstraction. For the step-by-step guide to adding a new engine, see [TTS Engines](/developer/tts-engines).
 
@@ -35,6 +35,8 @@ class TTSBackend(Protocol):
     def is_loaded(self) -> bool: ...
 ```
 
+`generate()` may also take an optional `options: dict[str, float] | None = None` argument, the request's `advanced_settings`. The service passes it only to engines whose `ModelConfig` declares `advanced_settings`, by wrapping the backend (`backend_with_generation_options()` in `services/generation.py`). Engines that declare none are called exactly as before and do not need the argument. VoxCPM2 is the only engine that takes it today.
+
 ## The `ModelConfig` Registry
 
 Each downloadable model variant is described by a `ModelConfig` dataclass:
@@ -52,7 +54,18 @@ class ModelConfig:
     retries_runaway: bool = False
     supports_instruct: bool = False
     languages: list[str] = field(default_factory=lambda: ["en"])
+    license_id: Optional[str] = None
+    commercial_use: Optional[bool] = None
+    dialect: Optional[str] = None
+    # Capability declarations. Every default keeps an engine's behaviour as it was.
+    accelerators: tuple[str, ...] = ()          # empty = unconstrained
+    supports_voice_design: bool = False
+    requires_download_confirmation: bool = False
+    advanced_settings: tuple[AdvancedSetting, ...] = ()
+    min_memory_mb: int | None = None             # below it: an advisory warning only
 ```
+
+`GET /models/engines` reports these per engine, together with whether this machine can run it. See [TTS Engines](/developer/tts-engines#the-capability-channel).
 
 Registry helpers in `backends/__init__.py` replace what used to be per-engine `if/elif` chains:
 
@@ -75,6 +88,8 @@ TTS_ENGINES = {
     "chatterbox_turbo": "Chatterbox Turbo",
     "tada": "TADA",
     "kokoro": "Kokoro",
+    "f5_tts": "F5-TTS",
+    "voxcpm": "VoxCPM2",
 }
 ```
 
@@ -89,11 +104,13 @@ encoded = model.encode_prompt(audio_path)
 return encoded, False  # (prompt_dict, was_cached)
 ```
 
-**Pattern B — Deferred file paths** (Chatterbox, Chatterbox Turbo, TADA)
+**Pattern B — Deferred file paths** (Chatterbox, Chatterbox Turbo, TADA, VoxCPM2)
 
 ```python
 return {"ref_audio": audio_path, "ref_text": reference_text}, False
 ```
+
+VoxCPM2 uses the keys `prompt_wav_path` and `prompt_text`. Both are required, so a VoxCPM2 clone needs each sample's transcript.
 
 **Pattern C — Preset voice pointer** (Kokoro, Qwen CustomVoice)
 
@@ -106,6 +123,8 @@ return {
 ```
 
 Pattern C is the shape used for profiles where `voice_type == "preset"` — there's no cloning step; the engine looks up a baked-in voice by ID.
+
+**Designed profiles** (`voice_type == "designed"`) have no audio. `create_voice_prompt_for_profile()` returns `{"voice_type": "designed", "design_prompt": ...}` instead of calling the engine. See [Voice Design](#voice-design).
 
 Engines that cache voice prompts prefix their cache keys to avoid collisions:
 
@@ -125,6 +144,8 @@ Engines pick their device through `get_torch_device()` in `backends/base.py`, wh
 
 Qwen TTS uses MLX directly on Apple Silicon instead of going through PyTorch — see `mlx_backend.py`.
 
+VoxCPM2 allows MPS but not XPU or DirectML, because the vendor accepts only `cpu`, `mps` and `cuda`. It declares `accelerators=("cuda", "mps", "cpu")`, so on an XPU or DirectML machine it is reported unavailable (see the availability check in the flow below).
+
 ## Generation Flow
 
 The request path from frontend to audio file:
@@ -142,9 +163,15 @@ The request path from frontend to audio file:
      "max_chunk_chars": 800
    }
    ```
-   The `engine` field is validated against the regex `^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro)$`.
+   The `engine` field is validated against the regex `^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$`.
+
+   Two optional fields default to `null`, so existing callers are unaffected:
+   - `voice_description` — up to 500 characters. Used only by engines that declare `supports_voice_design`. It is never sent as `instruct`.
+   - `advanced_settings` — a map of setting name to number, e.g. `{"cfg_value": 2.0, "inference_timesteps": 10}`. Only names the engine declares are allowed, within their bounds. Anything else returns 422.
 
 2. **Route** — `routes/generate.py` validates input and delegates.
+
+   **Availability** — before any row change, model load or download, the route checks the engine against this machine (`ensure_engine_available()`). An engine whose declared `accelerators` do not include this machine's accelerator is refused with a 400. The detail is the reason, e.g. "… can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using Intel XPU." `/generate`, `/generate/stream`, retry and regenerate all check. Engines that declare no accelerators are never refused this way.
 
 3. **Service** — `services/generation.py` fetches the profile, resolves the engine backend via `get_tts_backend_for_engine(engine)`, and ensures the model is loaded (downloading it on first use with live progress).
 
@@ -156,7 +183,7 @@ The request path from frontend to audio file:
 
 7. **Validate and post-process** — engines with `retries_runaway=True` retry unstable output as smaller chunks. If `engine_needs_trim(engine)` is True, `trim_tts_output()` strips trailing silence. Effects chains (if any) are applied per generation version, not the clean version.
 
-8. **Persist** — audio is written to the generations directory, a row is inserted into the `generations` table, and the response includes the generation metadata.
+8. **Persist** — audio is written to the generations directory with `save_audio()`, a row is inserted into the `generations` table, and the response includes the generation metadata. Every WAV written this way carries the AI-generated label (see [AI-Generated Label](#ai-generated-label)).
 
 ## Chunking for Long Text
 
@@ -178,6 +205,54 @@ Two engines support natural-language delivery control via the `instruct` kwarg:
 
 Other engines ignore `instruct` entirely.
 
+A voice description is not an instruction. It travels in its own `voice_description` field. VoxCPM2 declares `supports_instruct=False`, so delivery instructions never reach it, and the app does not show the instruction box for it.
+
+## Voice Design
+
+An engine that declares `supports_voice_design` can create a voice from a written description instead of reference audio. The description comes from one of two places:
+
+- the request's `voice_description`, which the app sends from the generate box's "Voice description" input
+- a designed profile's saved `design_prompt`, created with the "Describe a voice" source
+
+`resolve_backend_instruct()` in `services/generation.py` decides what the backend's `instruct` parameter receives. It reads capability flags, never engine names:
+
+| Engine declares | Backend `instruct` gets |
+|-----------------|-------------------------|
+| No `supports_voice_design` | The request's `instruct`, unchanged. `voice_description` is dropped |
+| `supports_voice_design` | The request's `voice_description` if not blank, else the designed profile's `design_prompt`, else `instruct` only if the engine also declares `supports_instruct`, else nothing |
+
+Precedence, in order:
+
+1. **Reference audio wins.** If the profile has a recording, the backend clones from it and ignores any description. The app says the description is not used.
+2. The request's `voice_description`.
+3. The designed profile's saved `design_prompt`.
+
+VoxCPM2 encodes the description as an ASCII prefix: `"(description)text"`. A description in any language is accepted.
+
+Retry and regenerate do not keep a one-off `voice_description`. A designed profile's own description is reused, because it comes from the profile. A description typed for one request is not.
+
+## Advanced Settings
+
+An engine may declare `advanced_settings`, each an `AdvancedSetting(name, label, default, min, max)`. The app renders them as sliders with the defaults preselected and sends them as `advanced_settings`. VoxCPM2 declares:
+
+| Name | Label | Default | Min | Max |
+|------|-------|---------|-----|-----|
+| `cfg_value` | Guidance | 2.0 | 1.0 | 3.0 |
+| `inference_timesteps` | Quality steps | 10 | 4 | 30 |
+
+The settings are not stored with a generation. Regenerate, retry and `/speak` use the engine's defaults.
+
+## AI-Generated Label
+
+Every audio file Voicebox generates carries the comment "AI-generated by Voicebox" in its RIFF `LIST/INFO` chunk: `ICMT` holds the comment and `ISFT` is set to "Voicebox". The samples are unchanged. Two helpers in `backend/utils/audio.py` write it, both defaulting to `AI_GENERATED_DISCLOSURE`:
+
+- `save_audio(audio, path, sample_rate, *, disclosure=...)` — saved generations (including `/speak` and the MCP `voicebox.speak` tool, which go through `/generate`), effects versions and story exports
+- `wav_bytes(audio, sample_rate, *, disclosure=...)` — audio returned without saving: `/generate/stream` (through `services/tts.audio_to_wav_bytes()`) and the effects preview
+
+The user's own audio is saved with `disclosure=None` and carries no label: reference samples, the combined reference, and the re-encoded temp file used for transcription.
+
+A new engine gets the label for free as long as it returns audio to the generation service and does not write WAV files itself.
+
 ## Memory Management
 
 Models are loaded lazily on first use and kept in memory. Switching between model sizes (e.g. Qwen 1.7B ↔ 0.6B) unloads the previous model before loading the new one to avoid OOM:
@@ -198,6 +273,9 @@ The model management API (`/models/load`, `/models/unload`) lets users free VRAM
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/generate` | Generate speech from text |
+| POST | `/generate/stream` | Generate and return the WAV bytes without saving |
+| POST | `/generate/{generation_id}/retry` | Retry a failed generation with the same parameters |
+| POST | `/generate/{generation_id}/regenerate` | Re-run a completed generation and save the result as a new version |
 | GET | `/audio/{generation_id}` | Serve generated audio file |
 
 ### Response schema
@@ -237,6 +315,7 @@ The model management API (`/models/load`, `/models/unload`) lets users free VRAM
 | Qwen 1.7B / Qwen CustomVoice 1.7B | ~6 GB |
 | TADA 1B | ~4 GB |
 | TADA 3B | ~8 GB |
+| VoxCPM2 | ~6 GB (5.9 GB measured on short text) |
 
 ## Next Steps
 
@@ -248,6 +327,6 @@ The model management API (`/models/load`, `/models/unload`) lets users free VRAM
     Downloading, loading, and unloading models
   </Card>
   <Card title="Voice Profiles" href="/developer/voice-profiles">
-    Cloned vs preset profile schema
+    Cloned, preset and designed profile schema
   </Card>
 </Cards>

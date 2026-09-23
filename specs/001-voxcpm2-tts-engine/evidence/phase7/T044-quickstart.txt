@@ -1,0 +1,984 @@
+# T044 PART 2: quickstart.md Steps 1-8 through the HTTP API (Windows)
+# Clone: C:\Users\sabus\voicebox-setupcheck-win, pulled to b69d37731d2d6b6aa0119ae7ebdbad8f8579d70c
+#   ("feat(tts): disclose AI audio on every surface and never on user recordings")
+# Backend: <clone>\backend\venv\Scripts\python.exe -m backend.main --port 17693 --data-dir <scratch>\t044\data
+#   (the clone's own 3.12 venv from Part 1; torch 2.11.0+cu128; GPU0 RTX 5070 12 GB; free VRAM checked before each run, 11+ GB)
+# Driver: scratch t044\drive.py (httpx); every request/response is in the raw logs below.
+# Network hook: PYTHONPATH sitecustomize wrapping socket.getaddrinfo/connect/connect_ex, logging each call and, in deny mode,
+#   refusing non-loopback (same method as evidence/phase3/realrun-offline.txt).
+# Three server sessions, all stopped afterwards (port 17693 has no listener):
+#   server1 online (log-only hook), server2 HF_HUB_OFFLINE=1 + deny hook, server3 online (log-only hook) for SC-007.
+# WAVs: C:\Users\sabus\voxcpm-probe-out\phase7\
+
+PER-STEP RESULTS
+----------------
+Step 1  Setup (FR-019, SC-007)                        PASS* see T044-setup-windows.txt / T044-setup-linux.txt
+        (*Windows needs a pre-created 3.12 venv when `python` is 3.14; Linux needs a C toolchain; both are pre-existing gaps.)
+        `just check-python` / `just test` were NOT run here (out of this worker's scope).
+Step 2  Engine appears and generates (FR-001/006)     PASS
+        GET /models/engines lists voxcpm "VoxCPM2", requires_download_confirmation=true, size_mb=4961.
+        POST /generate (engine=voxcpm, en) -> completed; 7.04 s of audio; WAV samplerate 48000 (the model's own rate, not 24 kHz
+        like the other engines); first call 26.1 s wall including the model load.
+        Download-size confirmation dialog and progress bar (2.3/2.4) are UI: NEEDS-HUMAN (model already cached here).
+Step 2b Offline load (Principle I)                    PASS
+        Restart with HF_HUB_OFFLINE=1 + deny-mode hook. Log shows "[offline-guard] VoxCPM2 is cached - forcing offline mode".
+        Load and generate OK (26.1 s wall incl. load; 6.08 s audio, 48 kHz), plus an offline clone generation.
+        Hook log for the whole session: 0 getaddrinfo, 0 non-loopback connects, 0 BLOCKED; only 1 loopback connect.
+        The online session (server1) also showed 0 non-loopback lookups while loading and generating VoxCPM2.
+        Offline clone output is byte-identical to the online run (sha256 f18ccca7...), i.e. deterministic across restarts too.
+Step 3  Arabic (FR-007/008, SC-001)                   PASS (API) / NEEDS-HUMAN (intelligibility, dictionary pronunciation)
+        Languages come from the engine declaration: 30 codes, including "ar". Arabic generation completed, 5.44 s at 48 kHz.
+        FR-008: POST /pronunciations {term "فوكس" -> "ڤوكس", ar}; /pronunciations/preview applies it
+        ("محرك فوكس جديد" -> "محرك ڤوكس جديد"); generation with the term completed. Whether it is SPOKEN as the
+        dictionary says is NEEDS-HUMAN.
+        Licence: /models/status voxcpm2 license_id=Apache-2.0, commercial_use=true (engines endpoint agrees).
+Step 4  Cloning (FR-011..014, SC-002/003)             PASS (API) / NEEDS-HUMAN (likeness, SC-002)
+        Reference: the Step 2 output WAV (a designed voice) with its exact transcript, uploaded via POST /profiles/{id}/samples.
+        4.1 single-clip clone generated (5.12 s, 48 kHz).
+        4.2 multi-clip profile (2 samples, both listed by GET /profiles/{id}/samples) generated (3.52 s). A distinct prompt-cache
+            entry was built for it (voxcpm_f5ce...prompt vs voxcpm_9bfc...prompt for the single clip), consistent with using the
+            combined reference. "Uses all clips" is not directly observable through the API.
+        4.3 reuse (FR-013): run 2 created NO new prompt-cache file (only 2 .prompt files exist, one per profile), so the prepared
+            reference was reused. Wall times 8.0 s vs 10.0 s, which is inconclusive at 2 s polling granularity.
+        4.4 determinism (SC-003): same text/voice/seed=1234 twice -> sha256 identical (f18ccca7d20d...), and identical again
+            after the offline restart (3 of 3).
+        4.5 CLONING_ENGINES contains "voxcpm"; /models/engines supports_cloning=true.
+Step 5  Availability and memory (FR-002..004, SC-004) PASS
+        5.1 supported_accelerators ["cuda","mps","cpu"]; 5.2 real hardware: available=true, reason=null, warning=null.
+        5.3/5.4 forced hardware (in-process TestClient against the real routes; only detect_accelerator_and_memory patched,
+            because there is no env override for the device):
+          directml -> available=false, reason "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple
+                      Silicon (MPS) or CPU, but this machine is using DirectML."; still listed (not hidden);
+                      POST /generate and /generate/stream -> 400 with that reason (no crash, no hang)
+          xpu      -> same, "...using Intel XPU."
+          cuda 4096 MB -> available=true + warning "This machine has about 4 GB of graphics memory. VoxCPM2 ... usually needs
+                      about 6 GB, so generation may fail." (not blocked, C1Q4)
+          cpu      -> available=true, no warning
+        5.5 `git grep -i voxcpm -- app/src`: no hardware/capability branching on the engine name. The hits are the engine picker
+            option, a description string, the model-name/display-name ternaries in useGenerationForm.ts and the model-management
+            voiceModels prefix filter. All of these existed before for every engine and VoxCPM2 adds one entry to each. Generated
+            API schemas are also hits. Whether adding to these existing per-engine maps is compatible with SC-009 is a T045 judgement.
+Step 6  Voice design (FR-015, SC-005)                 PASS (API) / NEEDS-HUMAN (match to description, UI label, consent)
+        Designed profile created via POST /profiles {voice_type:"designed", design_prompt:"A calm middle-aged man ...", default_engine:"voxcpm"}.
+        Without voice_description (uses design_prompt): OK 6.40 s. With voice_description ("A young woman ... high-pitched"): OK 4.16 s,
+        different audio (sha differs). English description + Arabic speech: accepted, 2.24 s generated (C1Q9; quality NEEDS-HUMAN).
+        Cloned profile + voice_description: output is byte-IDENTICAL to the clone-only run (same seed/text), so the recording wins and
+        the description is ignored (C1Q6 backend behaviour confirmed). The "description unused" UI notice, the separate labelled
+        input and the consent/disclosure affordances (6.1, 6.4, 6.5) are UI: NEEDS-HUMAN.
+Step 7  Settings and lifecycle (FR-010, FR-017)       PASS
+        advanced_settings declared: cfg_value (Guidance) default 2.0 [1.0,3.0]; inference_timesteps (Quality steps) default 10 [4,30].
+        In-bounds {cfg_value 2.5, inference_timesteps 16} -> generated OK.
+        cfg_value 9.0 -> 422 "must be between 1.0 and 3.0"; unknown "temperature" -> 422; cfg_value on engine qwen -> 422 (not declared).
+        Unload: POST /models/voxcpm2/unload -> status loaded true -> false; GPU0 memory.used 7577 MiB -> 1189 MiB (memory returned).
+        Preselected defaults in the UI: NEEDS-HUMAN.
+Step 8  Packaging and docs (FR-020..022, SC-008)      NEEDS-ORCHESTRATOR (frozen build and docs are covered by other workers;
+        build_binary.py was deliberately not run here).
+
+SC-007: every pre-existing engine still generates (one short line each, server3, then each model unloaded)
+------------------------------------------------------------------------------------------------------------
+engine / model                 cached before?        result  audio   sr     wall   WAV
+qwen / qwen-tts-1.7B           yes (4334 MB)         PASS    4.08 s  24000  38.1 s sc007-qwen-1.7B.wav (cloned profile)
+qwen / qwen-tts-0.6B           yes (2400 MB)         PASS    3.68 s  24000  22.1 s sc007-qwen-0.6B.wav
+qwen_custom_voice / 1.7B       yes (4311 MB)         PASS    4.24 s  24000  18.2 s sc007-qwen_custom_voice-1.7B.wav (preset Ryan)
+tada / tada-1b                 yes (3741 MB)         PASS    4.24 s  24000  26.1 s sc007-tada-1B.wav (loaded on cuda:1, the most-free GPU)
+f5_tts / habibi-msa            yes (Habibi-TTS)      PASS    5.13 s  24000  10.1 s sc007-f5_tts-habibi-msa.wav (Arabic; engine is ar-only)
+f5_tts / habibi-unified        yes                   PASS    5.13 s  24000   6.0 s sc007-f5_tts-habibi-unified.wav (Arabic)
+kokoro / kokoro                no -> downloaded      PASS    4.00 s  24000   6.1 s sc007-kokoro.wav (preset af_bella); 312 MB on disk
+luxtts / luxtts                no -> downloaded      PASS    3.13 s  48000   8.7 s sc007-luxtts.wav (cloned profile); 1126 MB on disk
+                                                                                 (declared size_mb is 300, so the real download is ~3.7x larger)
+chatterbox / chatterbox-tts    no                    NOT RUN  declared 3200 MB (over the ~1 GB budget)
+chatterbox_turbo               no                    NOT RUN  declared 1500 MB (over budget)
+tada / tada-3b-ml              no                    NOT RUN  size not reported by /models/status (tada engine declares 4000 MB)
+voxcpm / voxcpm2               yes (4731 MB)         PASS    (Steps 2-7 above)
+Extra downloads for this check: kokoro + luxtts, about 1.44 GB in total, slightly over the ~1 GB budget because LuxTTS is bigger than declared.
+Network during server3: 11 lookups of huggingface.co and 9 of us.aws.cdn.hf.co, all between 19:03:37 and 19:05:51, the kokoro/luxtts
+download window. The cached engines loaded after that with no lookups.
+Observation (pre-existing, cosmetic): after the TADA 1B generation, /models/status reported both tada-1b AND tada-3b-ml as loaded=true
+(tada-3b-ml is not downloaded), so the loaded check is not per-size for TADA.
+
+NEEDS-HUMAN (listen): C:\Users\sabus\voxcpm-probe-out\phase7\
+  s2-voxcpm-en-designed.wav               Step 2 English intelligibility; also the design "calm middle-aged man, deep warm voice"
+  s2b-voxcpm-offline.wav                  offline generation sanity
+  s3-voxcpm-ar.wav                        Step 3 / SC-001 Arabic intelligibility
+  s3-voxcpm-ar-pronunciation.wav          FR-008: "فوكس" should be spoken as "ڤوكس" (V sound)
+  s4-voxcpm-clone-run1.wav (+ reference s2-voxcpm-en-designed.wav)   SC-002 likeness. A blind 4/5 test needs a real human reference
+                                          voice; this reference is itself synthetic, so a proper SC-002 test still needs a human recording.
+  s4-voxcpm-clone-multi.wav (+ refs s2-voxcpm-en-designed.wav, s4-ref2-source.wav)   multi-clip likeness
+  s6-voxcpm-designed-no-description.wav   should match "calm middle-aged man, deep warm voice"
+  s6-voxcpm-designed-with-description.wav should match "young woman, bright, cheerful, high-pitched"
+  s6-voxcpm-en-description-ar-speech.wav  English description "elderly man, raspy, gentle" + Arabic speech (C1Q9 quality)
+  s7-voxcpm-advanced-in-bounds.wav        cfg 2.5 / 16 steps sanity
+  sc007-*.wav (8 files)                   each pre-existing engine intelligible
+  UI-only items: 2.3 size confirmation, 2.4 progress bar, 6.1 labelled description input and hidden instruct box,
+  6.4 "description unused" notice, 6.5 consent/disclosure on the design path, 7.1 advanced controls with defaults preselected.
+
+==================================================================
+RAW: q-info.log
+==================================================================
+GPU: 0, 972 MiB, 12227 MiB | 1, 3007 MiB, 16311 MiB
+> GET /health
+< 200 (0.08s) {"status": "healthy", "version": "0.5.4", "model_loaded": false, "model_downloaded": true, "model_size": null, "gpu_available": true, "gpu_type": "CUDA (NVIDIA GeForce RTX 5070)", "vram_used_mb": 0.0, "backend_type": "pytorch", "backend_variant": "cuda", "supports_rocm": false, "gpu_compatibility_warning": null}
+> GET /models/engines
+< 200 (0.07s)
+  ENGINE {"engine": "qwen", "display_name": "Qwen TTS", "available": true, "reason": null, "warning": null, "supported_accelerators": [], "detected_accelerator": "cuda", "languages": ["zh", "en", "ja", "ko", "de", "fr", "ru", "pt", "es", "it"], "supports_cloning": true, "supports_voice_design": false, "requires_download_confirmation": false, "advanced_settings": [], "size_mb": 3500, "license_id": null, "commercial_use": null}
+  ENGINE {"engine": "qwen_custom_voice", "display_name": "Qwen CustomVoice", "available": true, "reason": null, "warning": null, "supported_accelerators": [], "detected_accelerator": "cuda", "languages": ["zh", "en", "ja", "ko", "de", "fr", "ru", "pt", "es", "it"], "supports_cloning": false, "supports_voice_design": false, "requires_download_confirmation": false, "advanced_settings": [], "size_mb": 3500, "license_id": null, "commercial_use": null}
+  ENGINE {"engine": "luxtts", "display_name": "LuxTTS", "available": true, "reason": null, "warning": null, "supported_accelerators": [], "detected_accelerator": "cuda", "languages": ["en"], "supports_cloning": true, "supports_voice_design": false, "requires_download_confirmation": false, "advanced_settings": [], "size_mb": 300, "license_id": null, "commercial_use": null}
+  ENGINE {"engine": "chatterbox", "display_name": "Chatterbox TTS", "available": true, "reason": null, "warning": null, "supported_accelerators": [], "detected_accelerator": "cuda", "languages": ["zh", "en", "ja", "ko", "de", "fr", "ru", "pt", "es", "it", "he", "ar", "da", "el", "fi", "hi", "ms", "nl", "no", "pl", "sv", "sw", "tr"], "supports_cloning": true, "supports_voice_design": false, "requires_download_confirmation": false, "advanced_settings": [], "size_mb": 3200, "license_id": null, "commercial_use": null}
+  ENGINE {"engine": "chatterbox_turbo", "display_name": "Chatterbox Turbo", "available": true, "reason": null, "warning": null, "supported_accelerators": [], "detected_accelerator": "cuda", "languages": ["en"], "supports_cloning": true, "supports_voice_design": false, "requires_download_confirmation": false, "advanced_settings": [], "size_mb": 1500, "license_id": null, "commercial_use": null}
+  ENGINE {"engine": "tada", "display_name": "TADA", "available": true, "reason": null, "warning": null, "supported_accelerators": [], "detected_accelerator": "cuda", "languages": ["en", "ar", "zh", "de", "es", "fr", "it", "ja", "pl", "pt"], "supports_cloning": true, "supports_voice_design": false, "requires_download_confirmation": false, "advanced_settings": [], "size_mb": 4000, "license_id": null, "commercial_use": null}
+  ENGINE {"engine": "kokoro", "display_name": "Kokoro", "available": true, "reason": null, "warning": null, "supported_accelerators": [], "detected_accelerator": "cuda", "languages": ["en", "es", "fr", "hi", "it", "pt", "ja", "zh"], "supports_cloning": false, "supports_voice_design": false, "requires_download_confirmation": false, "advanced_settings": [], "size_mb": 350, "license_id": null, "commercial_use": null}
+  ENGINE {"engine": "f5_tts", "display_name": "F5-TTS", "available": true, "reason": null, "warning": null, "supported_accelerators": [], "detected_accelerator": "cuda", "languages": ["ar"], "supports_cloning": true, "supports_voice_design": false, "requires_download_confirmation": false, "advanced_settings": [], "size_mb": 1300, "license_id": null, "commercial_use": null}
+  ENGINE {"engine": "voxcpm", "display_name": "VoxCPM2", "available": true, "reason": null, "warning": null, "supported_accelerators": ["cuda", "mps", "cpu"], "detected_accelerator": "cuda", "languages": ["zh", "en", "ar", "my", "da", "nl", "fi", "fr", "de", "el", "he", "hi", "id", "it", "ja", "km", "ko", "lo", "ms", "no", "pl", "pt", "ru", "es", "sw", "sv", "tl", "th", "tr", "vi"], "supports_cloning": true, "supports_voice_design": true, "requires_download_confirmation": true, "advanced_settings": [{"name": "cfg_value", "label": "Guidance", "default": 2.0, "min": 1.0, "max": 3.0}, {"name": "inference_timesteps", "label": "Quality steps", "default": 10.0, "min": 4.0, "max": 30.0}], "size_mb": 4961, "license_id": "Apache-2.0", "commercial_use": true}
+> GET /models/status
+< 200 (0.11s)
+  MODEL {"model_name": "qwen-tts-1.7B", "display_name": "Qwen TTS 1.7B", "hf_repo_id": "Qwen/Qwen3-TTS-12Hz-1.7B-Base", "downloaded": true, "downloading": false, "size_mb": 4333.65856552124, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "qwen-tts-0.6B", "display_name": "Qwen TTS 0.6B", "hf_repo_id": "Qwen/Qwen3-TTS-12Hz-0.6B-Base", "downloaded": true, "downloading": false, "size_mb": 2399.540798187256, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "qwen-custom-voice-1.7B", "display_name": "Qwen CustomVoice 1.7B", "hf_repo_id": "Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice", "downloaded": true, "downloading": false, "size_mb": 4310.760103225708, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "qwen-custom-voice-0.6B", "display_name": "Qwen CustomVoice 0.6B", "hf_repo_id": "Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice", "downloaded": true, "downloading": false, "size_mb": 2382.644281387329, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "luxtts", "display_name": "LuxTTS (Fast, CPU-friendly)", "hf_repo_id": "YatharthS/LuxTTS", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "chatterbox-tts", "display_name": "Chatterbox TTS (Multilingual)", "hf_repo_id": "ResembleAI/chatterbox", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "chatterbox-turbo", "display_name": "Chatterbox Turbo (English, Tags)", "hf_repo_id": "ResembleAI/chatterbox-turbo", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "tada-1b", "display_name": "TADA 1B (English)", "hf_repo_id": "HumeAI/tada-1b", "downloaded": true, "downloading": false, "size_mb": 3740.7537202835083, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "tada-3b-ml", "display_name": "TADA 3B Multilingual", "hf_repo_id": "HumeAI/tada-3b-ml", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "kokoro", "display_name": "Kokoro 82M", "hf_repo_id": "hexgrad/Kokoro-82M", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "habibi-msa", "display_name": "Habibi Specialized MSA", "hf_repo_id": "SWivid/Habibi-TTS", "downloaded": true, "downloading": false, "size_mb": 1300.0, "loaded": false, "license_id": "Apache-2.0", "commercial_use": true, "dialect": "MSA"}
+  MODEL {"model_name": "habibi-unified", "display_name": "Habibi Unified (Automatic Dialect)", "hf_repo_id": "SWivid/Habibi-TTS", "downloaded": true, "downloading": false, "size_mb": 1300.0, "loaded": false, "license_id": "CC-BY-NC-SA-4.0", "commercial_use": false, "dialect": "UNK"}
+  MODEL {"model_name": "habibi-sau", "display_name": "Habibi Specialized Saudi", "hf_repo_id": "SWivid/Habibi-TTS", "downloaded": true, "downloading": false, "size_mb": 1300.0, "loaded": false, "license_id": "CC-BY-NC-SA-4.0", "commercial_use": false, "dialect": "SAU"}
+  MODEL {"model_name": "habibi-uae", "display_name": "Habibi Specialized Emirati", "hf_repo_id": "SWivid/Habibi-TTS", "downloaded": true, "downloading": false, "size_mb": 1300.0, "loaded": false, "license_id": "CC-BY-NC-SA-4.0", "commercial_use": false, "dialect": "UAE"}
+  MODEL {"model_name": "habibi-alg", "display_name": "Habibi Specialized Algerian", "hf_repo_id": "SWivid/Habibi-TTS", "downloaded": true, "downloading": false, "size_mb": 1300.0, "loaded": false, "license_id": "Apache-2.0", "commercial_use": true, "dialect": "ALG"}
+  MODEL {"model_name": "habibi-irq", "display_name": "Habibi Specialized Iraqi", "hf_repo_id": "SWivid/Habibi-TTS", "downloaded": true, "downloading": false, "size_mb": 1300.0, "loaded": false, "license_id": "Apache-2.0", "commercial_use": true, "dialect": "IRQ"}
+  MODEL {"model_name": "habibi-egy", "display_name": "Habibi Specialized Egyptian", "hf_repo_id": "SWivid/Habibi-TTS", "downloaded": true, "downloading": false, "size_mb": 1300.0, "loaded": false, "license_id": "Apache-2.0", "commercial_use": true, "dialect": "EGY"}
+  MODEL {"model_name": "habibi-mar", "display_name": "Habibi Specialized Moroccan", "hf_repo_id": "SWivid/Habibi-TTS", "downloaded": true, "downloading": false, "size_mb": 1300.0, "loaded": false, "license_id": "Apache-2.0", "commercial_use": true, "dialect": "MAR"}
+  MODEL {"model_name": "voxcpm2", "display_name": "VoxCPM2 (Multilingual, Voice Design)", "hf_repo_id": "openbmb/VoxCPM2", "downloaded": true, "downloading": false, "size_mb": 4730.922571182251, "loaded": false, "license_id": "Apache-2.0", "commercial_use": true, "dialect": null}
+  MODEL {"model_name": "whisper-base", "display_name": "Whisper Base", "hf_repo_id": "openai/whisper-base", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "whisper-small", "display_name": "Whisper Small", "hf_repo_id": "openai/whisper-small", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "whisper-medium", "display_name": "Whisper Medium", "hf_repo_id": "openai/whisper-medium", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "whisper-large", "display_name": "Whisper Large", "hf_repo_id": "openai/whisper-large-v3", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "whisper-turbo", "display_name": "Whisper Turbo", "hf_repo_id": "openai/whisper-large-v3-turbo", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "qwen3-0.6b", "display_name": "Qwen3 0.6B", "hf_repo_id": "Qwen/Qwen3-0.6B", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "qwen3-1.7b", "display_name": "Qwen3 1.7B", "hf_repo_id": "Qwen/Qwen3-1.7B", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+  MODEL {"model_name": "qwen3-4b", "display_name": "Qwen3 4B", "hf_repo_id": "Qwen/Qwen3-4B", "downloaded": false, "downloading": false, "size_mb": null, "loaded": false, "license_id": null, "commercial_use": null, "dialect": null}
+
+==================================================================
+RAW: q-main.log
+==================================================================
+GPU before: 0, 972 MiB, 12227 MiB | 1, 2967 MiB, 16311 MiB
+> POST /profiles json={"name": "T044 designed", "voice_type": "designed", "design_prompt": "A calm middle-aged man with a deep, warm voice, speaking slowly and clearly.", "language": "en", "default_engine": "voxcpm"}
+< 200 (0.10s) {"id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "name": "T044 designed", "description": null, "language": "en", "avatar_path": null, "effects_chain": null, "voice_type": "designed", "preset_engine": null, "preset_voice_id": null, "design_prompt": "A calm middle-aged man with a deep, warm voice, speaking slowly and clearly.", "default_engine": "voxcpm", "personality": null, "generation_count": 0, "sample_count": 0, "created_at": "2026-09-23T15:56:53.982543", "updated_at": "2026-09-23T15:56:53.982543"}
+
+### Step 2: VoxCPM2 English generation (designed profile, no voice_description -> design_prompt used)
+> POST /generate json={"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "language": "en", "seed": 7, "text": "Hello, this is VoxCPM two speaking through the Voicebox API for the phase seven check."}
+< 200 (0.04s) {"id": "8a51bc22-4081-4c4b-b9d8-504bcfb26a2e", "profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "text": "Hello, this is VoxCPM two speaking through the Voicebox API for the phase seven check.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 7, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T15:56:54.083403", "versions": null, "active_version_id": null}
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.01s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.01s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.00s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.01s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.00s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.00s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.00s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.00s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.01s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.00s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.00s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.00s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.00s)
+> GET /history/8a51bc22-4081-4c4b-b9d8-504bcfb26a2e
+< 200 (0.00s)
+  RESULT {"tag": "s2-voxcpm-en-designed", "ok": true, "id": "8a51bc22-4081-4c4b-b9d8-504bcfb26a2e", "engine": "voxcpm", "model_size": null, "wall_s": 26.1, "duration_s": 7.04, "samplerate": 48000, "sha256": "a6d3cece1d56f356c4320e7d0e8be34721dfb247da1b3d723f9ddf8d9e202339", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s2-voxcpm-en-designed.wav"}
+
+### Step 3: Arabic
+> POST /generate json={"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "language": "ar", "seed": 7, "text": "مرحبا، هذا اختبار للغة العربية باستخدام محرك فوكس سي بي إم الثاني."}
+< 200 (0.01s) {"id": "cedfa0a2-6c36-41c2-b3d6-90457cfb47a2", "profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "text": "مرحبا، هذا اختبار للغة العربية باستخدام محرك فوكس سي بي إم الثاني.", "language": "ar", "audio_path": "", "duration": 0.0, "seed": 7, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T15:57:20.211229", "versions": null, "active_version_id": null}
+> GET /history/cedfa0a2-6c36-41c2-b3d6-90457cfb47a2
+< 200 (0.00s)
+> GET /history/cedfa0a2-6c36-41c2-b3d6-90457cfb47a2
+< 200 (0.00s)
+> GET /history/cedfa0a2-6c36-41c2-b3d6-90457cfb47a2
+< 200 (0.00s)
+> GET /history/cedfa0a2-6c36-41c2-b3d6-90457cfb47a2
+< 200 (0.00s)
+> GET /history/cedfa0a2-6c36-41c2-b3d6-90457cfb47a2
+< 200 (0.00s)
+  RESULT {"tag": "s3-voxcpm-ar", "ok": true, "id": "cedfa0a2-6c36-41c2-b3d6-90457cfb47a2", "engine": "voxcpm", "model_size": null, "wall_s": 8.0, "duration_s": 5.44, "samplerate": 48000, "sha256": "9f864d7dd4afb09ed66616f3fb135b9cc6bad8ebf97949a7ac43577c349205ff", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s3-voxcpm-ar.wav"}
+> POST /pronunciations json={"term": "فوكس", "replacement": "ڤوكس", "language": "ar", "notes": "T044 FR-008 check"}
+< 200 (0.01s) {"id": "d719973e-dfc8-41e6-993a-eda16a8ad771", "term": "فوكس", "replacement": "ڤوكس", "language": "ar", "profile_id": null, "enabled": true, "notes": "T044 FR-008 check", "created_at": "2026-09-23T15:57:28.264024", "updated_at": "2026-09-23T15:57:28.264024"}
+> POST /pronunciations/preview json={"text": "محرك فوكس جديد", "language": "ar", "profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2"}
+< 200 (0.01s) {"original": "محرك فوكس جديد", "result": "محرك ڤوكس جديد", "applied": [{"term": "فوكس", "replacement": "ڤوكس", "entry_id": "d719973e-dfc8-41e6-993a-eda16a8ad771"}]}
+> POST /generate json={"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "language": "ar", "seed": 7, "text": "محرك فوكس جديد يتحدث العربية."}
+< 200 (0.01s) {"id": "d021b356-8b1b-4a68-b5a3-b9e69a73edd7", "profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "text": "محرك فوكس جديد يتحدث العربية.", "language": "ar", "audio_path": "", "duration": 0.0, "seed": 7, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T15:57:28.280772", "versions": null, "active_version_id": null}
+> GET /history/d021b356-8b1b-4a68-b5a3-b9e69a73edd7
+< 200 (0.00s)
+> GET /history/d021b356-8b1b-4a68-b5a3-b9e69a73edd7
+< 200 (0.00s)
+> GET /history/d021b356-8b1b-4a68-b5a3-b9e69a73edd7
+< 200 (0.00s)
+> GET /history/d021b356-8b1b-4a68-b5a3-b9e69a73edd7
+< 200 (0.00s)
+  RESULT {"tag": "s3-voxcpm-ar-pronunciation", "ok": true, "id": "d021b356-8b1b-4a68-b5a3-b9e69a73edd7", "engine": "voxcpm", "model_size": null, "wall_s": 6.0, "duration_s": 3.2, "samplerate": 48000, "sha256": "d004b3908bb61f57b99e2afa019afb945e08de772da8cda1cb706d686e86f7d9", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s3-voxcpm-ar-pronunciation.wav"}
+
+### Step 4: cloning
+> POST /profiles json={"name": "T044 cloned", "voice_type": "cloned", "language": "en", "default_engine": "voxcpm"}
+< 200 (0.01s) {"id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "name": "T044 cloned", "description": null, "language": "en", "avatar_path": null, "effects_chain": null, "voice_type": "cloned", "preset_engine": null, "preset_voice_id": null, "design_prompt": null, "default_engine": "voxcpm", "personality": null, "generation_count": 0, "sample_count": 0, "created_at": "2026-09-23T15:57:34.325379", "updated_at": "2026-09-23T15:57:34.325379"}
+> GET /profiles/1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f/samples
+< 200 (0.00s)
+> POST /profiles/1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f/samples
+< 200 (15.52s) {"id": "afd52209-176d-4b8c-b01d-2d38b3ac2897", "profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "audio_path": "profiles\\1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f\\afd52209-176d-4b8c-b01d-2d38b3ac2897.wav", "reference_text": "Hello, this is VoxCPM two speaking through the Voicebox API for the phase seven check."}
+> POST /generate json={"profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "engine": "voxcpm", "language": "en", "seed": 1234, "text": "The quick brown fox jumps over the lazy dog, and then it rests beside the river."}
+< 200 (0.02s) {"id": "f7de9101-ea0e-40d7-9143-305dfa8b8a79", "profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "text": "The quick brown fox jumps over the lazy dog, and then it rests beside the river.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 1234, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T15:57:49.861848", "versions": null, "active_version_id": null}
+> GET /history/f7de9101-ea0e-40d7-9143-305dfa8b8a79
+< 200 (0.00s)
+> GET /history/f7de9101-ea0e-40d7-9143-305dfa8b8a79
+< 200 (0.00s)
+> GET /history/f7de9101-ea0e-40d7-9143-305dfa8b8a79
+< 200 (0.01s)
+> GET /history/f7de9101-ea0e-40d7-9143-305dfa8b8a79
+< 200 (0.00s)
+> GET /history/f7de9101-ea0e-40d7-9143-305dfa8b8a79
+< 200 (0.00s)
+  RESULT {"tag": "s4-voxcpm-clone-run1", "ok": true, "id": "f7de9101-ea0e-40d7-9143-305dfa8b8a79", "engine": "voxcpm", "model_size": null, "wall_s": 8.0, "duration_s": 5.12, "samplerate": 48000, "sha256": "f18ccca7d20d75e88eada6919d3682cbd17fb06f37574501209fe3c55e6e63b7", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s4-voxcpm-clone-run1.wav"}
+> POST /generate json={"profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "engine": "voxcpm", "language": "en", "seed": 1234, "text": "The quick brown fox jumps over the lazy dog, and then it rests beside the river."}
+< 200 (0.02s) {"id": "8978a09c-527f-4ff3-8573-32cc768060eb", "profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "text": "The quick brown fox jumps over the lazy dog, and then it rests beside the river.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 1234, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T15:57:57.921187", "versions": null, "active_version_id": null}
+> GET /history/8978a09c-527f-4ff3-8573-32cc768060eb
+< 200 (0.00s)
+> GET /history/8978a09c-527f-4ff3-8573-32cc768060eb
+< 200 (0.01s)
+> GET /history/8978a09c-527f-4ff3-8573-32cc768060eb
+< 200 (0.00s)
+> GET /history/8978a09c-527f-4ff3-8573-32cc768060eb
+< 200 (0.00s)
+> GET /history/8978a09c-527f-4ff3-8573-32cc768060eb
+< 200 (0.00s)
+> GET /history/8978a09c-527f-4ff3-8573-32cc768060eb
+< 200 (0.00s)
+  RESULT {"tag": "s4-voxcpm-clone-run2", "ok": true, "id": "8978a09c-527f-4ff3-8573-32cc768060eb", "engine": "voxcpm", "model_size": null, "wall_s": 10.0, "duration_s": 5.12, "samplerate": 48000, "sha256": "f18ccca7d20d75e88eada6919d3682cbd17fb06f37574501209fe3c55e6e63b7", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s4-voxcpm-clone-run2.wav"}
+  DETERMINISM (SC-003): sha1=f18ccca7d20d75e88eada6919d3682cbd17fb06f37574501209fe3c55e6e63b7 sha2=f18ccca7d20d75e88eada6919d3682cbd17fb06f37574501209fe3c55e6e63b7 identical=True
+  REUSE timing (FR-013): run1 wall=8.0s run2 wall=10.0s
+> POST /profiles json={"name": "T044 cloned multi", "voice_type": "cloned", "language": "en", "default_engine": "voxcpm"}
+< 200 (0.01s) {"id": "a28ee83d-366e-4cd6-b0cb-d06ca7a9b314", "name": "T044 cloned multi", "description": null, "language": "en", "avatar_path": null, "effects_chain": null, "voice_type": "cloned", "preset_engine": null, "preset_voice_id": null, "design_prompt": null, "default_engine": "voxcpm", "personality": null, "generation_count": 0, "sample_count": 0, "created_at": "2026-09-23T15:58:07.979535", "updated_at": "2026-09-23T15:58:07.979535"}
+> GET /profiles/a28ee83d-366e-4cd6-b0cb-d06ca7a9b314/samples
+< 200 (0.00s)
+> POST /profiles/a28ee83d-366e-4cd6-b0cb-d06ca7a9b314/samples
+< 200 (0.03s) {"id": "6c03a5a3-2539-4439-9e0d-9ffe3d08e3e4", "profile_id": "a28ee83d-366e-4cd6-b0cb-d06ca7a9b314", "audio_path": "profiles\\a28ee83d-366e-4cd6-b0cb-d06ca7a9b314\\6c03a5a3-2539-4439-9e0d-9ffe3d08e3e4.wav", "reference_text": "Hello, this is VoxCPM two speaking through the Voicebox API for the phase seven check."}
+> POST /generate json={"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "language": "en", "seed": 11, "text": "Every morning I walk to the market and buy fresh bread."}
+< 200 (0.01s) {"id": "8bd5255f-23d2-4b55-9a8a-c75a24c90bda", "profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "text": "Every morning I walk to the market and buy fresh bread.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 11, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T15:58:08.022396", "versions": null, "active_version_id": null}
+> GET /history/8bd5255f-23d2-4b55-9a8a-c75a24c90bda
+< 200 (0.00s)
+> GET /history/8bd5255f-23d2-4b55-9a8a-c75a24c90bda
+< 200 (0.00s)
+> GET /history/8bd5255f-23d2-4b55-9a8a-c75a24c90bda
+< 200 (0.00s)
+> GET /history/8bd5255f-23d2-4b55-9a8a-c75a24c90bda
+< 200 (0.00s)
+> GET /history/8bd5255f-23d2-4b55-9a8a-c75a24c90bda
+< 200 (0.00s)
+  RESULT {"tag": "s4-ref2-source", "ok": true, "id": "8bd5255f-23d2-4b55-9a8a-c75a24c90bda", "engine": "voxcpm", "model_size": null, "wall_s": 8.0, "duration_s": 4.96, "samplerate": 48000, "sha256": "6de158760513bead077ad15b0cbc6adaaf766985563029949df50c441561d385", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s4-ref2-source.wav"}
+> POST /profiles/a28ee83d-366e-4cd6-b0cb-d06ca7a9b314/samples
+< 200 (0.02s) {"id": "9e52f063-9cbb-4a1a-9288-d633198806fe", "profile_id": "a28ee83d-366e-4cd6-b0cb-d06ca7a9b314", "audio_path": "profiles\\a28ee83d-366e-4cd6-b0cb-d06ca7a9b314\\9e52f063-9cbb-4a1a-9288-d633198806fe.wav", "reference_text": "Every morning I walk to the market and buy fresh bread."}
+> GET /profiles/a28ee83d-366e-4cd6-b0cb-d06ca7a9b314/samples
+< 200 (0.00s) [{"id": "6c03a5a3-2539-4439-9e0d-9ffe3d08e3e4", "profile_id": "a28ee83d-366e-4cd6-b0cb-d06ca7a9b314", "audio_path": "profiles\\a28ee83d-366e-4cd6-b0cb-d06ca7a9b314\\6c03a5a3-2539-4439-9e0d-9ffe3d08e3e4.wav", "reference_text": "Hello, this is VoxCPM two speaking through the Voicebox API for the phase seven check."}, {"id": "9e52f063-9cbb-4a1a-9288-d633198806fe", "profile_id": "a28ee83d-366e-4cd6-b0cb-d06ca7a9b314", "audio_path": "profiles\\a28ee83d-366e-4cd6-b0cb-d06ca7a9b314\\9e52f063-9cbb-4a1a-9288-d633198806fe.wav", "reference_text": "Every morning I walk to the market and buy fresh bread."}]
+> POST /generate json={"profile_id": "a28ee83d-366e-4cd6-b0cb-d06ca7a9b314", "engine": "voxcpm", "language": "en", "seed": 5, "text": "This clone was built from two reference clips."}
+< 200 (0.03s) {"id": "020e610f-bce9-4766-8eab-5fba5fefbce5", "profile_id": "a28ee83d-366e-4cd6-b0cb-d06ca7a9b314", "text": "This clone was built from two reference clips.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 5, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T15:58:16.098478", "versions": null, "active_version_id": null}
+> GET /history/020e610f-bce9-4766-8eab-5fba5fefbce5
+< 200 (0.00s)
+> GET /history/020e610f-bce9-4766-8eab-5fba5fefbce5
+< 200 (0.01s)
+> GET /history/020e610f-bce9-4766-8eab-5fba5fefbce5
+< 200 (0.00s)
+> GET /history/020e610f-bce9-4766-8eab-5fba5fefbce5
+< 200 (0.00s)
+  RESULT {"tag": "s4-voxcpm-clone-multi", "ok": true, "id": "020e610f-bce9-4766-8eab-5fba5fefbce5", "engine": "voxcpm", "model_size": null, "wall_s": 6.1, "duration_s": 3.52, "samplerate": 48000, "sha256": "76564b1b438719a0a3a73a3e5f9d95679011de7504e6d71f664d8a935c14d842", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s4-voxcpm-clone-multi.wav"}
+
+### Step 6: voice design
+> POST /generate json={"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "language": "en", "seed": 7, "voice_description": "A young woman with a bright, cheerful, high-pitched voice.", "text": "Good afternoon! I am delighted to read this sentence for you today."}
+< 200 (0.01s) {"id": "932e4794-1321-4140-9b06-3a7f0c67d535", "profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "text": "Good afternoon! I am delighted to read this sentence for you today.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 7, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T15:58:22.168153", "versions": null, "active_version_id": null}
+> GET /history/932e4794-1321-4140-9b06-3a7f0c67d535
+< 200 (0.00s)
+> GET /history/932e4794-1321-4140-9b06-3a7f0c67d535
+< 200 (0.00s)
+> GET /history/932e4794-1321-4140-9b06-3a7f0c67d535
+< 200 (0.00s)
+> GET /history/932e4794-1321-4140-9b06-3a7f0c67d535
+< 200 (0.00s)
+  RESULT {"tag": "s6-voxcpm-designed-with-description", "ok": true, "id": "932e4794-1321-4140-9b06-3a7f0c67d535", "engine": "voxcpm", "model_size": null, "wall_s": 6.0, "duration_s": 4.16, "samplerate": 48000, "sha256": "008190982ea8d4522719bb16a46bc55a37dec15e6a821f1e48bd23494c146157", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s6-voxcpm-designed-with-description.wav"}
+> POST /generate json={"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "language": "en", "seed": 7, "text": "Good afternoon! I am delighted to read this sentence for you today."}
+< 200 (0.01s) {"id": "5b9dbacd-2523-4e02-a81e-6a1130592221", "profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "text": "Good afternoon! I am delighted to read this sentence for you today.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 7, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T15:58:28.212931", "versions": null, "active_version_id": null}
+> GET /history/5b9dbacd-2523-4e02-a81e-6a1130592221
+< 200 (0.00s)
+> GET /history/5b9dbacd-2523-4e02-a81e-6a1130592221
+< 200 (0.00s)
+> GET /history/5b9dbacd-2523-4e02-a81e-6a1130592221
+< 200 (0.00s)
+> GET /history/5b9dbacd-2523-4e02-a81e-6a1130592221
+< 200 (0.00s)
+> GET /history/5b9dbacd-2523-4e02-a81e-6a1130592221
+< 200 (0.00s)
+> GET /history/5b9dbacd-2523-4e02-a81e-6a1130592221
+< 200 (0.01s)
+  RESULT {"tag": "s6-voxcpm-designed-no-description", "ok": true, "id": "5b9dbacd-2523-4e02-a81e-6a1130592221", "engine": "voxcpm", "model_size": null, "wall_s": 10.0, "duration_s": 6.4, "samplerate": 48000, "sha256": "18c70b9e9e924c7937442024300c95fe532b8f1e6df41419bd8d568b74022d19", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s6-voxcpm-designed-no-description.wav"}
+> POST /generate json={"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "language": "ar", "seed": 7, "voice_description": "An elderly man with a raspy, gentle voice.", "text": "صباح الخير، كيف حالك اليوم؟"}
+< 200 (0.03s) {"id": "5182f359-03e0-400d-b6d1-9c1df7fae2c5", "profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "text": "صباح الخير، كيف حالك اليوم؟", "language": "ar", "audio_path": "", "duration": 0.0, "seed": 7, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T15:58:38.278595", "versions": null, "active_version_id": null}
+> GET /history/5182f359-03e0-400d-b6d1-9c1df7fae2c5
+< 200 (0.01s)
+> GET /history/5182f359-03e0-400d-b6d1-9c1df7fae2c5
+< 200 (0.00s)
+> GET /history/5182f359-03e0-400d-b6d1-9c1df7fae2c5
+< 200 (0.00s)
+  RESULT {"tag": "s6-voxcpm-en-description-ar-speech", "ok": true, "id": "5182f359-03e0-400d-b6d1-9c1df7fae2c5", "engine": "voxcpm", "model_size": null, "wall_s": 4.0, "duration_s": 2.24, "samplerate": 48000, "sha256": "042e14ee446c5bf9b92660b7263bf1f429b9e2d3853cf6b4ff43d935d5463493", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s6-voxcpm-en-description-ar-speech.wav"}
+> POST /generate json={"profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "engine": "voxcpm", "language": "en", "seed": 1234, "voice_description": "A young woman with a bright, cheerful, high-pitched voice.", "text": "The quick brown fox jumps over the lazy dog, and then it rests beside the river."}
+< 200 (0.02s) {"id": "3679ae54-4bf7-4055-9cda-38282afed456", "profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "text": "The quick brown fox jumps over the lazy dog, and then it rests beside the river.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 1234, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T15:58:42.342666", "versions": null, "active_version_id": null}
+> GET /history/3679ae54-4bf7-4055-9cda-38282afed456
+< 200 (0.00s)
+> GET /history/3679ae54-4bf7-4055-9cda-38282afed456
+< 200 (0.00s)
+> GET /history/3679ae54-4bf7-4055-9cda-38282afed456
+< 200 (0.00s)
+> GET /history/3679ae54-4bf7-4055-9cda-38282afed456
+< 200 (0.00s)
+> GET /history/3679ae54-4bf7-4055-9cda-38282afed456
+< 200 (0.00s)
+  RESULT {"tag": "s6-voxcpm-clone-plus-description", "ok": true, "id": "3679ae54-4bf7-4055-9cda-38282afed456", "engine": "voxcpm", "model_size": null, "wall_s": 8.0, "duration_s": 5.12, "samplerate": 48000, "sha256": "f18ccca7d20d75e88eada6919d3682cbd17fb06f37574501209fe3c55e6e63b7", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s6-voxcpm-clone-plus-description.wav"}
+  CLONE+DESC vs CLONE-only same seed/text: identical=True
+
+### Step 7: advanced settings
+> POST /generate json={"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "language": "en", "seed": 7, "advanced_settings": {"cfg_value": 2.5, "inference_timesteps": 16}, "text": "Advanced settings inside their declared bounds."}
+< 200 (0.01s) {"id": "d15841d2-6847-470a-a50b-7e9fa5862266", "profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "text": "Advanced settings inside their declared bounds.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 7, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T15:58:50.390762", "versions": null, "active_version_id": null}
+> GET /history/d15841d2-6847-470a-a50b-7e9fa5862266
+< 200 (0.00s)
+> GET /history/d15841d2-6847-470a-a50b-7e9fa5862266
+< 200 (0.00s)
+> GET /history/d15841d2-6847-470a-a50b-7e9fa5862266
+< 200 (0.00s)
+> GET /history/d15841d2-6847-470a-a50b-7e9fa5862266
+< 200 (0.00s)
+> GET /history/d15841d2-6847-470a-a50b-7e9fa5862266
+< 200 (0.00s)
+  RESULT {"tag": "s7-voxcpm-advanced-in-bounds", "ok": true, "id": "d15841d2-6847-470a-a50b-7e9fa5862266", "engine": "voxcpm", "model_size": null, "wall_s": 8.0, "duration_s": 3.52, "samplerate": 48000, "sha256": "2b97a95c826f150617807c6fd4675b9773d002844687654669693fd78534e3a7", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s7-voxcpm-advanced-in-bounds.wav"}
+> POST /generate json={"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "text": "x", "advanced_settings": {"cfg_value": 9.0}}
+< 422 (0.00s) {"detail": [{"type": "value_error", "loc": ["body"], "msg": "Value error, Advanced setting 'cfg_value' must be between 1.0 and 3.0 for engine 'voxcpm'", "input": {"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "text": "x", "advanced_settings": {"cfg_value": 9.0}}, "ctx": {"error": {}}}]}
+> POST /generate json={"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "text": "x", "advanced_settings": {"temperature": 1.0}}
+< 422 (0.00s) {"detail": [{"type": "value_error", "loc": ["body"], "msg": "Value error, Engine 'voxcpm' does not declare an advanced setting named 'temperature'", "input": {"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "text": "x", "advanced_settings": {"temperature": 1.0}}, "ctx": {"error": {}}}]}
+> POST /generate json={"profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "engine": "qwen", "text": "x", "advanced_settings": {"cfg_value": 2.0}}
+< 422 (0.00s) {"detail": [{"type": "value_error", "loc": ["body"], "msg": "Value error, Engine 'qwen' does not declare an advanced setting named 'cfg_value'", "input": {"profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "engine": "qwen", "text": "x", "advanced_settings": {"cfg_value": 2.0}}, "ctx": {"error": {}}}]}
+
+### Step 7: unload
+> GET /models/status
+< 200 (0.07s)
+  voxcpm2 status before: [{"model_name": "voxcpm2", "display_name": "VoxCPM2 (Multilingual, Voice Design)", "hf_repo_id": "openbmb/VoxCPM2", "downloaded": true, "downloading": false, "size_mb": 4730.922571182251, "loaded": true, "license_id": "Apache-2.0", "commercial_use": true, "dialect": null}]
+  GPU before unload: 0, 7577 MiB, 12227 MiB | 1, 2979 MiB, 16311 MiB
+> POST /models/voxcpm2/unload
+< 200 (0.08s) {"message": "Model voxcpm2 unloaded successfully"}
+> GET /models/status
+< 200 (0.04s)
+  voxcpm2 status after: [{"model_name": "voxcpm2", "display_name": "VoxCPM2 (Multilingual, Voice Design)", "hf_repo_id": "openbmb/VoxCPM2", "downloaded": true, "downloading": false, "size_mb": 4730.922571182251, "loaded": false, "license_id": "Apache-2.0", "commercial_use": true, "dialect": null}]
+  GPU after unload: 0, 1189 MiB, 12227 MiB | 1, 2958 MiB, 16311 MiB
+> POST /models/voxcpm2/unload
+< 200 (0.00s) {"message": "Model voxcpm2 is not loaded"}
+
+SUMMARY {
+ "s2_en": {
+  "ok": true,
+  "wall_s": 26.1,
+  "duration_s": 7.04,
+  "samplerate": 48000,
+  "sha256": "a6d3cece1d56f356c4320e7d0e8be34721dfb247da1b3d723f9ddf8d9e202339",
+  "detail": null,
+  "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s2-voxcpm-en-designed.wav"
+ },
+ "s3_ar": {
+  "ok": true,
+  "wall_s": 8.0,
+  "duration_s": 5.44,
+  "samplerate": 48000,
+  "sha256": "9f864d7dd4afb09ed66616f3fb135b9cc6bad8ebf97949a7ac43577c349205ff",
+  "detail": null,
+  "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s3-voxcpm-ar.wav"
+ },
+ "s3_ar_dict": {
+  "ok": true,
+  "wall_s": 6.0,
+  "duration_s": 3.2,
+  "samplerate": 48000,
+  "sha256": "d004b3908bb61f57b99e2afa019afb945e08de772da8cda1cb706d686e86f7d9",
+  "detail": null,
+  "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s3-voxcpm-ar-pronunciation.wav"
+ },
+ "s4_clone1": {
+  "ok": true,
+  "wall_s": 8.0,
+  "duration_s": 5.12,
+  "samplerate": 48000,
+  "sha256": "f18ccca7d20d75e88eada6919d3682cbd17fb06f37574501209fe3c55e6e63b7",
+  "detail": null,
+  "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s4-voxcpm-clone-run1.wav"
+ },
+ "s4_clone2": {
+  "ok": true,
+  "wall_s": 10.0,
+  "duration_s": 5.12,
+  "samplerate": 48000,
+  "sha256": "f18ccca7d20d75e88eada6919d3682cbd17fb06f37574501209fe3c55e6e63b7",
+  "detail": null,
+  "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s4-voxcpm-clone-run2.wav"
+ },
+ "s4_multi": {
+  "ok": true,
+  "wall_s": 6.1,
+  "duration_s": 3.52,
+  "samplerate": 48000,
+  "sha256": "76564b1b438719a0a3a73a3e5f9d95679011de7504e6d71f664d8a935c14d842",
+  "detail": null,
+  "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s4-voxcpm-clone-multi.wav"
+ },
+ "s6_designed_with_desc": {
+  "ok": true,
+  "wall_s": 6.0,
+  "duration_s": 4.16,
+  "samplerate": 48000,
+  "sha256": "008190982ea8d4522719bb16a46bc55a37dec15e6a821f1e48bd23494c146157",
+  "detail": null,
+  "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s6-voxcpm-designed-with-description.wav"
+ },
+ "s6_designed_no_desc": {
+  "ok": true,
+  "wall_s": 10.0,
+  "duration_s": 6.4,
+  "samplerate": 48000,
+  "sha256": "18c70b9e9e924c7937442024300c95fe532b8f1e6df41419bd8d568b74022d19",
+  "detail": null,
+  "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s6-voxcpm-designed-no-description.wav"
+ },
+ "s6_en_desc_ar_speech": {
+  "ok": true,
+  "wall_s": 4.0,
+  "duration_s": 2.24,
+  "samplerate": 48000,
+  "sha256": "042e14ee446c5bf9b92660b7263bf1f429b9e2d3853cf6b4ff43d935d5463493",
+  "detail": null,
+  "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s6-voxcpm-en-description-ar-speech.wav"
+ },
+ "s6_clone_plus_desc": {
+  "ok": true,
+  "wall_s": 8.0,
+  "duration_s": 5.12,
+  "samplerate": 48000,
+  "sha256": "f18ccca7d20d75e88eada6919d3682cbd17fb06f37574501209fe3c55e6e63b7",
+  "detail": null,
+  "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s6-voxcpm-clone-plus-description.wav"
+ },
+ "s7_adv_ok": {
+  "ok": true,
+  "wall_s": 8.0,
+  "duration_s": 3.52,
+  "samplerate": 48000,
+  "sha256": "2b97a95c826f150617807c6fd4675b9773d002844687654669693fd78534e3a7",
+  "detail": null,
+  "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s7-voxcpm-advanced-in-bounds.wav"
+ },
+ "s7_adv_oob": [
+  422,
+  {
+   "detail": [
+    {
+     "type": "value_error",
+     "loc": [
+      "body"
+     ],
+     "msg": "Value error, Advanced setting 'cfg_value' must be between 1.0 and 3.0 for engine 'voxcpm'",
+     "input": {
+      "profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2",
+      "engine": "voxcpm",
+      "text": "x",
+      "advanced_settings": {
+       "cfg_value": 9.0
+      }
+     },
+     "ctx": {
+      "error": {}
+     }
+    }
+   ]
+  }
+ ],
+ "s7_adv_unknown": [
+  422,
+  {
+   "detail": [
+    {
+     "type": "value_error",
+     "loc": [
+      "body"
+     ],
+     "msg": "Value error, Engine 'voxcpm' does not declare an advanced setting named 'temperature'",
+     "input": {
+      "profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2",
+      "engine": "voxcpm",
+      "text": "x",
+      "advanced_settings": {
+       "temperature": 1.0
+      }
+     },
+     "ctx": {
+      "error": {}
+     }
+    }
+   ]
+  }
+ ],
+ "s7_adv_qwen": [
+  422,
+  {
+   "detail": [
+    {
+     "type": "value_error",
+     "loc": [
+      "body"
+     ],
+     "msg": "Value error, Engine 'qwen' does not declare an advanced setting named 'cfg_value'",
+     "input": {
+      "profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f",
+      "engine": "qwen",
+      "text": "x",
+      "advanced_settings": {
+       "cfg_value": 2.0
+      }
+     },
+     "ctx": {
+      "error": {}
+     }
+    }
+   ]
+  }
+ ]
+}
+
+==================================================================
+RAW: q-offline.log
+==================================================================
+GPU: 0, 789 MiB, 12227 MiB | 1, 3054 MiB, 16311 MiB
+> GET /models/status
+< 200 (0.15s)
+  voxcpm2 status: [{"model_name": "voxcpm2", "display_name": "VoxCPM2 (Multilingual, Voice Design)", "hf_repo_id": "openbmb/VoxCPM2", "downloaded": true, "downloading": false, "size_mb": 4730.922571182251, "loaded": false, "license_id": "Apache-2.0", "commercial_use": true, "dialect": null}]
+> POST /generate json={"profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "engine": "voxcpm", "language": "en", "seed": 7, "text": "This generation ran with the network blocked, from the local cache only."}
+< 200 (0.03s) {"id": "e9f17e99-4c49-4c88-8b2d-9341f00a9be2", "profile_id": "2e778a47-2eb6-4fb2-be65-5c61842255c2", "text": "This generation ran with the network blocked, from the local cache only.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 7, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T16:01:48.667448", "versions": null, "active_version_id": null}
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.01s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.01s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.01s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.00s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.00s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.01s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.00s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.00s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.00s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.00s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.00s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.00s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.00s)
+> GET /history/e9f17e99-4c49-4c88-8b2d-9341f00a9be2
+< 200 (0.00s)
+  RESULT {"tag": "s2b-voxcpm-offline", "ok": true, "id": "e9f17e99-4c49-4c88-8b2d-9341f00a9be2", "engine": "voxcpm", "model_size": null, "wall_s": 26.1, "duration_s": 6.08, "samplerate": 48000, "sha256": "e1daa2d3a8cd87c47633e62fcd35201464f15ed59f2e6fcce0691e24fe2a342c", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s2b-voxcpm-offline.wav"}
+> POST /generate json={"profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "engine": "voxcpm", "language": "en", "seed": 1234, "text": "The quick brown fox jumps over the lazy dog, and then it rests beside the river."}
+< 200 (0.02s) {"id": "e12f69e6-6eb7-47f3-ae69-8a4c2972e7e7", "profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "text": "The quick brown fox jumps over the lazy dog, and then it rests beside the river.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 1234, "instruct": null, "engine": "voxcpm", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T16:02:14.792503", "versions": null, "active_version_id": null}
+> GET /history/e12f69e6-6eb7-47f3-ae69-8a4c2972e7e7
+< 200 (0.00s)
+> GET /history/e12f69e6-6eb7-47f3-ae69-8a4c2972e7e7
+< 200 (0.00s)
+> GET /history/e12f69e6-6eb7-47f3-ae69-8a4c2972e7e7
+< 200 (0.00s)
+> GET /history/e12f69e6-6eb7-47f3-ae69-8a4c2972e7e7
+< 200 (0.01s)
+> GET /history/e12f69e6-6eb7-47f3-ae69-8a4c2972e7e7
+< 200 (0.00s)
+> GET /history/e12f69e6-6eb7-47f3-ae69-8a4c2972e7e7
+< 200 (0.00s)
+> GET /history/e12f69e6-6eb7-47f3-ae69-8a4c2972e7e7
+< 200 (0.00s)
+> GET /history/e12f69e6-6eb7-47f3-ae69-8a4c2972e7e7
+< 200 (0.00s)
+  RESULT {"tag": "s2b-voxcpm-offline-clone", "ok": true, "id": "e12f69e6-6eb7-47f3-ae69-8a4c2972e7e7", "engine": "voxcpm", "model_size": null, "wall_s": 14.1, "duration_s": 5.12, "samplerate": 48000, "sha256": "f18ccca7d20d75e88eada6919d3682cbd17fb06f37574501209fe3c55e6e63b7", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\s2b-voxcpm-offline-clone.wav"}
+  offline clone vs online clone identical: True
+> POST /models/voxcpm2/unload
+< 200 (0.10s) {"message": "Model voxcpm2 unloaded successfully"}
+
+==================================================================
+RAW: q-step5.log
+==================================================================
+C:\Users\sabus\voicebox-setupcheck-win\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+INFO:     Could not detect AMD GPU via rocminfo, skipping automatic HSA_OVERRIDE_GFX_VERSION configuration: [WinError 2] The system cannot find the file specified
+INFO:     MCP: mounted at /mcp
+INFO:     HTTP Request: POST http://testserver/profiles "HTTP/1.1 200 OK"
+INFO:     HTTP Request: GET http://testserver/models/engines "HTTP/1.1 200 OK"
+INFO:     HTTP Request: GET http://testserver/models/engines "HTTP/1.1 200 OK"
+INFO:     HTTP Request: POST http://testserver/generate "HTTP/1.1 400 Bad Request"
+INFO:     HTTP Request: POST http://testserver/generate/stream "HTTP/1.1 400 Bad Request"
+INFO:     HTTP Request: GET http://testserver/models/engines "HTTP/1.1 200 OK"
+INFO:     HTTP Request: POST http://testserver/generate "HTTP/1.1 400 Bad Request"
+INFO:     HTTP Request: POST http://testserver/generate/stream "HTTP/1.1 400 Bad Request"
+INFO:     HTTP Request: GET http://testserver/models/engines "HTTP/1.1 200 OK"
+INFO:     HTTP Request: GET http://testserver/models/engines "HTTP/1.1 200 OK"
+
+=== real hardware ===
+GET /models/engines -> 200 {"available": true, "reason": null, "warning": null, "supported_accelerators": ["cuda", "mps", "cpu"], "detected_accelerator": "cuda"}
+engines listed (never hidden): ['qwen', 'qwen_custom_voice', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'kokoro', 'f5_tts', 'voxcpm']
+
+=== forced directml (unsupported) ===
+GET /models/engines -> 200 {"available": false, "reason": "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using DirectML.", "warning": null, "supported_accelerators": ["cuda", "mps", "cpu"], "detected_accelerator": "directml"}
+engines listed (never hidden): ['qwen', 'qwen_custom_voice', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'kokoro', 'f5_tts', 'voxcpm']
+POST /generate voxcpm -> 400 {"detail":"VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using DirectML."}
+POST /generate/stream voxcpm -> 400 {"detail":"VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using DirectML."}
+
+=== forced xpu (unsupported) ===
+GET /models/engines -> 200 {"available": false, "reason": "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using Intel XPU.", "warning": null, "supported_accelerators": ["cuda", "mps", "cpu"], "detected_accelerator": "xpu"}
+engines listed (never hidden): ['qwen', 'qwen_custom_voice', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'kokoro', 'f5_tts', 'voxcpm']
+POST /generate voxcpm -> 400 {"detail":"VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using Intel XPU."}
+POST /generate/stream voxcpm -> 400 {"detail":"VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using Intel XPU."}
+
+=== forced cuda with 4096 MB (below min_memory_mb 6144) ===
+GET /models/engines -> 200 {"available": true, "reason": null, "warning": "This machine has about 4 GB of graphics memory. VoxCPM2 (Multilingual, Voice Design) usually needs about 6 GB, so generation may fail.", "supported_accelerators": ["cuda", "mps", "cpu"], "detected_accelerator": "cuda"}
+engines listed (never hidden): ['qwen', 'qwen_custom_voice', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'kokoro', 'f5_tts', 'voxcpm']
+
+=== forced cpu ===
+GET /models/engines -> 200 {"available": true, "reason": null, "warning": null, "supported_accelerators": ["cuda", "mps", "cpu"], "detected_accelerator": "cpu"}
+engines listed (never hidden): ['qwen', 'qwen_custom_voice', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'kokoro', 'f5_tts', 'voxcpm']
+
+==================================================================
+RAW: q-sc007.log
+==================================================================
+> POST /generate json={"profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "engine": "qwen", "language": "en", "seed": 3, "text": "Every engine that worked before still works after this change.", "model_size": "1.7B"}
+< 200 (0.06s) {"id": "8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7", "profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "text": "Every engine that worked before still works after this change.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 3, "instruct": null, "engine": "qwen", "model_size": "1.7B", "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T16:03:41.719998", "versions": null, "active_version_id": null}
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.01s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+> GET /history/8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7
+< 200 (0.00s)
+  RESULT {"tag": "sc007-qwen-1.7B", "ok": true, "id": "8634d6f3-fa7c-49d5-8d1f-d5542fb0b9e7", "engine": "qwen", "model_size": "1.7B", "wall_s": 38.1, "duration_s": 4.08, "samplerate": 24000, "sha256": "9d126ad57943b058d0b6866909e103a18b0ba32145d9aedf1941695974c24afc", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\sc007-qwen-1.7B.wav"}
+> GET /models/status
+< 200 (0.07s)
+  loaded now: qwen-tts-1.7B, kokoro
+> POST /models/qwen-tts-1.7B/unload
+< 200 (0.06s) {"message": "Model qwen-tts-1.7B unloaded successfully"}
+> POST /models/kokoro/unload
+< 200 (0.01s) {"message": "Model kokoro unloaded successfully"}
+> POST /generate json={"profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "engine": "qwen", "language": "en", "seed": 3, "text": "Every engine that worked before still works after this change.", "model_size": "0.6B"}
+< 200 (0.02s) {"id": "32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad", "profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "text": "Every engine that worked before still works after this change.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 3, "instruct": null, "engine": "qwen", "model_size": "0.6B", "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T16:04:20.398402", "versions": null, "active_version_id": null}
+> GET /history/32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad
+< 200 (0.01s)
+> GET /history/32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad
+< 200 (0.07s)
+> GET /history/32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad
+< 200 (0.00s)
+> GET /history/32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad
+< 200 (0.00s)
+> GET /history/32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad
+< 200 (0.01s)
+> GET /history/32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad
+< 200 (0.01s)
+> GET /history/32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad
+< 200 (0.01s)
+> GET /history/32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad
+< 200 (0.00s)
+> GET /history/32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad
+< 200 (0.01s)
+> GET /history/32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad
+< 200 (0.01s)
+> GET /history/32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad
+< 200 (0.00s)
+> GET /history/32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad
+< 200 (0.00s)
+  RESULT {"tag": "sc007-qwen-0.6B", "ok": true, "id": "32051fd7-cd2d-4bc2-b50b-6d98c9caa6ad", "engine": "qwen", "model_size": "0.6B", "wall_s": 22.1, "duration_s": 3.68, "samplerate": 24000, "sha256": "9c5f447de82601dbfc62e9c94f1ee1638a062863d8ff9277e756891432197729", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\sc007-qwen-0.6B.wav"}
+> GET /models/status
+< 200 (0.07s)
+  loaded now: qwen-tts-0.6B, luxtts
+> POST /models/qwen-tts-0.6B/unload
+< 200 (0.05s) {"message": "Model qwen-tts-0.6B unloaded successfully"}
+> POST /models/luxtts/unload
+< 200 (0.02s) {"message": "Model luxtts unloaded successfully"}
+> POST /generate json={"profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "engine": "tada", "language": "en", "seed": 3, "text": "Every engine that worked before still works after this change.", "model_size": "1B"}
+< 200 (0.02s) {"id": "8ccec02d-3587-4c12-9b29-e7af37f2b849", "profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "text": "Every engine that worked before still works after this change.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 3, "instruct": null, "engine": "tada", "model_size": "1B", "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T16:04:43.205068", "versions": null, "active_version_id": null}
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.00s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.00s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.00s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.00s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.01s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.01s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.01s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.00s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.03s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.00s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.01s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.00s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.00s)
+> GET /history/8ccec02d-3587-4c12-9b29-e7af37f2b849
+< 200 (0.00s)
+  RESULT {"tag": "sc007-tada-1B", "ok": true, "id": "8ccec02d-3587-4c12-9b29-e7af37f2b849", "engine": "tada", "model_size": "1B", "wall_s": 26.1, "duration_s": 4.24, "samplerate": 24000, "sha256": "65890a4560773987c5fd55ae6dcf974b3c5564e324a02d1f4f82ff4a94c20ed0", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\sc007-tada-1B.wav"}
+> GET /models/status
+< 200 (0.05s)
+  loaded now: tada-1b, tada-3b-ml
+> POST /models/tada-1b/unload
+< 200 (0.07s) {"message": "Model tada-1b unloaded successfully"}
+> POST /models/tada-3b-ml/unload
+< 200 (0.00s) {"message": "Model tada-3b-ml is not loaded"}
+> POST /profiles json={"name": "T044 preset qwen_custom_voice", "voice_type": "preset", "preset_engine": "qwen_custom_voice", "preset_voice_id": "Ryan", "language": "en"}
+< 200 (0.02s) {"id": "2433f7bf-4a95-4ae6-bce6-fc617a00d8e9", "name": "T044 preset qwen_custom_voice", "description": null, "language": "en", "avatar_path": null, "effects_chain": null, "voice_type": "preset", "preset_engine": "qwen_custom_voice", "preset_voice_id": "Ryan", "design_prompt": null, "default_engine": "qwen_custom_voice", "personality": null, "generation_count": 0, "sample_count": 0, "created_at": "2026-09-23T16:05:28.948262", "updated_at": "2026-09-23T16:05:28.948262"}
+> POST /generate json={"profile_id": "2433f7bf-4a95-4ae6-bce6-fc617a00d8e9", "engine": "qwen_custom_voice", "language": "en", "seed": 3, "text": "Every engine that worked before still works after this change.", "model_size": "1.7B"}
+< 200 (0.02s) {"id": "674f0d06-4ef7-4908-8997-1f6f8fe9d3e6", "profile_id": "2433f7bf-4a95-4ae6-bce6-fc617a00d8e9", "text": "Every engine that worked before still works after this change.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 3, "instruct": null, "engine": "qwen_custom_voice", "model_size": "1.7B", "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T16:05:28.962185", "versions": null, "active_version_id": null}
+> GET /history/674f0d06-4ef7-4908-8997-1f6f8fe9d3e6
+< 200 (0.01s)
+> GET /history/674f0d06-4ef7-4908-8997-1f6f8fe9d3e6
+< 200 (0.00s)
+> GET /history/674f0d06-4ef7-4908-8997-1f6f8fe9d3e6
+< 200 (0.00s)
+> GET /history/674f0d06-4ef7-4908-8997-1f6f8fe9d3e6
+< 200 (0.08s)
+> GET /history/674f0d06-4ef7-4908-8997-1f6f8fe9d3e6
+< 200 (0.11s)
+> GET /history/674f0d06-4ef7-4908-8997-1f6f8fe9d3e6
+< 200 (0.00s)
+> GET /history/674f0d06-4ef7-4908-8997-1f6f8fe9d3e6
+< 200 (0.00s)
+> GET /history/674f0d06-4ef7-4908-8997-1f6f8fe9d3e6
+< 200 (0.00s)
+> GET /history/674f0d06-4ef7-4908-8997-1f6f8fe9d3e6
+< 200 (0.00s)
+> GET /history/674f0d06-4ef7-4908-8997-1f6f8fe9d3e6
+< 200 (0.00s)
+  RESULT {"tag": "sc007-qwen_custom_voice-1.7B", "ok": true, "id": "674f0d06-4ef7-4908-8997-1f6f8fe9d3e6", "engine": "qwen_custom_voice", "model_size": "1.7B", "wall_s": 18.2, "duration_s": 4.24, "samplerate": 24000, "sha256": "a979054cb0f2281e1d2f6552486631c1d4cb70d8944e1abcc41d42c6b8d4afcd", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\sc007-qwen_custom_voice-1.7B.wav"}
+> GET /models/status
+< 200 (0.06s)
+  loaded now: qwen-custom-voice-1.7B
+> POST /models/qwen-custom-voice-1.7B/unload
+< 200 (0.03s) {"message": "Model qwen-custom-voice-1.7B unloaded successfully"}
+> POST /profiles json={"name": "T044 preset kokoro", "voice_type": "preset", "preset_engine": "kokoro", "preset_voice_id": "af_bella", "language": "en"}
+< 200 (0.36s) {"id": "0e602569-6d55-452d-8c17-b1120b11d0ae", "name": "T044 preset kokoro", "description": null, "language": "en", "avatar_path": null, "effects_chain": null, "voice_type": "preset", "preset_engine": "kokoro", "preset_voice_id": "af_bella", "design_prompt": null, "default_engine": "kokoro", "personality": null, "generation_count": 0, "sample_count": 0, "created_at": "2026-09-23T16:05:47.706358", "updated_at": "2026-09-23T16:05:47.706358"}
+> POST /generate json={"profile_id": "0e602569-6d55-452d-8c17-b1120b11d0ae", "engine": "kokoro", "language": "en", "seed": 3, "text": "Every engine that worked before still works after this change."}
+< 200 (0.01s) {"id": "4d147294-b884-4a07-8fc7-20b3be6b8650", "profile_id": "0e602569-6d55-452d-8c17-b1120b11d0ae", "text": "Every engine that worked before still works after this change.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 3, "instruct": null, "engine": "kokoro", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T16:05:48.052199", "versions": null, "active_version_id": null}
+> GET /history/4d147294-b884-4a07-8fc7-20b3be6b8650
+< 200 (0.01s)
+> GET /history/4d147294-b884-4a07-8fc7-20b3be6b8650
+< 200 (0.00s)
+> GET /history/4d147294-b884-4a07-8fc7-20b3be6b8650
+< 200 (0.12s)
+> GET /history/4d147294-b884-4a07-8fc7-20b3be6b8650
+< 200 (0.00s)
+  RESULT {"tag": "sc007-kokoro", "ok": true, "id": "4d147294-b884-4a07-8fc7-20b3be6b8650", "engine": "kokoro", "model_size": null, "wall_s": 6.1, "duration_s": 4.0, "samplerate": 24000, "sha256": "1f9ea4de7f49c5f62d924744a1f85314bcd48033be33288ef76efa3fbf536e19", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\sc007-kokoro.wav"}
+> GET /models/status
+< 200 (0.06s)
+  loaded now: kokoro
+> POST /models/kokoro/unload
+< 200 (0.02s) {"message": "Model kokoro unloaded successfully"}
+> POST /generate json={"profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "engine": "luxtts", "language": "en", "seed": 3, "text": "Every engine that worked before still works after this change."}
+< 200 (0.02s) {"id": "5d7b4c1f-e692-42f5-82f1-ece7c6f464b4", "profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "text": "Every engine that worked before still works after this change.", "language": "en", "audio_path": "", "duration": 0.0, "seed": 3, "instruct": null, "engine": "luxtts", "model_size": null, "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T16:05:54.815493", "versions": null, "active_version_id": null}
+> GET /history/5d7b4c1f-e692-42f5-82f1-ece7c6f464b4
+< 200 (0.00s)
+> GET /history/5d7b4c1f-e692-42f5-82f1-ece7c6f464b4
+< 200 (0.05s)
+> GET /history/5d7b4c1f-e692-42f5-82f1-ece7c6f464b4
+< 200 (0.00s)
+> GET /history/5d7b4c1f-e692-42f5-82f1-ece7c6f464b4
+< 200 (0.60s)
+> GET /history/5d7b4c1f-e692-42f5-82f1-ece7c6f464b4
+< 200 (0.00s)
+  RESULT {"tag": "sc007-luxtts", "ok": true, "id": "5d7b4c1f-e692-42f5-82f1-ece7c6f464b4", "engine": "luxtts", "model_size": null, "wall_s": 8.7, "duration_s": 3.13, "samplerate": 48000, "sha256": "59543170095009ebd9c22852defb50616f5958372b7b22fb29a24eb950380bb2", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\sc007-luxtts.wav"}
+> GET /models/status
+< 200 (0.08s)
+  loaded now: luxtts
+> POST /models/luxtts/unload
+< 200 (0.02s) {"message": "Model luxtts unloaded successfully"}
+> POST /generate json={"profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "engine": "f5_tts", "language": "ar", "seed": 3, "text": "مرحبا، هذا اختبار قصير لمحرك حبيبي.", "model_size": "habibi-msa"}
+< 200 (0.02s) {"id": "b21cfa81-6a7c-4757-890a-c2c725fa518a", "profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "text": "مرحبا، هذا اختبار قصير لمحرك حبيبي.", "language": "ar", "audio_path": "", "duration": 0.0, "seed": 3, "instruct": null, "engine": "f5_tts", "model_size": "habibi-msa", "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T16:06:04.018800", "versions": null, "active_version_id": null}
+> GET /history/b21cfa81-6a7c-4757-890a-c2c725fa518a
+< 200 (0.01s)
+> GET /history/b21cfa81-6a7c-4757-890a-c2c725fa518a
+< 200 (0.04s)
+> GET /history/b21cfa81-6a7c-4757-890a-c2c725fa518a
+< 200 (0.00s)
+> GET /history/b21cfa81-6a7c-4757-890a-c2c725fa518a
+< 200 (0.00s)
+> GET /history/b21cfa81-6a7c-4757-890a-c2c725fa518a
+< 200 (0.00s)
+> GET /history/b21cfa81-6a7c-4757-890a-c2c725fa518a
+< 200 (0.00s)
+  RESULT {"tag": "sc007-f5_tts-habibi-msa", "ok": true, "id": "b21cfa81-6a7c-4757-890a-c2c725fa518a", "engine": "f5_tts", "model_size": "habibi-msa", "wall_s": 10.1, "duration_s": 5.13, "samplerate": 24000, "sha256": "0bee7aec79d75ef8fec7056a20e1dc4e6954913467a6c7736cbf159b6ff27d9c", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\sc007-f5_tts-habibi-msa.wav"}
+> GET /models/status
+< 200 (0.05s)
+  loaded now: habibi-msa
+> POST /models/habibi-msa/unload
+< 200 (0.00s) {"message": "Model habibi-msa unloaded successfully"}
+> POST /generate json={"profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "engine": "f5_tts", "language": "ar", "seed": 3, "text": "مرحبا، هذا اختبار قصير لمحرك حبيبي.", "model_size": "habibi-unified"}
+< 200 (0.02s) {"id": "75a008e4-a012-4604-93d9-d172b753080c", "profile_id": "1baa5ccb-b0ee-4f65-b8f1-4690e0f4938f", "text": "مرحبا، هذا اختبار قصير لمحرك حبيبي.", "language": "ar", "audio_path": "", "duration": 0.0, "seed": 3, "instruct": null, "engine": "f5_tts", "model_size": "habibi-unified", "status": "generating", "error": null, "is_favorited": false, "source": "manual", "created_at": "2026-09-23T16:06:14.571563", "versions": null, "active_version_id": null}
+> GET /history/75a008e4-a012-4604-93d9-d172b753080c
+< 200 (0.00s)
+> GET /history/75a008e4-a012-4604-93d9-d172b753080c
+< 200 (0.00s)
+> GET /history/75a008e4-a012-4604-93d9-d172b753080c
+< 200 (0.00s)
+> GET /history/75a008e4-a012-4604-93d9-d172b753080c
+< 200 (0.00s)
+  RESULT {"tag": "sc007-f5_tts-habibi-unified", "ok": true, "id": "75a008e4-a012-4604-93d9-d172b753080c", "engine": "f5_tts", "model_size": "habibi-unified", "wall_s": 6.0, "duration_s": 5.13, "samplerate": 24000, "sha256": "ec154127a6d28f1a45c028def856d129759fa7db9d64e7027050140cd23c92de", "path": "C:\\Users\\sabus\\voxcpm-probe-out\\phase7\\sc007-f5_tts-habibi-unified.wav"}
+> GET /models/status
+< 200 (0.10s)
+  loaded now: habibi-unified
+> POST /models/habibi-unified/unload
+< 200 (0.01s) {"message": "Model habibi-unified unloaded successfully"}
+
+==================================================================
+RAW: q-grep.log
+==================================================================
+app/src/components/Generation/EngineModelSelector.tsx:46:  { value: 'voxcpm', label: 'VoxCPM2', engine: 'voxcpm' },
+app/src/components/Generation/EngineModelSelector.tsx:63:  voxcpm: 'OpenBMB, 30 languages incl. Arabic, voice design',
+app/src/components/Generation/FloatingGenerateBox.tsx:188:    | 'voxcpm';
+app/src/components/ServerSettings/ModelManagement.tsx:90:  voxcpm2:
+app/src/components/ServerSettings/ModelManagement.tsx:91:    'VoxCPM2 by OpenBMB. Multilingual TTS covering 30 languages including Arabic, with voice design from a written description. Apache-2.0 licensed; commercial use allowed.',
+app/src/components/ServerSettings/ModelManagement.tsx:120:  voxcpm2: 'voxcpm',
+app/src/components/ServerSettings/ModelManagement.tsx:471:        m.model_name.startsWith('voxcpm'),
+app/src/lib/api/models/EngineCapabilityResponse.ts:10: * See specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md.
+app/src/lib/api/schemas/$EngineCapabilityResponse.ts:8:    See specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md.`,
+app/src/lib/api/schemas/$GenerationRequest.ts:52:                pattern: '^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$',
+app/src/lib/api/schemas/$MCPClientBindingResponse.ts:34:                pattern: '^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$',
+app/src/lib/api/schemas/$MCPClientBindingUpsert.ts:35:                pattern: '^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$',
+app/src/lib/api/schemas/$SpeakRequest.ts:27:                pattern: '^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$',
+app/src/lib/api/types.ts:85:    | 'voxcpm';
+app/src/lib/constants/languages.ts:9: * VoxCPM2 declares 30 languages through the engine capabilities (all in ALL_LANGUAGES).
+app/src/lib/hooks/useGenerationForm.ts:45:      'voxcpm',
+app/src/lib/hooks/useGenerationForm.ts:154:                      : engine === 'voxcpm'
+app/src/lib/hooks/useGenerationForm.ts:155:                        ? 'voxcpm2'
+app/src/lib/hooks/useGenerationForm.ts:176:                      : engine === 'voxcpm'
+app/src/lib/hooks/useGenerationForm.ts:177:                        ? 'VoxCPM2'
+app/src/lib/utils/format.ts:65:  voxcpm: 'VoxCPM2',
+
+==================================================================
+NETWORK HOOK LOGS
+==================================================================
+--- net-online.log ---
+2026-09-23T18:56:29.390 pid=89808 nethook installed deny=False
+2026-09-23T18:56:34.990 pid=89808 connect ('127.0.0.1', 52202) loopback=True
+--- net-server2.log ---
+2026-09-23T19:01:38.798 pid=13328 nethook installed deny=True
+2026-09-23T19:01:43.120 pid=13328 connect ('127.0.0.1', 63861) loopback=True
+--- net-server3.log ---
+2026-09-23T19:03:24.831 pid=91432 nethook installed deny=False
+2026-09-23T19:03:29.034 pid=91432 connect ('127.0.0.1', 49788) loopback=True
+2026-09-23T19:03:37.286 pid=91432 getaddrinfo 'huggingface.co' loopback=False
+2026-09-23T19:03:37.413 pid=91432 connect ('2600:9000:292d:7c00:17:b174:6d00:93a1', 443, 0, 0) loopback=False
+2026-09-23T19:03:37.632 pid=91432 getaddrinfo 'huggingface.co' loopback=False
+2026-09-23T19:03:37.633 pid=91432 getaddrinfo 'huggingface.co' loopback=False
+2026-09-23T19:03:37.635 pid=91432 getaddrinfo 'huggingface.co' loopback=False
+2026-09-23T19:03:37.636 pid=91432 getaddrinfo 'huggingface.co' loopback=False
+2026-09-23T19:03:37.637 pid=91432 getaddrinfo 'huggingface.co' loopback=False
+2026-09-23T19:03:37.637 pid=91432 connect ('2600:9000:292d:7c00:17:b174:6d00:93a1', 443, 0, 0) loopback=False
+2026-09-23T19:03:37.637 pid=91432 connect ('2600:9000:292d:7c00:17:b174:6d00:93a1', 443, 0, 0) loopback=False
+2026-09-23T19:03:37.637 pid=91432 connect ('2600:9000:292d:7c00:17:b174:6d00:93a1', 443, 0, 0) loopback=False
+2026-09-23T19:03:37.638 pid=91432 connect ('2600:9000:292d:7c00:17:b174:6d00:93a1', 443, 0, 0) loopback=False
+2026-09-23T19:03:37.638 pid=91432 connect ('2600:9000:292d:7c00:17:b174:6d00:93a1', 443, 0, 0) loopback=False
+2026-09-23T19:03:37.659 pid=91432 getaddrinfo 'huggingface.co' loopback=False
+2026-09-23T19:03:37.661 pid=91432 connect ('2600:9000:292d:7c00:17:b174:6d00:93a1', 443, 0, 0) loopback=False
+2026-09-23T19:03:37.661 pid=91432 getaddrinfo 'huggingface.co' loopback=False
+2026-09-23T19:03:37.661 pid=91432 getaddrinfo 'huggingface.co' loopback=False
+2026-09-23T19:03:37.661 pid=91432 connect ('2600:9000:292d:7c00:17:b174:6d00:93a1', 443, 0, 0) loopback=False
+2026-09-23T19:03:37.662 pid=91432 connect ('2600:9000:292d:7c00:17:b174:6d00:93a1', 443, 0, 0) loopback=False
+2026-09-23T19:03:38.040 pid=91432 getaddrinfo 'us.aws.cdn.hf.co' loopback=False
+2026-09-23T19:03:38.040 pid=91432 getaddrinfo 'us.aws.cdn.hf.co' loopback=False
+2026-09-23T19:03:38.047 pid=91432 getaddrinfo 'us.aws.cdn.hf.co' loopback=False
+2026-09-23T19:03:38.047 pid=91432 getaddrinfo 'us.aws.cdn.hf.co' loopback=False
+2026-09-23T19:03:38.048 pid=91432 getaddrinfo 'us.aws.cdn.hf.co' loopback=False
+2026-09-23T19:03:38.119 pid=91432 connect ('15.237.164.118', 443) loopback=False
+2026-09-23T19:03:38.120 pid=91432 connect ('15.237.164.118', 443) loopback=False
+2026-09-23T19:03:38.120 pid=91432 connect ('15.237.164.118', 443) loopback=False
+2026-09-23T19:03:38.120 pid=91432 connect ('15.237.164.118', 443) loopback=False
+2026-09-23T19:03:38.120 pid=91432 connect ('15.237.164.118', 443) loopback=False
+2026-09-23T19:03:38.649 pid=91432 getaddrinfo 'us.aws.cdn.hf.co' loopback=False
+2026-09-23T19:03:38.650 pid=91432 connect ('15.237.164.118', 443) loopback=False
+2026-09-23T19:03:40.408 pid=91432 getaddrinfo 'huggingface.co' loopback=False
+2026-09-23T19:03:40.411 pid=91432 connect ('2600:9000:292d:7c00:17:b174:6d00:93a1', 443, 0, 0) loopback=False
+2026-09-23T19:03:42.054 pid=91432 getaddrinfo 'us.aws.cdn.hf.co' loopback=False
+2026-09-23T19:03:42.056 pid=91432 connect ('15.237.164.118', 443) loopback=False
+2026-09-23T19:03:42.140 pid=91432 getaddrinfo 'huggingface.co' loopback=False
+2026-09-23T19:03:42.141 pid=91432 connect ('2600:9000:292d:7c00:17:b174:6d00:93a1', 443, 0, 0) loopback=False
+2026-09-23T19:04:07.581 pid=91432 getaddrinfo 'us.aws.cdn.hf.co' loopback=False
+2026-09-23T19:04:07.639 pid=91432 connect ('15.237.164.118', 443) loopback=False
+2026-09-23T19:05:51.399 pid=91432 getaddrinfo 'us.aws.cdn.hf.co' loopback=False
+2026-09-23T19:05:51.477 pid=91432 connect ('13.37.0.65', 443) loopback=False
+--- server2 (offline) log lines of interest ---
+INFO:     [offline-guard] VoxCPM2 is cached — forcing offline mode
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+Running on device: cuda, dtype: bfloat16
+--- prompt cache files (FR-013) ---
+19:04:28.0049126000 26989 9bfcfe80555e33425774a9ac64120b7a.prompt
+19:06:01.4747012000 190337 luxtts_9bfcfe80555e33425774a9ac64120b7a.prompt
+19:05:02.6995195000 2163000 tada_en_9bfcfe80555e33425774a9ac64120b7a.prompt
+18:57:49.8764751000 1901 voxcpm_9bfcfe80555e33425774a9ac64120b7a.prompt
+18:58:16.1280074000 1901 voxcpm_f5ce431c7c330d547aae0954b607fd84.prompt

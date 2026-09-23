@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="4" time="54.021" timestamp="2026-09-23T19:02:57.882906+03:00" hostname="DevelopmentPC"><testcase classname="tests.test_all_models_e2e" name="test_voxcpm2_rows_declared" time="0.001" /><testcase classname="tests.test_all_models_e2e" name="test_voxcpm2_rows_follow_only_and_skip" time="0.000" /><testcase classname="tests.test_all_models_e2e" name="test_voxcpm2_request_bodies" time="0.000" /><testcase classname="tests.test_all_models_e2e" name="test_voxcpm2_frozen_binary_e2e" time="53.883"><failure message="AssertionError: harness wrote no report (exit 1)&#10;assert []">tmp_path = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-63/test_voxcpm2_frozen_binary_e2e0')
+
+    def test_voxcpm2_frozen_binary_e2e(tmp_path):
+        import shlex
+    
+        import pytest
+    
+        if os.environ.get(E2E_OPT_IN_ENV) != "1":
+            pytest.skip(f"frozen-binary E2E is opt-in: set {E2E_OPT_IN_ENV}=1 (and build with backend/build_binary.py)")
+    
+        extra = shlex.split(os.environ.get(E2E_ARGS_ENV, ""), posix=os.name != "nt")
+        extra = [a.strip('"') for a in extra]
+        cmd = [sys.executable, str(Path(__file__).resolve()), "--only", "voxcpm", "--skip-build"]
+        if "--output-dir" not in extra:
+            extra += ["--output-dir", str(tmp_path)]
+        cmd += extra
+        output_dir = Path(extra[extra.index("--output-dir") + 1])
+        before = set(output_dir.glob("e2e-*.json")) if output_dir.exists() else set()
+    
+        print(f"[pytest] {' '.join(cmd)}", flush=True)
+        proc = subprocess.run(cmd, cwd=str(REPO_ROOT), capture_output=True, text=True, errors="replace")
+        print(proc.stdout)
+        print(proc.stderr, file=sys.stderr)
+    
+        reports = sorted(set(output_dir.glob("e2e-*.json")) - before)
+&gt;       assert reports, f"harness wrote no report (exit {proc.returncode})"
+E       AssertionError: harness wrote no report (exit 1)
+E       assert []
+
+backend\tests\test_all_models_e2e.py:735: AssertionError</failure></testcase></testsuite></testsuites>

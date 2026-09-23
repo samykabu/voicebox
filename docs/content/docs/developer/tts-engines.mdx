@@ -220,6 +220,18 @@ ModelConfig(
 ),
 ```
 
+**Optional capability fields.** `ModelConfig` also carries five capability declarations. Their defaults keep an engine's behaviour exactly as it was, so set them only when your engine needs them:
+
+| Field | Default | Set it when |
+|-------|---------|-------------|
+| `accelerators` | `()` (unconstrained) | The engine runs only on some accelerators, e.g. `("cuda", "mps", "cpu")`. On any other accelerator the engine is shown greyed out with a reason and generation is refused. |
+| `min_memory_mb` | `None` | The engine usually needs this much memory. Below it the app shows a warning. It never blocks. |
+| `supports_voice_design` | `False` | The engine can create a voice from a written description. |
+| `requires_download_confirmation` | `False` | The app must ask before starting the download. |
+| `advanced_settings` | `()` | The engine has generation settings users may tune. Each is an `AdvancedSetting(name, label, default, min, max)`. |
+
+`GET /models/engines` reports these per engine. See [Worked Example: VoxCPM2](#worked-example-voxcpm2) for an engine that uses all five.
+
 **Add to `TTS_ENGINES` dict:**
 
 ```python
@@ -266,6 +278,8 @@ In `app/src/lib/constants/languages.ts`:
 - Add entry to `ENGINE_LANGUAGES` record
 - Add any new language codes to `ALL_LANGUAGES` if needed
 
+An engine with no `ENGINE_LANGUAGES` entry uses the `languages` that `GET /models/engines` reports for it. VoxCPM2 works this way. Its codes must still be in `ALL_LANGUAGES` and in the language pattern in `backend/models.py`, or they are dropped.
+
 ### 3.3 Engine/Model Selector
 
 In `app/src/components/Generation/EngineModelSelector.tsx`:
@@ -310,9 +324,10 @@ If your engine uses **pre-built voices** instead of zero-shot cloning from refer
 - `preset_engine: "<engine>"` — which engine owns this voice
 - `preset_voice_id: "<id>"` — the engine-specific voice identifier
 
-**For future "designed" voices** (text description instead of audio, e.g. Qwen CustomVoice):
-- Use `voice_type: "designed"` with `design_prompt` field
-- `create_voice_prompt_for_profile()` already returns the design prompt for this type
+**Designed voices** (a text description instead of audio):
+- Use `voice_type: "designed"` with a `design_prompt` field
+- `create_voice_prompt_for_profile()` returns `{"voice_type": "designed", "design_prompt": ...}` for this type
+- The profile form offers the "Describe a voice" source only for engines that declare `supports_voice_design`. VoxCPM2 is the first. See [Voice design](#voice-design)
 
 ## Phase 4: Dependencies
 
@@ -604,6 +619,139 @@ for name, mod in [("dac", types.ModuleType("dac")),
 - Do NOT use `@torch.jit.script` in the shim (see above)
 - Only reimplement what the model actually uses — check the import chain carefully
 
+## Worked Example: VoxCPM2
+
+VoxCPM2 (`openbmb/VoxCPM2`) was added by feature `specs/001-voxcpm2-tts-engine`. It is the first engine to use the capability channel, voice design, advanced settings and the download confirmation. Use it as the reference when your engine needs any of these.
+
+### At a glance
+
+| Item | Value |
+|------|-------|
+| Engine / model name | `voxcpm` / `voxcpm2` |
+| Display name | `VoxCPM2 (Multilingual, Voice Design)` |
+| Package | `voxcpm==2.0.3`, installed with `--no-deps` |
+| Licence | Apache-2.0, commercial use allowed |
+| Output | 48 kHz, read from `model.tts_model.sample_rate` at runtime |
+| Download | 4961 MB (`model.safetensors` plus `audiovae.pth`) |
+| Memory | About 5.9 GB of GPU memory on short text in the probe. `min_memory_mb=6144` |
+| Accelerators | `("cuda", "mps", "cpu")`. The probe tested CUDA and CPU; MPS is untested |
+| Languages | 30, including Arabic |
+| Cloning | Yes. The reference transcript is required |
+| Voice design | Yes (`supports_voice_design=True`) |
+| Delivery instructions | No (`supports_instruct=False`) |
+| Streaming | No. Generation is chunked like the other engines |
+
+The 30 languages, in the order of the model card: `zh`, `en`, `ar`, `my`, `da`, `nl`, `fi`, `fr`, `de`, `el`, `he`, `hi`, `id`, `it`, `ja`, `km`, `ko`, `lo`, `ms`, `no`, `pl`, `pt`, `ru`, `es`, `sw`, `sv`, `tl`, `th`, `tr`, `vi`. Seven of them were new to Voicebox: Burmese (`my`), Indonesian (`id`), Khmer (`km`), Lao (`lo`), Tagalog (`tl`), Thai (`th`) and Vietnamese (`vi`). They were added to `ALL_LANGUAGES` and to the five TTS language patterns in `backend/models.py`. The older engines still offer only their own lists.
+
+### Phase 0 findings
+
+The dependency probe is in `specs/001-voxcpm2-tts-engine/evidence/probe.md`. The points that shaped the integration:
+
+- **Why `--no-deps`.** voxcpm 2.0.3 declares 23 runtime dependencies, including `gradio>=6,<7`, `datasets>=3,<4`, `modelscope`, `funasr` and `torchcodec`. It does not cap numpy or transformers. On the probe machine a plain install pulled transformers 5.x, numpy 2.x and a CPU-only torch, all outside our pins (`numpy<2.0`, `transformers<=4.57.6`).
+- **What it needs at runtime.** torch, torchaudio, numpy, huggingface_hub, einops, pydantic, transformers and librosa. Only `einops` was new to `requirements.txt`.
+- **What it does not need.** gradio, datasets, spaces, funasr, modelscope (only for the denoiser), argbind, wetext and inflect (only for `normalize=True`), and torchcodec. torchcodec needs FFmpeg shared DLLs that the app does not ship. VoxCPM2 loads audio with librosa, so it never calls torchcodec.
+- **No `seed` argument.** `generate()` in 2.0.3 has none. The backend seeds torch itself.
+- **Voice design is a text prefix**, not a parameter. See [Voice design](#voice-design).
+- **The defaults are not offline.** `from_pretrained()` checks the HuggingFace revision on every load and loads a ModelScope denoiser by default. Both must be switched off.
+
+### Backend
+
+`backend/backends/voxcpm_backend.py` follows the LuxTTS backend with three differences: the sample rate comes from the model, the device comes from our own policy, and the voice prompt keeps the transcript.
+
+- **Voice prompt (Pattern B).** `create_voice_prompt()` returns `{"prompt_wav_path": ..., "prompt_text": ...}` and caches it under a `voxcpm_` prefix. The vendor needs both keys together. A blank transcript raises `ValueError`, so a VoxCPM2 clone needs the reference sample's transcript.
+- **Several samples.** `combine_voice_prompts()` combines them at 24 kHz, the rate `services/profiles.py` uses to save the combined reference. The vendor resamples prompt audio to its own 16 kHz encode rate.
+- **Device.** `get_torch_device(allow_mps=True)`, passed to the vendor explicitly. XPU and DirectML are not allowed, because the vendor accepts only `cpu`, `mps` and `cuda[:N]`.
+- **Loading.** Inside `model_load_progress()` and `force_offline_if_cached()`:
+
+  ```python
+  VoxCPM.from_pretrained(
+      "openbmb/VoxCPM2",
+      load_denoiser=False,          # keeps ModelScope out entirely
+      local_files_only=is_cached,   # no HuggingFace request once cached
+      device=device,                # never "auto"
+  )
+  ```
+
+  The cache check uses `weight_extensions=(".safetensors", ".pth", ".bin")`, because `audiovae.pth` is a weight file. Without `.pth` a fully cached model would look uncached. Once cached, the model loads with no HuggingFace or ModelScope requests.
+- **Generation.** `manual_seed(seed, device)` runs before the vendor call. The call passes `normalize=False`, so the vendor's text normalisation cannot undo the pronunciation dictionary's output, including its Arabic handling. `needs_trim=False` because the vendor trims silence itself. `retries_runaway=True` because the vendor retries runaway output (`retry_badcase=True`).
+- **Unload.** Drops the model and calls `empty_device_cache(device)`.
+
+### The capability channel
+
+`GET /models/engines` returns one entry per engine in `TTS_ENGINES`. It never loads a model, never starts a download and never imports torch at module scope. Each entry has:
+
+| Field | Meaning |
+|-------|---------|
+| `engine`, `display_name` | The engine id and its name from `TTS_ENGINES` |
+| `available`, `reason` | Whether this machine can run the engine. `reason` is set if and only if `available` is false |
+| `warning` | Advisory, e.g. too little memory. Never blocks |
+| `supported_accelerators`, `detected_accelerator` | The declared accelerators (empty means unconstrained) and what this machine uses |
+| `languages` | The union of all variants' languages |
+| `supports_cloning` | From `CLONING_ENGINES` in `services/profiles.py` |
+| `supports_voice_design`, `requires_download_confirmation`, `advanced_settings`, `size_mb` | From the default-size variant |
+| `license_id`, `commercial_use` | The value all variants share, or `null` when they differ |
+
+`min_memory_mb` is not in the response. It only drives `warning`. Memory is read only for CUDA devices today, so the warning appears only there.
+
+The app reads capabilities, not engine names. The rules live in `app/src/lib/hooks/engineCapabilityRules.ts`. There is no `if (engine === 'voxcpm')` capability branch in `app/`. An engine this machine cannot run is shown greyed out with its `reason`, never hidden. Every route that starts a generation (`/generate`, `/generate/stream`, retry and regenerate) refuses it with a 400 and the same reason, before any model load or download. The other engines declare no accelerators, so they are never refused this way.
+
+### Voice design
+
+There are two ways to design a voice. Both reach the backend's `instruct` parameter only for engines that declare `supports_voice_design`:
+
+- **The "Voice description" input** in the generate box (`FloatingGenerateBox.tsx`). It is shown only when the engine declares `supports_voice_design`. It is sent as the request's `voice_description` field, never as `instruct`.
+- **The "Describe a voice" profile source** in `ProfileForm.tsx`. It creates a profile with `voice_type: "designed"` and a required `design_prompt`. It is offered only for engines that declare voice design.
+
+`resolve_backend_instruct()` in `services/generation.py` picks what the backend receives. Precedence:
+
+1. **Reference audio wins.** If the profile has a recording, the backend clones from it and ignores any description. The generate box says so.
+2. Otherwise the request's `voice_description`.
+3. Otherwise the designed profile's saved `design_prompt` (found by `profile_design_prompt()`).
+
+The backend encodes the description as the ASCII prefix `"(description)text"`. The probe found that full-width parentheses `（…）` are read aloud, so only ASCII parentheses work. A description in any language is accepted. Because VoxCPM2 declares `supports_instruct=False`, delivery instructions never reach it, and the delivery-instruction box stays off for it.
+
+Retry and regenerate do not store a one-off request description. They reuse a designed profile's saved description, because that comes from the profile.
+
+### Advanced settings
+
+VoxCPM2 declares two settings. The app renders them as sliders from `advanced_settings`, with the defaults preselected:
+
+| Name | Label | Default | Min | Max |
+|------|-------|---------|-----|-----|
+| `cfg_value` | Guidance | 2.0 | 1.0 | 3.0 |
+| `inference_timesteps` | Quality steps | 10 | 4 | 30 |
+
+The defaults are voxcpm 2.0.3's own. The bounds are the recommended ranges from its CLI help. The request field is `advanced_settings`, a map of name to number. A name the engine does not declare, or a value outside the bounds, returns 422. The generation service passes these settings only to engines that declare advanced settings, as an extra `options` argument to `generate()`. The other backends are never called with it.
+
+**v1 limitation:** the settings are not stored with a generation. Regenerate, retry and `/speak` use the engine's defaults. To reproduce a generation made with other settings, choose them again.
+
+### Frontend
+
+- `app/src/lib/api/types.ts`, `EngineModelSelector.tsx`, `useGenerationForm.ts` and `ModelManagement.tsx` got the usual entries.
+- `languages.ts` has **no** `ENGINE_LANGUAGES` entry for `voxcpm`. The app uses the declared `languages`.
+- `DownloadConfirmDialog.tsx` asks before the first download. It shows the size, the licence and any memory warning. It opens from the generate box and from Model Management.
+
+### Dependencies and bundling
+
+- `backend/requirements.txt` adds `einops`.
+- `justfile` installs `voxcpm==2.0.3` with `--no-deps` in both setup targets (bash and PowerShell), so `just setup` covers it.
+- `.github/workflows/release.yml` installs it the same way in all three build jobs, and so does the `Dockerfile`. (The `Dockerfile` still omits `f5-tts` and `habibi-tts`; that gap is older than VoxCPM2.)
+- `build_binary.py` adds `--hidden-import backend.backends.voxcpm_backend` and `--collect-all voxcpm`. `--collect-all` is needed because the audio VAE decorates `snake` with `@torch.jit.script`, which needs the `.py` source in the bundle. It excludes `voxcpm.training` and the packages VoxCPM2 does not need at runtime: `modelscope`, `funasr`, `spaces`, `argbind`, `wetext` and `torchcodec`. The MCP shim build excludes `voxcpm`.
+
+### Responsible use and disclosure
+
+These apply to every engine, not only VoxCPM2:
+
+- The profile dialog shows a responsible-use line for every source (clone, built-in and describe): "Only create voices you have the right to use." It links to `RESPONSIBLE_USE.md`.
+- Every audio file Voicebox generates carries the comment "AI-generated by Voicebox" (`AI_GENERATED_DISCLOSURE` in `backend/utils/audio.py`) in its RIFF INFO chunk (`ICMT`, with `ISFT` set to "Voicebox"). Two helpers write it, both defaulting to that text. `save_audio(..., disclosure=...)` covers saved files: generations (including `/speak` and the MCP `voicebox.speak` tool, which go through `/generate`), effects versions and story exports. `wav_bytes(..., disclosure=...)` covers audio returned without saving: `/generate/stream` (through `services/tts.audio_to_wav_bytes()`) and the effects preview.
+- The user's own recordings are saved with `disclosure=None` and are not labelled: reference samples, the combined reference, and the temp WAV re-encoded for transcription.
+
+A new engine gets all of this for free as long as it returns audio to the generation service and does not write WAV files itself.
+
+### Profile export provenance
+
+Profile export writes manifest version `1.1`. It adds `voice_type`, `design_prompt`, `default_engine`, `preset_engine` and `preset_voice_id`, and import restores them instead of rebuilding every profile as cloned. Designed and preset profiles can be exported with no samples. A `1.0` manifest still imports as a cloned profile. The personality prompt is not exported.
+
 ## Candidate Engines
 
 The [`docs/PROJECT_STATUS.md`](https://github.com/jamiepine/voicebox/blob/main/docs/PROJECT_STATUS.md) file is the canonical, living list of candidates under evaluation — including why some have been backlogged (e.g. VoxCPM, which is effectively CUDA-only upstream).
@@ -618,9 +766,9 @@ At a glance, current top candidates:
 | **Dia2** | 3 | TBD | TBD | Successor to the original Dia |
 | **Fish Audio S2 Pro** | 3 | Medium | Yes | Word-level control via inline text |
 
-**Backlogged:**
+**Shipped from the backlog:**
 
-- **VoxCPM** (2B, Apache 2.0) — CUDA ≥12 required upstream; MPS broken in issues #232/#248; CPU path rejected by maintainers (#256). Keep watching for a PR that relaxes the device requirement.
+- **VoxCPM2** (Apache 2.0) — earlier notes listed VoxCPM as effectively CUDA-only. The dependency probe for voxcpm 2.0.3 found a working CPU path and a CUDA path. MPS has a code path upstream but was not tested. VoxCPM2 now ships with `accelerators=("cuda", "mps", "cpu")`. See [Worked Example: VoxCPM2](#worked-example-voxcpm2).
 
 Update `PROJECT_STATUS.md` when you pick one up or mark one as shipped/backlogged.
 

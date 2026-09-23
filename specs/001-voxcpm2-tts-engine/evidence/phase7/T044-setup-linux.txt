@@ -1,0 +1,2123 @@
+# T044 PART 1 (Linux): `just setup` from a clean checkout (FR-019, SC-007)
+# Environment: WSL2 distro Ubuntu-26.04 ("Ubuntu 26.04 LTS"), 24 cores, 62 GB RAM, user samykabu, NO passwordless sudo.
+# Clone: ~/voicebox-setupcheck  (fresh `git clone --branch feature/001-voxcpm2-tts-engine https://github.com/samykabu/voicebox.git`)
+# PATH used for the run: Linux-only ($HOME/.local/bin:$HOME/.bun/bin[:$HOME/tc/env/bin]:/usr/local/bin:/usr/bin:/bin);
+#   the Windows /mnt/c interop entries were removed so that nothing Windows-side was used.
+
+PREREQUISITES FOUND (initial state)
+  python3 = 3.14.4 (/usr/bin/python3; no python3.12 package present), git OK, curl OK
+  MISSING: python3.12, uv, just, bun, unzip, gcc, make, pkg-config; sudo requires a password, so apt was not possible.
+
+PREREQUISITES INSTALLED (user home only, official installers)
+  uv 0.12.18      curl -LsSf https://astral.sh/uv/install.sh | sh
+  just 1.58.0     curl ... https://just.systems/install.sh | bash -s -- --to ~/.local/bin
+  bun 1.4.2       CONTRIBUTING.md's `curl -fsSL https://bun.sh/install | bash` FAILED ("error: unzip is required to install bun");
+                  fallback: official release zip github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip,
+                  extracted with `python3 -m zipfile` into ~/.bun/bin
+  Python 3.12     `uv python install 3.12` -> cpython-3.12.14, which also puts a `python3.12` shim in ~/.local/bin.
+                  Because of that the [unix] recipe's own `command -v python3.12` found it and the RECIPE CREATED THE VENV ITSELF
+                  (no pre-created venv was needed on Linux). Source: uv (python-build-standalone), not deadsnakes.
+
+RUN 1 (HEAD 6e48673): FAIL after 81 s
+  Collecting pyopenjtalk (from misaki[en,ja,zh]>=0.9.4 -> requirements.txt line 70, i.e. Kokoro), sdist only ->
+  "CMake Error: CMAKE_C_COMPILER not set ... CMAKE_MAKE_PROGRAM is not set"
+  ERROR: Failed to build 'pyopenjtalk' when getting requirements to build wheel
+  error: recipe `setup-python` failed with exit code 1
+  Blocker: no C/C++ toolchain (build-essential) on this distro, and no sudo to install it. Pre-existing (Kokoro's misaki[ja]),
+  not caused by VoxCPM2. A normal Linux dev box with build-essential would not hit this.
+
+WORKAROUND: user-space toolchain without sudo: micromamba (official static binary) + conda-forge `gcc gxx make cmake`
+  into ~/tc/env (gcc 16.2.0), prepended to PATH with CC/CXX exported. Nothing else was changed.
+
+RUN 2 (fresh re-clone, HEAD b69d377, toolchain on PATH): PASS, EXIT 0, duration 543 s (9m03s), 18:49:41 to 18:58:44
+  - torch selection: WSL exposes neither /proc/driver/nvidia/version nor /sys/module/nvidia nor /dev/kfd, so the recipe's
+    NVIDIA/AMD branch did NOT fire and no explicit torch index was used. torch came from requirements.txt via PyPI's
+    default Linux wheel: torch 2.14.0+cu130 (CUDA 13.0 build, pulls nvidia-cublas 13.1.1.3 and related packages).
+    torch.cuda.is_available() = True anyway (WSL GPU passthrough via /usr/lib/wsl/lib).
+    So on this Linux the recipe installed a CUDA torch (by PyPI default), not a CPU-only one and not the cu128 index build.
+  - NOTE: torchaudio resolved to 2.11.0+cu130 while torch is 2.14.0 (pip check does not flag it). Smoke: `import torchaudio`
+    and torchaudio.functional.resample work. The mismatch is pre-existing (unpinned torch/torchaudio in requirements.txt).
+  - voxcpm==2.0.3 installed WITH --no-deps: YES (line: `pip install --no-deps 'voxcpm==2.0.3'` -> Successfully installed voxcpm-2.0.3)
+  - pip check: exit 1, the same expected --no-deps class as Windows. voxcpm lines: argbind, funasr, modelscope, simplejson,
+    spaces, torchcodec, wetext missing; datasets<4 vs 5.0.1. Extra pre-existing Linux-only line: hume-tada requires torchvision
+    (Linux installs no torchvision because the cu128 torch branch did not run).
+  - import (voxcpm has no __version__; used importlib.metadata as a fallback): 2.0.3 2.14.0+cu130 True cuda build: 13.0 ; `from voxcpm import VoxCPM` OK
+  - bun install: success, "407 packages installed [10.21s]", "Saved lockfile" -> bun.lock modified (the same 0.5.0 -> 0.5.4
+    workspace-version drift as on Windows; pre-existing)
+  - In-process backend smoke (FastAPI TestClient, no port): GET /models/engines 200; all 9 engines available=True,
+    detected=cuda; voxcpm reason=None warning=None; `from backend.backends.voxcpm_backend import VoxCPMBackend` OK.
+  - NOT RUN on Linux: a real VoxCPM2 model load/generate (the model is not cached in WSL; 4.7 GB download skipped).
+
+VERDICT (Linux): PASS once a C toolchain is present. FAIL on a bare Ubuntu 26.04 without build-essential, because of
+  pyopenjtalk (Kokoro, pre-existing). Recipe gaps to consider (not VoxCPM2 regressions): the WSL NVIDIA check misses WSL GPUs;
+  torch/torchaudio are unpinned on Linux; CONTRIBUTING's bun installer needs unzip; build-essential is an undocumented
+  prerequisite.
+
+==================================================================
+TOOL INSTALL LOG
+==================================================================
+wsl: Failed to start the systemd user session for 'samykabu'. See journalctl for more details.
++ mkdir -p /home/samykabu/.local/bin
++ curl -LsSf https://astral.sh/uv/install.sh
++ sh
+downloading uv 0.12.18 x86_64-unknown-linux-gnu
+installing to /home/samykabu/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
++ curl --proto =https --tlsv1.2 -sSf https://just.systems/install.sh
++ bash -s -- --to /home/samykabu/.local/bin
+install: Repository:  https://github.com/casey/just
+install: Crate:       just
+install: Tag:         1.58.0
+install: Target:      x86_64-unknown-linux-musl
+install: Destination: /home/samykabu/.local/bin
+install: Archive:     https://github.com/casey/just/releases/download/1.58.0/just-1.58.0-x86_64-unknown-linux-musl.tar.gz
++ curl -fsSL https://bun.sh/install
++ bash
+error: unzip is required to install bun
++ echo 'bun installer failed (unzip missing, no sudo); falling back to official release zip extracted with python3 zipfile'
++ mkdir -p /home/samykabu/.bun/bin
+bun installer failed (unzip missing, no sudo); falling back to official release zip extracted with python3 zipfile
++ cd /tmp
++ curl -fsSLo bun.zip https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip
++ python3 -m zipfile -e bun.zip /tmp/bunx
++ cp /tmp/bunx/bun-linux-x64/bun /home/samykabu/.bun/bin/bun
++ chmod +x /home/samykabu/.bun/bin/bun
++ uv --version
+uv 0.12.18 (x86_64-unknown-linux-gnu)
++ just --version
+just 1.58.0
++ bun --version
+1.4.2
++ uv python install 3.12
+Downloading cpython-3.12.14-linux-x86_64-gnu (download) (32.6MiB)
+ Downloaded cpython-3.12.14-linux-x86_64-gnu (download)
+Installed Python 3.12.14 in 2.71s
+ + cpython-3.12.14-linux-x86_64-gnu (python3.12)
++ uv python find 3.12
+/home/samykabu/.local/share/uv/python/cpython-3.12-linux-x86_64-gnu/bin/python3.12
+
+==================================================================
+RUN 1: FULL OUTPUT (no compiler)
+==================================================================
+wsl: Failed to start the systemd user session for 'samykabu'. See journalctl for more details.
+Cloning into '/home/samykabu/voicebox-setupcheck'...
+HEAD: 6e4867390c12b21d550061946dda1009a61043c0
+PATH=/home/samykabu/.local/bin:/home/samykabu/.bun/bin:/usr/local/bin:/usr/bin:/bin
+python3.12 resolves to: /home/samykabu/.local/bin/python3.12  python3: Python 3.14.4
+nvidia markers: ls: cannot access '/proc/driver/nvidia/version': No such file or directory ls: cannot access '/sys/module/nvidia': No such file or directory   /dev/kfd: ls: cannot access '/dev/kfd': No such file or directory
+START 2026-09-23T18:46:15+03:00
+Creating Python virtual environment...
+Installing Python dependencies...
+Looking in links: https://k2-fsa.github.io/icefall/piper_phonemize.html
+Collecting linacodec @ git+https://github.com/ysharma3501/LinaCodec.git (from -r backend/requirements.txt (line 38))
+  Cloning https://github.com/ysharma3501/LinaCodec.git to /tmp/pip-install-wcyb__kd/linacodec_437a3657815742bfa23092e9e619ed15
+  Running command git clone --filter=blob:none --quiet https://github.com/ysharma3501/LinaCodec.git /tmp/pip-install-wcyb__kd/linacodec_437a3657815742bfa23092e9e619ed15
+  Resolved https://github.com/ysharma3501/LinaCodec.git to commit c0ae7c7285e121475c27592cfbb600624b714290
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git (from -r backend/requirements.txt (line 39))
+  Cloning https://github.com/ysharma3501/LuxTTS.git to /tmp/pip-install-wcyb__kd/zipvoice_f001a1f4610b4dfd8ce1535b7907f682
+  Running command git clone --filter=blob:none --quiet https://github.com/ysharma3501/LuxTTS.git /tmp/pip-install-wcyb__kd/zipvoice_f001a1f4610b4dfd8ce1535b7907f682
+  Resolved https://github.com/ysharma3501/LuxTTS.git to commit 28ae6a61151684fffc9d1a7aa15eafa02286fe0b
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl (from -r backend/requirements.txt (line 73))
+  Downloading en_core_web_sm-3.8.0-py3-none-any.whl (12.8 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.8/12.8 MB 1.8 MB/s  0:00:07
+Ignoring audioop-lts: markers 'python_version >= "3.13"' don't match your environment
+Collecting fastapi>=0.109.0 (from -r backend/requirements.txt (line 2))
+  Downloading fastapi-0.141.1-py3-none-any.whl.metadata (27 kB)
+Collecting uvicorn>=0.27.0 (from uvicorn[standard]>=0.27.0->-r backend/requirements.txt (line 3))
+  Downloading uvicorn-0.53.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting pydantic>=2.5.0 (from -r backend/requirements.txt (line 4))
+  Downloading pydantic-2.13.5-py3-none-any.whl.metadata (110 kB)
+Collecting sqlalchemy>=2.0.0 (from -r backend/requirements.txt (line 7))
+  Downloading sqlalchemy-2.0.54-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (9.7 kB)
+Collecting alembic>=1.13.0 (from -r backend/requirements.txt (line 8))
+  Downloading alembic-1.20.0-py3-none-any.whl.metadata (7.3 kB)
+Collecting torch>=2.5.0 (from -r backend/requirements.txt (line 11))
+  Downloading torch-2.14.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (37 kB)
+Collecting transformers<=4.57.6,>=4.36.0 (from -r backend/requirements.txt (line 12))
+  Downloading transformers-4.57.6-py3-none-any.whl.metadata (43 kB)
+Collecting accelerate>=0.26.0 (from -r backend/requirements.txt (line 13))
+  Downloading accelerate-1.15.0-py3-none-any.whl.metadata (19 kB)
+Collecting huggingface_hub>=0.20.0 (from -r backend/requirements.txt (line 14))
+  Downloading huggingface_hub-1.32.0-py3-none-any.whl.metadata (16 kB)
+Collecting qwen-tts>=0.0.5 (from -r backend/requirements.txt (line 15))
+  Downloading qwen_tts-0.1.1-py3-none-any.whl.metadata (61 kB)
+Collecting ema-pytorch>=0.5.2 (from -r backend/requirements.txt (line 19))
+  Downloading ema_pytorch-0.8.3-py3-none-any.whl.metadata (8.0 kB)
+Collecting x-transformers>=1.31.14 (from -r backend/requirements.txt (line 20))
+  Downloading x_transformers-2.30.5-py3-none-any.whl.metadata (107 kB)
+Collecting vocos (from -r backend/requirements.txt (line 21))
+  Downloading vocos-0.1.0-py3-none-any.whl.metadata (4.8 kB)
+Collecting pydub (from -r backend/requirements.txt (line 22))
+  Downloading pydub-0.25.1-py2.py3-none-any.whl.metadata (1.4 kB)
+Collecting rjieba (from -r backend/requirements.txt (line 23))
+  Downloading rjieba-0.2.1-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.7 kB)
+Collecting pypinyin (from -r backend/requirements.txt (line 24))
+  Downloading pypinyin-0.55.0-py2.py3-none-any.whl.metadata (12 kB)
+Collecting transformers-stream-generator (from -r backend/requirements.txt (line 25))
+  Downloading transformers-stream-generator-0.0.5.tar.gz (13 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting cached-path (from -r backend/requirements.txt (line 26))
+  Downloading cached_path-1.8.10-py3-none-any.whl.metadata (19 kB)
+Collecting torchdiffeq (from -r backend/requirements.txt (line 27))
+  Downloading torchdiffeq-0.2.5-py3-none-any.whl.metadata (440 bytes)
+Collecting matplotlib (from -r backend/requirements.txt (line 28))
+  Downloading matplotlib-3.11.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (80 kB)
+Collecting wandb (from -r backend/requirements.txt (line 29))
+  Downloading wandb-0.30.0-py3-none-manylinux_2_28_x86_64.whl.metadata (11 kB)
+Collecting datasets (from -r backend/requirements.txt (line 30))
+  Downloading datasets-5.0.1-py3-none-any.whl.metadata (23 kB)
+Collecting hydra-core (from -r backend/requirements.txt (line 31))
+  Downloading hydra_core-1.3.7-py3-none-any.whl.metadata (5.7 kB)
+Collecting unidecode (from -r backend/requirements.txt (line 32))
+  Downloading Unidecode-1.4.0-py3-none-any.whl.metadata (13 kB)
+Collecting conformer>=0.3.2 (from -r backend/requirements.txt (line 44))
+  Downloading conformer-0.3.2-py3-none-any.whl.metadata (631 bytes)
+Collecting diffusers>=0.29.0 (from -r backend/requirements.txt (line 45))
+  Downloading diffusers-0.40.0-py3-none-any.whl.metadata (20 kB)
+Collecting omegaconf (from -r backend/requirements.txt (line 46))
+  Downloading omegaconf-2.3.1-py3-none-any.whl.metadata (4.5 kB)
+Collecting pykakasi (from -r backend/requirements.txt (line 47))
+  Downloading pykakasi-2.3.0-py3-none-any.whl.metadata (5.9 kB)
+Collecting resemble-perth>=1.0.1 (from -r backend/requirements.txt (line 48))
+  Downloading resemble_perth-1.0.1-py3-none-any.whl.metadata (4.8 kB)
+Collecting s3tokenizer (from -r backend/requirements.txt (line 49))
+  Downloading s3tokenizer-0.3.0-py3-none-any.whl.metadata (7.2 kB)
+Collecting spacy-pkuseg (from -r backend/requirements.txt (line 50))
+  Downloading spacy_pkuseg-1.0.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (13 kB)
+Collecting pyloudnorm (from -r backend/requirements.txt (line 51))
+  Downloading pyloudnorm-0.2.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting torchaudio (from -r backend/requirements.txt (line 58))
+  Downloading torchaudio-2.11.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (6.9 kB)
+Collecting einops (from -r backend/requirements.txt (line 66))
+  Downloading einops-0.8.2-py3-none-any.whl.metadata (13 kB)
+Collecting kokoro>=0.9.4 (from -r backend/requirements.txt (line 69))
+  Downloading kokoro-0.9.4-py3-none-any.whl.metadata (21 kB)
+Collecting misaki>=0.9.4 (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading misaki-0.9.4-py3-none-any.whl.metadata (19 kB)
+Collecting unidic-lite>=1.0.8 (from -r backend/requirements.txt (line 78))
+  Downloading unidic-lite-1.0.8.tar.gz (47.4 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 47.4/47.4 MB 60.1 MB/s  0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting librosa>=0.10.0 (from -r backend/requirements.txt (line 82))
+  Downloading librosa-1.0.0-py3-none-any.whl.metadata (6.7 kB)
+Collecting soundfile>=0.12.0 (from -r backend/requirements.txt (line 83))
+  Downloading soundfile-0.14.0-py2.py3-none-manylinux_2_28_x86_64.whl.metadata (18 kB)
+Collecting numpy<2.0,>=1.24.0 (from -r backend/requirements.txt (line 84))
+  Downloading numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+Collecting numba<0.61.0,>=0.60.0 (from -r backend/requirements.txt (line 85))
+  Downloading numba-0.60.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.7 kB)
+Collecting pedalboard>=0.9.0 (from -r backend/requirements.txt (line 86))
+  Downloading pedalboard-0.9.25-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (58 kB)
+Collecting httpx>=0.27.0 (from -r backend/requirements.txt (line 89))
+  Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting fastmcp<4.0,>=3.0 (from -r backend/requirements.txt (line 93))
+  Downloading fastmcp-3.4.7-py3-none-any.whl.metadata (8.5 kB)
+Collecting sse-starlette>=2.0 (from -r backend/requirements.txt (line 94))
+  Downloading sse_starlette-3.4.11-py3-none-any.whl.metadata (15 kB)
+Collecting python-multipart>=0.0.6 (from -r backend/requirements.txt (line 97))
+  Downloading python_multipart-0.0.32-py3-none-any.whl.metadata (2.1 kB)
+Collecting Pillow>=10.0.0 (from -r backend/requirements.txt (line 98))
+  Downloading pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.1 kB)
+Collecting jsonargparse[signatures] (from linacodec @ git+https://github.com/ysharma3501/LinaCodec.git->-r backend/requirements.txt (line 38))
+  Downloading jsonargparse-4.52.0-py3-none-any.whl.metadata (13 kB)
+Collecting safetensors (from linacodec @ git+https://github.com/ysharma3501/LinaCodec.git->-r backend/requirements.txt (line 38))
+  Downloading safetensors-0.8.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.2 kB)
+Collecting tqdm (from linacodec @ git+https://github.com/ysharma3501/LinaCodec.git->-r backend/requirements.txt (line 38))
+  Downloading tqdm-4.70.1-py3-none-any.whl.metadata (57 kB)
+Collecting cn2an (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading cn2an-0.5.24-py3-none-any.whl.metadata (10 kB)
+Collecting inflect (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading inflect-7.5.0-py3-none-any.whl.metadata (24 kB)
+Collecting jieba (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading jieba-0.42.1.tar.gz (19.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 19.2/19.2 MB 89.2 MB/s  0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting lhotse (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading lhotse-1.33.0-py3-none-any.whl.metadata (21 kB)
+Collecting onnxruntime (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading onnxruntime-1.30.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (5.7 kB)
+Collecting piper-phonemize (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading piper_phonemize-1.4.7-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (9.7 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.7/9.7 MB 1.7 MB/s  0:00:05
+Collecting setuptools<81 (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading setuptools-80.10.2-py3-none-any.whl.metadata (6.6 kB)
+Collecting tensorboard (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading tensorboard-2.21.0-py3-none-any.whl.metadata (1.8 kB)
+Collecting filelock (from transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Downloading filelock-4.0.1-py3-none-any.whl.metadata (2.0 kB)
+Collecting huggingface_hub>=0.20.0 (from -r backend/requirements.txt (line 14))
+  Downloading huggingface_hub-0.36.2-py3-none-any.whl.metadata (15 kB)
+Collecting packaging>=20.0 (from transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting pyyaml>=5.1 (from transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Collecting regex!=2019.12.17 (from transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Downloading regex-2026.9.10-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+Collecting requests (from transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+Collecting tokenizers<=0.23.0,>=0.22.0 (from transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Downloading tokenizers-0.22.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
+Collecting fsspec>=2023.5.0 (from huggingface_hub>=0.20.0->-r backend/requirements.txt (line 14))
+  Downloading fsspec-2026.9.0-py3-none-any.whl.metadata (10 kB)
+Collecting hf-xet<2.0.0,>=1.1.3 (from huggingface_hub>=0.20.0->-r backend/requirements.txt (line 14))
+  Downloading hf_xet-1.6.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (4.9 kB)
+Collecting typing-extensions>=3.7.4.3 (from huggingface_hub>=0.20.0->-r backend/requirements.txt (line 14))
+  Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting llvmlite<0.44,>=0.43.0dev0 (from numba<0.61.0,>=0.60.0->-r backend/requirements.txt (line 85))
+  Downloading llvmlite-0.43.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.8 kB)
+Collecting fastmcp-slim==3.4.7 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading fastmcp_slim-3.4.7-py3-none-any.whl.metadata (10 kB)
+Collecting platformdirs>=4.0.0 (from fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading platformdirs-4.11.12-py3-none-any.whl.metadata (5.5 kB)
+Collecting pydantic-settings>=2.0.0 (from fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading pydantic_settings-2.15.0-py3-none-any.whl.metadata (3.9 kB)
+Collecting python-dotenv>=1.1.0 (from fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading python_dotenv-1.2.3-py3-none-any.whl.metadata (29 kB)
+Collecting rich>=13.9.4 (from fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+Collecting authlib>=1.6.11 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading authlib-1.8.0-py2.py3-none-any.whl.metadata (10 kB)
+Collecting exceptiongroup>=1.2.2 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading exceptiongroup-1.3.1-py3-none-any.whl.metadata (6.7 kB)
+Collecting mcp<2.0,>=1.24.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading mcp-1.30.0-py3-none-any.whl.metadata (9.3 kB)
+Collecting opentelemetry-api>=1.20.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading opentelemetry_api-1.44.0-py3-none-any.whl.metadata (1.4 kB)
+Collecting py-key-value-aio<0.5.0,>=0.4.4 (from py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading py_key_value_aio-0.4.6-py3-none-any.whl.metadata (16 kB)
+Collecting starlette>=1.0.1 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading starlette-1.7.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting cyclopts>=4.0.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading cyclopts-4.25.3-py3-none-any.whl.metadata (12 kB)
+Collecting griffelib>=2.0.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading griffelib-2.3.0-py3-none-any.whl.metadata (1.3 kB)
+Collecting joserfc>=1.1.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading joserfc-1.7.5-py3-none-any.whl.metadata (3.1 kB)
+Collecting jsonref>=1.1.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading jsonref-1.1.0-py3-none-any.whl.metadata (2.7 kB)
+Collecting jsonschema-path>=0.3.4 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading jsonschema_path-0.5.0-py3-none-any.whl.metadata (8.1 kB)
+Collecting openapi-pydantic>=0.5.1 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading openapi_pydantic-0.5.1-py3-none-any.whl.metadata (10 kB)
+Collecting pyperclip>=1.9.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading pyperclip-1.11.0-py3-none-any.whl.metadata (2.4 kB)
+Collecting uncalled-for>=0.2.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading uncalled_for-0.4.0-py3-none-any.whl.metadata (4.4 kB)
+Collecting watchfiles>=1.0.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+Collecting websockets>=15.0.1 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading websockets-17.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.3 kB)
+Collecting anyio (from httpx>=0.27.0->-r backend/requirements.txt (line 89))
+  Downloading anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+Collecting certifi (from httpx>=0.27.0->-r backend/requirements.txt (line 89))
+  Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+Collecting httpcore==1.* (from httpx>=0.27.0->-r backend/requirements.txt (line 89))
+  Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting idna (from httpx>=0.27.0->-r backend/requirements.txt (line 89))
+  Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Collecting h11>=0.16 (from httpcore==1.*->httpx>=0.27.0->-r backend/requirements.txt (line 89))
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting httpx-sse>=0.4 (from mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading httpx_sse-0.4.3-py3-none-any.whl.metadata (9.7 kB)
+Collecting jsonschema>=4.20.0 (from mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+Collecting pyjwt>=2.10.1 (from pyjwt[crypto]>=2.10.1->mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading pyjwt-2.14.0-py3-none-any.whl.metadata (3.4 kB)
+Collecting typing-inspection>=0.4.1 (from mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+Collecting annotated-types>=0.6.0 (from pydantic>=2.5.0->-r backend/requirements.txt (line 4))
+  Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.46.5 (from pydantic>=2.5.0->-r backend/requirements.txt (line 4))
+  Downloading pydantic_core-2.46.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+Collecting beartype>=0.20.0 (from py-key-value-aio<0.5.0,>=0.4.4->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading beartype-0.22.9-py3-none-any.whl.metadata (37 kB)
+Collecting aiofile>=3.12.3 (from py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading aiofile-3.12.3-py3-none-any.whl.metadata (17 kB)
+Collecting keyring>=25.6.0 (from py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading keyring-25.7.0-py3-none-any.whl.metadata (21 kB)
+Collecting cachetools>=5.0.0 (from py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading cachetools-7.2.0-py3-none-any.whl.metadata (5.5 kB)
+Collecting annotated-doc>=0.0.2 (from fastapi>=0.109.0->-r backend/requirements.txt (line 2))
+  Downloading annotated_doc-0.0.5-py3-none-any.whl.metadata (6.5 kB)
+Collecting click>=7.0 (from uvicorn>=0.27.0->uvicorn[standard]>=0.27.0->-r backend/requirements.txt (line 3))
+  Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting greenlet>=1 (from sqlalchemy>=2.0.0->-r backend/requirements.txt (line 7))
+  Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
+Collecting Mako (from alembic>=1.13.0->-r backend/requirements.txt (line 8))
+  Downloading mako-1.4.3-py3-none-any.whl.metadata (2.9 kB)
+Collecting sympy>=1.13.3 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading sympy-1.14.0-py3-none-any.whl.metadata (12 kB)
+Collecting networkx>=2.5.1 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading networkx-3.7-py3-none-any.whl.metadata (6.7 kB)
+Collecting jinja2 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting cuda-toolkit==13.0.3 (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading cuda_toolkit-13.0.3.0-py2.py3-none-any.whl.metadata (17 kB)
+Collecting cuda-bindings<14,>=13.0.3 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading cuda_bindings-13.4.3-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Collecting nvidia-cudnn-cu13==9.24.0.43 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_cudnn_cu13-9.24.0.43-py3-none-manylinux_2_27_x86_64.whl.metadata (1.9 kB)
+Collecting nvidia-cusparselt-cu13==0.8.1 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_cusparselt_cu13-0.8.1-py3-none-manylinux2014_x86_64.whl.metadata (12 kB)
+Collecting nvidia-nccl-cu13==2.30.7 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_nccl_cu13-2.30.7-py3-none-manylinux_2_18_x86_64.whl.metadata (2.1 kB)
+Collecting nvidia-nvshmem-cu13==3.4.5 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_nvshmem_cu13-3.4.5-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.1 kB)
+Collecting triton~=3.8.0 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading triton-3.8.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (978 bytes)
+Collecting nvidia-cublas==13.1.1.3.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_cublas-13.1.1.3-py3-none-manylinux_2_27_x86_64.whl.metadata (1.8 kB)
+Collecting nvidia-cuda-nvrtc==13.0.88.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_cuda_nvrtc-13.0.88-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl.metadata (1.7 kB)
+Collecting nvidia-cuda-runtime==13.0.96.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_cuda_runtime-13.0.96-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.7 kB)
+Collecting nvidia-cufft==12.0.0.61.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_cufft-12.0.0.61-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.8 kB)
+Collecting nvidia-nvjitlink<14,>=13.0.88 (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_nvjitlink-13.4.92-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl.metadata (1.8 kB)
+Collecting nvidia-cufile==1.15.1.6.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_cufile-1.15.1.6-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.7 kB)
+Collecting nvidia-cuda-cupti==13.0.85.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_cuda_cupti-13.0.85-py3-none-manylinux_2_25_x86_64.whl.metadata (1.7 kB)
+Collecting nvidia-curand==10.4.0.35.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_curand-10.4.0.35-py3-none-manylinux_2_27_x86_64.whl.metadata (1.7 kB)
+Collecting nvidia-cusolver==12.0.4.66.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_cusolver-12.0.4.66-py3-none-manylinux_2_27_x86_64.whl.metadata (1.8 kB)
+Collecting nvidia-cusparse==12.6.3.3.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_cusparse-12.6.3.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.8 kB)
+Collecting nvidia-nvtx==13.0.85.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading nvidia_nvtx-13.0.85-py3-none-manylinux1_x86_64.manylinux_2_5_x86_64.whl.metadata (1.8 kB)
+Collecting cuda-pathfinder>=1.4.2 (from cuda-bindings<14,>=13.0.3->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading cuda_pathfinder-1.8.2-py3-none-any.whl.metadata (1.9 kB)
+Collecting psutil (from accelerate>=0.26.0->-r backend/requirements.txt (line 13))
+  Downloading psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl.metadata (22 kB)
+Collecting transformers<=4.57.6,>=4.36.0 (from -r backend/requirements.txt (line 12))
+  Downloading transformers-4.57.3-py3-none-any.whl.metadata (43 kB)
+Collecting accelerate>=0.26.0 (from -r backend/requirements.txt (line 13))
+  Downloading accelerate-1.12.0-py3-none-any.whl.metadata (19 kB)
+Collecting gradio (from qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading gradio-6.28.0-py3-none-any.whl.metadata (16 kB)
+Collecting sox (from qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading sox-1.5.0.tar.gz (63 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting einx>=0.3.0 (from x-transformers>=1.31.14->-r backend/requirements.txt (line 20))
+  Downloading einx-0.4.3-py3-none-any.whl.metadata (6.9 kB)
+Collecting loguru (from x-transformers>=1.31.14->-r backend/requirements.txt (line 20))
+  Downloading loguru-0.7.3-py3-none-any.whl.metadata (22 kB)
+Collecting torch-einops-utils>=0.1.29 (from x-transformers>=1.31.14->-r backend/requirements.txt (line 20))
+  Downloading torch_einops_utils-0.1.29-py3-none-any.whl.metadata (2.2 kB)
+Collecting scipy (from vocos->-r backend/requirements.txt (line 21))
+  Downloading scipy-1.18.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+Collecting encodec==0.1.1 (from vocos->-r backend/requirements.txt (line 21))
+  Downloading encodec-0.1.1.tar.gz (3.7 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.7/3.7 MB 85.0 MB/s  0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting rich>=13.9.4 (from fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading rich-13.9.4-py3-none-any.whl.metadata (18 kB)
+Collecting filelock (from huggingface_hub>=0.20.0->-r backend/requirements.txt (line 14))
+  Downloading filelock-3.32.7-py3-none-any.whl.metadata (2.0 kB)
+Collecting boto3<2.0,>=1.0 (from cached-path->-r backend/requirements.txt (line 26))
+  Downloading boto3-1.43.100-py3-none-any.whl.metadata (6.6 kB)
+Collecting google-cloud-storage<4.0,>=1.32.0 (from cached-path->-r backend/requirements.txt (line 26))
+  Downloading google_cloud_storage-3.14.1-py3-none-any.whl.metadata (14 kB)
+Collecting botocore<1.44.0,>=1.43.100 (from boto3<2.0,>=1.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading botocore-1.43.100-py3-none-any.whl.metadata (5.6 kB)
+Collecting jmespath<2.0.0,>=0.7.1 (from boto3<2.0,>=1.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading jmespath-1.1.0-py3-none-any.whl.metadata (7.6 kB)
+Collecting s3transfer<0.20.0,>=0.19.0 (from boto3<2.0,>=1.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading s3transfer-0.19.2-py3-none-any.whl.metadata (1.7 kB)
+Collecting python-dateutil<3.0.0,>=2.1 (from botocore<1.44.0,>=1.43.100->boto3<2.0,>=1.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Collecting urllib3!=2.2.0,<3,>=1.25.4 (from botocore<1.44.0,>=1.43.100->boto3<2.0,>=1.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+Collecting google-auth<3.0.0,>=2.26.1 (from google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading google_auth-2.58.0-py3-none-any.whl.metadata (6.0 kB)
+Collecting google-api-core<3.0.0,>=2.27.0 (from google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading google_api_core-2.38.0-py3-none-any.whl.metadata (3.2 kB)
+Collecting google-cloud-core<3.0.0,>=2.4.2 (from google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading google_cloud_core-2.7.0-py3-none-any.whl.metadata (2.8 kB)
+Collecting google-resumable-media<3.0.0,>=2.7.2 (from google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading google_resumable_media-2.10.2-py3-none-any.whl.metadata (2.2 kB)
+Collecting google-crc32c<2.0.0,>=1.6.0 (from google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading google_crc32c-1.8.0-cp312-cp312-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl.metadata (1.7 kB)
+Collecting googleapis-common-protos<2.0.0,>=1.69.2 (from google-api-core<3.0.0,>=2.27.0->google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading googleapis_common_protos-1.75.3-py3-none-any.whl.metadata (8.5 kB)
+Collecting protobuf<8.0.0,>=6.33.5 (from google-api-core<3.0.0,>=2.27.0->google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl.metadata (595 bytes)
+Collecting proto-plus<2.0.0,>=1.26.1 (from google-api-core<3.0.0,>=2.27.0->google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading proto_plus-1.28.4-py3-none-any.whl.metadata (2.2 kB)
+Collecting pyasn1-modules>=0.2.1 (from google-auth<3.0.0,>=2.26.1->google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading pyasn1_modules-0.4.2-py3-none-any.whl.metadata (3.5 kB)
+Collecting cryptography>=38.0.3 (from google-auth<3.0.0,>=2.26.1->google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading cryptography-50.0.1-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.3 kB)
+Collecting six>=1.5 (from python-dateutil<3.0.0,>=2.1->botocore<1.44.0,>=1.43.100->boto3<2.0,>=1.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Collecting charset_normalizer<4,>=2 (from requests->transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Downloading charset_normalizer-3.5.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (45 kB)
+Collecting markdown-it-py>=2.2.0 (from rich>=13.9.4->fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+Collecting pygments<3.0.0,>=2.13.0 (from rich>=13.9.4->fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting contourpy>=1.0.1 (from matplotlib->-r backend/requirements.txt (line 28))
+  Downloading contourpy-1.4.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
+Collecting cycler>=0.10 (from matplotlib->-r backend/requirements.txt (line 28))
+  Downloading cycler-0.12.1-py3-none-any.whl.metadata (3.8 kB)
+Collecting fonttools>=4.28.2 (from matplotlib->-r backend/requirements.txt (line 28))
+  Downloading fonttools-4.65.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (125 kB)
+Collecting kiwisolver>=1.3.1 (from matplotlib->-r backend/requirements.txt (line 28))
+  Downloading kiwisolver-1.5.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (5.2 kB)
+Collecting pyparsing>=3 (from matplotlib->-r backend/requirements.txt (line 28))
+  Downloading pyparsing-3.3.3-py3-none-any.whl.metadata (5.9 kB)
+Collecting opentelemetry-exporter-otlp-proto-http>=1.43.0 (from wandb->-r backend/requirements.txt (line 29))
+  Downloading opentelemetry_exporter_otlp_proto_http-1.44.0-py3-none-any.whl.metadata (2.4 kB)
+Collecting opentelemetry-sdk>=1.43.0 (from wandb->-r backend/requirements.txt (line 29))
+  Downloading opentelemetry_sdk-1.44.0-py3-none-any.whl.metadata (1.6 kB)
+Collecting xxhash>=3.0.0 (from wandb->-r backend/requirements.txt (line 29))
+  Downloading xxhash-4.0.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (17 kB)
+Collecting pyarrow>=21.0.0 (from datasets->-r backend/requirements.txt (line 30))
+  Downloading pyarrow-25.0.1-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+Collecting dill<0.4.2,>=0.3.0 (from datasets->-r backend/requirements.txt (line 30))
+  Downloading dill-0.4.1-py3-none-any.whl.metadata (10 kB)
+Collecting pandas (from datasets->-r backend/requirements.txt (line 30))
+  Downloading pandas-3.0.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+Collecting multiprocess<0.70.20 (from datasets->-r backend/requirements.txt (line 30))
+  Downloading multiprocess-0.70.19-py312-none-any.whl.metadata (7.5 kB)
+Collecting fsspec>=2023.5.0 (from huggingface_hub>=0.20.0->-r backend/requirements.txt (line 14))
+  Downloading fsspec-2026.6.0-py3-none-any.whl.metadata (10 kB)
+Collecting aiohttp!=4.0.0a0,!=4.0.0a1 (from fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Downloading aiohttp-3.14.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)
+Collecting antlr4-python3-runtime==4.9.* (from hydra-core->-r backend/requirements.txt (line 31))
+  Downloading antlr4-python3-runtime-4.9.3.tar.gz (117 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting importlib_metadata (from diffusers>=0.29.0->-r backend/requirements.txt (line 45))
+  Downloading importlib_metadata-9.0.1-py3-none-any.whl.metadata (4.5 kB)
+INFO: pip is looking at multiple versions of diffusers to determine which version is compatible with other requirements. This could take a while.
+Collecting diffusers>=0.29.0 (from -r backend/requirements.txt (line 45))
+  Downloading diffusers-0.39.0-py3-none-any.whl.metadata (20 kB)
+Collecting jaconv (from pykakasi->-r backend/requirements.txt (line 47))
+  Downloading jaconv-0.5.0-py3-none-any.whl.metadata (8.9 kB)
+Collecting deprecated (from pykakasi->-r backend/requirements.txt (line 47))
+  Downloading deprecated-1.3.1-py2.py3-none-any.whl.metadata (5.9 kB)
+Collecting pre-commit (from s3tokenizer->-r backend/requirements.txt (line 49))
+  Downloading pre_commit-4.6.2-py2.py3-none-any.whl.metadata (1.2 kB)
+Collecting onnx (from s3tokenizer->-r backend/requirements.txt (line 49))
+  Downloading onnx-1.23.0-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (8.7 kB)
+Collecting srsly<3.0.0,>=2.3.0 (from spacy-pkuseg->-r backend/requirements.txt (line 50))
+  Downloading srsly-2.5.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (19 kB)
+Collecting catalogue<2.1.0,>=2.0.3 (from srsly<3.0.0,>=2.3.0->spacy-pkuseg->-r backend/requirements.txt (line 50))
+  Downloading catalogue-2.0.10-py3-none-any.whl.metadata (14 kB)
+Collecting addict (from misaki>=0.9.4->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading addict-2.4.0-py3-none-any.whl.metadata (1.0 kB)
+INFO: pip is looking at multiple versions of librosa to determine which version is compatible with other requirements. This could take a while.
+Collecting librosa>=0.10.0 (from -r backend/requirements.txt (line 82))
+  Downloading librosa-0.11.0-py3-none-any.whl.metadata (8.7 kB)
+Collecting audioread>=2.1.9 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Downloading audioread-3.1.0-py3-none-any.whl.metadata (9.0 kB)
+Collecting scikit-learn>=1.1.0 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Downloading scikit_learn-1.9.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.3 kB)
+Collecting joblib>=1.0 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Downloading joblib-1.6.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting decorator>=4.3.0 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Downloading decorator-5.3.1-py3-none-any.whl.metadata (3.9 kB)
+Collecting pooch>=1.1 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Downloading pooch-1.9.0-py3-none-any.whl.metadata (10 kB)
+Collecting soxr>=0.3.2 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Downloading soxr-1.1.0-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (5.8 kB)
+Collecting lazy_loader>=0.1 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Downloading lazy_loader-0.6-py3-none-any.whl.metadata (6.0 kB)
+Collecting msgpack>=1.0 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Downloading msgpack-1.2.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)
+Collecting cffi>=1.0 (from soundfile>=0.12.0->-r backend/requirements.txt (line 83))
+  Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+Collecting caio~=0.12.0 (from aiofile>=3.12.3->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading caio-0.12.4-cp312-cp312-manylinux_2_34_x86_64.whl.metadata (4.5 kB)
+Collecting aiohappyeyeballs>=2.5.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl.metadata (5.9 kB)
+Collecting aiosignal>=1.4.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+Collecting attrs>=17.3.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+Collecting frozenlist>=1.1.1 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Downloading frozenlist-1.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (20 kB)
+Collecting multidict<7.0,>=4.5 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Downloading multidict-6.9.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.3 kB)
+Collecting propcache>=0.2.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Downloading propcache-0.5.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (25 kB)
+Collecting yarl<2.0,>=1.17.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Downloading yarl-1.25.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (111 kB)
+Collecting pycparser (from cffi>=1.0->soundfile>=0.12.0->-r backend/requirements.txt (line 83))
+  Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+INFO: pip is looking at multiple versions of contourpy to determine which version is compatible with other requirements. This could take a while.
+Collecting contourpy>=1.0.1 (from matplotlib->-r backend/requirements.txt (line 28))
+  Downloading contourpy-1.3.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (5.5 kB)
+Collecting docstring-parser<4.0,>=0.15 (from cyclopts>=4.0.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading docstring_parser-0.18.0-py3-none-any.whl.metadata (3.5 kB)
+Collecting rich-rst<3.0.0,>=1.3.1 (from cyclopts>=4.0.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading rich_rst-2.1.0-py3-none-any.whl.metadata (4.7 kB)
+Collecting frozendict (from einx>=0.3.0->x-transformers>=1.31.14->-r backend/requirements.txt (line 20))
+  Downloading frozendict-2.4.7-py3-none-any.whl.metadata (23 kB)
+Collecting cloudpickle>=3.0 (from joblib>=1.0->librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Downloading cloudpickle-3.1.2-py3-none-any.whl.metadata (7.1 kB)
+Collecting jsonschema-specifications>=2023.03.6 (from jsonschema>=4.20.0->mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+Collecting referencing>=0.28.4 (from jsonschema>=4.20.0->mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+Collecting rpds-py>=0.25.0 (from jsonschema>=4.20.0->mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+Collecting pathable<0.7.0,>=0.6.0 (from jsonschema-path>=0.3.4->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading pathable-0.6.0-py3-none-any.whl.metadata (7.2 kB)
+Collecting SecretStorage>=3.2 (from keyring>=25.6.0->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading secretstorage-3.5.0-py3-none-any.whl.metadata (4.0 kB)
+Collecting jeepney>=0.4.2 (from keyring>=25.6.0->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading jeepney-0.9.0-py3-none-any.whl.metadata (1.2 kB)
+Collecting jaraco.classes (from keyring>=25.6.0->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading jaraco.classes-3.4.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting jaraco.functools (from keyring>=25.6.0->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading jaraco_functools-4.6.0-py3-none-any.whl.metadata (2.9 kB)
+Collecting jaraco.context (from keyring>=25.6.0->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading jaraco_context-6.1.2-py3-none-any.whl.metadata (4.2 kB)
+Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=13.9.4->fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+Collecting espeakng-loader (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading espeakng_loader-0.2.4-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.3 kB)
+Collecting num2words (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading num2words-0.5.14-py3-none-any.whl.metadata (13 kB)
+Collecting phonemizer-fork (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading phonemizer_fork-3.3.2-py3-none-any.whl.metadata (48 kB)
+Collecting spacy (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading spacy-3.8.16-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (28 kB)
+Collecting spacy-curated-transformers (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading spacy_curated_transformers-2.1.2-py2.py3-none-any.whl.metadata (2.8 kB)
+Collecting fugashi (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading fugashi-1.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (7.3 kB)
+Collecting mojimoji (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading mojimoji-0.0.13-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.5 kB)
+Collecting pyopenjtalk (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading pyopenjtalk-0.4.1.tar.gz (1.4 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.4/1.4 MB 43.6 MB/s  0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'error'
+  error: subprocess-exited-with-error
+  
+  × Getting requirements to build wheel did not run successfully.
+  │ exit code: 1
+  ╰─> [25 lines of output]
+      CMake Error: CMake was unable to find a build program corresponding to "Unix Makefiles".  CMAKE_MAKE_PROGRAM is not set.  You probably need to select a different build tool.
+      CMake Error: CMAKE_C_COMPILER not set, after EnableLanguage
+      CMake Error: CMAKE_CXX_COMPILER not set, after EnableLanguage
+      -- Configuring incomplete, errors occurred!
+      Traceback (most recent call last):
+        File "/home/samykabu/voicebox-setupcheck/backend/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 389, in <module>
+          main()
+        File "/home/samykabu/voicebox-setupcheck/backend/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 373, in main
+          json_out["return_val"] = hook(**hook_input["kwargs"])
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/home/samykabu/voicebox-setupcheck/backend/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 143, in get_requires_for_build_wheel
+          return hook(config_settings)
+                 ^^^^^^^^^^^^^^^^^^^^^
+        File "/tmp/pip-build-env-_3xs9lor/overlay/lib/python3.12/site-packages/setuptools/build_meta.py", line 333, in get_requires_for_build_wheel
+          return self._get_build_requires(config_settings, requirements=[])
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/tmp/pip-build-env-_3xs9lor/overlay/lib/python3.12/site-packages/setuptools/build_meta.py", line 301, in _get_build_requires
+          self.run_setup()
+        File "/tmp/pip-build-env-_3xs9lor/overlay/lib/python3.12/site-packages/setuptools/build_meta.py", line 317, in run_setup
+          exec(code, locals())  # noqa: S102 # exec is intentional here
+          ^^^^^^^^^^^^^^^^^^^^
+        File "<string>", line 105, in <module>
+        File "/home/samykabu/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/subprocess.py", line 502, in check_returncode
+          raise CalledProcessError(self.returncode, self.args, self.stdout,
+      subprocess.CalledProcessError: Command '['cmake', '..']' returned non-zero exit status 1.
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+ERROR: Failed to build 'pyopenjtalk' when getting requirements to build wheel
+error: recipe `setup-python` failed with exit code 1
+EXIT 1 END 2026-09-23T18:47:36+03:00 ELAPSED_SECONDS 81
+
+==================================================================
+RUN 2: FULL OUTPUT (user-space gcc/make/cmake on PATH)
+==================================================================
+Cloning into '/home/samykabu/voicebox-setupcheck'...
+HEAD: b69d37731d2d6b6aa0119ae7ebdbad8f8579d70c
+PATH=/home/samykabu/.local/bin:/home/samykabu/.bun/bin:/home/samykabu/tc/env/bin:/usr/local/bin:/usr/bin:/bin
+python3.12 resolves to: /home/samykabu/.local/bin/python3.12  python3: Python 3.14.4
+nvidia markers: ls: cannot access '/proc/driver/nvidia/version': No such file or directory ls: cannot access '/sys/module/nvidia': No such file or directory   /dev/kfd: ls: cannot access '/dev/kfd': No such file or directory
+START 2026-09-23T18:49:41+03:00
+Creating Python virtual environment...
+Installing Python dependencies...
+Looking in links: https://k2-fsa.github.io/icefall/piper_phonemize.html
+Collecting linacodec @ git+https://github.com/ysharma3501/LinaCodec.git (from -r backend/requirements.txt (line 38))
+  Cloning https://github.com/ysharma3501/LinaCodec.git to /tmp/pip-install-kdj7w1qo/linacodec_884d8114e20a4a21a86d8fce22f2ca8a
+  Running command git clone --filter=blob:none --quiet https://github.com/ysharma3501/LinaCodec.git /tmp/pip-install-kdj7w1qo/linacodec_884d8114e20a4a21a86d8fce22f2ca8a
+  Resolved https://github.com/ysharma3501/LinaCodec.git to commit c0ae7c7285e121475c27592cfbb600624b714290
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git (from -r backend/requirements.txt (line 39))
+  Cloning https://github.com/ysharma3501/LuxTTS.git to /tmp/pip-install-kdj7w1qo/zipvoice_cb210e740dd94f62820d290dbde8f686
+  Running command git clone --filter=blob:none --quiet https://github.com/ysharma3501/LuxTTS.git /tmp/pip-install-kdj7w1qo/zipvoice_cb210e740dd94f62820d290dbde8f686
+  Resolved https://github.com/ysharma3501/LuxTTS.git to commit 28ae6a61151684fffc9d1a7aa15eafa02286fe0b
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl (from -r backend/requirements.txt (line 73))
+  Downloading en_core_web_sm-3.8.0-py3-none-any.whl (12.8 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.8/12.8 MB 30.5 MB/s  0:00:00
+Ignoring audioop-lts: markers 'python_version >= "3.13"' don't match your environment
+Collecting fastapi>=0.109.0 (from -r backend/requirements.txt (line 2))
+  Using cached fastapi-0.141.1-py3-none-any.whl.metadata (27 kB)
+Collecting uvicorn>=0.27.0 (from uvicorn[standard]>=0.27.0->-r backend/requirements.txt (line 3))
+  Using cached uvicorn-0.53.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting pydantic>=2.5.0 (from -r backend/requirements.txt (line 4))
+  Using cached pydantic-2.13.5-py3-none-any.whl.metadata (110 kB)
+Collecting sqlalchemy>=2.0.0 (from -r backend/requirements.txt (line 7))
+  Using cached sqlalchemy-2.0.54-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (9.7 kB)
+Collecting alembic>=1.13.0 (from -r backend/requirements.txt (line 8))
+  Using cached alembic-1.20.0-py3-none-any.whl.metadata (7.3 kB)
+Collecting torch>=2.5.0 (from -r backend/requirements.txt (line 11))
+  Using cached torch-2.14.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (37 kB)
+Collecting transformers<=4.57.6,>=4.36.0 (from -r backend/requirements.txt (line 12))
+  Using cached transformers-4.57.6-py3-none-any.whl.metadata (43 kB)
+Collecting accelerate>=0.26.0 (from -r backend/requirements.txt (line 13))
+  Using cached accelerate-1.15.0-py3-none-any.whl.metadata (19 kB)
+Collecting huggingface_hub>=0.20.0 (from -r backend/requirements.txt (line 14))
+  Using cached huggingface_hub-1.32.0-py3-none-any.whl.metadata (16 kB)
+Collecting qwen-tts>=0.0.5 (from -r backend/requirements.txt (line 15))
+  Using cached qwen_tts-0.1.1-py3-none-any.whl.metadata (61 kB)
+Collecting ema-pytorch>=0.5.2 (from -r backend/requirements.txt (line 19))
+  Using cached ema_pytorch-0.8.3-py3-none-any.whl.metadata (8.0 kB)
+Collecting x-transformers>=1.31.14 (from -r backend/requirements.txt (line 20))
+  Using cached x_transformers-2.30.5-py3-none-any.whl.metadata (107 kB)
+Collecting vocos (from -r backend/requirements.txt (line 21))
+  Using cached vocos-0.1.0-py3-none-any.whl.metadata (4.8 kB)
+Collecting pydub (from -r backend/requirements.txt (line 22))
+  Using cached pydub-0.25.1-py2.py3-none-any.whl.metadata (1.4 kB)
+Collecting rjieba (from -r backend/requirements.txt (line 23))
+  Using cached rjieba-0.2.1-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.7 kB)
+Collecting pypinyin (from -r backend/requirements.txt (line 24))
+  Using cached pypinyin-0.55.0-py2.py3-none-any.whl.metadata (12 kB)
+Collecting transformers-stream-generator (from -r backend/requirements.txt (line 25))
+  Using cached transformers-stream-generator-0.0.5.tar.gz (13 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting cached-path (from -r backend/requirements.txt (line 26))
+  Using cached cached_path-1.8.10-py3-none-any.whl.metadata (19 kB)
+Collecting torchdiffeq (from -r backend/requirements.txt (line 27))
+  Using cached torchdiffeq-0.2.5-py3-none-any.whl.metadata (440 bytes)
+Collecting matplotlib (from -r backend/requirements.txt (line 28))
+  Using cached matplotlib-3.11.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (80 kB)
+Collecting wandb (from -r backend/requirements.txt (line 29))
+  Using cached wandb-0.30.0-py3-none-manylinux_2_28_x86_64.whl.metadata (11 kB)
+Collecting datasets (from -r backend/requirements.txt (line 30))
+  Using cached datasets-5.0.1-py3-none-any.whl.metadata (23 kB)
+Collecting hydra-core (from -r backend/requirements.txt (line 31))
+  Using cached hydra_core-1.3.7-py3-none-any.whl.metadata (5.7 kB)
+Collecting unidecode (from -r backend/requirements.txt (line 32))
+  Using cached Unidecode-1.4.0-py3-none-any.whl.metadata (13 kB)
+Collecting conformer>=0.3.2 (from -r backend/requirements.txt (line 44))
+  Using cached conformer-0.3.2-py3-none-any.whl.metadata (631 bytes)
+Collecting diffusers>=0.29.0 (from -r backend/requirements.txt (line 45))
+  Using cached diffusers-0.40.0-py3-none-any.whl.metadata (20 kB)
+Collecting omegaconf (from -r backend/requirements.txt (line 46))
+  Using cached omegaconf-2.3.1-py3-none-any.whl.metadata (4.5 kB)
+Collecting pykakasi (from -r backend/requirements.txt (line 47))
+  Using cached pykakasi-2.3.0-py3-none-any.whl.metadata (5.9 kB)
+Collecting resemble-perth>=1.0.1 (from -r backend/requirements.txt (line 48))
+  Using cached resemble_perth-1.0.1-py3-none-any.whl.metadata (4.8 kB)
+Collecting s3tokenizer (from -r backend/requirements.txt (line 49))
+  Using cached s3tokenizer-0.3.0-py3-none-any.whl.metadata (7.2 kB)
+Collecting spacy-pkuseg (from -r backend/requirements.txt (line 50))
+  Using cached spacy_pkuseg-1.0.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (13 kB)
+Collecting pyloudnorm (from -r backend/requirements.txt (line 51))
+  Using cached pyloudnorm-0.2.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting torchaudio (from -r backend/requirements.txt (line 58))
+  Using cached torchaudio-2.11.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (6.9 kB)
+Collecting einops (from -r backend/requirements.txt (line 66))
+  Using cached einops-0.8.2-py3-none-any.whl.metadata (13 kB)
+Collecting kokoro>=0.9.4 (from -r backend/requirements.txt (line 69))
+  Using cached kokoro-0.9.4-py3-none-any.whl.metadata (21 kB)
+Collecting misaki>=0.9.4 (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Using cached misaki-0.9.4-py3-none-any.whl.metadata (19 kB)
+Collecting unidic-lite>=1.0.8 (from -r backend/requirements.txt (line 78))
+  Using cached unidic-lite-1.0.8.tar.gz (47.4 MB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting librosa>=0.10.0 (from -r backend/requirements.txt (line 82))
+  Using cached librosa-1.0.0-py3-none-any.whl.metadata (6.7 kB)
+Collecting soundfile>=0.12.0 (from -r backend/requirements.txt (line 83))
+  Using cached soundfile-0.14.0-py2.py3-none-manylinux_2_28_x86_64.whl.metadata (18 kB)
+Collecting numpy<2.0,>=1.24.0 (from -r backend/requirements.txt (line 84))
+  Using cached numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+Collecting numba<0.61.0,>=0.60.0 (from -r backend/requirements.txt (line 85))
+  Using cached numba-0.60.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.7 kB)
+Collecting pedalboard>=0.9.0 (from -r backend/requirements.txt (line 86))
+  Using cached pedalboard-0.9.25-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (58 kB)
+Collecting httpx>=0.27.0 (from -r backend/requirements.txt (line 89))
+  Using cached httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting fastmcp<4.0,>=3.0 (from -r backend/requirements.txt (line 93))
+  Using cached fastmcp-3.4.7-py3-none-any.whl.metadata (8.5 kB)
+Collecting sse-starlette>=2.0 (from -r backend/requirements.txt (line 94))
+  Using cached sse_starlette-3.4.11-py3-none-any.whl.metadata (15 kB)
+Collecting python-multipart>=0.0.6 (from -r backend/requirements.txt (line 97))
+  Using cached python_multipart-0.0.32-py3-none-any.whl.metadata (2.1 kB)
+Collecting Pillow>=10.0.0 (from -r backend/requirements.txt (line 98))
+  Using cached pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.1 kB)
+Collecting jsonargparse[signatures] (from linacodec @ git+https://github.com/ysharma3501/LinaCodec.git->-r backend/requirements.txt (line 38))
+  Using cached jsonargparse-4.52.0-py3-none-any.whl.metadata (13 kB)
+Collecting safetensors (from linacodec @ git+https://github.com/ysharma3501/LinaCodec.git->-r backend/requirements.txt (line 38))
+  Using cached safetensors-0.8.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.2 kB)
+Collecting tqdm (from linacodec @ git+https://github.com/ysharma3501/LinaCodec.git->-r backend/requirements.txt (line 38))
+  Using cached tqdm-4.70.1-py3-none-any.whl.metadata (57 kB)
+Collecting cn2an (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Using cached cn2an-0.5.24-py3-none-any.whl.metadata (10 kB)
+Collecting inflect (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Using cached inflect-7.5.0-py3-none-any.whl.metadata (24 kB)
+Collecting jieba (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Using cached jieba-0.42.1.tar.gz (19.2 MB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting lhotse (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Using cached lhotse-1.33.0-py3-none-any.whl.metadata (21 kB)
+Collecting onnxruntime (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Using cached onnxruntime-1.30.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (5.7 kB)
+Collecting piper-phonemize (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading piper_phonemize-1.4.7-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (9.7 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.7/9.7 MB 28.3 MB/s  0:00:00
+Collecting setuptools<81 (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Using cached setuptools-80.10.2-py3-none-any.whl.metadata (6.6 kB)
+Collecting tensorboard (from Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Using cached tensorboard-2.21.0-py3-none-any.whl.metadata (1.8 kB)
+Collecting filelock (from transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Using cached filelock-4.0.1-py3-none-any.whl.metadata (2.0 kB)
+Collecting huggingface_hub>=0.20.0 (from -r backend/requirements.txt (line 14))
+  Using cached huggingface_hub-0.36.2-py3-none-any.whl.metadata (15 kB)
+Collecting packaging>=20.0 (from transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Using cached packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting pyyaml>=5.1 (from transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Using cached pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Collecting regex!=2019.12.17 (from transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Using cached regex-2026.9.10-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+Collecting requests (from transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Using cached requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+Collecting tokenizers<=0.23.0,>=0.22.0 (from transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Using cached tokenizers-0.22.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
+Collecting fsspec>=2023.5.0 (from huggingface_hub>=0.20.0->-r backend/requirements.txt (line 14))
+  Using cached fsspec-2026.9.0-py3-none-any.whl.metadata (10 kB)
+Collecting hf-xet<2.0.0,>=1.1.3 (from huggingface_hub>=0.20.0->-r backend/requirements.txt (line 14))
+  Using cached hf_xet-1.6.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (4.9 kB)
+Collecting typing-extensions>=3.7.4.3 (from huggingface_hub>=0.20.0->-r backend/requirements.txt (line 14))
+  Using cached typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting llvmlite<0.44,>=0.43.0dev0 (from numba<0.61.0,>=0.60.0->-r backend/requirements.txt (line 85))
+  Using cached llvmlite-0.43.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.8 kB)
+Collecting fastmcp-slim==3.4.7 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached fastmcp_slim-3.4.7-py3-none-any.whl.metadata (10 kB)
+Collecting platformdirs>=4.0.0 (from fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached platformdirs-4.11.12-py3-none-any.whl.metadata (5.5 kB)
+Collecting pydantic-settings>=2.0.0 (from fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached pydantic_settings-2.15.0-py3-none-any.whl.metadata (3.9 kB)
+Collecting python-dotenv>=1.1.0 (from fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached python_dotenv-1.2.3-py3-none-any.whl.metadata (29 kB)
+Collecting rich>=13.9.4 (from fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+Collecting authlib>=1.6.11 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached authlib-1.8.0-py2.py3-none-any.whl.metadata (10 kB)
+Collecting exceptiongroup>=1.2.2 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached exceptiongroup-1.3.1-py3-none-any.whl.metadata (6.7 kB)
+Collecting mcp<2.0,>=1.24.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached mcp-1.30.0-py3-none-any.whl.metadata (9.3 kB)
+Collecting opentelemetry-api>=1.20.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached opentelemetry_api-1.44.0-py3-none-any.whl.metadata (1.4 kB)
+Collecting py-key-value-aio<0.5.0,>=0.4.4 (from py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached py_key_value_aio-0.4.6-py3-none-any.whl.metadata (16 kB)
+Collecting starlette>=1.0.1 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached starlette-1.7.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting cyclopts>=4.0.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached cyclopts-4.25.3-py3-none-any.whl.metadata (12 kB)
+Collecting griffelib>=2.0.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached griffelib-2.3.0-py3-none-any.whl.metadata (1.3 kB)
+Collecting joserfc>=1.1.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached joserfc-1.7.5-py3-none-any.whl.metadata (3.1 kB)
+Collecting jsonref>=1.1.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached jsonref-1.1.0-py3-none-any.whl.metadata (2.7 kB)
+Collecting jsonschema-path>=0.3.4 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached jsonschema_path-0.5.0-py3-none-any.whl.metadata (8.1 kB)
+Collecting openapi-pydantic>=0.5.1 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached openapi_pydantic-0.5.1-py3-none-any.whl.metadata (10 kB)
+Collecting pyperclip>=1.9.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached pyperclip-1.11.0-py3-none-any.whl.metadata (2.4 kB)
+Collecting uncalled-for>=0.2.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached uncalled_for-0.4.0-py3-none-any.whl.metadata (4.4 kB)
+Collecting watchfiles>=1.0.0 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached watchfiles-1.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+Collecting websockets>=15.0.1 (from fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached websockets-17.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.3 kB)
+Collecting anyio (from httpx>=0.27.0->-r backend/requirements.txt (line 89))
+  Using cached anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+Collecting certifi (from httpx>=0.27.0->-r backend/requirements.txt (line 89))
+  Using cached certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+Collecting httpcore==1.* (from httpx>=0.27.0->-r backend/requirements.txt (line 89))
+  Using cached httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting idna (from httpx>=0.27.0->-r backend/requirements.txt (line 89))
+  Using cached idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Collecting h11>=0.16 (from httpcore==1.*->httpx>=0.27.0->-r backend/requirements.txt (line 89))
+  Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting httpx-sse>=0.4 (from mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached httpx_sse-0.4.3-py3-none-any.whl.metadata (9.7 kB)
+Collecting jsonschema>=4.20.0 (from mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+Collecting pyjwt>=2.10.1 (from pyjwt[crypto]>=2.10.1->mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached pyjwt-2.14.0-py3-none-any.whl.metadata (3.4 kB)
+Collecting typing-inspection>=0.4.1 (from mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+Collecting annotated-types>=0.6.0 (from pydantic>=2.5.0->-r backend/requirements.txt (line 4))
+  Using cached annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.46.5 (from pydantic>=2.5.0->-r backend/requirements.txt (line 4))
+  Using cached pydantic_core-2.46.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+Collecting beartype>=0.20.0 (from py-key-value-aio<0.5.0,>=0.4.4->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached beartype-0.22.9-py3-none-any.whl.metadata (37 kB)
+Collecting aiofile>=3.12.3 (from py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached aiofile-3.12.3-py3-none-any.whl.metadata (17 kB)
+Collecting keyring>=25.6.0 (from py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached keyring-25.7.0-py3-none-any.whl.metadata (21 kB)
+Collecting cachetools>=5.0.0 (from py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached cachetools-7.2.0-py3-none-any.whl.metadata (5.5 kB)
+Collecting annotated-doc>=0.0.2 (from fastapi>=0.109.0->-r backend/requirements.txt (line 2))
+  Using cached annotated_doc-0.0.5-py3-none-any.whl.metadata (6.5 kB)
+Collecting click>=7.0 (from uvicorn>=0.27.0->uvicorn[standard]>=0.27.0->-r backend/requirements.txt (line 3))
+  Using cached click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting greenlet>=1 (from sqlalchemy>=2.0.0->-r backend/requirements.txt (line 7))
+  Using cached greenlet-3.5.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
+Collecting Mako (from alembic>=1.13.0->-r backend/requirements.txt (line 8))
+  Using cached mako-1.4.3-py3-none-any.whl.metadata (2.9 kB)
+Collecting sympy>=1.13.3 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached sympy-1.14.0-py3-none-any.whl.metadata (12 kB)
+Collecting networkx>=2.5.1 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached networkx-3.7-py3-none-any.whl.metadata (6.7 kB)
+Collecting jinja2 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting cuda-toolkit==13.0.3 (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached cuda_toolkit-13.0.3.0-py2.py3-none-any.whl.metadata (17 kB)
+Collecting cuda-bindings<14,>=13.0.3 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached cuda_bindings-13.4.3-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Collecting nvidia-cudnn-cu13==9.24.0.43 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_cudnn_cu13-9.24.0.43-py3-none-manylinux_2_27_x86_64.whl.metadata (1.9 kB)
+Collecting nvidia-cusparselt-cu13==0.8.1 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_cusparselt_cu13-0.8.1-py3-none-manylinux2014_x86_64.whl.metadata (12 kB)
+Collecting nvidia-nccl-cu13==2.30.7 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_nccl_cu13-2.30.7-py3-none-manylinux_2_18_x86_64.whl.metadata (2.1 kB)
+Collecting nvidia-nvshmem-cu13==3.4.5 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_nvshmem_cu13-3.4.5-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.1 kB)
+Collecting triton~=3.8.0 (from torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached triton-3.8.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (978 bytes)
+Collecting nvidia-cublas==13.1.1.3.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_cublas-13.1.1.3-py3-none-manylinux_2_27_x86_64.whl.metadata (1.8 kB)
+Collecting nvidia-cuda-nvrtc==13.0.88.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_cuda_nvrtc-13.0.88-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl.metadata (1.7 kB)
+Collecting nvidia-cuda-runtime==13.0.96.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_cuda_runtime-13.0.96-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.7 kB)
+Collecting nvidia-cufft==12.0.0.61.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_cufft-12.0.0.61-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.8 kB)
+Collecting nvidia-nvjitlink<14,>=13.0.88 (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_nvjitlink-13.4.92-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl.metadata (1.8 kB)
+Collecting nvidia-cufile==1.15.1.6.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_cufile-1.15.1.6-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.7 kB)
+Collecting nvidia-cuda-cupti==13.0.85.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_cuda_cupti-13.0.85-py3-none-manylinux_2_25_x86_64.whl.metadata (1.7 kB)
+Collecting nvidia-curand==10.4.0.35.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_curand-10.4.0.35-py3-none-manylinux_2_27_x86_64.whl.metadata (1.7 kB)
+Collecting nvidia-cusolver==12.0.4.66.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_cusolver-12.0.4.66-py3-none-manylinux_2_27_x86_64.whl.metadata (1.8 kB)
+Collecting nvidia-cusparse==12.6.3.3.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_cusparse-12.6.3.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (1.8 kB)
+Collecting nvidia-nvtx==13.0.85.* (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached nvidia_nvtx-13.0.85-py3-none-manylinux1_x86_64.manylinux_2_5_x86_64.whl.metadata (1.8 kB)
+Collecting cuda-pathfinder>=1.4.2 (from cuda-bindings<14,>=13.0.3->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Using cached cuda_pathfinder-1.8.2-py3-none-any.whl.metadata (1.9 kB)
+Collecting psutil (from accelerate>=0.26.0->-r backend/requirements.txt (line 13))
+  Using cached psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl.metadata (22 kB)
+Collecting transformers<=4.57.6,>=4.36.0 (from -r backend/requirements.txt (line 12))
+  Using cached transformers-4.57.3-py3-none-any.whl.metadata (43 kB)
+Collecting accelerate>=0.26.0 (from -r backend/requirements.txt (line 13))
+  Using cached accelerate-1.12.0-py3-none-any.whl.metadata (19 kB)
+Collecting gradio (from qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Using cached gradio-6.28.0-py3-none-any.whl.metadata (16 kB)
+Collecting sox (from qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Using cached sox-1.5.0.tar.gz (63 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting einx>=0.3.0 (from x-transformers>=1.31.14->-r backend/requirements.txt (line 20))
+  Using cached einx-0.4.3-py3-none-any.whl.metadata (6.9 kB)
+Collecting loguru (from x-transformers>=1.31.14->-r backend/requirements.txt (line 20))
+  Using cached loguru-0.7.3-py3-none-any.whl.metadata (22 kB)
+Collecting torch-einops-utils>=0.1.29 (from x-transformers>=1.31.14->-r backend/requirements.txt (line 20))
+  Using cached torch_einops_utils-0.1.29-py3-none-any.whl.metadata (2.2 kB)
+Collecting scipy (from vocos->-r backend/requirements.txt (line 21))
+  Using cached scipy-1.18.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+Collecting encodec==0.1.1 (from vocos->-r backend/requirements.txt (line 21))
+  Using cached encodec-0.1.1.tar.gz (3.7 MB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting rich>=13.9.4 (from fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached rich-13.9.4-py3-none-any.whl.metadata (18 kB)
+Collecting filelock (from huggingface_hub>=0.20.0->-r backend/requirements.txt (line 14))
+  Using cached filelock-3.32.7-py3-none-any.whl.metadata (2.0 kB)
+Collecting boto3<2.0,>=1.0 (from cached-path->-r backend/requirements.txt (line 26))
+  Using cached boto3-1.43.100-py3-none-any.whl.metadata (6.6 kB)
+Collecting google-cloud-storage<4.0,>=1.32.0 (from cached-path->-r backend/requirements.txt (line 26))
+  Using cached google_cloud_storage-3.14.1-py3-none-any.whl.metadata (14 kB)
+Collecting botocore<1.44.0,>=1.43.100 (from boto3<2.0,>=1.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached botocore-1.43.100-py3-none-any.whl.metadata (5.6 kB)
+Collecting jmespath<2.0.0,>=0.7.1 (from boto3<2.0,>=1.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached jmespath-1.1.0-py3-none-any.whl.metadata (7.6 kB)
+Collecting s3transfer<0.20.0,>=0.19.0 (from boto3<2.0,>=1.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached s3transfer-0.19.2-py3-none-any.whl.metadata (1.7 kB)
+Collecting python-dateutil<3.0.0,>=2.1 (from botocore<1.44.0,>=1.43.100->boto3<2.0,>=1.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Collecting urllib3!=2.2.0,<3,>=1.25.4 (from botocore<1.44.0,>=1.43.100->boto3<2.0,>=1.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+Collecting google-auth<3.0.0,>=2.26.1 (from google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached google_auth-2.58.0-py3-none-any.whl.metadata (6.0 kB)
+Collecting google-api-core<3.0.0,>=2.27.0 (from google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached google_api_core-2.38.0-py3-none-any.whl.metadata (3.2 kB)
+Collecting google-cloud-core<3.0.0,>=2.4.2 (from google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached google_cloud_core-2.7.0-py3-none-any.whl.metadata (2.8 kB)
+Collecting google-resumable-media<3.0.0,>=2.7.2 (from google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached google_resumable_media-2.10.2-py3-none-any.whl.metadata (2.2 kB)
+Collecting google-crc32c<2.0.0,>=1.6.0 (from google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached google_crc32c-1.8.0-cp312-cp312-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl.metadata (1.7 kB)
+Collecting googleapis-common-protos<2.0.0,>=1.69.2 (from google-api-core<3.0.0,>=2.27.0->google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached googleapis_common_protos-1.75.3-py3-none-any.whl.metadata (8.5 kB)
+Collecting protobuf<8.0.0,>=6.33.5 (from google-api-core<3.0.0,>=2.27.0->google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl.metadata (595 bytes)
+Collecting proto-plus<2.0.0,>=1.26.1 (from google-api-core<3.0.0,>=2.27.0->google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached proto_plus-1.28.4-py3-none-any.whl.metadata (2.2 kB)
+Collecting pyasn1-modules>=0.2.1 (from google-auth<3.0.0,>=2.26.1->google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached pyasn1_modules-0.4.2-py3-none-any.whl.metadata (3.5 kB)
+Collecting cryptography>=38.0.3 (from google-auth<3.0.0,>=2.26.1->google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached cryptography-50.0.1-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.3 kB)
+Collecting six>=1.5 (from python-dateutil<3.0.0,>=2.1->botocore<1.44.0,>=1.43.100->boto3<2.0,>=1.0->cached-path->-r backend/requirements.txt (line 26))
+  Using cached six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Collecting charset_normalizer<4,>=2 (from requests->transformers<=4.57.6,>=4.36.0->-r backend/requirements.txt (line 12))
+  Using cached charset_normalizer-3.5.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (45 kB)
+Collecting markdown-it-py>=2.2.0 (from rich>=13.9.4->fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+Collecting pygments<3.0.0,>=2.13.0 (from rich>=13.9.4->fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting contourpy>=1.0.1 (from matplotlib->-r backend/requirements.txt (line 28))
+  Using cached contourpy-1.4.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
+Collecting cycler>=0.10 (from matplotlib->-r backend/requirements.txt (line 28))
+  Using cached cycler-0.12.1-py3-none-any.whl.metadata (3.8 kB)
+Collecting fonttools>=4.28.2 (from matplotlib->-r backend/requirements.txt (line 28))
+  Using cached fonttools-4.65.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (125 kB)
+Collecting kiwisolver>=1.3.1 (from matplotlib->-r backend/requirements.txt (line 28))
+  Using cached kiwisolver-1.5.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (5.2 kB)
+Collecting pyparsing>=3 (from matplotlib->-r backend/requirements.txt (line 28))
+  Using cached pyparsing-3.3.3-py3-none-any.whl.metadata (5.9 kB)
+Collecting opentelemetry-exporter-otlp-proto-http>=1.43.0 (from wandb->-r backend/requirements.txt (line 29))
+  Using cached opentelemetry_exporter_otlp_proto_http-1.44.0-py3-none-any.whl.metadata (2.4 kB)
+Collecting opentelemetry-sdk>=1.43.0 (from wandb->-r backend/requirements.txt (line 29))
+  Using cached opentelemetry_sdk-1.44.0-py3-none-any.whl.metadata (1.6 kB)
+Collecting xxhash>=3.0.0 (from wandb->-r backend/requirements.txt (line 29))
+  Using cached xxhash-4.0.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (17 kB)
+Collecting pyarrow>=21.0.0 (from datasets->-r backend/requirements.txt (line 30))
+  Using cached pyarrow-25.0.1-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+Collecting dill<0.4.2,>=0.3.0 (from datasets->-r backend/requirements.txt (line 30))
+  Using cached dill-0.4.1-py3-none-any.whl.metadata (10 kB)
+Collecting pandas (from datasets->-r backend/requirements.txt (line 30))
+  Using cached pandas-3.0.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+Collecting multiprocess<0.70.20 (from datasets->-r backend/requirements.txt (line 30))
+  Using cached multiprocess-0.70.19-py312-none-any.whl.metadata (7.5 kB)
+Collecting fsspec>=2023.5.0 (from huggingface_hub>=0.20.0->-r backend/requirements.txt (line 14))
+  Using cached fsspec-2026.6.0-py3-none-any.whl.metadata (10 kB)
+Collecting aiohttp!=4.0.0a0,!=4.0.0a1 (from fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Using cached aiohttp-3.14.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)
+Collecting antlr4-python3-runtime==4.9.* (from hydra-core->-r backend/requirements.txt (line 31))
+  Using cached antlr4-python3-runtime-4.9.3.tar.gz (117 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting importlib_metadata (from diffusers>=0.29.0->-r backend/requirements.txt (line 45))
+  Using cached importlib_metadata-9.0.1-py3-none-any.whl.metadata (4.5 kB)
+INFO: pip is looking at multiple versions of diffusers to determine which version is compatible with other requirements. This could take a while.
+Collecting diffusers>=0.29.0 (from -r backend/requirements.txt (line 45))
+  Using cached diffusers-0.39.0-py3-none-any.whl.metadata (20 kB)
+Collecting jaconv (from pykakasi->-r backend/requirements.txt (line 47))
+  Using cached jaconv-0.5.0-py3-none-any.whl.metadata (8.9 kB)
+Collecting deprecated (from pykakasi->-r backend/requirements.txt (line 47))
+  Using cached deprecated-1.3.1-py2.py3-none-any.whl.metadata (5.9 kB)
+Collecting pre-commit (from s3tokenizer->-r backend/requirements.txt (line 49))
+  Using cached pre_commit-4.6.2-py2.py3-none-any.whl.metadata (1.2 kB)
+Collecting onnx (from s3tokenizer->-r backend/requirements.txt (line 49))
+  Using cached onnx-1.23.0-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (8.7 kB)
+Collecting srsly<3.0.0,>=2.3.0 (from spacy-pkuseg->-r backend/requirements.txt (line 50))
+  Using cached srsly-2.5.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (19 kB)
+Collecting catalogue<2.1.0,>=2.0.3 (from srsly<3.0.0,>=2.3.0->spacy-pkuseg->-r backend/requirements.txt (line 50))
+  Using cached catalogue-2.0.10-py3-none-any.whl.metadata (14 kB)
+Collecting addict (from misaki>=0.9.4->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Using cached addict-2.4.0-py3-none-any.whl.metadata (1.0 kB)
+INFO: pip is looking at multiple versions of librosa to determine which version is compatible with other requirements. This could take a while.
+Collecting librosa>=0.10.0 (from -r backend/requirements.txt (line 82))
+  Using cached librosa-0.11.0-py3-none-any.whl.metadata (8.7 kB)
+Collecting audioread>=2.1.9 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Using cached audioread-3.1.0-py3-none-any.whl.metadata (9.0 kB)
+Collecting scikit-learn>=1.1.0 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Using cached scikit_learn-1.9.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.3 kB)
+Collecting joblib>=1.0 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Using cached joblib-1.6.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting decorator>=4.3.0 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Using cached decorator-5.3.1-py3-none-any.whl.metadata (3.9 kB)
+Collecting pooch>=1.1 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Using cached pooch-1.9.0-py3-none-any.whl.metadata (10 kB)
+Collecting soxr>=0.3.2 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Using cached soxr-1.1.0-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (5.8 kB)
+Collecting lazy_loader>=0.1 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Using cached lazy_loader-0.6-py3-none-any.whl.metadata (6.0 kB)
+Collecting msgpack>=1.0 (from librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Using cached msgpack-1.2.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)
+Collecting cffi>=1.0 (from soundfile>=0.12.0->-r backend/requirements.txt (line 83))
+  Using cached cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+Collecting caio~=0.12.0 (from aiofile>=3.12.3->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached caio-0.12.4-cp312-cp312-manylinux_2_34_x86_64.whl.metadata (4.5 kB)
+Collecting aiohappyeyeballs>=2.5.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Using cached aiohappyeyeballs-2.7.1-py3-none-any.whl.metadata (5.9 kB)
+Collecting aiosignal>=1.4.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Using cached aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+Collecting attrs>=17.3.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Using cached attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+Collecting frozenlist>=1.1.1 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Using cached frozenlist-1.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (20 kB)
+Collecting multidict<7.0,>=4.5 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Using cached multidict-6.9.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.3 kB)
+Collecting propcache>=0.2.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Using cached propcache-0.5.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (25 kB)
+Collecting yarl<2.0,>=1.17.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.6.0,>=2023.1.0->datasets->-r backend/requirements.txt (line 30))
+  Using cached yarl-1.25.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (111 kB)
+Collecting pycparser (from cffi>=1.0->soundfile>=0.12.0->-r backend/requirements.txt (line 83))
+  Using cached pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+INFO: pip is looking at multiple versions of contourpy to determine which version is compatible with other requirements. This could take a while.
+Collecting contourpy>=1.0.1 (from matplotlib->-r backend/requirements.txt (line 28))
+  Using cached contourpy-1.3.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (5.5 kB)
+Collecting docstring-parser<4.0,>=0.15 (from cyclopts>=4.0.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached docstring_parser-0.18.0-py3-none-any.whl.metadata (3.5 kB)
+Collecting rich-rst<3.0.0,>=1.3.1 (from cyclopts>=4.0.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached rich_rst-2.1.0-py3-none-any.whl.metadata (4.7 kB)
+Collecting frozendict (from einx>=0.3.0->x-transformers>=1.31.14->-r backend/requirements.txt (line 20))
+  Using cached frozendict-2.4.7-py3-none-any.whl.metadata (23 kB)
+Collecting cloudpickle>=3.0 (from joblib>=1.0->librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Using cached cloudpickle-3.1.2-py3-none-any.whl.metadata (7.1 kB)
+Collecting jsonschema-specifications>=2023.03.6 (from jsonschema>=4.20.0->mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+Collecting referencing>=0.28.4 (from jsonschema>=4.20.0->mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+Collecting rpds-py>=0.25.0 (from jsonschema>=4.20.0->mcp<2.0,>=1.24.0->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+Collecting pathable<0.7.0,>=0.6.0 (from jsonschema-path>=0.3.4->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached pathable-0.6.0-py3-none-any.whl.metadata (7.2 kB)
+Collecting SecretStorage>=3.2 (from keyring>=25.6.0->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached secretstorage-3.5.0-py3-none-any.whl.metadata (4.0 kB)
+Collecting jeepney>=0.4.2 (from keyring>=25.6.0->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached jeepney-0.9.0-py3-none-any.whl.metadata (1.2 kB)
+Collecting jaraco.classes (from keyring>=25.6.0->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached jaraco.classes-3.4.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting jaraco.functools (from keyring>=25.6.0->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached jaraco_functools-4.6.0-py3-none-any.whl.metadata (2.9 kB)
+Collecting jaraco.context (from keyring>=25.6.0->py-key-value-aio[filetree,keyring,memory]<0.5.0,>=0.4.4; extra == "client"->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached jaraco_context-6.1.2-py3-none-any.whl.metadata (4.2 kB)
+Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=13.9.4->fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Using cached mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+Collecting espeakng-loader (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Using cached espeakng_loader-0.2.4-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.3 kB)
+Collecting num2words (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Using cached num2words-0.5.14-py3-none-any.whl.metadata (13 kB)
+Collecting phonemizer-fork (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Using cached phonemizer_fork-3.3.2-py3-none-any.whl.metadata (48 kB)
+Collecting spacy (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Using cached spacy-3.8.16-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (28 kB)
+Collecting spacy-curated-transformers (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Using cached spacy_curated_transformers-2.1.2-py2.py3-none-any.whl.metadata (2.8 kB)
+Collecting fugashi (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Using cached fugashi-1.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (7.3 kB)
+Collecting mojimoji (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Using cached mojimoji-0.0.13-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.5 kB)
+Collecting pyopenjtalk (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Using cached pyopenjtalk-0.4.1.tar.gz (1.4 MB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting unidic (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading unidic-1.1.0.tar.gz (7.7 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting ordered-set (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading ordered_set-4.1.0-py3-none-any.whl.metadata (5.3 kB)
+Collecting pypinyin-dict (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading pypinyin_dict-0.9.0-py2.py3-none-any.whl.metadata (3.8 kB)
+Collecting opentelemetry-exporter-otlp-proto-common==1.44.0 (from opentelemetry-exporter-otlp-proto-http>=1.43.0->wandb->-r backend/requirements.txt (line 29))
+  Downloading opentelemetry_exporter_otlp_proto_common-1.44.0-py3-none-any.whl.metadata (1.8 kB)
+Collecting opentelemetry-proto==1.44.0 (from opentelemetry-exporter-otlp-proto-http>=1.43.0->wandb->-r backend/requirements.txt (line 29))
+  Downloading opentelemetry_proto-1.44.0-py3-none-any.whl.metadata (2.3 kB)
+Collecting opentelemetry-semantic-conventions==0.65b0 (from opentelemetry-sdk>=1.43.0->wandb->-r backend/requirements.txt (line 29))
+  Downloading opentelemetry_semantic_conventions-0.65b0-py3-none-any.whl.metadata (2.4 kB)
+Collecting pyasn1<0.7.0,>=0.6.1 (from pyasn1-modules>=0.2.1->google-auth<3.0.0,>=2.26.1->google-cloud-storage<4.0,>=1.32.0->cached-path->-r backend/requirements.txt (line 26))
+  Downloading pyasn1-0.6.4-py3-none-any.whl.metadata (8.4 kB)
+Collecting email-validator>=2.0.0 (from pydantic[email]>=2.11.7->fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading email_validator-2.3.0-py3-none-any.whl.metadata (26 kB)
+Collecting dnspython>=2.0.0 (from email-validator>=2.0.0->pydantic[email]>=2.11.7->fastmcp-slim==3.4.7->fastmcp-slim[client,server]==3.4.7->fastmcp<4.0,>=3.0->-r backend/requirements.txt (line 93))
+  Downloading dnspython-2.8.0-py3-none-any.whl.metadata (5.7 kB)
+Collecting narwhals>=2.0.1 (from scikit-learn>=1.1.0->librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Downloading narwhals-2.26.0-py3-none-any.whl.metadata (15 kB)
+Collecting threadpoolctl>=3.5.0 (from scikit-learn>=1.1.0->librosa>=0.10.0->-r backend/requirements.txt (line 82))
+  Downloading threadpoolctl-3.7.0-py3-none-any.whl.metadata (24 kB)
+INFO: pip is looking at multiple versions of scipy to determine which version is compatible with other requirements. This could take a while.
+Collecting scipy (from vocos->-r backend/requirements.txt (line 21))
+  Downloading scipy-1.18.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+  Downloading scipy-1.17.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+Collecting mpmath<1.4,>=1.1.0 (from sympy>=1.13.3->torch>=2.5.0->-r backend/requirements.txt (line 11))
+  Downloading mpmath-1.3.0-py3-none-any.whl.metadata (8.6 kB)
+Collecting httptools>=0.8.0 (from uvicorn[standard]>=0.27.0->-r backend/requirements.txt (line 3))
+  Downloading httptools-0.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (3.5 kB)
+Collecting uvloop>=0.15.1 (from uvicorn[standard]>=0.27.0->-r backend/requirements.txt (line 3))
+  Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (4.9 kB)
+Collecting proces>=0.1.7 (from cn2an->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading proces-0.1.7-py3-none-any.whl.metadata (3.3 kB)
+Collecting wrapt<3,>=1.10 (from deprecated->pykakasi->-r backend/requirements.txt (line 47))
+  Downloading wrapt-2.4.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (7.4 kB)
+Collecting brotli>=1.1.0 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading brotli-1.2.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (6.1 kB)
+Collecting gradio-client==2.7.1 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading gradio_client-2.7.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting groovy~=0.1 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading groovy-0.1.2-py3-none-any.whl.metadata (6.1 kB)
+Collecting hf-gradio<1.0,>=0.4.1 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading hf_gradio-0.4.1-py3-none-any.whl.metadata (428 bytes)
+INFO: pip is looking at multiple versions of gradio to determine which version is compatible with other requirements. This could take a while.
+Collecting gradio (from qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading gradio-6.27.0-py3-none-any.whl.metadata (17 kB)
+Collecting gradio-client==2.7.0 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading gradio_client-2.7.0-py3-none-any.whl.metadata (7.1 kB)
+Collecting gradio (from qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading gradio-6.26.0-py3-none-any.whl.metadata (17 kB)
+Collecting gradio-client==2.6.1 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading gradio_client-2.6.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting gradio (from qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading gradio-6.25.0-py3-none-any.whl.metadata (17 kB)
+Collecting gradio-client==2.6.0 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading gradio_client-2.6.0-py3-none-any.whl.metadata (7.1 kB)
+Collecting gradio (from qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading gradio-6.24.0-py3-none-any.whl.metadata (17 kB)
+  Downloading gradio-6.23.1-py3-none-any.whl.metadata (17 kB)
+  Downloading gradio-6.22.0-py3-none-any.whl.metadata (17 kB)
+  Downloading gradio-6.21.0-py3-none-any.whl.metadata (17 kB)
+INFO: pip is still looking at multiple versions of gradio to determine which version is compatible with other requirements. This could take a while.
+  Downloading gradio-6.20.0-py3-none-any.whl.metadata (17 kB)
+Collecting gradio-client==2.5.0 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading gradio_client-2.5.0-py3-none-any.whl.metadata (7.1 kB)
+Collecting gradio (from qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading gradio-6.19.0-py3-none-any.whl.metadata (17 kB)
+  Downloading gradio-6.18.0-py3-none-any.whl.metadata (17 kB)
+  Downloading gradio-6.17.3-py3-none-any.whl.metadata (17 kB)
+Collecting markupsafe<4.0,>=2.0 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+Collecting orjson~=3.0 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading orjson-3.12.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (41 kB)
+Collecting pytz>=2017.2 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading pytz-2026.3.post1-py2.py3-none-any.whl.metadata (22 kB)
+Collecting safehttpx<0.2.0,>=0.1.7 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading safehttpx-0.1.7-py3-none-any.whl.metadata (4.2 kB)
+Collecting semantic-version~=2.0 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading semantic_version-2.10.0-py2.py3-none-any.whl.metadata (9.7 kB)
+Collecting tomlkit<0.15.0,>=0.12.0 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading tomlkit-0.14.0-py3-none-any.whl.metadata (2.8 kB)
+Collecting typer<1.0,>=0.12 (from gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading typer-0.27.2-py3-none-any.whl.metadata (16 kB)
+Collecting shellingham>=1.3.0 (from typer<1.0,>=0.12->gradio->qwen-tts>=0.0.5->-r backend/requirements.txt (line 15))
+  Downloading shellingham-1.5.4-py2.py3-none-any.whl.metadata (3.5 kB)
+Collecting zipp>=3.20 (from importlib_metadata->diffusers>=0.29.0->-r backend/requirements.txt (line 45))
+  Downloading zipp-4.1.0-py3-none-any.whl.metadata (3.6 kB)
+Collecting more_itertools>=8.5.0 (from inflect->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading more_itertools-11.1.0-py3-none-any.whl.metadata (41 kB)
+Collecting typeguard>=4.0.1 (from inflect->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading typeguard-4.6.0-py3-none-any.whl.metadata (3.7 kB)
+Collecting typeshed-client>=2.8.2 (from jsonargparse[signatures]->linacodec @ git+https://github.com/ysharma3501/LinaCodec.git->-r backend/requirements.txt (line 38))
+  Downloading typeshed_client-2.13.0-py3-none-any.whl.metadata (10 kB)
+Collecting cytoolz>=0.10.1 (from lhotse->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading cytoolz-1.1.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.2 kB)
+Collecting intervaltree>=3.1.0 (from lhotse->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading intervaltree-3.2.1-py2.py3-none-any.whl.metadata (12 kB)
+Collecting tabulate>=0.8.1 (from lhotse->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading tabulate-0.10.0-py3-none-any.whl.metadata (40 kB)
+Collecting toolz>=0.8.0 (from cytoolz>=0.10.1->lhotse->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading toolz-1.1.0-py3-none-any.whl.metadata (5.1 kB)
+Collecting sortedcontainers (from intervaltree>=3.1.0->lhotse->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl.metadata (10 kB)
+Collecting docopt>=0.6.2 (from num2words->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading docopt-0.6.2.tar.gz (25 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting ml_dtypes>=0.5.4 (from onnx->s3tokenizer->-r backend/requirements.txt (line 49))
+  Downloading ml_dtypes-0.6.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (8.8 kB)
+INFO: pip is looking at multiple versions of ml-dtypes to determine which version is compatible with other requirements. This could take a while.
+  Downloading ml_dtypes-0.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (8.9 kB)
+Collecting flatbuffers (from onnxruntime->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading flatbuffers-25.12.19-py2.py3-none-any.whl.metadata (1.0 kB)
+Collecting dlinfo (from phonemizer-fork->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading dlinfo-2.0.0-py3-none-any.whl.metadata (1.1 kB)
+Collecting segments (from phonemizer-fork->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading segments-2.4.0-py2.py3-none-any.whl.metadata (3.5 kB)
+Collecting cfgv>=2.0.0 (from pre-commit->s3tokenizer->-r backend/requirements.txt (line 49))
+  Downloading cfgv-3.5.0-py2.py3-none-any.whl.metadata (8.9 kB)
+Collecting identify>=1.0.0 (from pre-commit->s3tokenizer->-r backend/requirements.txt (line 49))
+  Downloading identify-2.6.19-py2.py3-none-any.whl.metadata (4.4 kB)
+Collecting nodeenv>=0.11.1 (from pre-commit->s3tokenizer->-r backend/requirements.txt (line 49))
+  Downloading nodeenv-1.10.0-py2.py3-none-any.whl.metadata (24 kB)
+Collecting virtualenv>=20.10.0 (from pre-commit->s3tokenizer->-r backend/requirements.txt (line 49))
+  Downloading virtualenv-21.11.1-py3-none-any.whl.metadata (3.8 kB)
+Collecting distlib<1,>=0.3.7 (from virtualenv>=20.10.0->pre-commit->s3tokenizer->-r backend/requirements.txt (line 49))
+  Downloading distlib-0.4.3-py2.py3-none-any.whl.metadata (5.3 kB)
+Collecting python-discovery>=1.6 (from virtualenv>=20.10.0->pre-commit->s3tokenizer->-r backend/requirements.txt (line 49))
+  Downloading python_discovery-1.6.1-py3-none-any.whl.metadata (5.1 kB)
+Collecting csvw>=1.5.6 (from segments->phonemizer-fork->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading csvw-4.1.0-py2.py3-none-any.whl.metadata (10 kB)
+Collecting isodate (from csvw>=1.5.6->segments->phonemizer-fork->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading isodate-0.7.2-py3-none-any.whl.metadata (11 kB)
+Collecting rfc3986<2 (from csvw>=1.5.6->segments->phonemizer-fork->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading rfc3986-1.5.0-py2.py3-none-any.whl.metadata (6.5 kB)
+Collecting uritemplate>=3.0.0 (from csvw>=1.5.6->segments->phonemizer-fork->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading uritemplate-4.2.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting babel (from csvw>=1.5.6->segments->phonemizer-fork->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading babel-2.18.0-py3-none-any.whl.metadata (2.2 kB)
+Collecting language-tags (from csvw>=1.5.6->segments->phonemizer-fork->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading language_tags-1.3.1-py3-none-any.whl.metadata (6.5 kB)
+Collecting rdflib (from csvw>=1.5.6->segments->phonemizer-fork->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading rdflib-7.6.0-py3-none-any.whl.metadata (12 kB)
+Collecting termcolor (from csvw>=1.5.6->segments->phonemizer-fork->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading termcolor-3.3.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting spacy-legacy<3.1.0,>=3.0.11 (from spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading spacy_legacy-3.0.12-py2.py3-none-any.whl.metadata (2.8 kB)
+Collecting spacy-loggers<2.0.0,>=1.0.0 (from spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading spacy_loggers-1.0.5-py3-none-any.whl.metadata (23 kB)
+Collecting murmurhash<1.1.0,>=0.28.0 (from spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading murmurhash-1.0.15-cp312-cp312-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl.metadata (2.3 kB)
+Collecting cymem<2.1.0,>=2.0.2 (from spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading cymem-2.0.13-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (9.7 kB)
+Collecting preshed<3.1.0,>=3.0.2 (from spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading preshed-3.0.13-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (5.2 kB)
+Collecting thinc<8.4.0,>=8.3.12 (from spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading thinc-8.3.13-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (14 kB)
+Collecting wasabi<1.2.0,>=0.9.1 (from spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading wasabi-1.1.3-py3-none-any.whl.metadata (28 kB)
+Collecting weasel<2.0.0,>=1.0.0 (from spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading weasel-1.0.0-py3-none-any.whl.metadata (4.6 kB)
+Collecting confection<2.0.0,>=1.3.2 (from spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading confection-1.3.3-py3-none-any.whl.metadata (19 kB)
+Collecting blis<1.4.0,>=1.3.0 (from thinc<8.4.0,>=8.3.12->spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading blis-1.3.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (7.5 kB)
+Collecting cloudpathlib>=0.7.0 (from weasel<2.0.0,>=1.0.0->spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading cloudpathlib-0.25.0-py3-none-any.whl.metadata (16 kB)
+Collecting smart-open>=5.2.1 (from weasel<2.0.0,>=1.0.0->spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading smart_open-8.0.1-py3-none-any.whl.metadata (24 kB)
+Collecting curated-transformers<3.0.0,>=2.0.0 (from spacy-curated-transformers->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading curated_transformers-2.0.1-py2.py3-none-any.whl.metadata (5.3 kB)
+Collecting curated-tokenizers<3.0.0,>=2.0.0 (from spacy-curated-transformers->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading curated_tokenizers-2.0.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (2.0 kB)
+INFO: pip is looking at multiple versions of spacy-curated-transformers to determine which version is compatible with other requirements. This could take a while.
+Collecting spacy-curated-transformers (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading spacy_curated_transformers-2.1.1-py2.py3-none-any.whl.metadata (2.8 kB)
+Collecting spacy (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading spacy-4.0.0.dev3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (26 kB)
+Collecting spacy-curated-transformers (from misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading spacy_curated_transformers-2.0.0-py2.py3-none-any.whl.metadata (2.8 kB)
+  Downloading spacy_curated_transformers-0.3.1-py2.py3-none-any.whl.metadata (2.7 kB)
+Collecting curated-transformers<0.2.0,>=0.1.0 (from spacy-curated-transformers->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading curated_transformers-0.1.1-py2.py3-none-any.whl.metadata (965 bytes)
+Collecting curated-tokenizers<0.1.0,>=0.0.9 (from spacy-curated-transformers->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading curated_tokenizers-0.0.10-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (2.0 kB)
+Collecting absl-py>=0.4 (from tensorboard->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading absl_py-2.5.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting grpcio<2.0,>=1.74.0 (from tensorboard->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading grpcio-1.84.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (3.8 kB)
+Collecting markdown>=2.6.8 (from tensorboard->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading markdown-3.10.3-py3-none-any.whl.metadata (5.1 kB)
+Collecting tensorboard-data-server<0.8.0,>=0.7.0 (from tensorboard->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading tensorboard_data_server-0.7.2-py3-none-manylinux_2_31_x86_64.whl.metadata (1.1 kB)
+Collecting werkzeug>=1.0.1 (from tensorboard->Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git->-r backend/requirements.txt (line 39))
+  Downloading werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
+Collecting wasabi<1.2.0,>=0.9.1 (from spacy->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading wasabi-0.10.1-py3-none-any.whl.metadata (28 kB)
+Collecting plac<2.0.0,>=1.1.3 (from unidic->misaki[en,ja,zh]>=0.9.4->-r backend/requirements.txt (line 70))
+  Downloading plac-1.4.7-py2.py3-none-any.whl.metadata (6.1 kB)
+Downloading huggingface_hub-0.36.2-py3-none-any.whl (566 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 566.4/566.4 kB 4.5 MB/s  0:00:00
+Downloading numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.0/18.0 MB 41.4 MB/s  0:00:00
+Downloading numba-0.60.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (3.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.8/3.8 MB 4.8 MB/s  0:00:00
+Downloading fastmcp-3.4.7-py3-none-any.whl (8.0 kB)
+Downloading fastmcp_slim-3.4.7-py3-none-any.whl (769 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 769.4/769.4 kB 37.5 MB/s  0:00:00
+Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+Downloading hf_xet-1.6.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 87.9 MB/s  0:00:00
+Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+Downloading llvmlite-0.43.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (43.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.9/43.9 MB 77.7 MB/s  0:00:00
+Downloading mcp-1.30.0-py3-none-any.whl (234 kB)
+Downloading pydantic-2.13.5-py3-none-any.whl (472 kB)
+Downloading pydantic_core-2.46.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 68.6 MB/s  0:00:00
+Downloading py_key_value_aio-0.4.6-py3-none-any.whl (171 kB)
+Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 40.4 MB/s  0:00:00
+Downloading setuptools-80.10.2-py3-none-any.whl (1.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 48.6 MB/s  0:00:00
+Downloading tokenizers-0.22.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 78.3 MB/s  0:00:00
+Downloading fastapi-0.141.1-py3-none-any.whl (131 kB)
+Downloading uvicorn-0.53.0-py3-none-any.whl (87 kB)
+Downloading sqlalchemy-2.0.54-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (3.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.5/3.5 MB 79.5 MB/s  0:00:00
+Downloading alembic-1.20.0-py3-none-any.whl (268 kB)
+Downloading torch-2.14.0-cp312-cp312-manylinux_2_28_x86_64.whl (554.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 554.6/554.6 MB 17.7 MB/s  0:00:24
+Downloading cuda_toolkit-13.0.3.0-py2.py3-none-any.whl (2.5 kB)
+Downloading nvidia_cudnn_cu13-9.24.0.43-py3-none-manylinux_2_27_x86_64.whl (553.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 553.1/553.1 MB 35.2 MB/s  0:00:21
+Downloading nvidia_cusparselt_cu13-0.8.1-py3-none-manylinux2014_x86_64.whl (170.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 170.1/170.1 MB 37.5 MB/s  0:00:04
+Downloading nvidia_nccl_cu13-2.30.7-py3-none-manylinux_2_18_x86_64.whl (216.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 216.0/216.0 MB 34.1 MB/s  0:00:06
+Downloading nvidia_nvshmem_cu13-3.4.5-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (60.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 60.4/60.4 MB 35.8 MB/s  0:00:01
+Downloading cuda_bindings-13.4.3-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (7.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.2/7.2 MB 36.2 MB/s  0:00:00
+Downloading nvidia_cublas-13.1.1.3-py3-none-manylinux_2_27_x86_64.whl (423.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 423.1/423.1 MB 3.9 MB/s  0:01:07
+Downloading nvidia_cuda_cupti-13.0.85-py3-none-manylinux_2_25_x86_64.whl (10.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.7/10.7 MB 10.6 MB/s  0:00:01
+Downloading nvidia_cuda_nvrtc-13.0.88-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl (90.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 90.2/90.2 MB 8.8 MB/s  0:00:10
+Downloading nvidia_cuda_runtime-13.0.96-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (2.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 8.0 MB/s  0:00:00
+Downloading nvidia_cufft-12.0.0.61-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (214.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 214.1/214.1 MB 4.4 MB/s  0:01:12
+Downloading nvidia_cufile-1.15.1.6-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 9.1 MB/s  0:00:00
+Downloading nvidia_curand-10.4.0.35-py3-none-manylinux_2_27_x86_64.whl (59.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 59.5/59.5 MB 11.1 MB/s  0:00:05
+Downloading nvidia_cusolver-12.0.4.66-py3-none-manylinux_2_27_x86_64.whl (200.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 200.9/200.9 MB 11.2 MB/s  0:00:17
+Downloading nvidia_cusparse-12.6.3.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (145.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 145.9/145.9 MB 9.2 MB/s  0:00:15
+Downloading nvidia_nvjitlink-13.4.92-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl (42.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 42.5/42.5 MB 17.6 MB/s  0:00:02
+Downloading nvidia_nvtx-13.0.85-py3-none-manylinux1_x86_64.manylinux_2_5_x86_64.whl (148 kB)
+Downloading triton-3.8.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (248.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 248.0/248.0 MB 5.9 MB/s  0:00:35
+Downloading qwen_tts-0.1.1-py3-none-any.whl (113 kB)
+Downloading transformers-4.57.3-py3-none-any.whl (12.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.0/12.0 MB 5.1 MB/s  0:00:02
+Downloading accelerate-1.12.0-py3-none-any.whl (380 kB)
+Downloading ema_pytorch-0.8.3-py3-none-any.whl (16 kB)
+Downloading x_transformers-2.30.5-py3-none-any.whl (143 kB)
+Downloading vocos-0.1.0-py3-none-any.whl (24 kB)
+Downloading pydub-0.25.1-py2.py3-none-any.whl (32 kB)
+Downloading rjieba-0.2.1-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.6/3.6 MB 5.2 MB/s  0:00:00
+Downloading pypinyin-0.55.0-py2.py3-none-any.whl (840 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 840.2/840.2 kB 4.9 MB/s  0:00:00
+Downloading cached_path-1.8.10-py3-none-any.whl (37 kB)
+Downloading boto3-1.43.100-py3-none-any.whl (140 kB)
+Downloading botocore-1.43.100-py3-none-any.whl (15.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15.9/15.9 MB 4.3 MB/s  0:00:03
+Downloading filelock-3.32.7-py3-none-any.whl (100 kB)
+Downloading google_cloud_storage-3.14.1-py3-none-any.whl (343 kB)
+Downloading google_api_core-2.38.0-py3-none-any.whl (187 kB)
+Downloading google_auth-2.58.0-py3-none-any.whl (262 kB)
+Downloading google_cloud_core-2.7.0-py3-none-any.whl (31 kB)
+Downloading google_crc32c-1.8.0-cp312-cp312-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl (33 kB)
+Downloading google_resumable_media-2.10.2-py3-none-any.whl (81 kB)
+Downloading googleapis_common_protos-1.75.3-py3-none-any.whl (306 kB)
+Downloading jmespath-1.1.0-py3-none-any.whl (20 kB)
+Downloading opentelemetry_api-1.44.0-py3-none-any.whl (60 kB)
+Downloading proto_plus-1.28.4-py3-none-any.whl (50 kB)
+Downloading protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl (343 kB)
+Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+Downloading charset_normalizer-3.5.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (248 kB)
+Downloading idna-3.20-py3-none-any.whl (69 kB)
+Downloading rich-13.9.4-py3-none-any.whl (242 kB)
+Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 6.8 MB/s  0:00:00
+Downloading s3transfer-0.19.2-py3-none-any.whl (90 kB)
+Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+Downloading torchdiffeq-0.2.5-py3-none-any.whl (32 kB)
+Downloading matplotlib-3.11.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (9.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.9/9.9 MB 7.3 MB/s  0:00:01
+Downloading wandb-0.30.0-py3-none-manylinux_2_28_x86_64.whl (26.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 26.1/26.1 MB 7.8 MB/s  0:00:03
+Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Downloading datasets-5.0.1-py3-none-any.whl (559 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 559.1/559.1 kB 6.3 MB/s  0:00:00
+Downloading dill-0.4.1-py3-none-any.whl (120 kB)
+Downloading fsspec-2026.6.0-py3-none-any.whl (203 kB)
+Downloading multiprocess-0.70.19-py312-none-any.whl (150 kB)
+Downloading hydra_core-1.3.7-py3-none-any.whl (168 kB)
+Downloading omegaconf-2.3.1-py3-none-any.whl (79 kB)
+Downloading Unidecode-1.4.0-py3-none-any.whl (235 kB)
+Downloading conformer-0.3.2-py3-none-any.whl (4.3 kB)
+Downloading diffusers-0.39.0-py3-none-any.whl (5.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.6/5.6 MB 7.8 MB/s  0:00:00
+Downloading pykakasi-2.3.0-py3-none-any.whl (2.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.4/2.4 MB 7.6 MB/s  0:00:00
+Downloading resemble_perth-1.0.1-py3-none-any.whl (34.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 34.4/34.4 MB 8.2 MB/s  0:00:04
+Downloading s3tokenizer-0.3.0-py3-none-any.whl (226 kB)
+Downloading spacy_pkuseg-1.0.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.1/4.1 MB 9.2 MB/s  0:00:00
+Downloading srsly-2.5.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 9.5 MB/s  0:00:00
+Downloading catalogue-2.0.10-py3-none-any.whl (17 kB)
+Downloading pyloudnorm-0.2.0-py3-none-any.whl (10 kB)
+Downloading torchaudio-2.11.0-cp312-cp312-manylinux_2_28_x86_64.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 9.5 MB/s  0:00:00
+Downloading einops-0.8.2-py3-none-any.whl (65 kB)
+Downloading kokoro-0.9.4-py3-none-any.whl (32 kB)
+Downloading misaki-0.9.4-py3-none-any.whl (3.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.6/3.6 MB 9.7 MB/s  0:00:00
+Downloading librosa-0.11.0-py3-none-any.whl (260 kB)
+Downloading soundfile-0.14.0-py2.py3-none-manylinux_2_28_x86_64.whl (1.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 9.7 MB/s  0:00:00
+Downloading pedalboard-0.9.25-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (5.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.1/5.1 MB 10.2 MB/s  0:00:00
+Downloading sse_starlette-3.4.11-py3-none-any.whl (17 kB)
+Downloading python_multipart-0.0.32-py3-none-any.whl (30 kB)
+Downloading pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (6.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.9/6.9 MB 11.1 MB/s  0:00:00
+Downloading aiofile-3.12.3-py3-none-any.whl (22 kB)
+Downloading caio-0.12.4-cp312-cp312-manylinux_2_34_x86_64.whl (159 kB)
+Downloading aiohttp-3.14.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 11.0 MB/s  0:00:00
+Downloading multidict-6.9.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (336 kB)
+Downloading yarl-1.25.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (117 kB)
+Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl (15 kB)
+Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+Downloading annotated_doc-0.0.5-py3-none-any.whl (5.3 kB)
+Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
+Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+Downloading audioread-3.1.0-py3-none-any.whl (23 kB)
+Downloading authlib-1.8.0-py2.py3-none-any.whl (260 kB)
+Downloading beartype-0.22.9-py3-none-any.whl (1.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 11.5 MB/s  0:00:00
+Downloading cachetools-7.2.0-py3-none-any.whl (16 kB)
+Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+Downloading cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (221 kB)
+Downloading click-8.5.0-py3-none-any.whl (125 kB)
+Downloading contourpy-1.3.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (362 kB)
+Downloading cryptography-50.0.1-cp311-abi3-manylinux_2_34_x86_64.whl (4.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 12.3 MB/s  0:00:00
+Downloading cuda_pathfinder-1.8.2-py3-none-any.whl (62 kB)
+Downloading cycler-0.12.1-py3-none-any.whl (8.3 kB)
+Downloading cyclopts-4.25.3-py3-none-any.whl (242 kB)
+Downloading docstring_parser-0.18.0-py3-none-any.whl (22 kB)
+Downloading rich_rst-2.1.0-py3-none-any.whl (272 kB)
+Downloading decorator-5.3.1-py3-none-any.whl (10 kB)
+Downloading einx-0.4.3-py3-none-any.whl (163 kB)
+Downloading exceptiongroup-1.3.1-py3-none-any.whl (16 kB)
+Downloading fonttools-4.65.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (5.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.4/5.4 MB 12.8 MB/s  0:00:00
+Downloading frozenlist-1.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (242 kB)
+Downloading greenlet-3.5.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (621 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 621.4/621.4 kB 13.4 MB/s  0:00:00
+Downloading griffelib-2.3.0-py3-none-any.whl (169 kB)
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading httpx_sse-0.4.3-py3-none-any.whl (9.0 kB)
+Downloading joblib-1.6.0-py3-none-any.whl (306 kB)
+Downloading cloudpickle-3.1.2-py3-none-any.whl (22 kB)
+Downloading joserfc-1.7.5-py3-none-any.whl (71 kB)
+Downloading jsonref-1.1.0-py3-none-any.whl (9.4 kB)
+Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+Downloading jsonschema_path-0.5.0-py3-none-any.whl (24 kB)
+Downloading pathable-0.6.0-py3-none-any.whl (18 kB)
+Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+Downloading keyring-25.7.0-py3-none-any.whl (39 kB)
+Downloading jeepney-0.9.0-py3-none-any.whl (49 kB)
+Downloading kiwisolver-1.5.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (1.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.5/1.5 MB 13.2 MB/s  0:00:00
+Downloading lazy_loader-0.6-py3-none-any.whl (8.8 kB)
+Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+Downloading msgpack-1.2.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (420 kB)
+Downloading networkx-3.7-py3-none-any.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 13.5 MB/s  0:00:00
+Downloading openapi_pydantic-0.5.1-py3-none-any.whl (96 kB)
+Downloading opentelemetry_exporter_otlp_proto_http-1.44.0-py3-none-any.whl (21 kB)
+Downloading opentelemetry_exporter_otlp_proto_common-1.44.0-py3-none-any.whl (17 kB)
+Downloading opentelemetry_proto-1.44.0-py3-none-any.whl (72 kB)
+Downloading opentelemetry_sdk-1.44.0-py3-none-any.whl (137 kB)
+Downloading opentelemetry_semantic_conventions-0.65b0-py3-none-any.whl (204 kB)
+Using cached packaging-26.3-py3-none-any.whl (129 kB)
+Downloading platformdirs-4.11.12-py3-none-any.whl (24 kB)
+Downloading pooch-1.9.0-py3-none-any.whl (67 kB)
+Downloading propcache-0.5.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (250 kB)
+Downloading pyarrow-25.0.1-cp312-cp312-manylinux_2_28_x86_64.whl (50.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 50.1/50.1 MB 17.7 MB/s  0:00:02
+Downloading pyasn1_modules-0.4.2-py3-none-any.whl (181 kB)
+Downloading pyasn1-0.6.4-py3-none-any.whl (84 kB)
+Downloading pydantic_settings-2.15.0-py3-none-any.whl (69 kB)
+Downloading email_validator-2.3.0-py3-none-any.whl (35 kB)
+Downloading dnspython-2.8.0-py3-none-any.whl (331 kB)
+Downloading pyjwt-2.14.0-py3-none-any.whl (32 kB)
+Downloading pyparsing-3.3.3-py3-none-any.whl (126 kB)
+Downloading pyperclip-1.11.0-py3-none-any.whl (11 kB)
+Downloading python_dotenv-1.2.3-py3-none-any.whl (22 kB)
+Downloading regex-2026.9.10-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (804 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 804.6/804.6 kB 20.0 MB/s  0:00:00
+Downloading rpds_py-2026.6.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (366 kB)
+Downloading safetensors-0.8.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (516 kB)
+Downloading scikit_learn-1.9.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (9.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.2/9.2 MB 22.8 MB/s  0:00:00
+Downloading narwhals-2.26.0-py3-none-any.whl (474 kB)
+Downloading scipy-1.17.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (35.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 35.2/35.2 MB 26.2 MB/s  0:00:01
+Downloading secretstorage-3.5.0-py3-none-any.whl (15 kB)
+Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+Downloading soxr-1.1.0-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (240 kB)
+Downloading starlette-1.7.0-py3-none-any.whl (78 kB)
+Downloading sympy-1.14.0-py3-none-any.whl (6.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.3/6.3 MB 28.4 MB/s  0:00:00
+Downloading mpmath-1.3.0-py3-none-any.whl (536 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 536.2/536.2 kB 18.8 MB/s  0:00:00
+Downloading threadpoolctl-3.7.0-py3-none-any.whl (26 kB)
+Downloading torch_einops_utils-0.1.29-py3-none-any.whl (15 kB)
+Downloading tqdm-4.70.1-py3-none-any.whl (80 kB)
+Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+Downloading uncalled_for-0.4.0-py3-none-any.whl (15 kB)
+Downloading httptools-0.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (523 kB)
+Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 28.9 MB/s  0:00:00
+Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (458 kB)
+Downloading websockets-17.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (224 kB)
+Downloading xxhash-4.0.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (261 kB)
+Downloading addict-2.4.0-py3-none-any.whl (3.8 kB)
+Downloading cn2an-0.5.24-py3-none-any.whl (227 kB)
+Downloading proces-0.1.7-py3-none-any.whl (137 kB)
+Downloading deprecated-1.3.1-py2.py3-none-any.whl (11 kB)
+Downloading wrapt-2.4.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (236 kB)
+Downloading espeakng_loader-0.2.4-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (10.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.1/10.1 MB 31.1 MB/s  0:00:00
+Downloading frozendict-2.4.7-py3-none-any.whl (16 kB)
+Downloading fugashi-1.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (694 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 694.9/694.9 kB 23.3 MB/s  0:00:00
+Downloading gradio-6.17.3-py3-none-any.whl (32.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 32.3/32.3 MB 34.1 MB/s  0:00:00
+Downloading gradio_client-2.5.0-py3-none-any.whl (59 kB)
+Downloading groovy-0.1.2-py3-none-any.whl (14 kB)
+Downloading hf_gradio-0.4.1-py3-none-any.whl (4.5 kB)
+Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+Downloading markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+Downloading orjson-3.12.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (131 kB)
+Downloading pandas-3.0.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (10.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.8/10.8 MB 34.3 MB/s  0:00:00
+Downloading safehttpx-0.1.7-py3-none-any.whl (9.0 kB)
+Downloading semantic_version-2.10.0-py2.py3-none-any.whl (15 kB)
+Downloading tomlkit-0.14.0-py3-none-any.whl (39 kB)
+Downloading typer-0.27.2-py3-none-any.whl (123 kB)
+Downloading brotli-1.2.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (1.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.4/1.4 MB 36.1 MB/s  0:00:00
+Downloading pytz-2026.3.post1-py2.py3-none-any.whl (508 kB)
+Downloading shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+Downloading importlib_metadata-9.0.1-py3-none-any.whl (27 kB)
+Downloading zipp-4.1.0-py3-none-any.whl (10 kB)
+Downloading inflect-7.5.0-py3-none-any.whl (35 kB)
+Downloading more_itertools-11.1.0-py3-none-any.whl (72 kB)
+Downloading typeguard-4.6.0-py3-none-any.whl (36 kB)
+Downloading jaconv-0.5.0-py3-none-any.whl (16 kB)
+Downloading jaraco.classes-3.4.0-py3-none-any.whl (6.8 kB)
+Downloading jaraco_context-6.1.2-py3-none-any.whl (7.9 kB)
+Downloading jaraco_functools-4.6.0-py3-none-any.whl (11 kB)
+Downloading jsonargparse-4.52.0-py3-none-any.whl (174 kB)
+Downloading typeshed_client-2.13.0-py3-none-any.whl (800 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 800.2/800.2 kB 29.1 MB/s  0:00:00
+Downloading lhotse-1.33.0-py3-none-any.whl (903 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 903.9/903.9 kB 28.8 MB/s  0:00:00
+Downloading cytoolz-1.1.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (2.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.9/2.9 MB 35.0 MB/s  0:00:00
+Downloading intervaltree-3.2.1-py2.py3-none-any.whl (25 kB)
+Downloading tabulate-0.10.0-py3-none-any.whl (39 kB)
+Downloading toolz-1.1.0-py3-none-any.whl (58 kB)
+Downloading loguru-0.7.3-py3-none-any.whl (61 kB)
+Downloading mako-1.4.3-py3-none-any.whl (80 kB)
+Downloading mojimoji-0.0.13-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (211 kB)
+Downloading num2words-0.5.14-py3-none-any.whl (163 kB)
+Downloading onnx-1.23.0-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (8.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.9/8.9 MB 38.9 MB/s  0:00:00
+Downloading ml_dtypes-0.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (5.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.0/5.0 MB 41.6 MB/s  0:00:00
+Downloading onnxruntime-1.30.0-cp312-cp312-manylinux_2_28_x86_64.whl (23.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 23.6/23.6 MB 43.0 MB/s  0:00:00
+Downloading flatbuffers-25.12.19-py2.py3-none-any.whl (26 kB)
+Downloading ordered_set-4.1.0-py3-none-any.whl (7.6 kB)
+Downloading phonemizer_fork-3.3.2-py3-none-any.whl (82 kB)
+Downloading dlinfo-2.0.0-py3-none-any.whl (3.7 kB)
+Downloading pre_commit-4.6.2-py2.py3-none-any.whl (226 kB)
+Downloading cfgv-3.5.0-py2.py3-none-any.whl (7.4 kB)
+Downloading identify-2.6.19-py2.py3-none-any.whl (99 kB)
+Downloading nodeenv-1.10.0-py2.py3-none-any.whl (23 kB)
+Downloading virtualenv-21.11.1-py3-none-any.whl (5.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 44.2 MB/s  0:00:00
+Downloading distlib-0.4.3-py2.py3-none-any.whl (470 kB)
+Downloading python_discovery-1.6.1-py3-none-any.whl (38 kB)
+Downloading psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl (155 kB)
+Downloading pycparser-3.0-py3-none-any.whl (48 kB)
+Downloading pypinyin_dict-0.9.0-py2.py3-none-any.whl (9.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.5/9.5 MB 42.6 MB/s  0:00:00
+Downloading segments-2.4.0-py2.py3-none-any.whl (16 kB)
+Downloading csvw-4.1.0-py2.py3-none-any.whl (69 kB)
+Downloading rfc3986-1.5.0-py2.py3-none-any.whl (31 kB)
+Downloading uritemplate-4.2.0-py3-none-any.whl (11 kB)
+Downloading babel-2.18.0-py3-none-any.whl (10.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.2/10.2 MB 45.4 MB/s  0:00:00
+Downloading isodate-0.7.2-py3-none-any.whl (22 kB)
+Downloading language_tags-1.3.1-py3-none-any.whl (216 kB)
+Downloading rdflib-7.6.0-py3-none-any.whl (615 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 615.4/615.4 kB 22.4 MB/s  0:00:00
+Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl (29 kB)
+Downloading spacy-3.8.16-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (35.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 35.5/35.5 MB 33.5 MB/s  0:00:01
+Downloading confection-1.3.3-py3-none-any.whl (35 kB)
+Downloading cymem-2.0.13-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (260 kB)
+Downloading murmurhash-1.0.15-cp312-cp312-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl (134 kB)
+Downloading preshed-3.0.13-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (868 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 869.0/869.0 kB 35.3 MB/s  0:00:00
+Downloading spacy_legacy-3.0.12-py2.py3-none-any.whl (29 kB)
+Downloading spacy_loggers-1.0.5-py3-none-any.whl (22 kB)
+Downloading thinc-8.3.13-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (3.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.9/3.9 MB 45.2 MB/s  0:00:00
+Downloading blis-1.3.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (11.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.4/11.4 MB 45.4 MB/s  0:00:00
+Downloading weasel-1.0.0-py3-none-any.whl (50 kB)
+Downloading cloudpathlib-0.25.0-py3-none-any.whl (66 kB)
+Downloading smart_open-8.0.1-py3-none-any.whl (73 kB)
+Downloading spacy_curated_transformers-0.3.1-py2.py3-none-any.whl (237 kB)
+Downloading curated_tokenizers-0.0.10-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (6.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.3/6.3 MB 57.2 MB/s  0:00:00
+Downloading curated_transformers-0.1.1-py2.py3-none-any.whl (25 kB)
+Downloading tensorboard-2.21.0-py3-none-any.whl (5.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 50.8 MB/s  0:00:00
+Downloading grpcio-1.84.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (7.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.2/7.2 MB 57.7 MB/s  0:00:00
+Downloading tensorboard_data_server-0.7.2-py3-none-manylinux_2_31_x86_64.whl (6.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.6/6.6 MB 57.1 MB/s  0:00:00
+Downloading absl_py-2.5.0-py3-none-any.whl (137 kB)
+Downloading markdown-3.10.3-py3-none-any.whl (110 kB)
+Downloading werkzeug-3.1.8-py3-none-any.whl (226 kB)
+Downloading termcolor-3.3.0-py3-none-any.whl (7.7 kB)
+Downloading plac-1.4.7-py2.py3-none-any.whl (22 kB)
+Downloading wasabi-0.10.1-py3-none-any.whl (26 kB)
+Building wheels for collected packages: linacodec, Zipvoice, encodec, transformers-stream-generator, antlr4-python3-runtime, unidic-lite, jieba, docopt, pyopenjtalk, sox, unidic
+  Building wheel for linacodec (pyproject.toml): started
+  Building wheel for linacodec (pyproject.toml): finished with status 'done'
+  Created wheel for linacodec: filename=linacodec-0.0.11-py3-none-any.whl size=48495 sha256=e7b93d03f34cf27f32561ce9dcbe94127c173743a1c8d0bc0cad59dcc3f30133
+  Stored in directory: /tmp/pip-ephem-wheel-cache-5t7og8ym/wheels/f6/8e/cc/8e8843b4f56001406bfc1ba74ffdc3ce3dd670296bf766d42c
+  Building wheel for Zipvoice (pyproject.toml): started
+  Building wheel for Zipvoice (pyproject.toml): finished with status 'done'
+  Created wheel for Zipvoice: filename=zipvoice-0.0.11-py3-none-any.whl size=179254 sha256=85ea0ae23ce4eece2216ef977df401b1d1de3a271f4be0ab9255d6d9e63d8e4d
+  Stored in directory: /tmp/pip-ephem-wheel-cache-5t7og8ym/wheels/ec/8c/e0/7f0b05add3f31134909526bbbbf61d6f813a89e8c1eeed1500
+  Building wheel for encodec (pyproject.toml): started
+  Building wheel for encodec (pyproject.toml): finished with status 'done'
+  Created wheel for encodec: filename=encodec-0.1.1-py3-none-any.whl size=45853 sha256=413fea7c3a992451830dc8f59c348e66ac6037dbdec9903414673b6cb73a458d
+  Stored in directory: /home/samykabu/.cache/pip/wheels/b8/eb/9f/e13610cc46ab39d3199fbabebd1c3e142d44b679526e0f228a
+  Building wheel for transformers-stream-generator (pyproject.toml): started
+  Building wheel for transformers-stream-generator (pyproject.toml): finished with status 'done'
+  Created wheel for transformers-stream-generator: filename=transformers_stream_generator-0.0.5-py3-none-any.whl size=12526 sha256=7b236da930ba1167bd55b4c23a9b9cf282e6935969e044152008d3a59c12c511
+  Stored in directory: /home/samykabu/.cache/pip/wheels/a8/58/d2/014cb67c3cc6def738c1b1635dbf4e3dab6fb63aba7070dce0
+  Building wheel for antlr4-python3-runtime (pyproject.toml): started
+  Building wheel for antlr4-python3-runtime (pyproject.toml): finished with status 'done'
+  Created wheel for antlr4-python3-runtime: filename=antlr4_python3_runtime-4.9.3-py3-none-any.whl size=144590 sha256=786670f8b17f7995f556877fc68812e5045f1fd82b235d442d770680907d9d7c
+  Stored in directory: /home/samykabu/.cache/pip/wheels/1f/be/48/13754633f1d08d1fbfc60d5e80ae1e5d7329500477685286cd
+  Building wheel for unidic-lite (pyproject.toml): started
+  Building wheel for unidic-lite (pyproject.toml): finished with status 'done'
+  Created wheel for unidic-lite: filename=unidic_lite-1.0.8-py3-none-any.whl size=47658913 sha256=d100a52dc9351dabc5c8d25f86697c6e4e7dc3a459914463d1591422cca1ed10
+  Stored in directory: /home/samykabu/.cache/pip/wheels/5e/1f/0f/4d43887e5476d956fae828ee9b6687becd5544d68b51ed633d
+  Building wheel for jieba (pyproject.toml): started
+  Building wheel for jieba (pyproject.toml): finished with status 'done'
+  Created wheel for jieba: filename=jieba-0.42.1-py3-none-any.whl size=19314509 sha256=9fb9201dc0908071d3203c450fa235388eb3cb9e9e28726d82f6672559976dff
+  Stored in directory: /home/samykabu/.cache/pip/wheels/08/a1/a3/5c8ac52cc2f5782ffffc34c95c57c8e5ecb3063dc69541ee7c
+  Building wheel for docopt (pyproject.toml): started
+  Building wheel for docopt (pyproject.toml): finished with status 'done'
+  Created wheel for docopt: filename=docopt-0.6.2-py2.py3-none-any.whl size=13783 sha256=07080485d11f40f748734b92cfa974575047c79180362b2b89903ad3ce678b41
+  Stored in directory: /home/samykabu/.cache/pip/wheels/1a/bf/a1/4cee4f7678c68c5875ca89eaccf460593539805c3906722228
+  Building wheel for pyopenjtalk (pyproject.toml): started
+  Building wheel for pyopenjtalk (pyproject.toml): finished with status 'done'
+  Created wheel for pyopenjtalk: filename=pyopenjtalk-0.4.1-cp312-cp312-linux_x86_64.whl size=6905969 sha256=2f67afd7cc9da2c829cb804bf8e355d0f193a8c40acc8c291ab552434df08e35
+  Stored in directory: /home/samykabu/.cache/pip/wheels/7e/63/4a/2a68afc3843e86a32e5772b75f2652efe73aa9f4a8435a47d3
+  Building wheel for sox (pyproject.toml): started
+  Building wheel for sox (pyproject.toml): finished with status 'done'
+  Created wheel for sox: filename=sox-1.5.0-py3-none-any.whl size=40128 sha256=b9bdfb81bc007a389b116d87c08a6424d9714af18c9f3c34e2bfa648dec56655
+  Stored in directory: /home/samykabu/.cache/pip/wheels/8c/c7/e7/baea1f7e79b9eb53addc81cc9b827424f4a7d8c9cc18c03659
+  Building wheel for unidic (pyproject.toml): started
+  Building wheel for unidic (pyproject.toml): finished with status 'done'
+  Created wheel for unidic: filename=unidic-1.1.0-py3-none-any.whl size=7474 sha256=12e72655bc676b717de533ee592a1f7b8b646a03b5aaab66301a1be73cc6222b
+  Stored in directory: /home/samykabu/.cache/pip/wheels/cb/04/a2/659428f84ed1fa7257f8efb544b36043dd37a7c419e8ca711a
+Successfully built linacodec Zipvoice encodec transformers-stream-generator antlr4-python3-runtime unidic-lite jieba docopt pyopenjtalk sox unidic
+Installing collected packages: wasabi, unidic-lite, torchaudio, sortedcontainers, rjieba, rfc3986, pytz, pyperclip, pydub, plac, nvidia-cusparselt-cu13, mpmath, jieba, jaconv, flatbuffers, en_core_web_sm, docopt, distlib, cuda-toolkit, brotli, antlr4-python3-runtime, addict, zipp, xxhash, wrapt, websockets, uvloop, urllib3, uritemplate, unidecode, uncalled-for, typing-extensions, triton, tqdm, toolz, tomlkit, threadpoolctl, termcolor, tensorboard-data-server, tabulate, sympy, spacy-loggers, spacy-legacy, six, shellingham, setuptools, semantic-version, safetensors, rpds-py, resemble-perth, regex, pyyaml, python-multipart, python-dotenv, pypinyin, pyparsing, pyjwt, pygments, pycparser, pyasn1, pyarrow, psutil, protobuf, propcache, proces, platformdirs, piper-phonemize, Pillow, pathable, packaging, orjson, ordered-set, nvidia-nvtx, nvidia-nvshmem-cu13, nvidia-nvjitlink, nvidia-nccl-cu13, nvidia-curand, nvidia-cufile, nvidia-cuda-runtime, nvidia-cuda-nvrtc, nvidia-cuda-cupti, numpy, num2words, nodeenv, networkx, narwhals, murmurhash, multidict, msgpack, more_itertools, mojimoji, mdurl, markupsafe, markdown, loguru, llvmlite, language-tags, kiwisolver, jsonref, jmespath, jeepney, jaraco.context, isodate, intervaltree, idna, identify, httpx-sse, httptools, hf-xet, h11, groovy, griffelib, greenlet, google-crc32c, fugashi, fsspec, frozenlist, frozendict, fonttools, filelock, espeakng-loader, einops, docstring-parser, dnspython, dlinfo, dill, decorator, cymem, cycler, cuda-pathfinder, confection, cloudpickle, cloudpathlib, click, charset_normalizer, cfgv, certifi, catalogue, caio, cachetools, beartype, babel, audioread, attrs, annotated-types, annotated-doc, aiohappyeyeballs, absl-py, yarl, werkzeug, uvicorn, typing-inspection, typeshed-client, typeguard, srsly, sqlalchemy, soxr, sox, smart-open, scipy, requests, referencing, rdflib, python-discovery, python-dateutil, pypinyin-dict, pyopenjtalk, pydantic-core, pyasn1-modules, py-key-value-aio, proto-plus, preshed, pedalboard, opentelemetry-proto, opentelemetry-api, onnxruntime, omegaconf, nvidia-cusparse, nvidia-cufft, nvidia-cublas, numba, multiprocess, ml_dtypes, misaki, markdown-it-py, Mako, lazy_loader, jsonargparse, joblib, jinja2, jaraco.functools, jaraco.classes, importlib_metadata, httpcore, grpcio, googleapis-common-protos, google-resumable-media, exceptiongroup, email-validator, einx, deprecated, cytoolz, curated-tokenizers, cuda-bindings, contourpy, cn2an, cffi, blis, anyio, aiosignal, aiofile, watchfiles, virtualenv, unidic, tensorboard, starlette, spacy-pkuseg, soundfile, scikit-learn, rich, pyloudnorm, pykakasi, pydantic, pooch, pandas, opentelemetry-semantic-conventions, opentelemetry-exporter-otlp-proto-common, onnx, nvidia-cusolver, nvidia-cudnn-cu13, matplotlib, jsonschema-specifications, jsonschema-path, inflect, hydra-core, huggingface_hub, httpx, cryptography, botocore, alembic, aiohttp, typer, tokenizers, thinc, sse-starlette, SecretStorage, safehttpx, s3transfer, rich-rst, pydantic-settings, pre-commit, opentelemetry-sdk, openapi-pydantic, librosa, jsonschema, joserfc, gradio-client, google-auth, fastapi, diffusers, weasel, transformers, torch, opentelemetry-exporter-otlp-proto-http, mcp, keyring, hf-gradio, google-api-core, fastmcp-slim, datasets, cyclopts, csvw, boto3, authlib, wandb, transformers-stream-generator, torchdiffeq, torch-einops-utils, spacy, segments, s3tokenizer, lhotse, gradio, google-cloud-core, encodec, ema-pytorch, curated-transformers, conformer, accelerate, x-transformers, vocos, spacy-curated-transformers, qwen-tts, phonemizer-fork, google-cloud-storage, linacodec, fastmcp, cached-path, Zipvoice, kokoro
+
+Successfully installed Mako-1.4.3 Pillow-12.3.0 SecretStorage-3.5.0 Zipvoice-0.0.11 absl-py-2.5.0 accelerate-1.12.0 addict-2.4.0 aiofile-3.12.3 aiohappyeyeballs-2.7.1 aiohttp-3.14.3 aiosignal-1.4.0 alembic-1.20.0 annotated-doc-0.0.5 annotated-types-0.8.0 antlr4-python3-runtime-4.9.3 anyio-4.15.1 attrs-26.1.0 audioread-3.1.0 authlib-1.8.0 babel-2.18.0 beartype-0.22.9 blis-1.3.3 boto3-1.43.100 botocore-1.43.100 brotli-1.2.0 cached-path-1.8.10 cachetools-7.2.0 caio-0.12.4 catalogue-2.0.10 certifi-2026.7.22 cffi-2.1.1 cfgv-3.5.0 charset_normalizer-3.5.1 click-8.5.0 cloudpathlib-0.25.0 cloudpickle-3.1.2 cn2an-0.5.24 confection-1.3.3 conformer-0.3.2 contourpy-1.3.3 cryptography-50.0.1 csvw-4.1.0 cuda-bindings-13.4.3 cuda-pathfinder-1.8.2 cuda-toolkit-13.0.3.0 curated-tokenizers-0.0.10 curated-transformers-0.1.1 cycler-0.12.1 cyclopts-4.25.3 cymem-2.0.13 cytoolz-1.1.0 datasets-5.0.1 decorator-5.3.1 deprecated-1.3.1 diffusers-0.39.0 dill-0.4.1 distlib-0.4.3 dlinfo-2.0.0 dnspython-2.8.0 docopt-0.6.2 docstring-parser-0.18.0 einops-0.8.2 einx-0.4.3 ema-pytorch-0.8.3 email-validator-2.3.0 en_core_web_sm-3.8.0 encodec-0.1.1 espeakng-loader-0.2.4 exceptiongroup-1.3.1 fastapi-0.141.1 fastmcp-3.4.7 fastmcp-slim-3.4.7 filelock-3.32.7 flatbuffers-25.12.19 fonttools-4.65.0 frozendict-2.4.7 frozenlist-1.8.0 fsspec-2026.6.0 fugashi-1.5.2 google-api-core-2.38.0 google-auth-2.58.0 google-cloud-core-2.7.0 google-cloud-storage-3.14.1 google-crc32c-1.8.0 google-resumable-media-2.10.2 googleapis-common-protos-1.75.3 gradio-6.17.3 gradio-client-2.5.0 greenlet-3.5.6 griffelib-2.3.0 groovy-0.1.2 grpcio-1.84.0 h11-0.16.0 hf-gradio-0.4.1 hf-xet-1.6.0 httpcore-1.0.9 httptools-0.8.0 httpx-0.28.1 httpx-sse-0.4.3 huggingface_hub-0.36.2 hydra-core-1.3.7 identify-2.6.19 idna-3.20 importlib_metadata-9.0.1 inflect-7.5.0 intervaltree-3.2.1 isodate-0.7.2 jaconv-0.5.0 jaraco.classes-3.4.0 jaraco.context-6.1.2 jaraco.functools-4.6.0 jeepney-0.9.0 jieba-0.42.1 jinja2-3.1.6 jmespath-1.1.0 joblib-1.6.0 joserfc-1.7.5 jsonargparse-4.52.0 jsonref-1.1.0 jsonschema-4.26.0 jsonschema-path-0.5.0 jsonschema-specifications-2025.9.1 keyring-25.7.0 kiwisolver-1.5.1 kokoro-0.9.4 language-tags-1.3.1 lazy_loader-0.6 lhotse-1.33.0 librosa-0.11.0 linacodec-0.0.11 llvmlite-0.43.0 loguru-0.7.3 markdown-3.10.3 markdown-it-py-4.2.0 markupsafe-3.0.3 matplotlib-3.11.2 mcp-1.30.0 mdurl-0.1.2 misaki-0.9.4 ml_dtypes-0.5.4 mojimoji-0.0.13 more_itertools-11.1.0 mpmath-1.3.0 msgpack-1.2.2 multidict-6.9.1 multiprocess-0.70.19 murmurhash-1.0.15 narwhals-2.26.0 networkx-3.7 nodeenv-1.10.0 num2words-0.5.14 numba-0.60.0 numpy-1.26.4 nvidia-cublas-13.1.1.3 nvidia-cuda-cupti-13.0.85 nvidia-cuda-nvrtc-13.0.88 nvidia-cuda-runtime-13.0.96 nvidia-cudnn-cu13-9.24.0.43 nvidia-cufft-12.0.0.61 nvidia-cufile-1.15.1.6 nvidia-curand-10.4.0.35 nvidia-cusolver-12.0.4.66 nvidia-cusparse-12.6.3.3 nvidia-cusparselt-cu13-0.8.1 nvidia-nccl-cu13-2.30.7 nvidia-nvjitlink-13.4.92 nvidia-nvshmem-cu13-3.4.5 nvidia-nvtx-13.0.85 omegaconf-2.3.1 onnx-1.23.0 onnxruntime-1.30.0 openapi-pydantic-0.5.1 opentelemetry-api-1.44.0 opentelemetry-exporter-otlp-proto-common-1.44.0 opentelemetry-exporter-otlp-proto-http-1.44.0 opentelemetry-proto-1.44.0 opentelemetry-sdk-1.44.0 opentelemetry-semantic-conventions-0.65b0 ordered-set-4.1.0 orjson-3.12.0 packaging-26.3 pandas-3.0.6 pathable-0.6.0 pedalboard-0.9.25 phonemizer-fork-3.3.2 piper-phonemize-1.4.7 plac-1.4.7 platformdirs-4.11.12 pooch-1.9.0 pre-commit-4.6.2 preshed-3.0.13 proces-0.1.7 propcache-0.5.4 proto-plus-1.28.4 protobuf-7.36.2 psutil-7.2.2 py-key-value-aio-0.4.6 pyarrow-25.0.1 pyasn1-0.6.4 pyasn1-modules-0.4.2 pycparser-3.0 pydantic-2.13.5 pydantic-core-2.46.5 pydantic-settings-2.15.0 pydub-0.25.1 pygments-2.21.0 pyjwt-2.14.0 pykakasi-2.3.0 pyloudnorm-0.2.0 pyopenjtalk-0.4.1 pyparsing-3.3.3 pyperclip-1.11.0 pypinyin-0.55.0 pypinyin-dict-0.9.0 python-dateutil-2.9.0.post0 python-discovery-1.6.1 python-dotenv-1.2.3 python-multipart-0.0.32 pytz-2026.3.post1 pyyaml-6.0.3 qwen-tts-0.1.1 rdflib-7.6.0 referencing-0.37.0 regex-2026.9.10 requests-2.34.2 resemble-perth-1.0.1 rfc3986-1.5.0 rich-13.9.4 rich-rst-2.1.0 rjieba-0.2.1 rpds-py-2026.6.3 s3tokenizer-0.3.0 s3transfer-0.19.2 safehttpx-0.1.7 safetensors-0.8.0 scikit-learn-1.9.1 scipy-1.17.1 segments-2.4.0 semantic-version-2.10.0 setuptools-80.10.2 shellingham-1.5.4 six-1.17.0 smart-open-8.0.1 sortedcontainers-2.4.0 soundfile-0.14.0 sox-1.5.0 soxr-1.1.0 spacy-3.8.16 spacy-curated-transformers-0.3.1 spacy-legacy-3.0.12 spacy-loggers-1.0.5 spacy-pkuseg-1.0.1 sqlalchemy-2.0.54 srsly-2.5.3 sse-starlette-3.4.11 starlette-1.7.0 sympy-1.14.0 tabulate-0.10.0 tensorboard-2.21.0 tensorboard-data-server-0.7.2 termcolor-3.3.0 thinc-8.3.13 threadpoolctl-3.7.0 tokenizers-0.22.2 tomlkit-0.14.0 toolz-1.1.0 torch-2.14.0 torch-einops-utils-0.1.29 torchaudio-2.11.0 torchdiffeq-0.2.5 tqdm-4.70.1 transformers-4.57.3 transformers-stream-generator-0.0.5 triton-3.8.0 typeguard-4.6.0 typer-0.27.2 typeshed-client-2.13.0 typing-extensions-4.16.0 typing-inspection-0.4.4 uncalled-for-0.4.0 unidecode-1.4.0 unidic-1.1.0 unidic-lite-1.0.8 uritemplate-4.2.0 urllib3-2.8.0 uvicorn-0.53.0 uvloop-0.22.1 virtualenv-21.11.1 vocos-0.1.0 wandb-0.30.0 wasabi-0.10.1 watchfiles-1.3.0 weasel-1.0.0 websockets-17.1 werkzeug-3.1.8 wrapt-2.4.1 x-transformers-2.30.5 xxhash-4.0.1 yarl-1.25.1 zipp-4.1.0
+Collecting chatterbox-tts
+  Downloading chatterbox_tts-0.1.7-py3-none-any.whl.metadata (12 kB)
+Downloading chatterbox_tts-0.1.7-py3-none-any.whl (108 kB)
+Installing collected packages: chatterbox-tts
+Successfully installed chatterbox-tts-0.1.7
+Collecting hume-tada
+  Downloading hume_tada-0.1.9-py3-none-any.whl.metadata (9.8 kB)
+Downloading hume_tada-0.1.9-py3-none-any.whl (2.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.6/2.6 MB 11.0 MB/s  0:00:00
+Installing collected packages: hume-tada
+Successfully installed hume-tada-0.1.9
+Collecting f5-tts==1.1.21
+  Downloading f5_tts-1.1.21-py3-none-any.whl.metadata (12 kB)
+Downloading f5_tts-1.1.21-py3-none-any.whl (1.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 4.6 MB/s  0:00:00
+Installing collected packages: f5-tts
+Successfully installed f5-tts-1.1.21
+Collecting habibi-tts==0.1.1
+  Downloading habibi_tts-0.1.1-py3-none-any.whl.metadata (6.4 kB)
+Downloading habibi_tts-0.1.1-py3-none-any.whl (1.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.6/1.6 MB 7.2 MB/s  0:00:00
+Installing collected packages: habibi-tts
+Successfully installed habibi-tts-0.1.1
+Collecting voxcpm==2.0.3
+  Downloading voxcpm-2.0.3-py3-none-any.whl.metadata (30 kB)
+Downloading voxcpm-2.0.3-py3-none-any.whl (88 kB)
+Installing collected packages: voxcpm
+Successfully installed voxcpm-2.0.3
+Collecting git+https://github.com/QwenLM/Qwen3-TTS.git
+  Cloning https://github.com/QwenLM/Qwen3-TTS.git to /tmp/pip-req-build-bp8ripwv
+  Running command git clone --filter=blob:none --quiet https://github.com/QwenLM/Qwen3-TTS.git /tmp/pip-req-build-bp8ripwv
+  Resolved https://github.com/QwenLM/Qwen3-TTS.git to commit 022e286b98fbec7e1e916cb940cdf532cd9f488e
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: transformers==4.57.3 in ./backend/venv/lib/python3.12/site-packages (from qwen-tts==0.1.1) (4.57.3)
+Requirement already satisfied: accelerate==1.12.0 in ./backend/venv/lib/python3.12/site-packages (from qwen-tts==0.1.1) (1.12.0)
+Requirement already satisfied: gradio in ./backend/venv/lib/python3.12/site-packages (from qwen-tts==0.1.1) (6.17.3)
+Requirement already satisfied: librosa in ./backend/venv/lib/python3.12/site-packages (from qwen-tts==0.1.1) (0.11.0)
+Requirement already satisfied: torchaudio in ./backend/venv/lib/python3.12/site-packages (from qwen-tts==0.1.1) (2.11.0)
+Requirement already satisfied: soundfile in ./backend/venv/lib/python3.12/site-packages (from qwen-tts==0.1.1) (0.14.0)
+Requirement already satisfied: sox in ./backend/venv/lib/python3.12/site-packages (from qwen-tts==0.1.1) (1.5.0)
+Requirement already satisfied: onnxruntime in ./backend/venv/lib/python3.12/site-packages (from qwen-tts==0.1.1) (1.30.0)
+Requirement already satisfied: einops in ./backend/venv/lib/python3.12/site-packages (from qwen-tts==0.1.1) (0.8.2)
+Requirement already satisfied: numpy>=1.17 in ./backend/venv/lib/python3.12/site-packages (from accelerate==1.12.0->qwen-tts==0.1.1) (1.26.4)
+Requirement already satisfied: packaging>=20.0 in ./backend/venv/lib/python3.12/site-packages (from accelerate==1.12.0->qwen-tts==0.1.1) (26.3)
+Requirement already satisfied: psutil in ./backend/venv/lib/python3.12/site-packages (from accelerate==1.12.0->qwen-tts==0.1.1) (7.2.2)
+Requirement already satisfied: pyyaml in ./backend/venv/lib/python3.12/site-packages (from accelerate==1.12.0->qwen-tts==0.1.1) (6.0.3)
+Requirement already satisfied: torch>=2.0.0 in ./backend/venv/lib/python3.12/site-packages (from accelerate==1.12.0->qwen-tts==0.1.1) (2.14.0)
+Requirement already satisfied: huggingface_hub>=0.21.0 in ./backend/venv/lib/python3.12/site-packages (from accelerate==1.12.0->qwen-tts==0.1.1) (0.36.2)
+Requirement already satisfied: safetensors>=0.4.3 in ./backend/venv/lib/python3.12/site-packages (from accelerate==1.12.0->qwen-tts==0.1.1) (0.8.0)
+Requirement already satisfied: filelock in ./backend/venv/lib/python3.12/site-packages (from transformers==4.57.3->qwen-tts==0.1.1) (3.32.7)
+Requirement already satisfied: regex!=2019.12.17 in ./backend/venv/lib/python3.12/site-packages (from transformers==4.57.3->qwen-tts==0.1.1) (2026.9.10)
+Requirement already satisfied: requests in ./backend/venv/lib/python3.12/site-packages (from transformers==4.57.3->qwen-tts==0.1.1) (2.34.2)
+Requirement already satisfied: tokenizers<=0.23.0,>=0.22.0 in ./backend/venv/lib/python3.12/site-packages (from transformers==4.57.3->qwen-tts==0.1.1) (0.22.2)
+Requirement already satisfied: tqdm>=4.27 in ./backend/venv/lib/python3.12/site-packages (from transformers==4.57.3->qwen-tts==0.1.1) (4.70.1)
+Requirement already satisfied: fsspec>=2023.5.0 in ./backend/venv/lib/python3.12/site-packages (from huggingface_hub>=0.21.0->accelerate==1.12.0->qwen-tts==0.1.1) (2026.6.0)
+Requirement already satisfied: hf-xet<2.0.0,>=1.1.3 in ./backend/venv/lib/python3.12/site-packages (from huggingface_hub>=0.21.0->accelerate==1.12.0->qwen-tts==0.1.1) (1.6.0)
+Requirement already satisfied: typing-extensions>=3.7.4.3 in ./backend/venv/lib/python3.12/site-packages (from huggingface_hub>=0.21.0->accelerate==1.12.0->qwen-tts==0.1.1) (4.16.0)
+Requirement already satisfied: setuptools>=77.0.3 in ./backend/venv/lib/python3.12/site-packages (from torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (80.10.2)
+Requirement already satisfied: sympy>=1.13.3 in ./backend/venv/lib/python3.12/site-packages (from torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (1.14.0)
+Requirement already satisfied: networkx>=2.5.1 in ./backend/venv/lib/python3.12/site-packages (from torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (3.7)
+Requirement already satisfied: jinja2 in ./backend/venv/lib/python3.12/site-packages (from torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (3.1.6)
+Requirement already satisfied: cuda-toolkit==13.0.3 in ./backend/venv/lib/python3.12/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (13.0.3.0)
+Requirement already satisfied: cuda-bindings<14,>=13.0.3 in ./backend/venv/lib/python3.12/site-packages (from torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (13.4.3)
+Requirement already satisfied: nvidia-cudnn-cu13==9.24.0.43 in ./backend/venv/lib/python3.12/site-packages (from torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (9.24.0.43)
+Requirement already satisfied: nvidia-cusparselt-cu13==0.8.1 in ./backend/venv/lib/python3.12/site-packages (from torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (0.8.1)
+Requirement already satisfied: nvidia-nccl-cu13==2.30.7 in ./backend/venv/lib/python3.12/site-packages (from torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (2.30.7)
+Requirement already satisfied: nvidia-nvshmem-cu13==3.4.5 in ./backend/venv/lib/python3.12/site-packages (from torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (3.4.5)
+Requirement already satisfied: triton~=3.8.0 in ./backend/venv/lib/python3.12/site-packages (from torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (3.8.0)
+Requirement already satisfied: nvidia-cublas==13.1.1.3.* in ./backend/venv/lib/python3.12/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (13.1.1.3)
+Requirement already satisfied: nvidia-cuda-nvrtc==13.0.88.* in ./backend/venv/lib/python3.12/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (13.0.88)
+Requirement already satisfied: nvidia-cuda-runtime==13.0.96.* in ./backend/venv/lib/python3.12/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (13.0.96)
+Requirement already satisfied: nvidia-cufft==12.0.0.61.* in ./backend/venv/lib/python3.12/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (12.0.0.61)
+Requirement already satisfied: nvidia-nvjitlink<14,>=13.0.88 in ./backend/venv/lib/python3.12/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (13.4.92)
+Requirement already satisfied: nvidia-cufile==1.15.1.6.* in ./backend/venv/lib/python3.12/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (1.15.1.6)
+Requirement already satisfied: nvidia-cuda-cupti==13.0.85.* in ./backend/venv/lib/python3.12/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (13.0.85)
+Requirement already satisfied: nvidia-curand==10.4.0.35.* in ./backend/venv/lib/python3.12/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (10.4.0.35)
+Requirement already satisfied: nvidia-cusolver==12.0.4.66.* in ./backend/venv/lib/python3.12/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (12.0.4.66)
+Requirement already satisfied: nvidia-cusparse==12.6.3.3.* in ./backend/venv/lib/python3.12/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (12.6.3.3)
+Requirement already satisfied: nvidia-nvtx==13.0.85.* in ./backend/venv/lib/python3.12/site-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (13.0.85)
+Requirement already satisfied: cuda-pathfinder>=1.4.2 in ./backend/venv/lib/python3.12/site-packages (from cuda-bindings<14,>=13.0.3->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (1.8.2)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in ./backend/venv/lib/python3.12/site-packages (from sympy>=1.13.3->torch>=2.0.0->accelerate==1.12.0->qwen-tts==0.1.1) (1.3.0)
+Requirement already satisfied: anyio<5.0,>=3.0 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (4.15.1)
+Requirement already satisfied: brotli>=1.1.0 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (1.2.0)
+Requirement already satisfied: fastapi<1.0,>=0.115.2 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (0.141.1)
+Requirement already satisfied: gradio-client==2.5.0 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (2.5.0)
+Requirement already satisfied: groovy~=0.1 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (0.1.2)
+Requirement already satisfied: hf-gradio<1.0,>=0.4.1 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (0.4.1)
+Requirement already satisfied: httpx<1.0,>=0.24.1 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (0.28.1)
+Requirement already satisfied: markupsafe<4.0,>=2.0 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (3.0.3)
+Requirement already satisfied: orjson~=3.0 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (3.12.0)
+Requirement already satisfied: pandas<4.0,>=1.0 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (3.0.6)
+Requirement already satisfied: pillow<13.0,>=8.0 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (12.3.0)
+Requirement already satisfied: pydantic<=3.0,>=2.0 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (2.13.5)
+Requirement already satisfied: pydub<1.0 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (0.25.1)
+Requirement already satisfied: python-multipart<1.0,>=0.0.18 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (0.0.32)
+Requirement already satisfied: pytz>=2017.2 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (2026.3.post1)
+Requirement already satisfied: safehttpx<0.2.0,>=0.1.7 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (0.1.7)
+Requirement already satisfied: semantic-version~=2.0 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (2.10.0)
+Requirement already satisfied: starlette<2.0,>=1.0.1 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (1.7.0)
+Requirement already satisfied: tomlkit<0.15.0,>=0.12.0 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (0.14.0)
+Requirement already satisfied: typer<1.0,>=0.12 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (0.27.2)
+Requirement already satisfied: uvicorn>=0.14.0 in ./backend/venv/lib/python3.12/site-packages (from gradio->qwen-tts==0.1.1) (0.53.0)
+Requirement already satisfied: idna>=2.8 in ./backend/venv/lib/python3.12/site-packages (from anyio<5.0,>=3.0->gradio->qwen-tts==0.1.1) (3.20)
+Requirement already satisfied: typing-inspection>=0.4.2 in ./backend/venv/lib/python3.12/site-packages (from fastapi<1.0,>=0.115.2->gradio->qwen-tts==0.1.1) (0.4.4)
+Requirement already satisfied: annotated-doc>=0.0.2 in ./backend/venv/lib/python3.12/site-packages (from fastapi<1.0,>=0.115.2->gradio->qwen-tts==0.1.1) (0.0.5)
+Requirement already satisfied: certifi in ./backend/venv/lib/python3.12/site-packages (from httpx<1.0,>=0.24.1->gradio->qwen-tts==0.1.1) (2026.7.22)
+Requirement already satisfied: httpcore==1.* in ./backend/venv/lib/python3.12/site-packages (from httpx<1.0,>=0.24.1->gradio->qwen-tts==0.1.1) (1.0.9)
+Requirement already satisfied: h11>=0.16 in ./backend/venv/lib/python3.12/site-packages (from httpcore==1.*->httpx<1.0,>=0.24.1->gradio->qwen-tts==0.1.1) (0.16.0)
+Requirement already satisfied: python-dateutil>=2.8.2 in ./backend/venv/lib/python3.12/site-packages (from pandas<4.0,>=1.0->gradio->qwen-tts==0.1.1) (2.9.0.post0)
+Requirement already satisfied: annotated-types>=0.6.0 in ./backend/venv/lib/python3.12/site-packages (from pydantic<=3.0,>=2.0->gradio->qwen-tts==0.1.1) (0.8.0)
+Requirement already satisfied: pydantic-core==2.46.5 in ./backend/venv/lib/python3.12/site-packages (from pydantic<=3.0,>=2.0->gradio->qwen-tts==0.1.1) (2.46.5)
+Requirement already satisfied: shellingham>=1.3.0 in ./backend/venv/lib/python3.12/site-packages (from typer<1.0,>=0.12->gradio->qwen-tts==0.1.1) (1.5.4)
+Requirement already satisfied: rich>=13.8.0 in ./backend/venv/lib/python3.12/site-packages (from typer<1.0,>=0.12->gradio->qwen-tts==0.1.1) (13.9.4)
+Requirement already satisfied: six>=1.5 in ./backend/venv/lib/python3.12/site-packages (from python-dateutil>=2.8.2->pandas<4.0,>=1.0->gradio->qwen-tts==0.1.1) (1.17.0)
+Requirement already satisfied: markdown-it-py>=2.2.0 in ./backend/venv/lib/python3.12/site-packages (from rich>=13.8.0->typer<1.0,>=0.12->gradio->qwen-tts==0.1.1) (4.2.0)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in ./backend/venv/lib/python3.12/site-packages (from rich>=13.8.0->typer<1.0,>=0.12->gradio->qwen-tts==0.1.1) (2.21.0)
+Requirement already satisfied: mdurl~=0.1 in ./backend/venv/lib/python3.12/site-packages (from markdown-it-py>=2.2.0->rich>=13.8.0->typer<1.0,>=0.12->gradio->qwen-tts==0.1.1) (0.1.2)
+Requirement already satisfied: click>=7.0 in ./backend/venv/lib/python3.12/site-packages (from uvicorn>=0.14.0->gradio->qwen-tts==0.1.1) (8.5.0)
+Requirement already satisfied: audioread>=2.1.9 in ./backend/venv/lib/python3.12/site-packages (from librosa->qwen-tts==0.1.1) (3.1.0)
+Requirement already satisfied: numba>=0.51.0 in ./backend/venv/lib/python3.12/site-packages (from librosa->qwen-tts==0.1.1) (0.60.0)
+Requirement already satisfied: scipy>=1.6.0 in ./backend/venv/lib/python3.12/site-packages (from librosa->qwen-tts==0.1.1) (1.17.1)
+Requirement already satisfied: scikit-learn>=1.1.0 in ./backend/venv/lib/python3.12/site-packages (from librosa->qwen-tts==0.1.1) (1.9.1)
+Requirement already satisfied: joblib>=1.0 in ./backend/venv/lib/python3.12/site-packages (from librosa->qwen-tts==0.1.1) (1.6.0)
+Requirement already satisfied: decorator>=4.3.0 in ./backend/venv/lib/python3.12/site-packages (from librosa->qwen-tts==0.1.1) (5.3.1)
+Requirement already satisfied: pooch>=1.1 in ./backend/venv/lib/python3.12/site-packages (from librosa->qwen-tts==0.1.1) (1.9.0)
+Requirement already satisfied: soxr>=0.3.2 in ./backend/venv/lib/python3.12/site-packages (from librosa->qwen-tts==0.1.1) (1.1.0)
+Requirement already satisfied: lazy_loader>=0.1 in ./backend/venv/lib/python3.12/site-packages (from librosa->qwen-tts==0.1.1) (0.6)
+Requirement already satisfied: msgpack>=1.0 in ./backend/venv/lib/python3.12/site-packages (from librosa->qwen-tts==0.1.1) (1.2.2)
+Requirement already satisfied: cloudpickle>=3.0 in ./backend/venv/lib/python3.12/site-packages (from joblib>=1.0->librosa->qwen-tts==0.1.1) (3.1.2)
+Requirement already satisfied: llvmlite<0.44,>=0.43.0dev0 in ./backend/venv/lib/python3.12/site-packages (from numba>=0.51.0->librosa->qwen-tts==0.1.1) (0.43.0)
+Requirement already satisfied: platformdirs>=2.5.0 in ./backend/venv/lib/python3.12/site-packages (from pooch>=1.1->librosa->qwen-tts==0.1.1) (4.11.12)
+Requirement already satisfied: charset_normalizer<4,>=2 in ./backend/venv/lib/python3.12/site-packages (from requests->transformers==4.57.3->qwen-tts==0.1.1) (3.5.1)
+Requirement already satisfied: urllib3<3,>=1.26 in ./backend/venv/lib/python3.12/site-packages (from requests->transformers==4.57.3->qwen-tts==0.1.1) (2.8.0)
+Requirement already satisfied: narwhals>=2.0.1 in ./backend/venv/lib/python3.12/site-packages (from scikit-learn>=1.1.0->librosa->qwen-tts==0.1.1) (2.26.0)
+Requirement already satisfied: threadpoolctl>=3.5.0 in ./backend/venv/lib/python3.12/site-packages (from scikit-learn>=1.1.0->librosa->qwen-tts==0.1.1) (3.7.0)
+Requirement already satisfied: cffi>=1.0 in ./backend/venv/lib/python3.12/site-packages (from soundfile->qwen-tts==0.1.1) (2.1.1)
+Requirement already satisfied: pycparser in ./backend/venv/lib/python3.12/site-packages (from cffi>=1.0->soundfile->qwen-tts==0.1.1) (3.0)
+Requirement already satisfied: flatbuffers in ./backend/venv/lib/python3.12/site-packages (from onnxruntime->qwen-tts==0.1.1) (25.12.19)
+Requirement already satisfied: protobuf>=4.25.8 in ./backend/venv/lib/python3.12/site-packages (from onnxruntime->qwen-tts==0.1.1) (7.36.2)
+Python environment ready.
+bun install
+bun install v1.4.2 (744846f84)
+
++ @biomejs/biome@2.3.12
++ @types/node@20.19.30
++ tailwindcss@4.1.18
++ typescript@5.9.3
++ loaders.css@0.1.2
++ react-loaders@3.0.1
+
+407 packages installed [10.21s]
+Saved lockfile
+
+Setup complete! Run: just dev
+EXIT 0 END 2026-09-23T18:58:44+03:00 ELAPSED_SECONDS 543
+
+==================================================================
+POST-SETUP CHECKS
+==================================================================
+wsl: Failed to start the systemd user session for 'samykabu'. See journalctl for more details.
+=== HEAD ===
+b69d37731d2d6b6aa0119ae7ebdbad8f8579d70c
+=== venv python ===
+Python 3.12.14
+/home/samykabu/.local/share/uv/python/cpython-3.12.14-linux-x86_64-gnu/bin/python3.12
+=== torch install decision (setup log) ===
+(no GPU marker in WSL -> no torch index line; torch came from PyPI default via requirements.txt)
+=== voxcpm lines in setup log ===
+1192:Collecting voxcpm==2.0.3
+1193:  Downloading voxcpm-2.0.3-py3-none-any.whl.metadata (30 kB)
+1194:Downloading voxcpm-2.0.3-py3-none-any.whl (88 kB)
+1195:Installing collected packages: voxcpm
+1196:Successfully installed voxcpm-2.0.3
+=== pip show voxcpm ===
+Name: voxcpm
+Version: 2.0.3
+Summary: VoxCPM: Tokenizer-Free TTS for Context-Aware Speech Generation and True-to-Life Voice Cloning
+Home-page: https://github.com/OpenBMB/VoxCPM
+Author: 
+Author-email: OpenBMB <openbmb@gmail.com>
+License-Expression: Apache-2.0
+Location: /home/samykabu/voicebox-setupcheck/backend/venv/lib/python3.12/site-packages
+Requires: addict, argbind, datasets, einops, funasr, gradio, huggingface-hub, inflect, librosa, matplotlib, modelscope, pydantic, safetensors, simplejson, sortedcontainers, soundfile, spaces, torch, torchaudio, torchcodec, tqdm, transformers, wetext
+Required-by: 
+=== pip check ===
+f5-tts 1.1.21 requires bitsandbytes, which is not installed.
+f5-tts 1.1.21 requires tomli, which is not installed.
+f5-tts 1.1.21 requires torchcodec, which is not installed.
+voxcpm 2.0.3 requires argbind, which is not installed.
+voxcpm 2.0.3 requires funasr, which is not installed.
+voxcpm 2.0.3 requires modelscope, which is not installed.
+voxcpm 2.0.3 requires simplejson, which is not installed.
+voxcpm 2.0.3 requires spaces, which is not installed.
+voxcpm 2.0.3 requires torchcodec, which is not installed.
+voxcpm 2.0.3 requires wetext, which is not installed.
+hume-tada 0.1.9 requires descript-audio-codec, which is not installed.
+hume-tada 0.1.9 requires torchvision, which is not installed.
+voxcpm 2.0.3 has requirement datasets<4,>=3, but you have datasets 5.0.1.
+chatterbox-tts 0.1.7 has requirement diffusers==0.29.0, but you have diffusers 0.39.0.
+chatterbox-tts 0.1.7 has requirement gradio==6.8.0, but you have gradio 6.17.3.
+chatterbox-tts 0.1.7 has requirement safetensors==0.5.3, but you have safetensors 0.8.0.
+chatterbox-tts 0.1.7 has requirement torch==2.6.0; python_version < "3.14", but you have torch 2.14.0.
+chatterbox-tts 0.1.7 has requirement torchaudio==2.6.0; python_version < "3.14", but you have torchaudio 2.11.0.
+chatterbox-tts 0.1.7 has requirement transformers==5.2.0, but you have transformers 4.57.3.
+habibi-tts 0.1.1 has requirement torch<2.9.0,>=2.4.0, but you have torch 2.14.0.
+pip check exit: 1
+=== import ===
+/home/samykabu/voicebox-setupcheck/backend/venv/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+2.0.3 2.14.0+cu130 True cuda build: 13.0
+VoxCPM class import OK
+=== key versions ===
+chatterbox-tts                           0.1.7
+einops                                   0.8.2
+f5-tts                                   1.1.21
+habibi-tts                               0.1.1
+hume-tada                                0.1.9
+kokoro                                   0.9.4
+librosa                                  0.11.0
+numpy                                    1.26.4
+nvidia-cublas                            13.1.1.3
+pyopenjtalk                              0.4.1
+qwen-tts                                 0.1.1
+torch                                    2.14.0
+torchaudio                               2.11.0
+transformers                             4.57.3
+voxcpm                                   2.0.3
+=== bun ===
+1.4.2
+6
+=== git status after setup ===
+ M bun.lock
+ bun.lock | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+=== du ===
+8.9G	/home/samykabu/voicebox-setupcheck
+1.6G	/home/samykabu/tc
+
+=== in-process smoke ===
+/home/samykabu/voicebox-setupcheck/backend/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+torch 2.14.0+cu130 torchaudio 2.11.0+cu130
+torchaudio resample ok: torch.Size([1, 48000])
+[32mINFO[0m:     Could not detect AMD GPU via rocminfo, skipping automatic HSA_OVERRIDE_GFX_VERSION configuration: [Errno 2] No such file or directory: 'rocminfo'
+[32mINFO[0m:     MCP: mounted at /mcp
+/home/samykabu/voicebox-setupcheck/backend/database/migrations.py:74: SAWarning: Skipped unsupported reflection of expression-based index uq_pronunciation_scope
+  existing = {ix["name"] for ix in inspector.get_indexes("pronunciation_entries")}
+[32mINFO[0m:     Added uq_pronunciation_scope index to pronunciation_entries
+[32mINFO[0m:     HTTP Request: GET http://testserver/models/engines "HTTP/1.1 200 OK"
+GET /models/engines 200
+  qwen available= True reason= None warning= None detected= cuda
+  qwen_custom_voice available= True reason= None warning= None detected= cuda
+  luxtts available= True reason= None warning= None detected= cuda
+  chatterbox available= True reason= None warning= None detected= cuda
+  chatterbox_turbo available= True reason= None warning= None detected= cuda
+  tada available= True reason= None warning= None detected= cuda
+  kokoro available= True reason= None warning= None detected= cuda
+  f5_tts available= True reason= None warning= None detected= cuda
+  voxcpm available= True reason= None warning= None detected= cuda
+VoxCPMBackend import OK

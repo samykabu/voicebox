@@ -1,0 +1,129 @@
+# T043 Biome (bun run check) vs pre-feature baseline (merge-base 4eb2a64, detached worktree)
+baseline errors=483, now errors=491 (see T043-check-js.txt)
+biome-base total=483 excluding .specify/** and specs/**=390 app/src excluding generated api=172
+biome-now total=491 excluding .specify/** and specs/**=344 app/src excluding generated api=171
+Interpretation: every added finding is in .specify/** (workflow/scope JSON, user's Sanduq upgrade) or specs/** (workflow JSON, evidence copies of bun test files, e2e report JSON). Source code: app/src 172 -> 171 (useGenerationForm.ts format finding gone); generated api/ findings gone via chore d6a3a11 exclusion. No source file gained a finding.
+
+## per-file diff (base < > now)
+8d7
+<       1 .specify/extensions/assure/package-inventory.json format
+38,41d36
+<       1 .specify/extensions/user-manual/assets/scaffold/theme/extra.css format
+<       1 .specify/extensions/user-manual/assets/scaffold/theme/print.css format
+<       1 .specify/extensions/user-manual/assets/scaffold/theme/rtl.css format
+<       1 .specify/extensions/user-manual/package-inventory.json format
+44,45d38
+<       1 .specify/extensions/workflow/dependencies.json format
+<       1 .specify/extensions/workflow/package-inventory.json format
+53a47,85
+>       1 .specify/project-sync-state.json format
+>       1 .specify/scope/approvals/13-baseline.json format
+>       1 .specify/scope/approvals/13-c2df207f8c415fd678ff5ae345a7b55d1153f0ca1c9539306140bce2d70016b5.json format
+>       1 .specify/scope/approvals/13-feca4105ffd7e470caa9fd5b68bd5b112ef95105c70e83bca7ad74679415403f.json format
+>       1 .specify/scope/clarification-13-review.json format
+>       1 .specify/scope/clarification-13-round2.json format
+>       1 .specify/scope/clarification-13-snapshot.json format
+>       1 .specify/scope/clarifications/13-328cc7630b9b368f2129/analysis.json format
+>       1 .specify/scope/clarifications/13-328cc7630b9b368f2129/journal.json format
+>       1 .specify/scope/clarifications/13-328cc7630b9b368f2129/snapshot.json format
+>       1 .specify/scope/clarifications/13-a52edb4789bf2af8be81/analysis.json format
+>       1 .specify/scope/clarifications/13-a52edb4789bf2af8be81/journal.json format
+>       1 .specify/scope/clarifications/13-a52edb4789bf2af8be81/snapshot.json format
+>       1 .specify/scope/clarifications/13-observed.json format
+>       1 .specify/scope/issue-13-analysis.json format
+>       1 .specify/scope/issue-13-publish.json format
+>       1 .specify/scope/issue-13-snapshot.json format
+>       1 .specify/scope/runs/13-c2df207f8c415fd6/analysis.json format
+>       1 .specify/scope/runs/13-c2df207f8c415fd6/catalog-before.json format
+>       1 .specify/scope/runs/13-c2df207f8c415fd6/issue-map-before.json format
+>       1 .specify/scope/runs/13-c2df207f8c415fd6/journal.json format
+>       1 .specify/scope/runs/13-c2df207f8c415fd6/snapshot.json format
+>       1 .specify/scope/runs/13-feca4105ffd7e470/analysis.json format
+>       1 .specify/scope/runs/13-feca4105ffd7e470/catalog-before.json format
+>       1 .specify/scope/runs/13-feca4105ffd7e470/issue-map-before.json format
+>       1 .specify/scope/runs/13-feca4105ffd7e470/journal.json format
+>       1 .specify/scope/runs/13-feca4105ffd7e470/snapshot.json format
+>       1 .specify/workflow/backups/installs/1475e6a98ce3426dbc97517d2ddf0f2c/before.json format
+>       1 .specify/workflow/backups/installs/1475e6a98ce3426dbc97517d2ddf0f2c/result.json format
+>       1 .specify/workflow/backups/installs/3950361078e24c33ab889e355f352c2c/before.json format
+>       1 .specify/workflow/backups/installs/3950361078e24c33ab889e355f352c2c/result.json format
+>       1 .specify/workflow/backups/installs/5f27aaf9e9324244a6027afed34c9c81/before.json format
+>       1 .specify/workflow/backups/installs/5f27aaf9e9324244a6027afed34c9c81/result.json format
+>       1 .specify/workflow/backups/installs/b0bb434c10014141986fcec5276b434c/before.json format
+>       1 .specify/workflow/backups/installs/b0bb434c10014141986fcec5276b434c/result.json format
+>       1 .specify/workflow/backups/installs/b1f7a5d67cc34a56927cf9c783a18c6c/before.json format
+>       1 .specify/workflow/backups/installs/b1f7a5d67cc34a56927cf9c783a18c6c/result.json format
+>       1 .specify/workflow/backups/installs/ea2aefbb3e8943bc92844a19cb674a64/before.json format
+>       1 .specify/workflow/backups/installs/ea2aefbb3e8943bc92844a19cb674a64/result.json format
+54a87
+>       1 .specify/workflow/install-receipt.json format
+185,229d217
+<       1 app/src/lib/api/core/ApiError.ts format
+<       1 app/src/lib/api/core/ApiRequestOptions.ts format
+<       1 app/src/lib/api/core/ApiResult.ts format
+<       1 app/src/lib/api/core/CancelablePromise.ts format
+<       1 app/src/lib/api/core/CancelablePromise.ts lint/suspicious/noThenProperty
+<       1 app/src/lib/api/core/OpenAPI.ts format
+<       1 app/src/lib/api/core/request.ts assist/source/organizeImports
+<       1 app/src/lib/api/core/request.ts format
+<       1 app/src/lib/api/core/request.ts lint/suspicious/useIterableCallbackReturn
+<       1 app/src/lib/api/index.ts assist/source/organizeImports
+<       1 app/src/lib/api/index.ts format
+<       1 app/src/lib/api/models/Body_add_profile_sample_profiles__profile_id__samples_post.ts format
+<       1 app/src/lib/api/models/Body_transcribe_audio_transcribe_post.ts format
+<       1 app/src/lib/api/models/GenerationRequest.ts format
+<       1 app/src/lib/api/models/GenerationResponse.ts format
+<       1 app/src/lib/api/models/HTTPValidationError.ts format
+<       1 app/src/lib/api/models/HealthResponse.ts format
+<       1 app/src/lib/api/models/HistoryListResponse.ts format
+<       1 app/src/lib/api/models/HistoryResponse.ts format
+<       1 app/src/lib/api/models/ModelDownloadRequest.ts format
+<       1 app/src/lib/api/models/ModelStatus.ts format
+<       1 app/src/lib/api/models/ModelStatusListResponse.ts format
+<       1 app/src/lib/api/models/ProfileSampleResponse.ts format
+<       1 app/src/lib/api/models/TranscriptionResponse.ts format
+<       1 app/src/lib/api/models/ValidationError.ts format
+<       1 app/src/lib/api/models/VoiceProfileCreate.ts format
+<       1 app/src/lib/api/models/VoiceProfileResponse.ts format
+<       1 app/src/lib/api/schemas/$Body_add_profile_sample_profiles__profile_id__samples_post.ts format
+<       1 app/src/lib/api/schemas/$Body_transcribe_audio_transcribe_post.ts format
+<       1 app/src/lib/api/schemas/$GenerationRequest.ts format
+<       1 app/src/lib/api/schemas/$GenerationResponse.ts format
+<       1 app/src/lib/api/schemas/$HTTPValidationError.ts format
+<       1 app/src/lib/api/schemas/$HealthResponse.ts format
+<       1 app/src/lib/api/schemas/$HistoryListResponse.ts format
+<       1 app/src/lib/api/schemas/$HistoryResponse.ts format
+<       1 app/src/lib/api/schemas/$ModelDownloadRequest.ts format
+<       1 app/src/lib/api/schemas/$ModelStatus.ts format
+<       1 app/src/lib/api/schemas/$ModelStatusListResponse.ts format
+<       1 app/src/lib/api/schemas/$ProfileSampleResponse.ts format
+<       1 app/src/lib/api/schemas/$TranscriptionResponse.ts format
+<       1 app/src/lib/api/schemas/$ValidationError.ts format
+<       1 app/src/lib/api/schemas/$VoiceProfileCreate.ts format
+<       1 app/src/lib/api/schemas/$VoiceProfileResponse.ts format
+<       1 app/src/lib/api/services/DefaultService.ts assist/source/organizeImports
+<       1 app/src/lib/api/services/DefaultService.ts format
+241d228
+<       1 app/src/lib/hooks/useGenerationForm.ts format
+391a379,399
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase3/frontend-capability-tests/capability-logic.test.ts assist/source/organizeImports
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase3/frontend-capability-tests/capability-logic.test.ts format
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase3/lang-fe-capability-logic.test.ts assist/source/organizeImports
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase3/lang-fe-capability-logic.test.ts format
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase4/T028-capability-logic.test.ts assist/source/organizeImports
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase4/T028-capability-logic.test.ts format
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase5/T031-T032-capability-logic.test.ts assist/source/organizeImports
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase5/T031-T032-capability-logic.test.ts format
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase6/T036-capability-logic.test.ts assist/source/organizeImports
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase6/T036-capability-logic.test.ts format
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase6/T049-capability-logic.test.ts assist/source/organizeImports
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase6/T049-capability-logic.test.ts format
+>       1 specs/001-voxcpm2-tts-engine/evidence/phase7/T041-voxcpm-e2e-report.json format
+>       1 specs/001-voxcpm2-tts-engine/scope-source.json format
+>       1 specs/001-voxcpm2-tts-engine/workflow/backups/de67b85692ba43c8986c1be6a076b492.json format
+>       1 specs/001-voxcpm2-tts-engine/workflow/checkpoint.json format
+>       1 specs/001-voxcpm2-tts-engine/workflow/progress/state.json format
+>       1 specs/001-voxcpm2-tts-engine/workflow/task-dependencies.json format
+>       1 specs/001-voxcpm2-tts-engine/workflow/task-issues-result.json format
+>       1 specs/001-voxcpm2-tts-engine/workflow/task-issues.json format
+>       1 specs/001-voxcpm2-tts-engine/workflow/task-state.json format

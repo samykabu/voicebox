@@ -1,0 +1,81 @@
+# T041 VoxCPM2 E2E, OPTED IN, against the T042 frozen CPU binary
+# 2026-09-23T19:02:57+03:00
+# nvidia-smi: 925 MiB, 12227 MiB;3092 MiB, 16311 MiB; (binary is CPU-only torch; GPU unused)
+# env: VOICEBOX_E2E=1 HF_HUB_OFFLINE=1 (model cached in default HF cache C:/Users/sabus/.cache/huggingface/hub)
+# env: VOICEBOX_E2E_ARGS=--binary D:/Projects/Personal/voicebox/backend/dist/voicebox-server.exe --port 17593 --reference-wav C:/Users/sabus/voxcpm-probe-out/cuda_plain.wav --reference-text "Hello, this is a short test of the VoxCPM two speech engine, running locally." --timeout-cached 900 --output-dir C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/e2e-results --keep-data-dir
+# reference: C:/Users/sabus/voxcpm-probe-out/cuda_plain.wav (48 kHz, 5.6 s, the probe's VoxCPM2 output; outside the repo)
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_all_models_e2e.py -v -rs -s -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase7/T041-voxcpm-e2e.xml
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 4 items
+
+backend\tests\test_all_models_e2e.py::test_voxcpm2_rows_declared PASSED
+backend\tests\test_all_models_e2e.py::test_voxcpm2_rows_follow_only_and_skip PASSED
+backend\tests\test_all_models_e2e.py::test_voxcpm2_request_bodies PASSED
+backend\tests\test_all_models_e2e.py::test_voxcpm2_frozen_binary_e2e [pytest] D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe D:\Projects\Personal\voicebox\backend\tests\test_all_models_e2e.py --only voxcpm --skip-build --binary D:/Projects/Personal/voicebox/backend/dist/voicebox-server.exe --port 17593 --reference-wav C:/Users/sabus/voxcpm-probe-out/cuda_plain.wav --reference-text Hello, this is a short test of the VoxCPM two speech engine, running locally. --timeout-cached 900 --output-dir C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/e2e-results --keep-data-dir
+Traceback (most recent call last):
+  File "D:\Projects\Personal\voicebox\backend\tests\test_all_models_e2e.py", line 746, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "D:\Projects\Personal\voicebox\backend\tests\test_all_models_e2e.py", line 641, in main
+    print(f"[run] {row.label} \u2192 {result.status} in {result.elapsed_seconds}s"
+  File "C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2192' in position 14: character maps to <undefined>
+
+[binary] D:\Projects\Personal\voicebox\backend\dist\voicebox-server.exe
+[fixture] reference WAV:  C:\Users\sabus\voxcpm-probe-out\cuda_plain.wav
+[fixture] reference text: 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'
+[spawn] D:\Projects\Personal\voicebox\backend\dist\voicebox-server.exe --host 127.0.0.1 --port 17593 --data-dir C:\Users\sabus\AppData\Local\Temp\voicebox-e2e-53uxpqy1 --parent-pid 85000
+[health] waiting for http://127.0.0.1:17593/health ...
+[health] ready
+[profile] creating cloned profile...
+[profile] creating designed profile...
+
+[run] voxcpm2 (engine=voxcpm, size=None)
+[run] cached=True timeout=900s
+[cleanup] keeping data dir: C:\Users\sabus\AppData\Local\Temp\voicebox-e2e-53uxpqy1
+
+FAILED
+
+================================== FAILURES ===================================
+_______________________ test_voxcpm2_frozen_binary_e2e ________________________
+
+tmp_path = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-63/test_voxcpm2_frozen_binary_e2e0')
+
+    def test_voxcpm2_frozen_binary_e2e(tmp_path):
+        import shlex
+    
+        import pytest
+    
+        if os.environ.get(E2E_OPT_IN_ENV) != "1":
+            pytest.skip(f"frozen-binary E2E is opt-in: set {E2E_OPT_IN_ENV}=1 (and build with backend/build_binary.py)")
+    
+        extra = shlex.split(os.environ.get(E2E_ARGS_ENV, ""), posix=os.name != "nt")
+        extra = [a.strip('"') for a in extra]
+        cmd = [sys.executable, str(Path(__file__).resolve()), "--only", "voxcpm", "--skip-build"]
+        if "--output-dir" not in extra:
+            extra += ["--output-dir", str(tmp_path)]
+        cmd += extra
+        output_dir = Path(extra[extra.index("--output-dir") + 1])
+        before = set(output_dir.glob("e2e-*.json")) if output_dir.exists() else set()
+    
+        print(f"[pytest] {' '.join(cmd)}", flush=True)
+        proc = subprocess.run(cmd, cwd=str(REPO_ROOT), capture_output=True, text=True, errors="replace")
+        print(proc.stdout)
+        print(proc.stderr, file=sys.stderr)
+    
+        reports = sorted(set(output_dir.glob("e2e-*.json")) - before)
+>       assert reports, f"harness wrote no report (exit {proc.returncode})"
+E       AssertionError: harness wrote no report (exit 1)
+E       assert []
+
+backend\tests\test_all_models_e2e.py:735: AssertionError
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase7\T041-voxcpm-e2e.xml -
+======================== 1 failed, 3 passed in 54.06s =========================
+# pytest exit=1 wall_s=55 2026-09-23T19:03:52+03:00

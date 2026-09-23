@@ -1,0 +1,40 @@
+{
+  "platform": "windows-amd64",
+  "binary": "D:\\Projects\\Personal\\voicebox\\backend\\dist\\voicebox-server.exe",
+  "binary_size_mb": 569.6,
+  "started_at": "2026-09-23T16:05:51.842867+00:00",
+  "finished_at": "2026-09-23T16:07:01.305429+00:00",
+  "elapsed_seconds": 69.462562,
+  "results": [
+    {
+      "label": "voxcpm2",
+      "engine": "voxcpm",
+      "model_size": null,
+      "status": "passed",
+      "was_cached": true,
+      "generation_id": "c5272635-86d2-4ac5-a924-df5f63f58ed1",
+      "elapsed_seconds": 32.71,
+      "audio_duration": 2.56,
+      "audio_path": "C:\\Users\\sabus\\AppData\\Local\\Temp\\voicebox-e2e-gxslvkfr\\generations\\c5272635-86d2-4ac5-a924-df5f63f58ed1.wav",
+      "audio_bytes": 245886,
+      "error": null,
+      "http_status": null,
+      "server_log_tail": null
+    },
+    {
+      "label": "voxcpm2 voice design",
+      "engine": "voxcpm",
+      "model_size": null,
+      "status": "passed",
+      "was_cached": true,
+      "generation_id": "748bddb9-68c1-4531-a5d0-aa91f510bdde",
+      "elapsed_seconds": 15.1,
+      "audio_duration": 2.72,
+      "audio_path": "C:\\Users\\sabus\\AppData\\Local\\Temp\\voicebox-e2e-gxslvkfr\\generations\\748bddb9-68c1-4531-a5d0-aa91f510bdde.wav",
+      "audio_bytes": 261246,
+      "error": null,
+      "http_status": null,
+      "server_log_tail": null
+    }
+  ]
+}

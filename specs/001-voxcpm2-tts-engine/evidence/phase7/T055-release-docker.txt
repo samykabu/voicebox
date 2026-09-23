@@ -1,0 +1,143 @@
+T055 - Install VoxCPM2 in the release builds and the Docker image
+Date: 2026-09-23T19:23:25+03:00   Branch: feature/001-voxcpm2-tts-engine   HEAD: b69d377
+
+== 1. Diff (working tree vs HEAD, only these two files) ==
+warning: in the working copy of '.github/workflows/release.yml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'Dockerfile', LF will be replaced by CRLF the next time Git touches it
+3	0	.github/workflows/release.yml
+1	0	Dockerfile
+warning: in the working copy of '.github/workflows/release.yml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'Dockerfile', LF will be replaced by CRLF the next time Git touches it
+diff --git a/.github/workflows/release.yml b/.github/workflows/release.yml
+index f10f992..0db6145 100644
+--- a/.github/workflows/release.yml
++++ b/.github/workflows/release.yml
+@@ -132,6 +132,7 @@ jobs:
+           pip install --no-deps hume-tada
+           pip install --no-deps 'f5-tts==1.1.21'
+           pip install --no-deps 'habibi-tts==0.1.1'
++          pip install --no-deps 'voxcpm==2.0.3'
+ 
+       - name: Install MLX dependencies (Apple Silicon only)
+         if: matrix.backend == 'mlx'
+@@ -340,6 +341,7 @@ jobs:
+           pip install --no-deps hume-tada
+           pip install --no-deps 'f5-tts==1.1.21'
+           pip install --no-deps 'habibi-tts==0.1.1'
++          pip install --no-deps 'voxcpm==2.0.3'
+ 
+       - name: Install PyTorch with CUDA 12.8
+         run: |
+@@ -416,6 +418,7 @@ jobs:
+           pip install --no-deps hume-tada
+           pip install --no-deps 'f5-tts==1.1.21'
+           pip install --no-deps 'habibi-tts==0.1.1'
++          pip install --no-deps 'voxcpm==2.0.3'
+ 
+       - name: Build ROCm server binary (onedir)
+         shell: bash
+diff --git a/Dockerfile b/Dockerfile
+index e1340a2..10e0a18 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -63,6 +63,7 @@ RUN if [ "$PYTORCH_VARIANT" = "rocm" ]; then \
+ RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+ RUN pip install --no-cache-dir --prefix=/install --no-deps chatterbox-tts
+ RUN pip install --no-cache-dir --prefix=/install --no-deps hume-tada
++RUN pip install --no-cache-dir --prefix=/install --no-deps 'voxcpm==2.0.3'
+ RUN pip install --no-cache-dir --prefix=/install \
+     git+https://github.com/QwenLM/Qwen3-TTS.git
+ 
+
+== 2. actionlint 1.7.12 (docker image rhysd/actionlint:latest) ==
+-- New (working tree) findings, exit 1:
+.github/workflows/release.yml:110:9: shellcheck reported issue in this script: SC2086:info:2:40: Double quote to prevent globbing and word splitting [shellcheck]
+.github/workflows/release.yml:110:9: shellcheck reported issue in this script: SC2086:info:3:64: Double quote to prevent globbing and word splitting [shellcheck]
+.github/workflows/release.yml:162:9: shellcheck reported issue in this script: SC2086:info:12:73: Double quote to prevent globbing and word splitting [shellcheck]
+.github/workflows/release.yml:162:9: shellcheck reported issue in this script: SC2086:info:13:67: Double quote to prevent globbing and word splitting [shellcheck]
+-- HEAD findings, exit 1:
+.github/workflows/release.yml:110:9: shellcheck reported issue in this script: SC2086:info:2:40: Double quote to prevent globbing and word splitting [shellcheck]
+.github/workflows/release.yml:110:9: shellcheck reported issue in this script: SC2086:info:3:64: Double quote to prevent globbing and word splitting [shellcheck]
+.github/workflows/release.yml:161:9: shellcheck reported issue in this script: SC2086:info:12:73: Double quote to prevent globbing and word splitting [shellcheck]
+.github/workflows/release.yml:161:9: shellcheck reported issue in this script: SC2086:info:13:67: Double quote to prevent globbing and word splitting [shellcheck]
+-- Comparison (line/col normalised): identical. NEW FINDINGS INTRODUCED BY T055: none.
+   All 4 are pre-existing shellcheck SC2086 'info' notes in steps unrelated to the install lines.
+
+== 3. YAML parse (PyYAML safe_load via backend/venv python, read-only) ==
+parsed OK; jobs: ['release-notes', 'release', 'build-cuda-windows', 'build-rocm-windows']
+runs-on identical to HEAD: True
+triggers identical to HEAD: True
+voxcpm lines: 3
+
+== 4. Docker build ==
+Context: clean 'git archive HEAD' export (70 MB) + working-copy Dockerfile (diff vs HEAD = the one voxcpm line).
+Reason: the repo .dockerignore does not exclude backend/venv (11 GB), so a build from the working tree
+transferred >9 GB of context before it was stopped. This gap predates T055 and doesn't affect CI (clean checkout).
+Command: docker build --progress=plain -t voicebox-t055 -f Dockerfile .
+Result: exit 0; wall time 14m58.031s (start 2026-09-23T19:07:42+03:00, end 2026-09-23T19:22:40+03:00)
+-- voxcpm step:
+#25 [backend-builder 10/11] RUN pip install --no-cache-dir --prefix=/install --no-deps 'voxcpm==2.0.3'
+#25 0.874 Collecting voxcpm==2.0.3
+#25 1.097   Downloading voxcpm-2.0.3-py3-none-any.whl.metadata (30 kB)
+#25 1.194 Downloading voxcpm-2.0.3-py3-none-any.whl (88 kB)
+#25 1.281 Installing collected packages: voxcpm
+#25 1.320 Successfully installed voxcpm-2.0.3
+#25 DONE 1.4s
+-- log tail:
+#33 [stage-2  8/10] RUN mkdir -p /app/data/generations /app/data/profiles /app/data/cache     && chown -R voicebox:voicebox /app/data
+#33 DONE 0.2s
+
+#34 [stage-2  9/10] COPY --chmod=755 scripts/rocm-entrypoint.sh /usr/local/bin/entrypoint.sh
+#34 DONE 0.1s
+
+#35 [stage-2 10/10] RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh
+#35 DONE 0.3s
+
+#36 exporting to image
+#36 exporting layers
+#36 exporting layers 138.4s done
+#36 exporting manifest sha256:3eb299bcea8df98c5f51c3b95be717b708bbff1798fbcc89abe76f3ca64affac 0.0s done
+#36 exporting config sha256:82b3ecf0df44cd98bdabe042e6c58f1daa3192e8779370c5cd17ff29fb61397a 0.0s done
+#36 exporting attestation manifest sha256:c1806fe0165394cc6f531593cfd5693eccd6b26b5bec156cf3551b25d3da1a4c 0.0s done
+#36 exporting manifest list sha256:15822639fa3f27de90d5280bd78408ff40d6d7ccc2deb1fa84f13a8f924b1329 0.0s done
+#36 naming to docker.io/library/voicebox-t055:latest done
+#36 unpacking to docker.io/library/voicebox-t055:latest
+#36 unpacking to docker.io/library/voicebox-t055:latest 21.1s done
+#36 DONE 159.6s
+
+real	14m58.031s
+user	0m0.015s
+sys	0m0.000s
+exit=0
+
+== 5. Image checks ==
+Image size: voicebox-t055:latest 15822639fa3f 13.1GB
+$ docker run --rm --entrypoint python voicebox-t055 -c 'import voxcpm; from voxcpm import VoxCPM ...'
+/usr/local/lib/python3.11/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+voxcpm None dist 2.0.3
+VoxCPM class OK
+(voxcpm 2.0.3 defines no __version__; the version comes from importlib.metadata.)
+$ docker run --rm --entrypoint python -w /app voicebox-t055 -c 'from backend.backends.voxcpm_backend import VoxCPMBackend; ...'
+VoxCPMBackend import OK
+voxcpm engine in registry: ['voxcpm']
+$ pip check (voxcpm lines) / pip show voxcpm
+voxcpm 2.0.3 requires argbind, which is not installed.
+voxcpm 2.0.3 requires funasr, which is not installed.
+voxcpm 2.0.3 requires modelscope, which is not installed.
+voxcpm 2.0.3 requires simplejson, which is not installed.
+voxcpm 2.0.3 requires spaces, which is not installed.
+voxcpm 2.0.3 requires torchcodec, which is not installed.
+voxcpm 2.0.3 requires wetext, which is not installed.
+voxcpm 2.0.3 has requirement datasets<4,>=3, but you have datasets 5.0.1.
+Name: voxcpm
+Version: 2.0.3
+Requires: addict, argbind, datasets, einops, funasr, gradio, huggingface-hub, inflect, librosa, matplotlib, modelscope, pydantic, safetensors, simplejson, sortedcontainers, soundfile, spaces, torch, torchaudio, torchcodec, tqdm, transformers, wetext
+Note: these unmet declared deps are intentional. voxcpm is installed --no-deps on every surface, and
+backend/requirements.txt:60-65 lists the minimal runtime set it actually needs (all present).
+
+== 6. Notes ==
+- The Dockerfile already omits f5-tts and habibi-tts (and has no f5/habibi install lines). That predates this
+  feature, and T055 does not add them.
+- runs-on, triggers and job structure in release.yml are unchanged (confirmed by YAML comparison against HEAD).
+- Image voicebox-t055 (13.1GB) was removed after verification.

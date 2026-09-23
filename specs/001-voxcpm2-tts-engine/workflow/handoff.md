@@ -195,3 +195,67 @@ Inspect git status before continuing; do not discard uncommitted files.
   - `wav_bytes()` tags /generate/stream, /speak persist=false, MCP speak and the effects preview.
   - JUnit: T053 red 37/9, green 602/0; T054 red 45/8, green 613/0. Orchestrator re-run 608/0. Full suite 1009 tests, 1 failure (baseline), 9 skipped.
   - WAV writers left untagged are all user audio: captures.py:82 and :114, and generations.py:494 (import_audio).
+- T053/T054 commit `b69d37731d2d6b6aa0119ae7ebdbad8f8579d70c`, pushed `6e48673..b69d377`; ls-remote returns the same SHA.
+- T038–T040 accepted (`adf34544ed5f65383`). Found gap, for the dispatcher: `.github/workflows/release.yml` (~:131-134, :339-341) and `Dockerfile` (~:64) do not install `voxcpm==2.0.3 --no-deps`. The CHANGELOG header says the release workflow compiles it; the entry went under [Unreleased] per FR-022.
+- T055 (release.yml and Dockerfile voxcpm install) → `a68e059f0d3fa363c`. T056 (remaining docs) → `adf34544ed5f65383` (resumed). User decisions: fix release and Docker, keep the CHANGELOG entry under [Unreleased], update all the suggested docs pages.
+- T056 accepted. Correction to the T054 notes and the b69d377 commit message: /speak and MCP speak call generate_speech (`routes/speak.py:72-83`, `mcp_server/tools.py:250-263`). They are saved and tagged through save_audio, not wav_bytes. generate_audio_sync has no production caller. wav_bytes covers /generate/stream and the effects preview.
+- Human listening check passed: Arabic intelligibility, and the designed voices match their descriptions (`evidence/human/listening-check.md`). SC-002 blind likeness is still outstanding.
+- T044 accepted as PASS with prerequisites.
+  - Windows `just setup` fails as written because `python` is 3.14 here; with a 3.12 venv it passes in 6m42s.
+  - WSL Ubuntu-26.04 passes in 543 s, given python3.12 via uv and a C toolchain (pyopenjtalk). Its pip check notes voxcpm --no-deps leaves `wetext` missing and wants `datasets<4`; the import works.
+  - `bun install` rewrites bun.lock (0.5.0 → 0.5.4).
+  - Quickstart steps 1–7 PASS through the API.
+  - SC-007: 8 engines pass; chatterbox, chatterbox_turbo and tada-3b-ml were not run (not cached).
+  - Leftovers: `C:\Users\sabus\voicebox-setupcheck-win` (6.9 GB); in WSL, ~/voicebox-setupcheck (8.9 GB), ~/tc (1.6 GB) and ~/.cache/pip (3.7 GB).
+- T041 and T042 accepted (`abddad5a3c5d64de6`).
+  - test_all_models_e2e.py is a standalone script. It gains the voxcpm2 clone and voice-design rows, plus pytest wrappers; the real run is opt-in via `VOICEBOX_E2E=1`.
+  - JUnit: gated 4 tests, 1 skipped; opted in against the frozen binary 4 tests, 0 failures, on CPU (32.7 s and 15.1 s).
+  - Build: `C:\Users\sabus\voicebox-buildenv` (2.7 GB, kept) produced `backend/dist/voicebox-server.exe` (570 MiB, gitignored).
+  - Pre-existing issue: the harness crashes on "→" with a cp1252 pipe on Windows.
+- T043 gates run by the orchestrator: check-js 491 (baseline 483; no source regressions, app/src 172→171); typecheck 0; ruff check 1060 (baseline 1063); ruff format 63 files (same set as baseline, after the orchestrator ran ruff format on test_voxcpm_backend.py, whose Phase 6 appends had added one file); just test 1009 tests / 1 failure (baseline) / 9 skipped; build:web 0. Note: the b69d377 suite count of 1009 included the 4 then-uncommitted E2E wrapper tests.
+- T055 accepted (`a68e059f0d3fa363c`). 4 install lines; actionlint shows no new findings; the Docker build passes and voxcpm imports in the image. It built from a `git archive` export because `.dockerignore` does not exclude backend/venv (pre-existing).
+- Log-clobber check: T055's Docker run overwrote the shared `scratchpad/build.log` at 18:55. `T042-build.txt` contains only PyInstaller and pip output, no Docker lines. It ends with "Build complete" and rc=0 at 19:01, and the binary's mtime is 19:00:59. The T041 E2E logs have no Docker content. Evidence accepted as-is.
+
+## T045 checklist (human final review), prepared by the orchestrator
+Done:
+- Human listening check passed: Arabic intelligibility, and the designed voices match their descriptions (`evidence/human/listening-check.md`).
+- T037 consent review decided and implemented (T050–T052, T053–T054).
+- SC-009 name maps: reviewed in Phase 5. They are registration entries in pre-existing hand-maintained chains that FR-024 keeps for the other engines; there is no hardware or capability branching.
+Still needs a human:
+1. SC-002 blind speaker-likeness test (at least 4 of 5) with a cloned profile made from a REAL human recording. Not covered by the listening check. `s4-voxcpm-clone-run1.wav` uses a synthetic reference.
+2. UI walk-through in the running app:
+   - the download-confirmation dialog (size and licence) and the progress bar
+   - the greyed-out engine with its reason
+   - the memory warning
+   - the "Voice description" input and its "unused" notice
+   - the "Describe a voice" profile source
+   - the responsible-use sentence and its link (does target=_blank open in Tauri?)
+   - the advanced-settings sliders and their defaults
+3. The PR must state that `just test` was run locally: 1009 tests, 1 failure (baseline test_hf_progress_tracker), 9 skipped (`evidence/phase7/T043-just-test.xml`).
+4. SC-007: chatterbox, chatterbox_turbo and tada-3b-ml were not run (models not cached). Download them and generate, or accept the risk.
+5. Apple Silicon (MPS) is enabled but untested. Linux had no real VoxCPM2 generation (setup and registry only).
+6. Before completing Execute: recover the claim and revalidate Plan → Tasks-to-Issues (upstream spec/plan/contracts changed).
+Accepted quality-gate notes:
+- The 8 new Biome findings are all in specs/ and .specify/ JSON files and evidence copies of test files; none are in app code. app/src went 172 → 171.
+- Ruff is at or below the baseline.
+Follow-ups (pre-existing, not fixed here):
+- The Windows setup recipe uses `python` (3.14 here) and needs a pre-made 3.12 venv.
+- Linux setup needs python3.12 and a C toolchain for pyopenjtalk.
+- `bun install` rewrites bun.lock (0.5.0 → 0.5.4).
+- `.dockerignore` does not exclude backend/venv.
+- The Dockerfile omits f5-tts and habibi-tts.
+- The E2E harness crashes printing "→" to a cp1252 pipe.
+- `generate_audio_sync` has no production caller.
+- The api-reference docs pages need regenerating from openapi.json.
+- introduction.mdx says Kokoro has 9 languages; other pages say 8.
+- Other locales' createDescription still names two sources.
+- Voice-design and advanced-settings values are not persisted for retry and regenerate (v1).
+- A designed profile's design_prompt cannot be edited (the backend ignores it).
+- ProfileList shows designed profiles for all non-preset engines.
+- Export drops personality.
+- WSL voxcpm --no-deps leaves wetext missing and datasets≥4 (the import works).
+- Disk leftovers:
+  - C:\Users\sabus\voicebox-buildenv (2.7 GB)
+  - C:\Users\sabus\voicebox-setupcheck-win (6.9 GB)
+  - WSL ~/voicebox-setupcheck (8.9 GB), ~/tc (1.6 GB), ~/.cache/pip (3.7 GB)
+  - backend/dist/voicebox-server.exe (gitignored)

@@ -1168,7 +1168,6 @@ async def test_pronunciation_processed_arabic_reaches_the_vendor_byte_for_byte(
     assert audio.dtype == np.float32
 
 
-
 # ---------------------------------------------------------------------------
 # T034: voice design precedence and encoding through the generation service (FR-015)
 #
@@ -1431,7 +1430,9 @@ def test_resolve_backend_instruct_reads_capability_data_not_engine_names(monkeyp
         supports_instruct=False,
     )
     # voxcpm redeclared without voice design: it must then behave like any existing engine.
-    plain_voxcpm = ModelConfig(model_name="voxcpm2", display_name="VoxCPM2", engine="voxcpm", hf_repo_id="openbmb/VoxCPM2")
+    plain_voxcpm = ModelConfig(
+        model_name="voxcpm2", display_name="VoxCPM2", engine="voxcpm", hf_repo_id="openbmb/VoxCPM2"
+    )
     configs = [c for c in real_configs if c.engine != "voxcpm"] + [designer, silent, plain_voxcpm]
     monkeypatch.setattr(backends_pkg, "get_tts_model_configs", lambda: configs)
 
@@ -1551,7 +1552,6 @@ async def test_stream_route_encodes_the_description_and_drops_delivery_for_voxcp
     assert [c["text"] for c in recorder.generate_calls] == [f"({DESCRIPTION})Hello.", "Hello."]
 
 
-
 # ---------------------------------------------------------------------------
 # T048: a designed profile's saved description is used when the request has none (FR-015a)
 #
@@ -1605,7 +1605,9 @@ def test_design_prompt_fallback_reads_capability_data_not_engine_names(monkeypat
         hf_repo_id="example/fake-designer",
         supports_voice_design=True,
     )
-    plain_voxcpm = ModelConfig(model_name="voxcpm2", display_name="VoxCPM2", engine="voxcpm", hf_repo_id="openbmb/VoxCPM2")
+    plain_voxcpm = ModelConfig(
+        model_name="voxcpm2", display_name="VoxCPM2", engine="voxcpm", hf_repo_id="openbmb/VoxCPM2"
+    )
     configs = [c for c in real_configs if c.engine != "voxcpm"] + [designer, plain_voxcpm]
     monkeypatch.setattr(backends_pkg, "get_tts_model_configs", lambda: configs)
 

@@ -188,9 +188,9 @@ beneath it.
 - [x] T052 [TDD] Preserve profile provenance through export and import
   - Test first, then change `backend/services/export_import.py`: the manifest (about lines 84-92) carries `voice_type`, `design_prompt` and `default_engine`; import (about lines 170-177) restores them instead of rebuilding as cloned; a designed profile with no samples can be exported (about lines 65-67). Older manifests without these fields still import as before. Round-trip tests for cloned and designed profiles. JUnit counts from XML. **Covers**: FR-027.
 
-- [ ] T053 [TDD] Keep the AI-generated tag off the user's own recordings
+- [x] T053 [TDD] Keep the AI-generated tag off the user's own recordings
   - Test first, then add an optional disclosure switch to `save_audio` in `backend/utils/audio.py` (generated audio stays tagged by default) and pass it from the callers that save real user audio: `backend/services/profiles.py` reference samples (about line 236) and the combined reference (about line 623), and `backend/routes/transcription.py` (about line 55). Verify those files carry no AI tag and generated saves still do. JUnit counts from XML. **Covers**: FR-026.
-- [ ] T054 [TDD] Tag generated audio that bypasses save_audio
+- [x] T054 [TDD] Tag generated audio that bypasses save_audio
   - Test first, then add a small helper that writes the same RIFF INFO disclosure into in-memory WAV bytes, and use it in `backend/services/tts.py` (about line 32; /generate/stream and non-persisted /speak) and `backend/routes/effects.py` (about line 53; effect preview). Audio samples must be unchanged apart from the metadata. Read the tag back in tests. JUnit counts from XML. **Covers**: FR-026.
 
 **Checkpoint**: voice design works and has passed the consent review.
@@ -213,6 +213,10 @@ beneath it.
   - Run every constitution quality gate and keep the output as evidence: `just check-js`, `bun run typecheck`, `just check-python`, `just test`, `bun run build:web`. **Covers**: constitution quality gates.
 - [ ] T044 Run quickstart Steps 1-8 on Windows and Linux
   - Run [quickstart.md](./quickstart.md) Steps 1–8, including `just setup` from a clean checkout on Windows **and** Linux, and confirm every pre-existing engine still generates (SC-007). Record results in `specs/001-voxcpm2-tts-engine/evidence/`. **Covers**: FR-019, SC-001–SC-009.
+- [ ] T055 [P] Install VoxCPM2 in the release builds and the Docker image
+  - Add `pip install --no-deps 'voxcpm==2.0.3'` next to the existing `habibi-tts` install in each of the three build jobs in `.github/workflows/release.yml` (about lines 134, 342 and 418), and add the matching `--no-deps` install to `Dockerfile` (after the `hume-tada` line, about line 65). Change install steps only: `runs-on`, triggers and job structure stay as they are, so the runner policy and the red README exception are unaffected. Verify with `actionlint` if available, a YAML parse, and a local Docker build if Docker is available; otherwise say so. **Covers**: FR-019, FR-020. Added 2026-09-23 by user decision.
+- [ ] T056 [P] Update the remaining documentation for VoxCPM2
+  - Update `docs/PROJECT_STATUS.md` (VoxCPM2 is shipped, not backlogged), the developer voice-profiles and tts-generation pages under `docs/content/docs/developer/`, the user-facing docs that cover engines, profiles and generation, and `backend/README.md` (profile export manifest 1.1 and the AI-disclosure metadata in generated WAVs). Plain, human English. **Covers**: FR-021. Added 2026-09-23 by user decision.
 - [ ] T045 [HUMAN-REVIEW] Final review against the spec before merge
   - Final review against the spec before merge (plan.md Human Checkpoint 4). The PR must state that `just test` was run locally. **Covers**: all.
 

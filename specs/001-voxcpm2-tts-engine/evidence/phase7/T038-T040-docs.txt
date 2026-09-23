@@ -1,0 +1,164 @@
+T038-T040 documentation evidence
+Feature: specs/001-voxcpm2-tts-engine   Branch: feature/001-voxcpm2-tts-engine
+Date: 2026-09-23   Worker: docs-only subagent (no code edited, no tests or servers run)
+
+FILES CHANGED (git diff --stat)
+  CHANGELOG.md                                      +54 -0
+  docs/content/docs/developer/model-management.mdx  +60 -1
+  docs/content/docs/developer/tts-engines.mdx       +152 -5
+  total: 266 insertions, 6 deletions (git diff --numstat)
+
+SECTIONS ADDED / CHANGED
+T038 docs/content/docs/developer/tts-engines.mdx (FR-021)
+  - Phase 1.3: new "Optional capability fields" table (accelerators, min_memory_mb,
+    supports_voice_design, requires_download_confirmation, advanced_settings)
+  - Phase 3.2: note that an engine without an ENGINE_LANGUAGES entry uses declared languages
+  - Phase 3.6: "For future designed voices" rewritten as "Designed voices" (now shipped)
+  - New "## Worked Example: VoxCPM2" with subsections: At a glance, Phase 0 findings,
+    Backend, The capability channel, Voice design, Advanced settings, Frontend,
+    Dependencies and bundling, Responsible use and disclosure, Profile export provenance.
+    Structured after the page's own phases (0 research, 1 backend, 3 frontend,
+    4 dependencies, 5 bundling), per its new-engine guidance.
+  - Candidate Engines: "Backlogged: VoxCPM" replaced with "Shipped from the backlog: VoxCPM2"
+T039 docs/content/docs/developer/model-management.mdx (FR-021)
+  - Overview: "Seven engines" -> "Nine engines (the TTS_ENGINES dict)"
+  - Available TTS Models table: VoxCPM2 row
+  - New "### VoxCPM2" (size, licence, package, hardware, memory, output)
+  - New "### Download confirmation" (flow, dialog text, where it opens, app-only)
+  - New "### Offline load"
+  - New "## Engine Capabilities" with a VoxCPM2 JSON example
+  - Manual Model Operations table: GET /models/engines row
+  - Error Handling table: 400 "can't run on this machine" row, memory-warning row
+T040 CHANGELOG.md (FR-022)
+  - Under "## [Unreleased]": "### VoxCPM2 engine", "### Responsible use", "### API changes"
+    (all additive; endpoint, voice_description, advanced_settings, 400 refusal,
+    manifest 1.1, WAV INFO chunk, seven new language codes)
+
+FACTS VERIFIED (source file:line, as of this worktree)
+Engine / registry
+  - TTS_ENGINES "voxcpm": "VoxCPM2" ............................ backend/backends/__init__.py:240
+  - model_name voxcpm2, display "VoxCPM2 (Multilingual, Voice Design)" __init__.py:493-494
+  - hf_repo_id openbmb/VoxCPM2 ................................ __init__.py:496
+  - size_mb=4961 .............................................. __init__.py:498
+  - needs_trim=False, retries_runaway=True .................... __init__.py:499-500
+  - supports_instruct=False, supports_voice_design=True,
+    requires_download_confirmation=True ....................... __init__.py:501-503
+  - accelerators=("cuda","mps","cpu") ......................... __init__.py:504
+  - min_memory_mb=6144 ........................................ __init__.py:508
+  - 30 languages in model-card order (zh ... vi) .............. __init__.py:510-541
+  - license_id Apache-2.0, commercial_use True ................ __init__.py:542-543
+  - AdvancedSetting cfg_value "Guidance" 2.0 [1.0, 3.0];
+    inference_timesteps "Quality steps" 10 [4, 30] ............ __init__.py:548-549
+  - ModelConfig capability fields + defaults .................. __init__.py:76-81
+  - Only VoxCPM2 sets requires_download_confirmation=True ..... grep: single hit __init__.py:503
+  - Nine engines in TTS_ENGINES ............................... __init__.py:230-241
+Download size / measurement
+  - 4,960,733,321 bytes = 4961 MB; model.safetensors + audiovae.pth  evidence/probe.md Q4
+  - Peak GPU ~5.9 GB on short text (5885 MiB nvidia-smi delta) evidence/probe.md Q8
+Package / install
+  - voxcpm==2.0.3 --no-deps, bash + PowerShell targets ........ justfile:76, justfile:126
+  - einops added (only new runtime dep) ........................ backend/requirements.txt:60-66
+  - numpy<2.0, transformers<=4.57.6, torch>=2.5.0 pins ........ backend/requirements.txt:84, :12, :11
+  - 23 declared deps incl. gradio>=6,<7, datasets>=3,<4 ....... research.md R4 (line ~114)
+  - plain install pulled transformers 5.x, numpy 2.x, CPU torch  evidence/probe.md Q13 / Facts for T002
+  - runtime set (8 pkgs) and not-needed list .................. evidence/probe.md Q11
+Backend
+  - weight extensions (.safetensors,.pth,.bin) ................ backend/backends/voxcpm_backend.py:41
+  - combine at 24000 Hz ........................................ voxcpm_backend.py:50, services/profiles.py:625
+  - get_torch_device(allow_mps=True), no XPU/DirectML ......... voxcpm_backend.py:62-65
+  - force_offline_if_cached + load_denoiser=False +
+    local_files_only=is_cached + explicit device .............. voxcpm_backend.py:104-113
+  - blank transcript raises ValueError ......................... voxcpm_backend.py:143-145
+  - cache prefix "voxcpm_" ..................................... voxcpm_backend.py:147
+  - manual_seed before vendor call ............................. voxcpm_backend.py:202-203
+  - normalize=False ............................................ voxcpm_backend.py:212
+  - sample rate from model.tts_model.sample_rate ............... voxcpm_backend.py:217
+  - 48 kHz output / 16 kHz encode rate ......................... evidence/probe.md Q7
+  - "(description)text" ASCII prefix, skipped when reference ... voxcpm_backend.py:239-244
+  - full-width parens read aloud ............................... evidence/probe.md Q9
+  - empty_device_cache on unload ............................... voxcpm_backend.py:117-125
+  - offline defaults (revision check, ModelScope denoiser) ..... evidence/probe.md Q12
+Capability channel
+  - GET /models/engines fields and aggregation ................. backend/routes/models.py:403-460
+  - README field description ................................... backend/README.md:110-158
+  - reason/warning text, memory never blocks ................... backend/backends/base.py:277-335
+  - memory read only for CUDA .................................. backend/backends/base.py:337-359
+  - XPU / DirectML labels, normalize_accelerator ............... backend/backends/base.py:229-258
+  - 400 refusal helper ......................................... backend/routes/generations.py:64-74
+  - refusal called by /generate, retry, regenerate, /generate/stream
+                                                                 generations.py:97, :182, :228, :369
+  - also in run_generation service ............................. backend/services/generation.py:432
+  - ensure_engine_available skips engines with no accelerators . services/generation.py:41-67
+  - supports_cloning from CLONING_ENGINES (includes voxcpm) .... backend/services/profiles.py:27
+  - app capability rules, no engine-name branching ............. app/src/lib/hooks/engineCapabilityRules.ts:1-200
+Voice design
+  - resolve_backend_instruct precedence (request desc, then
+    profile design_prompt; instruct only if supports_instruct) . services/generation.py:81-117
+  - profile_design_prompt ...................................... services/generation.py:70-78
+  - reference audio wins (backend ignores description) ......... voxcpm_backend.py:192, 239-244
+  - retry/regenerate pass no voice_description ................. routes/generations.py:172-260 (only :165 passes it, in /generate)
+  - voice_description max 500, never instruct .................. backend/models.py:108-112
+  - UI input shown only for supports_voice_design; "unused"
+    state for cloned profiles ................................... engineCapabilityRules.ts:150-187,
+                                                                 FloatingGenerateBox.tsx:650-690
+  - i18n "Voice description", "Any language works", unused text  app/src/i18n/locales/en/translation.json:741-746
+  - delivery-instruction toggle only for qwen_custom_voice ..... FloatingGenerateBox.tsx:481-483
+  - "Describe a voice" source, voice_type designed, design_prompt ProfileForm.tsx:311-350, :612-633
+Advanced settings
+  - request field, 422 on undeclared / out-of-range ............ backend/models.py:113-146
+  - options passed only to engines declaring settings .......... services/generation.py:120-156
+  - /speak builds GenerationRequest without advanced_settings .. backend/routes/speak.py:74-83
+  - sliders ..................................................... app/src/components/Generation/AdvancedSettingsControls.tsx:2,32
+  - v1 limitation wording ....................................... spec.md Assumptions (line 182)
+Download confirmation
+  - needsDownloadConfirmation / details ........................ engineCapabilityRules.ts:76-109
+  - dialog text, size / 1024 -> "4.8 GB", licence line ......... app/src/components/Generation/DownloadConfirmDialog.tsx:14-16, 50-66
+  - opens from generate flow and Model Management .............. useGenerationForm.ts:186-193, ModelManagement.tsx:300
+Languages
+  - seven added codes (my id km lo tl th vi), five TTS patterns  git show e7096ed; backend/models.py:86
+  - ALL_LANGUAGES has them; no ENGINE_LANGUAGES entry for voxcpm app/src/lib/constants/languages.ts:12-43, 49-81, 97-106
+Responsible use / disclosure
+  - RESPONSIBLE_USE_URL, acknowledgement for every source ...... ProfileForm.tsx:73, :926-936; en json :241
+  - RESPONSIBLE_USE.md exists .................................. repo root
+  - AI_GENERATED_DISCLOSURE = "AI-generated by Voicebox" ....... backend/utils/audio.py:11
+  - save_audio writes comment (ICMT) + software "Voicebox" (ISFT) audio.py:~100-107 (file being edited by T053)
+  - save_audio callers: generations (clean, processed/effects version, saved) services/generation.py:336,366,392,495
+    story export ............................................... services/stories.py:969
+Export provenance
+  - manifest 1.1, PROVENANCE_FIELDS ............................ backend/services/export_import.py:45-55
+  - designed/preset may export without samples ................. export_import.py:78-84
+  - manifest fields written, no personality .................... export_import.py:101-113
+  - import restores provenance; 1.0 imports as cloned .......... export_import.py:193-210
+Frozen build
+  - hidden-import backend.backends.voxcpm_backend .............. backend/build_binary.py:329
+  - collect-all voxcpm (reason: @torch.jit.script on snake) .... build_binary.py:330-337
+  - exclude voxcpm.training, modelscope, funasr, spaces,
+    argbind, wetext, torchcodec ................................ build_binary.py:338-365
+  - MCP shim excludes voxcpm ................................... build_binary.py:782
+
+NOT VERIFIED / DESCRIBED AS INTENDED BEHAVIOUR
+  - T053 (in progress): reference samples and transcription temp files not tagged.
+    Only the combined reference already passes disclosure=None (services/profiles.py:625).
+    backend/services/profiles.py reference-sample save and backend/routes/transcription.py
+    were not checked; documented per FR-026 as intended behaviour.
+  - T054 (in progress): /generate/stream bytes, non-persisted /speak bytes and the effects
+    preview carrying the INFO chunk. Today backend/services/tts.py:32 and
+    backend/routes/effects.py:53 still call plain sf.write. Documented per FR-026 as intended.
+    Also: /speak in routes/speak.py:74 calls generate_speech (which saves); I did not find a
+    separate non-persisted /speak path. The wording follows T054's task text.
+  - That the ISFT software tag is also written to in-memory bytes after T054 (the CHANGELOG
+    names ICMT and ISFT for WAV files generally).
+  - MPS: not tested by the probe (probe.md Q3). Docs say so.
+  - "Once downloaded, VoxCPM2 loads offline / no HF or ModelScope requests": verified by the
+    probe's O3/O4 scenarios and by the backend's arguments, not by a run of the Voicebox
+    backend itself.
+  - Dialog text "about 4.8 GB": computed from formatDownloadSize (4961/1024 = 4.84), not
+    observed in a running app.
+
+GAPS FOUND (not in my files; not edited)
+  - .github/workflows/release.yml (lines ~131-134, ~339-341) and Dockerfile (line ~64) install
+    the other --no-deps engines but NOT voxcpm==2.0.3. The tts-engines.mdx Phase 4 table says
+    both must carry the same --no-deps line. The docs I wrote mention only justfile and
+    build_binary.py, so they stay accurate either way.
+  - CHANGELOG.md header says it is compiled during the release workflow and should not be
+    edited manually. The task (FR-022) requires the entry, so it was added under [Unreleased].

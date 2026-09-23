@@ -2,26 +2,14 @@
   "dry_run": false,
   "changes": [
     {
-      "task": "T037",
-      "number": 55,
+      "task": "T053",
+      "number": 69,
       "from": "open",
       "to": "closed"
     },
     {
-      "task": "T050",
-      "number": 66,
-      "from": "open",
-      "to": "closed"
-    },
-    {
-      "task": "T051",
-      "number": 67,
-      "from": "open",
-      "to": "closed"
-    },
-    {
-      "task": "T052",
-      "number": 68,
+      "task": "T054",
+      "number": 70,
       "from": "open",
       "to": "closed"
     }
