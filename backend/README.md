@@ -148,7 +148,8 @@ Each entry describes the engine across all of its model variants:
 - `supports_cloning` comes from `CLONING_ENGINES`.
 - `detected_accelerator` is the accelerator detected on this machine.
 - `reason` is non-null if and only if `available` is false. An empty `supported_accelerators` list means unconstrained, and such an engine is always available.
-- `warning` is advisory. It appears when detected memory is below the engine's usual need (`min_memory_mb`) and never blocks generation.
+- `reason` and `warning` depend on `supported_accelerators`. If the detected accelerator is in the list, the engine is available. If it is not, but the list includes `cpu`, the engine is still available and runs on the processor. If the list has no `cpu`, the engine is unavailable and `reason` says why.
+- `warning` is advisory and never blocks generation. It carries one of two messages. The memory warning appears when detected memory is below the engine's usual need (`min_memory_mb`). The processor-fallback warning appears when the engine runs on the processor instead of the detected accelerator, for example VoxCPM2 on an Intel XPU or DirectML machine: "VoxCPM2 (Multilingual, Voice Design) doesn't support Intel XPU here, so it will run on the processor, which is slower." The memory warning is not given in that case.
 
 `POST /generate` accepts two optional fields, both defaulting to `null`, so existing callers are unaffected:
 
@@ -157,7 +158,7 @@ Each entry describes the engine across all of its model variants:
 
 See [contracts/engine-capabilities.md](../specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md) for the full field contract.
 
-A generation route asked to use an engine this machine can't run returns 400. The detail is the same `reason` that `/models/engines` reports. `/generate`, `/generate/stream`, retry and regenerate all check. Only engines that declare accelerators can be refused, which today means only VoxCPM2.
+A generation route asked to use an engine this machine can't run returns 400. The detail is the same `reason` that `/models/engines` reports. `/generate`, `/generate/stream`, retry and regenerate all check. Only an engine that declares accelerators without `cpu` can be refused. No registered engine does that today: the existing engines declare nothing, and VoxCPM2 declares `cpu`, so on an Intel XPU or DirectML machine it runs on the processor with a warning instead of being refused.
 
 ### Profile export manifest
 

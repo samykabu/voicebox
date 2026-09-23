@@ -224,7 +224,7 @@ ModelConfig(
 
 | Field | Default | Set it when |
 |-------|---------|-------------|
-| `accelerators` | `()` (unconstrained) | The engine runs only on some accelerators, e.g. `("cuda", "mps", "cpu")`. On any other accelerator the engine is shown greyed out with a reason and generation is refused. |
+| `accelerators` | `()` (unconstrained) | The engine runs only on some accelerators, e.g. `("cuda", "mps", "cpu")`. On any other accelerator, an engine that lists `cpu` runs on the processor with a warning. An engine that does not list `cpu` is shown greyed out with a reason, and generation is refused. |
 | `min_memory_mb` | `None` | The engine usually needs this much memory. Below it the app shows a warning. It never blocks. |
 | `supports_voice_design` | `False` | The engine can create a voice from a written description. |
 | `requires_download_confirmation` | `False` | The app must ask before starting the download. |
@@ -660,7 +660,7 @@ The dependency probe is in `specs/001-voxcpm2-tts-engine/evidence/probe.md`. The
 
 - **Voice prompt (Pattern B).** `create_voice_prompt()` returns `{"prompt_wav_path": ..., "prompt_text": ...}` and caches it under a `voxcpm_` prefix. The vendor needs both keys together. A blank transcript raises `ValueError`, so a VoxCPM2 clone needs the reference sample's transcript.
 - **Several samples.** `combine_voice_prompts()` combines them at 24 kHz, the rate `services/profiles.py` uses to save the combined reference. The vendor resamples prompt audio to its own 16 kHz encode rate.
-- **Device.** `get_torch_device(allow_mps=True)`, passed to the vendor explicitly. XPU and DirectML are not allowed, because the vendor accepts only `cpu`, `mps` and `cuda[:N]`.
+- **Device.** `get_torch_device(allow_mps=True)`, passed to the vendor explicitly. XPU and DirectML are not allowed, because the vendor accepts only `cpu`, `mps` and `cuda[:N]`. On those machines the engine runs on the processor, and `/models/engines` reports it available with a processor-fallback `warning`.
 - **Loading.** Inside `model_load_progress()` and `force_offline_if_cached()`:
 
   ```python
@@ -684,16 +684,16 @@ The dependency probe is in `specs/001-voxcpm2-tts-engine/evidence/probe.md`. The
 |-------|---------|
 | `engine`, `display_name` | The engine id and its name from `TTS_ENGINES` |
 | `available`, `reason` | Whether this machine can run the engine. `reason` is set if and only if `available` is false |
-| `warning` | Advisory, e.g. too little memory. Never blocks |
+| `warning` | Advisory. Never blocks. Either too little memory, or the engine will run on the processor because it does not support the detected accelerator |
 | `supported_accelerators`, `detected_accelerator` | The declared accelerators (empty means unconstrained) and what this machine uses |
 | `languages` | The union of all variants' languages |
 | `supports_cloning` | From `CLONING_ENGINES` in `services/profiles.py` |
 | `supports_voice_design`, `requires_download_confirmation`, `advanced_settings`, `size_mb` | From the default-size variant |
 | `license_id`, `commercial_use` | The value all variants share, or `null` when they differ |
 
-`min_memory_mb` is not in the response. It only drives `warning`. Memory is read only for CUDA devices today, so the warning appears only there.
+`min_memory_mb` is not in the response. It only drives the memory `warning`. Memory is read only for CUDA devices today, so the memory warning appears only there. The processor-fallback warning reads, for example, "VoxCPM2 (Multilingual, Voice Design) doesn't support Intel XPU here, so it will run on the processor, which is slower."
 
-The app reads capabilities, not engine names. The rules live in `app/src/lib/hooks/engineCapabilityRules.ts`. There is no `if (engine === 'voxcpm')` capability branch in `app/`. An engine this machine cannot run is shown greyed out with its `reason`, never hidden. Every route that starts a generation (`/generate`, `/generate/stream`, retry and regenerate) refuses it with a 400 and the same reason, before any model load or download. The other engines declare no accelerators, so they are never refused this way.
+The app reads capabilities, not engine names. The rules live in `app/src/lib/hooks/engineCapabilityRules.ts`. There is no `if (engine === 'voxcpm')` capability branch in `app/`. An engine this machine cannot run is shown greyed out with its `reason`, never hidden. Every route that starts a generation (`/generate`, `/generate/stream`, retry and regenerate) refuses it with a 400 and the same reason, before any model load or download. Only an engine that declares accelerators without `cpu` can reach this path. No registered engine does today: VoxCPM2 declares `cpu`, and the other engines declare no accelerators.
 
 ### Voice design
 
@@ -729,7 +729,7 @@ The defaults are voxcpm 2.0.3's own. The bounds are the recommended ranges from 
 
 - `app/src/lib/api/types.ts`, `EngineModelSelector.tsx`, `useGenerationForm.ts` and `ModelManagement.tsx` got the usual entries.
 - `languages.ts` has **no** `ENGINE_LANGUAGES` entry for `voxcpm`. The app uses the declared `languages`.
-- `DownloadConfirmDialog.tsx` asks before the first download. It shows the size, the licence and any memory warning. It opens from the generate box and from Model Management.
+- `DownloadConfirmDialog.tsx` asks before the first download. It shows the size, the licence and any warning (memory or processor fallback). It opens from the generate box and from Model Management.
 
 ### Dependencies and bundling
 

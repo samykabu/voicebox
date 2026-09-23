@@ -144,7 +144,7 @@ Engines pick their device through `get_torch_device()` in `backends/base.py`, wh
 
 Qwen TTS uses MLX directly on Apple Silicon instead of going through PyTorch — see `mlx_backend.py`.
 
-VoxCPM2 allows MPS but not XPU or DirectML, because the vendor accepts only `cpu`, `mps` and `cuda`. It declares `accelerators=("cuda", "mps", "cpu")`, so on an XPU or DirectML machine it is reported unavailable (see the availability check in the flow below).
+VoxCPM2 allows MPS but not XPU or DirectML, because the vendor accepts only `cpu`, `mps` and `cuda`. It declares `accelerators=("cuda", "mps", "cpu")`. On an XPU or DirectML machine it stays available and runs on the processor, with the warning "VoxCPM2 (Multilingual, Voice Design) doesn't support Intel XPU here, so it will run on the processor, which is slower." See the availability check in the flow below.
 
 ## Generation Flow
 
@@ -171,7 +171,7 @@ The request path from frontend to audio file:
 
 2. **Route** — `routes/generate.py` validates input and delegates.
 
-   **Availability** — before any row change, model load or download, the route checks the engine against this machine (`ensure_engine_available()`). An engine whose declared `accelerators` do not include this machine's accelerator is refused with a 400. The detail is the reason, e.g. "… can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using Intel XPU." `/generate`, `/generate/stream`, retry and regenerate all check. Engines that declare no accelerators are never refused this way.
+   **Availability** — before any row change, model load or download, the route checks the engine against this machine (`ensure_engine_available()`). An engine whose declared `accelerators` include neither this machine's accelerator nor `cpu` is refused with a 400. The detail is the reason, e.g. "… can't run on this machine: it needs CUDA or Apple Silicon (MPS), but this machine is using Intel XPU." An engine that declares `cpu` is not refused. It runs on the processor with a warning. `/generate`, `/generate/stream`, retry and regenerate all check. Engines that declare no accelerators are never refused this way. No registered engine is refused today: VoxCPM2 declares `cpu`, and the others declare nothing.
 
 3. **Service** — `services/generation.py` fetches the profile, resolves the engine backend via `get_tts_backend_for_engine(engine)`, and ensures the model is loaded (downloading it on first use with live progress).
 

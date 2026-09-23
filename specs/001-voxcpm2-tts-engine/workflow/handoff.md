@@ -279,3 +279,4 @@ Follow-ups (pre-existing, not fixed here):
     - The Principle V checkboxes in engine-capabilities.md are still unchecked.
     - The Key Entities text now names a code field (supports_voice_design).
     - The tasks.md T054 detail and spec FR-026 still mention "non-persisted /speak" or "non-persisted API responses". This is dispatcher-owned task text and was left alone.
+- Analyze re-run N1–N7: the N4 test is in commit `39cdc3a` (4 tests, 0 failures; full suite 1073 tests / 1 failure (baseline) / 9 skipped). The docs fixes are by `af29b24ad9fb3a016`, plus the orchestrator's edit to gpu-acceleration.mdx for XPU and DirectML. Left as-is: overview/generating-speech.mdx:25 and introduction.mdx:65 ("an engine this computer can't run is greyed out"), which is still true for the mechanism.

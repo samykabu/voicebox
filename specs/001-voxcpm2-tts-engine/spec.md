@@ -55,7 +55,7 @@ A user on hardware that cannot run VoxCPM2 never gets to pick it and then hit a 
 
 **Why this priority**: P2. The engine runs on the processor and has an Apple Silicon path, so almost every machine can use it; this story protects the remaining machines that cannot load the model from a crash at the point of use. It was P1 while the engine was believed to exclude every Mac; the dependency probe disproved that and the user moved it to P2 at the T002 decision gate.
 
-**Independent Test**: Run the app on hardware the engine does not support and confirm the engine is visibly greyed out in the picker with a stated reason, not hidden, and that no generation attempt reaches a crash. Testable without cloning or voice design.
+**Independent Test**: Run the app on hardware the engine does not support and confirm the engine is visibly greyed out in the picker with a stated reason, not hidden, and that no generation attempt reaches a crash. Testable without cloning or voice design. On real hardware VoxCPM2 is never unavailable today, because it falls back to the processor, so the unavailable path is exercised with an injected engine configuration (see backend/tests/test_cpu_fallback.py and backend/tests/test_engine_capabilities.py).
 
 **Acceptance Scenarios**:
 
@@ -152,7 +152,7 @@ A user who wants a particular kind of voice but has nothing to clone from writes
 
 ### Key Entities
 
-- **Speech engine**: A named way of turning text into audio. Carries its own identity, display name, licence and commercial-use status, supported languages, download size, and — new with this feature — the hardware it can run on, whether it can clone, and whether it can design a voice from a written description (its voice-design capability, `supports_voice_design`).
+- **Speech engine**: A named way of turning text into audio. Carries its own identity, display name, licence and commercial-use status, supported languages, download size, and — new with this feature — the hardware it can run on, whether it can clone, and whether it can create a voice from a written description (its voice-design capability).
 - **Voice profile**: A user-created voice. Existing entity, with three sources: cloned (one or more reference audio clips and their transcripts), preset (a built-in voice of a specific engine), and designed (a written description, new in use with this feature, offered only for engines with the voice-design capability). This feature makes cloned and designed profiles usable with the new engine.
 - **Voice description**: A short written description of a desired voice, used in place of reference audio. It is either stored on a designed profile or supplied once with a generation. New with this feature.
 - **Prepared voice reference**: The reusable result of processing a profile's reference audio for a particular engine, kept so the same work is not repeated.

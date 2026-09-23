@@ -27,8 +27,10 @@
 - **Advanced settings.** Guidance and Quality steps can be tuned per
   generation. Retry, regenerate and `/speak` use the defaults, because these
   settings are not saved with a generation yet.
-- **Engines this machine can't run are greyed out** with the reason, instead of
-  failing later.
+- **On an Intel Arc (XPU) or DirectML machine, VoxCPM2 runs on the processor.**
+  The app says so next to the engine: it will work, but more slowly.
+- **An engine this machine can't run would be greyed out** with the reason,
+  instead of failing later. No engine is refused on real hardware today.
 - Once downloaded, VoxCPM2 loads offline.
 - VoxCPM2 is included in the desktop release builds and the Docker image.
 
@@ -53,8 +55,12 @@ All of these are additive. Existing requests and files keep working.
   `voice_description` and `advanced_settings`. Unknown or out-of-range
   settings return 422.
 - Generating with an engine this machine can't run returns 400 with the
-  reason. This applies only to engines that declare their hardware, which is
-  only VoxCPM2 today.
+  reason. This applies only to an engine that declares its hardware without
+  the processor (`cpu`). No engine does that today, so no engine is refused.
+- `warning` in `GET /models/engines` carries either a memory warning or a
+  processor-fallback message, such as "VoxCPM2 (Multilingual, Voice Design)
+  doesn't support Intel XPU here, so it will run on the processor, which is
+  slower."
 - Profile export manifests are now version 1.1, with `voice_type`,
   `design_prompt`, `default_engine`, `preset_engine` and `preset_voice_id`.
   Version 1.0 archives still import, as cloned profiles.
