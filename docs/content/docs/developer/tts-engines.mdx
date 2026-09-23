@@ -673,7 +673,7 @@ The dependency probe is in `specs/001-voxcpm2-tts-engine/evidence/probe.md`. The
   ```
 
   The cache check uses `weight_extensions=(".safetensors", ".pth", ".bin")`, because `audiovae.pth` is a weight file. Without `.pth` a fully cached model would look uncached. Once cached, the model loads with no HuggingFace or ModelScope requests.
-- **Generation.** `manual_seed(seed, device)` runs before the vendor call. The call passes `normalize=False`, so the vendor's text normalisation cannot undo the pronunciation dictionary's output, including its Arabic handling. `needs_trim=False` because the vendor trims silence itself. `retries_runaway=True` because the vendor retries runaway output (`retry_badcase=True`).
+- **Generation.** `manual_seed(seed, device)` runs before the vendor call. The call passes `normalize=False`, so the vendor's text normalisation cannot undo the pronunciation dictionary's output, including its Arabic handling. `needs_trim=False` because the vendor trims silence itself. `retries_runaway=False`: the vendor already retries runaway output (`retry_badcase=True`), so Voicebox adds no split-and-retry of its own. Loads and generations are serialised inside the backend (a load lock with a re-check, and an inference lock), because `/generate/stream` and `/models/download` run outside the generation queue.
 - **Unload.** Drops the model and calls `empty_device_cache(device)`.
 
 ### The capability channel
@@ -710,7 +710,9 @@ There are two ways to design a voice. Both reach the backend's `instruct` parame
 
 The backend encodes the description as the ASCII prefix `"(description)text"`. The probe found that full-width parentheses `（…）` are read aloud, so only ASCII parentheses work. A description in any language is accepted. Because VoxCPM2 declares `supports_instruct=False`, delivery instructions never reach it, and the delivery-instruction box stays off for it.
 
-Retry and regenerate do not store a one-off request description. They reuse a designed profile's saved description, because that comes from the profile.
+A one-off request description is stored with the generation (the nullable `generations.voice_description` column, only for engines with voice design), so retry and regenerate replay it. When none was given, a designed profile's saved description applies.
+
+Long designed text keeps one speaker. The backend defines `continuation_voice_prompt()`: chunk 0 is generated from the description, then its audio and text become the prompt for every later chunk.
 
 ### Advanced settings
 

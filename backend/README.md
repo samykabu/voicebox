@@ -153,8 +153,8 @@ Each entry describes the engine across all of its model variants:
 
 `POST /generate` accepts two optional fields, both defaulting to `null`, so existing callers are unaffected:
 
-- `voice_description`: up to 500 characters, for engines with `supports_voice_design`. It is never sent as `instruct`.
-- `advanced_settings`: an object mapping a setting name to a number. Only names the engine declares in `advanced_settings` are allowed, within their `min`/`max`. Anything else returns 422.
+- `voice_description`: up to 500 characters, for engines with `supports_voice_design`. It is never sent as `instruct`. It is stored with the generation (nullable `generations.voice_description`, added by an additive migration) so retry and regenerate replay it.
+- `advanced_settings`: an object mapping a setting name to a number. Only names the engine declares in `advanced_settings` are allowed, within their `min`/`max`. Anything else returns 422. With `"engine": null` the check runs against the profile's default engine.
 
 See [contracts/engine-capabilities.md](../specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md) for the full field contract.
 

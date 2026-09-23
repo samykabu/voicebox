@@ -189,6 +189,8 @@ The request path from frontend to audio file:
 
 Text longer than `max_chunk_chars` (default 800, range 100–5000) is split at sentence boundaries, generated in sequence, and crossfaded together. The chunking behavior is engine-agnostic — it lives in the service layer, not in individual backends.
 
+A backend may define `continuation_voice_prompt(voice_prompt, instruct, chunk_text, chunk_audio, sample_rate)`. After the first chunk, a returned prompt replaces the voice prompt for the remaining chunks, and `release_continuation_voice_prompt()` cleans it up afterwards. VoxCPM2 uses this in voice design: chunk 0 is generated from the description, then its audio and text become the prompt pair for every later chunk, so a long designed generation keeps one speaker. Cloned profiles keep their own reference for every chunk.
+
 ## Instruct Mode
 
 Two engines support natural-language delivery control via the `instruct` kwarg:
@@ -229,7 +231,7 @@ Precedence, in order:
 
 VoxCPM2 encodes the description as an ASCII prefix: `"(description)text"`. A description in any language is accepted.
 
-Retry and regenerate do not keep a one-off `voice_description`. A designed profile's own description is reused, because it comes from the profile. A description typed for one request is not.
+A one-off `voice_description` is stored with the generation (nullable `generations.voice_description`, only for engines with voice design), so retry and regenerate replay it. When none was stored, a designed profile's own description applies. For long text, see [Chunking for Long Text](#chunking-for-long-text): the designed speaker stays the same across chunks.
 
 ## Advanced Settings
 

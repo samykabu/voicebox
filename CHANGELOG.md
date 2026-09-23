@@ -24,6 +24,8 @@
   "Describe a voice" source, or type a one-off "Voice description" in the
   generate box. Any language works for the description. If the profile has a
   recording, the recording sets the voice and the description is not used.
+  Retry and regenerate reuse the description, and long text keeps the same
+  designed voice from start to finish.
 - **Advanced settings.** Guidance and Quality steps can be tuned per
   generation. Retry, regenerate and `/speak` use the defaults, because these
   settings are not saved with a generation yet.
