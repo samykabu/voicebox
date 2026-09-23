@@ -7,8 +7,6 @@ compared byte for byte with what the pre-T051 code path (``sf.write(..., format=
 writes, and the atomic temp-file write and its cleanup behave as before.
 """
 
-from __future__ import annotations
-
 import os
 import struct
 from pathlib import Path

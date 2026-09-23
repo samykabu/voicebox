@@ -698,7 +698,7 @@ The generation form now uses a flat model dropdown with engine-based routing. Pe
 
 ### 6. No Platform Gating on Models — NEW
 
-> **Fork update (2026-09-23):** partly resolved. `ModelConfig.accelerators` declares the hardware an engine runs on. `GET /models/engines` reports it with `available`, `reason` and an advisory memory `warning`. The app greys out an unavailable engine with the reason, and generation routes refuse it with a 400. Only VoxCPM2 declares accelerators so far; the other engines are still unconstrained.
+> **Fork update (2026-09-23):** partly resolved. `ModelConfig.accelerators` declares the hardware an engine runs on. `GET /models/engines` reports it with `available`, `reason` and an advisory `warning`. The warning is either a memory warning (CUDA) or, when an engine that declares the processor finds an accelerator it doesn't support (Intel XPU, DirectML), a note that it will run on the processor, which is slower. Only VoxCPM2 declares accelerators so far, and it declares the processor, so it is never refused; the other engines are still unconstrained. The greyed-out state and the 400 refusal remain for a future engine that declares no processor path.
 
 `ModelConfig` has no way to express hardware requirements. Every engine is shown to every user, regardless of whether it'll actually load. Users on non-CUDA platforms discover failure at load time (or not at all — some fall back silently to CPU and never complete). Blocks shipping CUDA-only engines (VoxCPM) and would improve the Intel Arc / ROCm / CPU-only UX today. See `ModelConfig` TODO: add `requires: list[Literal["cuda", "mps", "xpu", "cpu", "rocm"]]` or equivalent, plumb through `/models` API, render in `ModelManagement.tsx` + `EngineModelSelector.tsx`.
 

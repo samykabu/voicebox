@@ -8,8 +8,6 @@ helpers (device detection, seeding, cache emptying, progress tracking) are
 replaced on the backend module, following ``test_f5tts_backend.py``.
 """
 
-from __future__ import annotations
-
 import ast
 import contextlib
 import importlib

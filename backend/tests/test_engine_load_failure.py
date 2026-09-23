@@ -15,8 +15,6 @@ download is involved. History, profiles, pronunciation, the DB session, the audi
 save and the task manager are faked at the seams ``run_generation`` uses.
 """
 
-from __future__ import annotations
-
 from types import SimpleNamespace
 
 import numpy as np

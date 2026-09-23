@@ -11,8 +11,6 @@ tests cover what happens after validation:
 Every backend, database and model call is faked; nothing loads weights.
 """
 
-from __future__ import annotations
-
 from types import SimpleNamespace
 
 import numpy as np
