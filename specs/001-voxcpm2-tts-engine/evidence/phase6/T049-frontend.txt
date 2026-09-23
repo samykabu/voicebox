@@ -1,0 +1,130 @@
+# T049 frontend: "Describe a voice" profile source (FR-015a). Generated 2026-09-23T18:19+03:00
+Base: HEAD 2ade0e0 plus the T036 working-tree changes (see T036-frontend.txt).
+Test file: copy of the T036 scratch test file with T049 cases added at the end (final copy: T049-capability-logic.test.ts). It also imports isProfileCompatibleWithEngine from EngineModelSelector.tsx by absolute path; bun resolves the app's '@/...' aliases.
+i18n: same approach as T036. fallbackLng is 'en', so the keys were added to locales/en/translation.json only.
+
+## 1. RED run 1 (helpers not exported yet), timestamp 2026-09-23T18:14:43+03:00
+$ bun test <scratchpad>/t049/capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/t049/red1.xml
+SyntaxError: Export named 'voiceDesignEngineOptions' not found in module '.../engineCapabilityRules.ts'.
+0 pass / 1 fail / 1 error, exit=1. bun wrote no XML.
+
+## 2. RED run 2, timestamp 2026-09-23T18:14:53+03:00 (saved as T049-fe-red.xml)
+Setup: signature-only stubs that throw 'not implemented' for the three helpers, MAX_DESIGN_PROMPT_CHARS set to 0, and isProfileCompatibleWithEngine still at HEAD ('return true; // designed - future').
+Result: 44 pass, 11 fail, exit=1.
+### counts from T049-fe-red.xml
+capability-logic.test.ts: tests=55 failures=11 skipped=0
+T049 voiceDesignEngineOptions: tests=3 failures=3 skipped=0
+T049 pickVoiceDesignEngine: tests=3 failures=3 skipped=0
+T049 designPromptError: tests=3 failures=3 skipped=0
+T049 isProfileCompatibleWithEngine, designed profiles: tests=3 failures=2 skipped=0
+- The 2 failures are real behaviour failures against the HEAD 'return true'.
+- The third test (cloned and preset profiles unchanged) passes, as intended.
+All T019-T036 suites: failures=0.
+
+## 3. GREEN, final run timestamp 2026-09-23T18:17:40+03:00 (saved as T049-fe.xml), after the Biome format fix
+Result: 55 pass, 0 fail, exit=0.
+### counts from T049-fe.xml
+capability-logic.test.ts: tests=55 failures=0 skipped=0
+T020 6/0, T019 2/0, T022 3/0, T023 buildAdvancedSettingsPayload 5/0, T023 advancedSettingStep 1/0, T028 supportsCloning 4/0, T028 declaredCloningEngineOptions 3/0, T031 5/0, T032 3/0, T036 supportsVoiceDesign 1/0, T036 voiceDescriptionState 4/0, T036 buildVoiceDescriptionPayload 6/0
+T049 voiceDesignEngineOptions: tests=3 failures=0 skipped=0
+T049 pickVoiceDesignEngine: tests=3 failures=0 skipped=0
+T049 designPromptError: tests=3 failures=0 skipped=0
+T049 isProfileCompatibleWithEngine, designed profiles: tests=3 failures=0 skipped=0
+
+## 4. Typecheck, final, timestamp 2026-09-23T18:17:40+03:00
+$ bun run typecheck
+$ bunx tsc -p app/tsconfig.json --noEmit && cd web && bunx tsc --noEmit
+exit=0
+
+## 5. Biome, all touched files (T036 + T049) vs HEAD
+Same method as T036: LF copies of the working files and the HEAD blobs, each beside the repo's biome.json, checked with node_modules/.bin/biome check --vcs-enabled=false. The formatter's changes were compared by running format --write on a copy and diffing.
+- engineCapabilityRules.ts: the first pass showed one NEW format finding, a long object literal in voiceDesignEngineOptions' .map. It was fixed by hand, and 'biome check app/src/lib/hooks/engineCapabilityRules.ts' now exits 0: "Checked 1 file ... No fixes applied."
+- ProfileForm.tsx: HEAD 1 format error, working 1 format error. The formatter's changes are identical HEAD vs working, so the error is pre-existing.
+- EngineModelSelector.tsx: HEAD 1 format error, working 1 format error. Identical, pre-existing.
+- translation.json (en): HEAD 1, working 1. Identical, pre-existing.
+- FloatingGenerateBox.tsx: HEAD 1, working 1. Identical, pre-existing.
+- useGenerationForm.ts: clean in both.
+- There are no lint findings in any touched file.
+Result: no new Biome findings.
+
+## 6. No engine-name branching added
+$ git diff -U0 -- app/ | grep '^+' | grep -cE "=== *'(voxcpm|kokoro|qwen|chatterbox|luxtts|tada|f5_tts)'"
+0
+Rules:
+- The source is offered when voiceDesignEngineOptions(capabilities) is non-empty, i.e. some engine declares supports_voice_design.
+- The engine list, and therefore the selected engine, contains only engines that declare it.
+- isProfileCompatibleWithEngine's designed branch returns supportsVoiceDesign(capability).
+- Tests show that 'kokoro' with the flag is accepted and 'voxcpm' without it is rejected.
+
+## 7. UI flow and file:line (app/src/components/VoiceProfiles/ProfileForm.tsx unless noted)
+Helpers in app/src/lib/hooks/engineCapabilityRules.ts:
+- VoiceDesignEngineOption :189
+- voiceDesignEngineOptions :200. Engines declaring supports_voice_design, labelled with display_name, including availability.
+- pickVoiceDesignEngine :216. Keeps the current choice if it declares voice design, else the first available engine, else the first declared one, else ''.
+- MAX_DESIGN_PROMPT_CHARS = 2000 :225. Matches backend/models.py VoiceProfileCreate.design_prompt max_length=2000.
+- designPromptError :228. Returns 'required' when blank, 'tooLong' when over 2000 characters.
+
+State and derivation:
+- :162 voiceSource is now 'clone' | 'builtin' | 'design'.
+- :311-315 designEngineOptions and canDesignVoice.
+- :316-332 isDesignedProfile. For a designed profile (creating with the design source, or editing a designed profile), the Default Engine list shows only voice-design engines.
+- :336 designEngine = pickVoiceDesignEngine(designEngineOptions, defaultEngine).
+- :339-343 falls back to the 'clone' source if capabilities load with no voice-design engine.
+- :346-350 keeps defaultEngine on a voice-design engine while creating a designed profile.
+
+Schema:
+- :97 designPrompt: z.string().max(2000).optional(). It is required only for the design source; that check is in onSubmit.
+
+Source toggle:
+- :991-1005 third button "Describe a voice" (UserRoundPen icon :1001, text :1002).
+- It renders only when canDesignVoice (:991).
+
+Left panel for the design source (:1008-1057):
+- Hint (FormDescription) :1010: "Create a voice from a written description. No audio sample is needed."
+- Engine select :1012-1032. Lists only voice-design engines; unavailable ones are shown disabled.
+- The description is an RHF FormField named designPrompt (:1034-1055):
+  - label (FormLabel) "Voice description" :1039
+  - Textarea with maxLength 2000 :1041-1046
+  - helper text (FormDescription) :1049-1051: "Describe how the voice should sound: age, gender, tone, pace, accent. Any language works. Up to 2000 characters."
+  - FormMessage shows the validation error.
+- The right-column Default Engine select is disabled while creating with the design source (:1440), mirroring the built-in source.
+
+Validation and create payload (onSubmit, :609-657):
+- :611-624 validation with designPromptError. A blank prompt sets the form error "A voice description is required"; over 2000 characters sets "The voice description can be at most 2000 characters". The function then returns.
+- :626-634 create payload through the existing profile API:
+  createProfile.mutateAsync({ name, description, language, voice_type: 'designed', design_prompt: designPrompt.trim(), default_engine: designEngine || undefined, personality })
+  No sample upload follows.
+- Then an avatar upload if one was given, and the toast '"{name}" has been created from a description.'
+
+Editing a designed profile (:1278-1292):
+- Shows the design_prompt read-only, with the note "This profile's voice comes from the description above. The description can't be changed after creation; create a new profile to use a different one."
+- Reason it is not editable: backend/services/profiles.py update_profile (around :384-394) keeps the stored design_prompt and ignores the request's design_prompt. Editing it would need a backend change, which is outside this worker's scope.
+- Previously a designed profile showed the SampleList, which was empty.
+
+Engine compatibility:
+- app/src/components/Generation/EngineModelSelector.tsx:299. The designed branch is now 'return supportsVoiceDesign(capability);' (was 'return true; // designed - future').
+- The only caller is getAvailableOptions in the same file (:80), which passes findEngineCapability(capabilities, opt.engine). Typecheck is clean.
+- Effect: for a designed profile, the generate-box engine picker lists only engines declaring voice design, and the existing fallback effect (:195-203) switches to the first selectable one.
+- Before capabilities load, a designed profile briefly has no options (capability undefined gives false). The fallback does nothing when there are no options.
+
+i18n (app/src/i18n/locales/en/translation.json):
+- profileForm.source.design :247
+- profileForm.design.{hint,badge,note} :249-253
+- fields.designPrompt/designPromptPlaceholder/designPromptHint :274-276
+- validation.designPromptRequired/designPromptTooLong :299-300
+- toast.profileCreatedDesigned :333
+
+## 8. Consent and rights: what each source shows today. Observation only, no consent UI added (T037 human decision)
+- Clone from audio: the Upload / Record / System Audio tabs (ProfileForm.tsx:1116-1215, components AudioSampleUpload / AudioSampleRecording / AudioSampleSystem) and the Reference Text field (:1223).
+  - It shows no consent, rights, permission, or responsible-use text.
+  - grep -rin "consent|rights|permission" over app/src/components/VoiceProfiles and app/src/components/Generation finds nothing.
+  - The en locale's profileForm section has no such string.
+  - The only related text is the dialog description (:922, profileForm.createDescription): "Create a new voice profile from an audio sample or a built-in voice."
+- Describe a voice: shows only the hint (:1010), the field label (:1039) and the helper text (:1049-1051). It has no consent, rights, or AI-generated disclosure text either.
+- So today neither path carries a responsible-use acknowledgement or disclosure in the profile form. Whether to add one to both paths is the T037 review decision.
+- createDescription still names only the two older sources. I left it unchanged because the third source is conditional.
+
+## 9. Known limits / notes for the orchestrator
+- The draft saved when closing the create dialog (ProfileFormDraft in stores/uiStore.ts, not owned) has no designPrompt field. A typed description is not kept in the draft, and voiceSource is not saved in the draft either (pre-existing).
+- ProfileList.tsx (not owned) still shows designed profiles for every non-preset engine (p.voice_type !== 'preset'). It does not filter by voice-design capability.
+- FR-015a's second sentence (the profile's own description is used when the generation supplies none) is a backend concern. On the frontend, T036's voiceDescriptionState is 'active' for designed profiles, so an explicit description is sent when typed and omitted when blank.

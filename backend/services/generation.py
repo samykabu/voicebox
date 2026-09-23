@@ -67,6 +67,56 @@ def ensure_engine_available(engine: str) -> None:
         raise EngineUnavailableError(engine, availability.reason or f"{config.display_name} is unavailable.")
 
 
+def profile_design_prompt(voice_prompt) -> str | None:
+    """Return a designed profile's saved description from its voice prompt, else None (FR-015a).
+
+    ``profiles.create_voice_prompt_for_profile`` returns ``{"voice_type": "designed",
+    "design_prompt": ...}`` for a designed profile; any other prompt yields None.
+    """
+    if not isinstance(voice_prompt, dict) or voice_prompt.get("voice_type") != "designed":
+        return None
+    return voice_prompt.get("design_prompt") or None
+
+
+def resolve_backend_instruct(
+    engine: str,
+    instruct: str | None,
+    voice_description: str | None,
+    *,
+    profile_design_prompt: str | None = None,
+) -> str | None:
+    """Return what goes into the backend's ``instruct`` parameter for *engine* (FR-015).
+
+    Generic: reads the capability flags of the engine's default-size config, never its name.
+
+    * An engine declaring ``supports_voice_design`` gets the stripped written voice
+      description when one is given. Without one it gets the delivery ``instruct`` only if
+      it also declares ``supports_instruct``, so a delivery instruction never reaches an
+      engine that would encode it as a voice description (C1Q5). A blank request
+      description falls back to *profile_design_prompt*, a designed profile's saved
+      description (FR-015a).
+    * Every other engine, and any unknown engine, gets ``instruct`` unchanged and never the
+      description: exactly today's behaviour.
+
+    Precedence against reference audio (C1Q6) is the backend's job: it ignores the
+    description when the voice prompt carries a recording.
+    """
+    from ..backends import get_default_model_size, get_tts_model_configs
+
+    variants = [c for c in get_tts_model_configs() if c.engine == engine]
+    if not variants:
+        return instruct
+    default_size = get_default_model_size(engine)
+    config = next((c for c in variants if c.model_size == default_size), variants[0])
+    if not config.supports_voice_design:
+        return instruct
+
+    description = (voice_description or "").strip() or (profile_design_prompt or "").strip()
+    if description:
+        return description
+    return instruct if config.supports_instruct else None
+
+
 def engine_declares_advanced_settings(engine: str) -> bool:
     """Whether any model config of *engine* declares advanced settings (FR-010)."""
     from ..backends import get_tts_model_configs
@@ -123,6 +173,7 @@ async def run_generation(
     crossfade_ms: Optional[int] = None,
     version_id: Optional[str] = None,
     advanced_settings: dict[str, float] | None = None,
+    voice_description: str | None = None,
 ) -> None:
     """Execute TTS inference and persist the result.
 
@@ -172,7 +223,9 @@ async def run_generation(
         gen_kwargs: dict = dict(
             language=language,
             seed=seed if mode != "regenerate" else None,
-            instruct=instruct,
+            instruct=resolve_backend_instruct(
+                engine, instruct, voice_description, profile_design_prompt=profile_design_prompt(voice_prompt)
+            ),
             trim_fn=trim_fn,
             runaway_detector=runaway_detector,
         )
@@ -352,6 +405,7 @@ async def generate_audio_sync(
     normalize: bool = True,
     max_chunk_chars: Optional[int] = None,
     crossfade_ms: Optional[int] = None,
+    voice_description: str | None = None,
 ) -> bytes:
     """Run a TTS generation synchronously and return the resulting wav bytes.
 
@@ -398,7 +452,9 @@ async def generate_audio_sync(
     gen_kwargs: dict = dict(
         language=language,
         seed=seed,
-        instruct=instruct,
+        instruct=resolve_backend_instruct(
+            engine, instruct, voice_description, profile_design_prompt=profile_design_prompt(voice_prompt)
+        ),
         trim_fn=trim_fn,
         runaway_detector=runaway_detector,
     )

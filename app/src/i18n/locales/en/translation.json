@@ -237,13 +237,20 @@
   "profileForm": {
     "createTitle": "Create Voice",
     "editTitle": "Edit Voice",
-    "createDescription": "Create a new voice profile from an audio sample or a built-in voice.",
+    "createDescription": "Create a new voice profile from an audio sample, a built-in voice, or a written description.",
+    "responsibleUse": "Only create voices you have the right to use. See <link>Responsible Use</link>.",
     "editDescription": "Update your voice profile details and manage samples.",
     "draftRestored": "Draft restored",
     "discard": "Discard",
     "source": {
       "clone": "Clone from audio",
-      "builtin": "Built-in voice"
+      "builtin": "Built-in voice",
+      "design": "Describe a voice"
+    },
+    "design": {
+      "hint": "Create a voice from a written description. No audio sample is needed.",
+      "badge": "Designed Voice",
+      "note": "This profile's voice comes from the description above. The description can't be changed after creation; create a new profile to use a different one."
     },
     "builtin": {
       "hint": "Choose a pre-built voice. These don't require an audio sample.",
@@ -265,6 +272,9 @@
       "language": "Language",
       "referenceText": "Reference Text",
       "referenceTextPlaceholder": "Enter the exact text spoken in the audio…",
+      "designPrompt": "Voice description",
+      "designPromptPlaceholder": "e.g. A calm older woman with a low, warm voice",
+      "designPromptHint": "Describe how the voice should sound: age, gender, tone, pace, accent. Any language works. Up to 2000 characters.",
       "defaultEngine": "Default Engine",
       "noPreference": "No preference",
       "defaultEngineHint": "Auto-selects this engine when the profile is chosen.",
@@ -287,6 +297,8 @@
       "referenceRequired": "Reference text is required when adding a sample",
       "sampleRequired": "Audio sample is required",
       "referenceTextRequired": "Reference text is required",
+      "designPromptRequired": "A voice description is required",
+      "designPromptTooLong": "The voice description can be at most {{max}} characters",
       "audioTooLong": "Audio is too long ({{duration}}). Maximum duration is {{max}}.",
       "audioFailed": "Failed to validate audio file. Please try a different file."
     },
@@ -319,6 +331,7 @@
       "profileCreated": "Profile created",
       "profileCreatedBuiltin": "\"{{name}}\" has been created with a built-in voice.",
       "profileCreatedSample": "\"{{name}}\" has been created with a sample.",
+      "profileCreatedDesigned": "\"{{name}}\" has been created from a description.",
       "sampleRequired": "Audio sample required",
       "sampleRequiredDescription": "Please provide an audio sample to create the voice profile.",
       "referenceTextRequired": "Reference text required",
@@ -724,6 +737,12 @@
       "hide": "Hide delivery instructions",
       "tooltip": "Delivery instructions (tone, emotion, pace)",
       "placeholder": "Delivery instructions — e.g. Speak slowly with warmth, Authoritative and clear…"
+    },
+    "voiceDescription": {
+      "label": "Voice description",
+      "help": "Describe the voice to create, for example 'A calm older woman with a low, warm voice'. Any language works.",
+      "placeholder": "Describe the voice…",
+      "unused": "This profile has a voice recording, so the recording sets the voice and this description is not used."
     },
     "voiceSelector": {
       "placeholder": "Select a voice…"

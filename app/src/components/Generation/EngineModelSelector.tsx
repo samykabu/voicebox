@@ -22,6 +22,7 @@ import {
   engineNotice,
   isEngineSelectable,
   supportsCloning,
+  supportsVoiceDesign,
 } from '@/lib/hooks/engineCapabilityRules';
 import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
 import type { GenerationFormValues } from '@/lib/hooks/useGenerationForm';
@@ -294,5 +295,6 @@ export function isProfileCompatibleWithEngine(
   if (voiceType === 'cloned') {
     return supportsCloning(engine, capability, CLONING_ENGINES);
   }
-  return true; // designed — future
+  // Designed profiles fit only engines whose capability declares voice design (FR-015a).
+  return supportsVoiceDesign(capability);
 }

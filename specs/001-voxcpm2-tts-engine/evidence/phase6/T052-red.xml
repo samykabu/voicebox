@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="8" time="5.276" timestamp="2026-09-23T18:28:58.151533+03:00" hostname="DevelopmentPC"><testcase classname="tests.test_profile_export_provenance" name="test_export_manifest_contains_provenance_keys" time="2.043"><failure message="KeyError: 'voice_type'">test_db = &lt;sqlalchemy.orm.session.Session object at 0x000001F2C1981250&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_export_manifest_contains_0/data')
+reference_wav = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_export_manifest_contains_0/ref.wav')
+
+    @pytest.mark.asyncio
+    async def test_export_manifest_contains_provenance_keys(test_db, data_dir, reference_wav):
+        profile = await _cloned_with_sample(test_db, reference_wav)
+    
+        manifest = _manifest(export_profile_to_zip(profile.id, test_db))
+    
+        exported = manifest["profile"]
+&gt;       assert exported["voice_type"] == "cloned"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'voice_type'
+
+backend\tests\test_profile_export_provenance.py:117: KeyError</failure></testcase><testcase classname="tests.test_profile_export_provenance" name="test_cloned_round_trip_preserves_voice_type_and_default_engine" time="0.141"><failure message="AssertionError: assert None == 'voxcpm'&#10; +  where None = &lt;backend.database.models.VoiceProfile object at 0x000001F2F99A5520&gt;.default_engine">test_db = &lt;sqlalchemy.orm.session.Session object at 0x000001F2C22D82C0&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_cloned_round_trip_preserv0/data')
+reference_wav = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_cloned_round_trip_preserv0/ref.wav')
+
+    @pytest.mark.asyncio
+    async def test_cloned_round_trip_preserves_voice_type_and_default_engine(test_db, data_dir, reference_wav):
+        profile = await _cloned_with_sample(test_db, reference_wav)
+        zip_bytes = export_profile_to_zip(profile.id, test_db)
+    
+        imported = await import_profile_from_zip(zip_bytes, test_db)
+    
+        assert imported.id != profile.id
+        row = _db_profile(test_db, imported.id)
+        assert row.voice_type == "cloned"
+&gt;       assert row.default_engine == "voxcpm"
+E       AssertionError: assert None == 'voxcpm'
+E        +  where None = &lt;backend.database.models.VoiceProfile object at 0x000001F2F99A5520&gt;.default_engine
+
+backend\tests\test_profile_export_provenance.py:133: AssertionError</failure></testcase><testcase classname="tests.test_profile_export_provenance" name="test_designed_profile_without_samples_is_exportable" time="0.091"><failure message="ValueError: Profile ca8604dd-dc56-4239-9af2-28a7fd72fd57 has no samples">test_db = &lt;sqlalchemy.orm.session.Session object at 0x000001F2C22956A0&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_designed_profile_without_0/data')
+
+    @pytest.mark.asyncio
+    async def test_designed_profile_without_samples_is_exportable(test_db, data_dir):
+        profile = await _designed(test_db)
+    
+&gt;       manifest = _manifest(export_profile_to_zip(profile.id, test_db))
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_profile_export_provenance.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+profile_id = 'ca8604dd-dc56-4239-9af2-28a7fd72fd57'
+db = &lt;sqlalchemy.orm.session.Session object at 0x000001F2C22956A0&gt;
+
+    def export_profile_to_zip(profile_id: str, db: Session) -&gt; bytes:
+        """
+        Export a voice profile to a ZIP archive.
+    
+        Args:
+            profile_id: Profile ID to export
+            db: Database session
+    
+        Returns:
+            ZIP file contents as bytes
+    
+        Raises:
+            ValueError: If profile not found or has no samples
+        """
+        # Get profile
+        profile = db.query(DBVoiceProfile).filter_by(id=profile_id).first()
+        if not profile:
+            raise ValueError(f"Profile {profile_id} not found")
+    
+        # Get all samples
+        samples = db.query(DBProfileSample).filter_by(profile_id=profile_id).all()
+        if not samples:
+&gt;           raise ValueError(f"Profile {profile_id} has no samples")
+E           ValueError: Profile ca8604dd-dc56-4239-9af2-28a7fd72fd57 has no samples
+
+backend\services\export_import.py:67: ValueError</failure></testcase><testcase classname="tests.test_profile_export_provenance" name="test_designed_round_trip_restores_design_prompt_and_default_engine" time="0.090"><failure message="ValueError: Profile 55291f78-7c30-44c9-b1ed-04bbbcaa01a1 has no samples">test_db = &lt;sqlalchemy.orm.session.Session object at 0x000001F2C2295940&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_designed_round_trip_resto0/data')
+
+    @pytest.mark.asyncio
+    async def test_designed_round_trip_restores_design_prompt_and_default_engine(test_db, data_dir):
+        profile = await _designed(test_db)
+&gt;       zip_bytes = export_profile_to_zip(profile.id, test_db)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_profile_export_provenance.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+profile_id = '55291f78-7c30-44c9-b1ed-04bbbcaa01a1'
+db = &lt;sqlalchemy.orm.session.Session object at 0x000001F2C2295940&gt;
+
+    def export_profile_to_zip(profile_id: str, db: Session) -&gt; bytes:
+        """
+        Export a voice profile to a ZIP archive.
+    
+        Args:
+            profile_id: Profile ID to export
+            db: Database session
+    
+        Returns:
+            ZIP file contents as bytes
+    
+        Raises:
+            ValueError: If profile not found or has no samples
+        """
+        # Get profile
+        profile = db.query(DBVoiceProfile).filter_by(id=profile_id).first()
+        if not profile:
+            raise ValueError(f"Profile {profile_id} not found")
+    
+        # Get all samples
+        samples = db.query(DBProfileSample).filter_by(profile_id=profile_id).all()
+        if not samples:
+&gt;           raise ValueError(f"Profile {profile_id} has no samples")
+E           ValueError: Profile 55291f78-7c30-44c9-b1ed-04bbbcaa01a1 has no samples
+
+backend\services\export_import.py:67: ValueError</failure></testcase><testcase classname="tests.test_profile_export_provenance" name="test_preset_round_trip_restores_preset_fields" time="1.122"><failure message="ValueError: Profile b716ae39-9af8-41cc-9ce5-ff9b325bc36b has no samples">test_db = &lt;sqlalchemy.orm.session.Session object at 0x000001F2F99A4EF0&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_preset_round_trip_restore0/data')
+
+    @pytest.mark.asyncio
+    async def test_preset_round_trip_restores_preset_fields(test_db, data_dir):
+        profile = await create_profile(
+            VoiceProfileCreate(
+                name="Preset Voice",
+                language="en",
+                voice_type="preset",
+                preset_engine="kokoro",
+                preset_voice_id="af_alloy",
+            ),
+            test_db,
+        )
+&gt;       zip_bytes = export_profile_to_zip(profile.id, test_db)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_profile_export_provenance.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+profile_id = 'b716ae39-9af8-41cc-9ce5-ff9b325bc36b'
+db = &lt;sqlalchemy.orm.session.Session object at 0x000001F2F99A4EF0&gt;
+
+    def export_profile_to_zip(profile_id: str, db: Session) -&gt; bytes:
+        """
+        Export a voice profile to a ZIP archive.
+    
+        Args:
+            profile_id: Profile ID to export
+            db: Database session
+    
+        Returns:
+            ZIP file contents as bytes
+    
+        Raises:
+            ValueError: If profile not found or has no samples
+        """
+        # Get profile
+        profile = db.query(DBVoiceProfile).filter_by(id=profile_id).first()
+        if not profile:
+            raise ValueError(f"Profile {profile_id} not found")
+    
+        # Get all samples
+        samples = db.query(DBProfileSample).filter_by(profile_id=profile_id).all()
+        if not samples:
+&gt;           raise ValueError(f"Profile {profile_id} has no samples")
+E           ValueError: Profile b716ae39-9af8-41cc-9ce5-ff9b325bc36b has no samples
+
+backend\services\export_import.py:67: ValueError</failure></testcase><testcase classname="tests.test_profile_export_provenance" name="test_cloned_profile_without_samples_still_refuses_export" time="0.087" /><testcase classname="tests.test_profile_export_provenance" name="test_legacy_1_0_manifest_imports_as_cloned" time="0.120" /><testcase classname="tests.test_profile_export_provenance" name="test_import_rejects_designed_manifest_with_blank_prompt" time="0.085"><failure message="Failed: DID NOT RAISE ValueError">test_db = &lt;sqlalchemy.orm.session.Session object at 0x000001F2F99A7140&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_import_rejects_designed_m0/data')
+
+    @pytest.mark.asyncio
+    async def test_import_rejects_designed_manifest_with_blank_prompt(test_db, data_dir):
+        manifest = {
+            "version": "1.1",
+            "profile": {
+                "name": "Broken Design",
+                "description": None,
+                "language": "en",
+                "voice_type": "designed",
+                "design_prompt": "   ",
+                "default_engine": "voxcpm",
+            },
+            "has_avatar": False,
+        }
+    
+&gt;       with pytest.raises(ValueError, match="Designed profiles require a design_prompt"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+backend\tests\test_profile_export_provenance.py:235: Failed</failure></testcase></testsuite></testsuites>

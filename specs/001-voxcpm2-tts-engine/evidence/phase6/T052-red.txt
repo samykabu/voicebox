@@ -1,0 +1,342 @@
+# 2026-09-23T18:28:57+03:00
+# cwd: D:/Projects/Personal/voicebox
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_profile_export_provenance.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase6/T052-red.xml
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 8 items
+
+backend\tests\test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys FAILED [ 12%]
+backend\tests\test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine FAILED [ 25%]
+backend\tests\test_profile_export_provenance.py::test_designed_profile_without_samples_is_exportable FAILED [ 37%]
+backend\tests\test_profile_export_provenance.py::test_designed_round_trip_restores_design_prompt_and_default_engine FAILED [ 50%]
+backend\tests\test_profile_export_provenance.py::test_preset_round_trip_restores_preset_fields FAILED [ 62%]
+backend\tests\test_profile_export_provenance.py::test_cloned_profile_without_samples_still_refuses_export PASSED [ 75%]
+backend\tests\test_profile_export_provenance.py::test_legacy_1_0_manifest_imports_as_cloned PASSED [ 87%]
+backend\tests\test_profile_export_provenance.py::test_import_rejects_designed_manifest_with_blank_prompt FAILED [100%]
+
+================================== FAILURES ===================================
+________________ test_export_manifest_contains_provenance_keys ________________
+
+test_db = <sqlalchemy.orm.session.Session object at 0x000001F2C1981250>
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_export_manifest_contains_0/data')
+reference_wav = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_export_manifest_contains_0/ref.wav')
+
+    @pytest.mark.asyncio
+    async def test_export_manifest_contains_provenance_keys(test_db, data_dir, reference_wav):
+        profile = await _cloned_with_sample(test_db, reference_wav)
+    
+        manifest = _manifest(export_profile_to_zip(profile.id, test_db))
+    
+        exported = manifest["profile"]
+>       assert exported["voice_type"] == "cloned"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'voice_type'
+
+backend\tests\test_profile_export_provenance.py:117: KeyError
+_______ test_cloned_round_trip_preserves_voice_type_and_default_engine ________
+
+test_db = <sqlalchemy.orm.session.Session object at 0x000001F2C22D82C0>
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_cloned_round_trip_preserv0/data')
+reference_wav = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_cloned_round_trip_preserv0/ref.wav')
+
+    @pytest.mark.asyncio
+    async def test_cloned_round_trip_preserves_voice_type_and_default_engine(test_db, data_dir, reference_wav):
+        profile = await _cloned_with_sample(test_db, reference_wav)
+        zip_bytes = export_profile_to_zip(profile.id, test_db)
+    
+        imported = await import_profile_from_zip(zip_bytes, test_db)
+    
+        assert imported.id != profile.id
+        row = _db_profile(test_db, imported.id)
+        assert row.voice_type == "cloned"
+>       assert row.default_engine == "voxcpm"
+E       AssertionError: assert None == 'voxcpm'
+E        +  where None = <backend.database.models.VoiceProfile object at 0x000001F2F99A5520>.default_engine
+
+backend\tests\test_profile_export_provenance.py:133: AssertionError
+_____________ test_designed_profile_without_samples_is_exportable _____________
+
+test_db = <sqlalchemy.orm.session.Session object at 0x000001F2C22956A0>
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_designed_profile_without_0/data')
+
+    @pytest.mark.asyncio
+    async def test_designed_profile_without_samples_is_exportable(test_db, data_dir):
+        profile = await _designed(test_db)
+    
+>       manifest = _manifest(export_profile_to_zip(profile.id, test_db))
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_profile_export_provenance.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+profile_id = 'ca8604dd-dc56-4239-9af2-28a7fd72fd57'
+db = <sqlalchemy.orm.session.Session object at 0x000001F2C22956A0>
+
+    def export_profile_to_zip(profile_id: str, db: Session) -> bytes:
+        """
+        Export a voice profile to a ZIP archive.
+    
+        Args:
+            profile_id: Profile ID to export
+            db: Database session
+    
+        Returns:
+            ZIP file contents as bytes
+    
+        Raises:
+            ValueError: If profile not found or has no samples
+        """
+        # Get profile
+        profile = db.query(DBVoiceProfile).filter_by(id=profile_id).first()
+        if not profile:
+            raise ValueError(f"Profile {profile_id} not found")
+    
+        # Get all samples
+        samples = db.query(DBProfileSample).filter_by(profile_id=profile_id).all()
+        if not samples:
+>           raise ValueError(f"Profile {profile_id} has no samples")
+E           ValueError: Profile ca8604dd-dc56-4239-9af2-28a7fd72fd57 has no samples
+
+backend\services\export_import.py:67: ValueError
+_____ test_designed_round_trip_restores_design_prompt_and_default_engine ______
+
+test_db = <sqlalchemy.orm.session.Session object at 0x000001F2C2295940>
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_designed_round_trip_resto0/data')
+
+    @pytest.mark.asyncio
+    async def test_designed_round_trip_restores_design_prompt_and_default_engine(test_db, data_dir):
+        profile = await _designed(test_db)
+>       zip_bytes = export_profile_to_zip(profile.id, test_db)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_profile_export_provenance.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+profile_id = '55291f78-7c30-44c9-b1ed-04bbbcaa01a1'
+db = <sqlalchemy.orm.session.Session object at 0x000001F2C2295940>
+
+    def export_profile_to_zip(profile_id: str, db: Session) -> bytes:
+        """
+        Export a voice profile to a ZIP archive.
+    
+        Args:
+            profile_id: Profile ID to export
+            db: Database session
+    
+        Returns:
+            ZIP file contents as bytes
+    
+        Raises:
+            ValueError: If profile not found or has no samples
+        """
+        # Get profile
+        profile = db.query(DBVoiceProfile).filter_by(id=profile_id).first()
+        if not profile:
+            raise ValueError(f"Profile {profile_id} not found")
+    
+        # Get all samples
+        samples = db.query(DBProfileSample).filter_by(profile_id=profile_id).all()
+        if not samples:
+>           raise ValueError(f"Profile {profile_id} has no samples")
+E           ValueError: Profile 55291f78-7c30-44c9-b1ed-04bbbcaa01a1 has no samples
+
+backend\services\export_import.py:67: ValueError
+________________ test_preset_round_trip_restores_preset_fields ________________
+
+test_db = <sqlalchemy.orm.session.Session object at 0x000001F2F99A4EF0>
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_preset_round_trip_restore0/data')
+
+    @pytest.mark.asyncio
+    async def test_preset_round_trip_restores_preset_fields(test_db, data_dir):
+        profile = await create_profile(
+            VoiceProfileCreate(
+                name="Preset Voice",
+                language="en",
+                voice_type="preset",
+                preset_engine="kokoro",
+                preset_voice_id="af_alloy",
+            ),
+            test_db,
+        )
+>       zip_bytes = export_profile_to_zip(profile.id, test_db)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_profile_export_provenance.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+profile_id = 'b716ae39-9af8-41cc-9ce5-ff9b325bc36b'
+db = <sqlalchemy.orm.session.Session object at 0x000001F2F99A4EF0>
+
+    def export_profile_to_zip(profile_id: str, db: Session) -> bytes:
+        """
+        Export a voice profile to a ZIP archive.
+    
+        Args:
+            profile_id: Profile ID to export
+            db: Database session
+    
+        Returns:
+            ZIP file contents as bytes
+    
+        Raises:
+            ValueError: If profile not found or has no samples
+        """
+        # Get profile
+        profile = db.query(DBVoiceProfile).filter_by(id=profile_id).first()
+        if not profile:
+            raise ValueError(f"Profile {profile_id} not found")
+    
+        # Get all samples
+        samples = db.query(DBProfileSample).filter_by(profile_id=profile_id).all()
+        if not samples:
+>           raise ValueError(f"Profile {profile_id} has no samples")
+E           ValueError: Profile b716ae39-9af8-41cc-9ce5-ff9b325bc36b has no samples
+
+backend\services\export_import.py:67: ValueError
+___________ test_import_rejects_designed_manifest_with_blank_prompt ___________
+
+test_db = <sqlalchemy.orm.session.Session object at 0x000001F2F99A7140>
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-49/test_import_rejects_designed_m0/data')
+
+    @pytest.mark.asyncio
+    async def test_import_rejects_designed_manifest_with_blank_prompt(test_db, data_dir):
+        manifest = {
+            "version": "1.1",
+            "profile": {
+                "name": "Broken Design",
+                "description": None,
+                "language": "en",
+                "voice_type": "designed",
+                "design_prompt": "   ",
+                "default_engine": "voxcpm",
+            },
+            "has_avatar": False,
+        }
+    
+>       with pytest.raises(ValueError, match="Designed profiles require a design_prompt"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+backend\tests\test_profile_export_provenance.py:235: Failed
+============================== warnings summary ===============================
+backend\database\models.py:26
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+backend\models.py:33
+  D:\Projects\Personal\voicebox\backend\models.py:33: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(BaseModel):
+
+backend\models.py:69
+  D:\Projects\Personal\voicebox\backend\models.py:69: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ProfileSampleResponse(BaseModel):
+
+backend\models.py:146
+  D:\Projects\Personal\voicebox\backend\models.py:146: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationResponse(BaseModel):
+
+backend\models.py:211
+  D:\Projects\Personal\voicebox\backend\models.py:211: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationEntryResponse(BaseModel):
+
+backend\models.py:269
+  D:\Projects\Personal\voicebox\backend\models.py:269: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class HistoryResponse(BaseModel):
+
+backend\models.py:323
+  D:\Projects\Personal\voicebox\backend\models.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureResponse(BaseModel):
+
+backend\models.py:378
+  D:\Projects\Personal\voicebox\backend\models.py:378: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureSettingsResponse(BaseModel):
+
+backend\models.py:419
+  D:\Projects\Personal\voicebox\backend\models.py:419: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationSettingsResponse(BaseModel):
+
+backend\models.py:440
+  D:\Projects\Personal\voicebox\backend\models.py:440: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class MCPClientBindingResponse(BaseModel):
+
+backend\models.py:720
+  D:\Projects\Personal\voicebox\backend\models.py:720: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioChannelResponse(BaseModel):
+
+backend\models.py:752
+  D:\Projects\Personal\voicebox\backend\models.py:752: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+backend\models.py:766
+  D:\Projects\Personal\voicebox\backend\models.py:766: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+backend\models.py:798
+  D:\Projects\Personal\voicebox\backend\models.py:798: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+backend\models.py:906
+  D:\Projects\Personal\voicebox\backend\models.py:906: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+backend\models.py:920
+  D:\Projects\Personal\voicebox\backend\models.py:920: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+tests/test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys
+tests/test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine
+tests/test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine
+tests/test_profile_export_provenance.py::test_designed_profile_without_samples_is_exportable
+tests/test_profile_export_provenance.py::test_designed_round_trip_restores_design_prompt_and_default_engine
+tests/test_profile_export_provenance.py::test_preset_round_trip_restores_preset_fields
+tests/test_profile_export_provenance.py::test_cloned_profile_without_samples_still_refuses_export
+tests/test_profile_export_provenance.py::test_legacy_1_0_manifest_imports_as_cloned
+tests/test_profile_export_provenance.py::test_import_rejects_designed_manifest_with_blank_prompt
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:186: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+tests/test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys
+tests/test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine
+tests/test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine
+tests/test_profile_export_provenance.py::test_designed_profile_without_samples_is_exportable
+tests/test_profile_export_provenance.py::test_designed_round_trip_restores_design_prompt_and_default_engine
+tests/test_profile_export_provenance.py::test_preset_round_trip_restores_preset_fields
+tests/test_profile_export_provenance.py::test_cloned_profile_without_samples_still_refuses_export
+tests/test_profile_export_provenance.py::test_legacy_1_0_manifest_imports_as_cloned
+tests/test_profile_export_provenance.py::test_import_rejects_designed_manifest_with_blank_prompt
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:187: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    updated_at=datetime.utcnow(),
+
+tests/test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:16: DeprecationWarning: 'aifc' is deprecated and slated for removal in Python 3.13
+    import aifc
+
+tests/test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:17: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+tests/test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:19: DeprecationWarning: 'sunau' is deprecated and slated for removal in Python 3.13
+    import sunau
+
+tests/test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys
+tests/test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine
+tests/test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine
+tests/test_profile_export_provenance.py::test_legacy_1_0_manifest_imports_as_cloned
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:247: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    profile.updated_at = datetime.utcnow()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase6\T052-red.xml -
+=========================== short test summary info ===========================
+FAILED backend\tests\test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys
+FAILED backend\tests\test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine
+FAILED backend\tests\test_profile_export_provenance.py::test_designed_profile_without_samples_is_exportable
+FAILED backend\tests\test_profile_export_provenance.py::test_designed_round_trip_restores_design_prompt_and_default_engine
+FAILED backend\tests\test_profile_export_provenance.py::test_preset_round_trip_restores_preset_fields
+FAILED backend\tests\test_profile_export_provenance.py::test_import_rejects_designed_manifest_with_blank_prompt
+================== 6 failed, 2 passed, 41 warnings in 5.29s ===================

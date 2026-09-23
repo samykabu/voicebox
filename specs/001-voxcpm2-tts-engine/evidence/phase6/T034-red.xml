@@ -1,0 +1,679 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="22" skipped="0" tests="97" time="10.247" timestamp="2026-09-23T18:09:33.178530+03:00" hostname="DevelopmentPC"><testcase classname="tests.test_voxcpm_backend" name="test_load_model_is_idempotent" time="2.057" /><testcase classname="tests.test_voxcpm_backend" name="test_load_model_disables_the_modelscope_denoiser" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_load_model_passes_an_explicit_device_from_our_policy" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_cached_model_loads_with_local_files_only" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_uncached_model_may_download" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_load_runs_inside_model_load_progress[True]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_load_runs_inside_model_load_progress[False]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_returns_the_array_and_the_model_runtime_sample_rate" time="0.007" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_keeps_upstream_normalization_off" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_seed_is_applied_before_the_vendor_call_and_never_forwarded" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_no_seed_means_no_manual_seed" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_passes_the_prompt_pair_together" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_without_reference_passes_neither_prompt_key[None]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_without_reference_passes_neither_prompt_key[voice_prompt1]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_rejects_half_a_prompt_pair[voice_prompt0]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_rejects_half_a_prompt_pair[voice_prompt1]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_rejects_half_a_prompt_pair[voice_prompt2]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_uses_declared_defaults_without_options" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_maps_advanced_options" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_partial_options_fall_back_per_setting" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_description_becomes_the_ascii_paren_prefix_without_reference" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_description_is_inactive_when_reference_audio_is_present" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_blank_voice_description_adds_no_prefix[None]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_blank_voice_description_adds_no_prefix[]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_blank_voice_description_adds_no_prefix[   ]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_unload_empties_the_device_cache_and_reports_unloaded" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_unload_when_not_loaded_is_a_no_op" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_reload_after_unload_loads_again" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_model_path_is_the_hf_repo" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_is_model_cached_recognises_pth_weights" time="0.005" /><testcase classname="tests.test_voxcpm_backend" name="test_is_model_cached_recognises_safetensors_weights" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_is_model_cached_rejects_incomplete_downloads" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_prompt_carries_the_audio_path_and_transcript" time="0.007" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_prompt_is_served_from_the_engine_scoped_cache" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_prompt_without_cache_writes_nothing" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_prompt_requires_a_transcript" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_combine_voice_prompts_delegates_to_the_shared_helper" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_prompt_key_is_the_prefixed_shared_cache_key" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_real_cache_returns_the_pair_and_reports_cached_on_the_second_call" time="0.010" /><testcase classname="tests.test_voxcpm_backend" name="test_real_cache_does_not_serve_another_engines_entry" time="0.005" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[None]" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt1]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt2]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt3]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt4]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt5]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt6]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt7]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_a_created_prompt_reaches_the_vendor_as_a_complete_pair" time="0.005" /><testcase classname="tests.test_voxcpm_backend" name="test_combine_rate_is_the_profiles_save_rate" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_combine_passes_the_named_constant_not_a_literal" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_combine_delegate_is_the_shared_base_helper" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_multi_clip_prompt_is_combined_and_then_used_by_generate" time="1.343" /><testcase classname="tests.test_voxcpm_backend" name="test_same_seed_gives_identical_output" time="0.007" /><testcase classname="tests.test_voxcpm_backend" name="test_different_seed_gives_different_output" time="0.006" /><testcase classname="tests.test_voxcpm_backend" name="test_voxcpm_is_a_cloning_engine" time="0.261" /><testcase classname="tests.test_voxcpm_backend" name="test_cloned_profile_with_voxcpm_passes_profile_validation" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_module_has_no_top_level_heavy_import" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_import_is_marked_lazy" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_importing_and_constructing_the_backend_does_not_import_the_vendor" time="2.415" /><testcase classname="tests.test_voxcpm_backend" name="test_engine_is_registered_by_name" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_model_config_declares_the_data_model_values" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_model_config_declares_the_two_advanced_settings" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_backend_defaults_match_the_declared_settings" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_default_model_size_is_default" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_dispatch_returns_the_voxcpm_backend" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_dispatch_does_not_import_the_vendor" time="2.713" /><testcase classname="tests.test_voxcpm_backend" name="test_all_four_engine_patterns_accept_voxcpm" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_generation_request_accepts_the_declared_advanced_settings" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_cached_load_succeeds_with_the_network_blocked" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_cached_load_runs_inside_force_offline_if_cached" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_cached_load_passes_local_files_only_and_no_denoiser" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_offline_mode_is_restored_after_the_cached_load" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_uncached_load_is_not_forced_offline" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_pronunciation_processed_arabic_reaches_the_vendor_byte_for_byte" time="0.007" /><testcase classname="tests.test_voxcpm_backend" name="test_service_description_only_becomes_the_voxcpm_prefix" time="0.003"><failure message="TypeError: run_generation() got an unexpected keyword argument 'voice_description'">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CBE78B60&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x00000157CBE786B0&gt;
+design_service = namespace(backend=&lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CBE78B60&gt;, voice_prompt={}, statuses=[])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000157CBE780E0&gt;
+
+    @pytest.mark.asyncio
+    async def test_service_description_only_becomes_the_voxcpm_prefix(
+        backend, recorder: _Recorder, design_service, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        """Description only -&gt; the backend's instruct is the description; the vendor text is "(description)text"."""
+        seen_instruct = _spy_instruct(backend, monkeypatch)
+        design_service.backend = backend
+    
+&gt;       await _run_design("voxcpm", voice_description=f"  {DESCRIPTION}  ")
+
+backend\tests\test_voxcpm_backend.py:1281: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm', text = 'Hello there.', language = 'en'
+kwargs = {'voice_description': '  An old man, deep, slow and raspy voice  '}
+
+    async def _run_design(engine: str, *, text: str = "Hello there.", language: str = "en", **kwargs) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       await generation_service.run_generation(
+            generation_id="gen-design",
+            profile_id="profile-1",
+            text=text,
+            language=language,
+            engine=engine,
+            model_size="default",
+            seed=None,
+            mode="generate",
+            **kwargs,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'voice_description'
+
+backend\tests\test_voxcpm_backend.py:1247: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_delivery_instruct_never_reaches_voxcpm" time="0.650"><failure message="AssertionError: assert ['whisper'] == [None]&#10;  &#10;  At index 0 diff: 'whisper' != None&#10;  &#10;  Full diff:&#10;    [&#10;  -     None,&#10;  +     'whisper',&#10;    ]">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CBE7A6F0&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x00000157CBE7B530&gt;
+design_service = namespace(backend=&lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CBE7A6F0&gt;, voice_prompt={}, statuses=[('loading_model', None), ('generating', None), ('completed', None)])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000157CBE7B470&gt;
+
+    @pytest.mark.asyncio
+    async def test_service_delivery_instruct_never_reaches_voxcpm(
+        backend, recorder: _Recorder, design_service, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        """A delivery instruction alone is dropped for VoxCPM2 (supports_instruct=False, C1Q5)."""
+        seen_instruct = _spy_instruct(backend, monkeypatch)
+        design_service.backend = backend
+    
+        await _run_design("voxcpm", instruct=DELIVERY)
+    
+        assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+&gt;       assert seen_instruct == [None]
+E       AssertionError: assert ['whisper'] == [None]
+E         
+E         At index 0 diff: 'whisper' != None
+E         
+E         Full diff:
+E           [
+E         -     None,
+E         +     'whisper',
+E           ]
+
+backend\tests\test_voxcpm_backend.py:1302: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_description_wins_over_delivery_instruct_for_voxcpm" time="0.002"><failure message="TypeError: run_generation() got an unexpected keyword argument 'voice_description'">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CBE7B6E0&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x00000157CBE7A810&gt;
+design_service = namespace(backend=&lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CBE7B6E0&gt;, voice_prompt={}, statuses=[])
+
+    @pytest.mark.asyncio
+    async def test_service_description_wins_over_delivery_instruct_for_voxcpm(
+        backend, recorder: _Recorder, design_service
+    ) -&gt; None:
+        design_service.backend = backend
+    
+&gt;       await _run_design("voxcpm", instruct=DELIVERY, voice_description=DESCRIPTION)
+
+backend\tests\test_voxcpm_backend.py:1315: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm', text = 'Hello there.', language = 'en'
+kwargs = {'instruct': 'whisper', 'voice_description': 'An old man, deep, slow and raspy voice'}
+
+    async def _run_design(engine: str, *, text: str = "Hello there.", language: str = "en", **kwargs) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       await generation_service.run_generation(
+            generation_id="gen-design",
+            profile_id="profile-1",
+            text=text,
+            language=language,
+            engine=engine,
+            model_size="default",
+            seed=None,
+            mode="generate",
+            **kwargs,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'voice_description'
+
+backend\tests\test_voxcpm_backend.py:1247: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_neither_gives_plain_text_for_voxcpm" time="0.002"><failure message="TypeError: run_generation() got an unexpected keyword argument 'voice_description'">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CD0F6FF0&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x00000157CD0F70B0&gt;
+design_service = namespace(backend=&lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CD0F6FF0&gt;, voice_prompt={}, statuses=[])
+
+    @pytest.mark.asyncio
+    async def test_service_neither_gives_plain_text_for_voxcpm(backend, recorder: _Recorder, design_service) -&gt; None:
+        design_service.backend = backend
+    
+&gt;       await _run_design("voxcpm", voice_description=None)
+
+backend\tests\test_voxcpm_backend.py:1327: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm', text = 'Hello there.', language = 'en'
+kwargs = {'voice_description': None}
+
+    async def _run_design(engine: str, *, text: str = "Hello there.", language: str = "en", **kwargs) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       await generation_service.run_generation(
+            generation_id="gen-design",
+            profile_id="profile-1",
+            text=text,
+            language=language,
+            engine=engine,
+            model_size="default",
+            seed=None,
+            mode="generate",
+            **kwargs,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'voice_description'
+
+backend\tests\test_voxcpm_backend.py:1247: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_existing_engines_keep_instruct_and_drop_the_description[qwen_custom_voice]" time="0.002"><failure message="TypeError: run_generation() got an unexpected keyword argument 'voice_description'">design_service = namespace(backend=&lt;backend.tests.test_voxcpm_backend._KwargsBackend object at 0x00000157CD0F7320&gt;, voice_prompt={}, statuses=[])
+engine = 'qwen_custom_voice'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", ["qwen_custom_voice", "qwen", "kokoro"])
+    async def test_service_existing_engines_keep_instruct_and_drop_the_description(design_service, engine) -&gt; None:
+        """Regression guard: existing engines receive the delivery instruct unchanged and never the description."""
+        design_service.backend = _KwargsBackend()
+    
+&gt;       await _run_design(engine, instruct=DELIVERY, voice_description=DESCRIPTION)
+
+backend\tests\test_voxcpm_backend.py:1339: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'qwen_custom_voice', text = 'Hello there.', language = 'en'
+kwargs = {'instruct': 'whisper', 'voice_description': 'An old man, deep, slow and raspy voice'}
+
+    async def _run_design(engine: str, *, text: str = "Hello there.", language: str = "en", **kwargs) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       await generation_service.run_generation(
+            generation_id="gen-design",
+            profile_id="profile-1",
+            text=text,
+            language=language,
+            engine=engine,
+            model_size="default",
+            seed=None,
+            mode="generate",
+            **kwargs,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'voice_description'
+
+backend\tests\test_voxcpm_backend.py:1247: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_existing_engines_keep_instruct_and_drop_the_description[qwen]" time="0.002"><failure message="TypeError: run_generation() got an unexpected keyword argument 'voice_description'">design_service = namespace(backend=&lt;backend.tests.test_voxcpm_backend._KwargsBackend object at 0x00000157CD135B20&gt;, voice_prompt={}, statuses=[])
+engine = 'qwen'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", ["qwen_custom_voice", "qwen", "kokoro"])
+    async def test_service_existing_engines_keep_instruct_and_drop_the_description(design_service, engine) -&gt; None:
+        """Regression guard: existing engines receive the delivery instruct unchanged and never the description."""
+        design_service.backend = _KwargsBackend()
+    
+&gt;       await _run_design(engine, instruct=DELIVERY, voice_description=DESCRIPTION)
+
+backend\tests\test_voxcpm_backend.py:1339: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'qwen', text = 'Hello there.', language = 'en'
+kwargs = {'instruct': 'whisper', 'voice_description': 'An old man, deep, slow and raspy voice'}
+
+    async def _run_design(engine: str, *, text: str = "Hello there.", language: str = "en", **kwargs) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       await generation_service.run_generation(
+            generation_id="gen-design",
+            profile_id="profile-1",
+            text=text,
+            language=language,
+            engine=engine,
+            model_size="default",
+            seed=None,
+            mode="generate",
+            **kwargs,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'voice_description'
+
+backend\tests\test_voxcpm_backend.py:1247: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_existing_engines_keep_instruct_and_drop_the_description[kokoro]" time="0.002"><failure message="TypeError: run_generation() got an unexpected keyword argument 'voice_description'">design_service = namespace(backend=&lt;backend.tests.test_voxcpm_backend._KwargsBackend object at 0x00000157CD136810&gt;, voice_prompt={}, statuses=[])
+engine = 'kokoro'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", ["qwen_custom_voice", "qwen", "kokoro"])
+    async def test_service_existing_engines_keep_instruct_and_drop_the_description(design_service, engine) -&gt; None:
+        """Regression guard: existing engines receive the delivery instruct unchanged and never the description."""
+        design_service.backend = _KwargsBackend()
+    
+&gt;       await _run_design(engine, instruct=DELIVERY, voice_description=DESCRIPTION)
+
+backend\tests\test_voxcpm_backend.py:1339: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'kokoro', text = 'Hello there.', language = 'en'
+kwargs = {'instruct': 'whisper', 'voice_description': 'An old man, deep, slow and raspy voice'}
+
+    async def _run_design(engine: str, *, text: str = "Hello there.", language: str = "en", **kwargs) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       await generation_service.run_generation(
+            generation_id="gen-design",
+            profile_id="profile-1",
+            text=text,
+            language=language,
+            engine=engine,
+            model_size="default",
+            seed=None,
+            mode="generate",
+            **kwargs,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'voice_description'
+
+backend\tests\test_voxcpm_backend.py:1247: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_cloned_profile_ignores_the_description" time="0.004"><failure message="TypeError: run_generation() got an unexpected keyword argument 'voice_description'">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CD136F00&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x00000157CD137020&gt;
+design_service = namespace(backend=&lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CD136F00&gt;, voice_prompt={'prompt_...\\pytest-42\\test_service_cloned_profile_ig0\\reference.wav', 'prompt_text': 'The reference transcript.'}, statuses=[])
+reference_file = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-42/test_service_cloned_profile_ig0/reference.wav')
+
+    @pytest.mark.asyncio
+    async def test_service_cloned_profile_ignores_the_description(
+        backend, recorder: _Recorder, design_service, reference_file: Path
+    ) -&gt; None:
+        """Reference audio + description -&gt; cloned from audio with plain text, no prefix (C1Q6)."""
+        design_service.backend = backend
+        design_service.voice_prompt = _clone_prompt(reference_file)
+    
+&gt;       await _run_design("voxcpm", voice_description=DESCRIPTION)
+
+backend\tests\test_voxcpm_backend.py:1356: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm', text = 'Hello there.', language = 'en'
+kwargs = {'voice_description': 'An old man, deep, slow and raspy voice'}
+
+    async def _run_design(engine: str, *, text: str = "Hello there.", language: str = "en", **kwargs) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       await generation_service.run_generation(
+            generation_id="gen-design",
+            profile_id="profile-1",
+            text=text,
+            language=language,
+            engine=engine,
+            model_size="default",
+            seed=None,
+            mode="generate",
+            **kwargs,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'voice_description'
+
+backend\tests\test_voxcpm_backend.py:1247: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_english_description_with_arabic_text_is_encoded_byte_for_byte" time="0.002"><failure message="TypeError: run_generation() got an unexpected keyword argument 'voice_description'">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CD0F7860&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x00000157CD0F7B60&gt;
+design_service = namespace(backend=&lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CD0F7860&gt;, voice_prompt={}, statuses=[])
+
+    @pytest.mark.asyncio
+    async def test_service_english_description_with_arabic_text_is_encoded_byte_for_byte(
+        backend, recorder: _Recorder, design_service
+    ) -&gt; None:
+        """C1Q9: a description in another language than the text is accepted; no language check."""
+        from backend import models
+    
+        arabic = "مرحبا، هذا صوت مصمم من وصف مكتوب."
+        request = models.GenerationRequest(
+            profile_id="p1", text=arabic, language="ar", engine="voxcpm", voice_description=DESCRIPTION
+        )
+        assert request.voice_description == DESCRIPTION
+        design_service.backend = backend
+    
+&gt;       await _run_design(
+            "voxcpm", text=request.text, language=request.language, voice_description=request.voice_description
+        )
+
+backend\tests\test_voxcpm_backend.py:1380: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm', text = 'مرحبا، هذا صوت مصمم من وصف مكتوب.', language = 'ar'
+kwargs = {'voice_description': 'An old man, deep, slow and raspy voice'}
+
+    async def _run_design(engine: str, *, text: str = "Hello there.", language: str = "en", **kwargs) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       await generation_service.run_generation(
+            generation_id="gen-design",
+            profile_id="profile-1",
+            text=text,
+            language=language,
+            engine=engine,
+            model_size="default",
+            seed=None,
+            mode="generate",
+            **kwargs,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'voice_description'
+
+backend\tests\test_voxcpm_backend.py:1247: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[voxcpm-None-An old man, deep, slow and raspy voice-An old man, deep, slow and raspy voice]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'">engine = 'voxcpm', instruct = None
+description = 'An old man, deep, slow and raspy voice'
+expected = 'An old man, deep, slow and raspy voice'
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "expected"),
+        [
+            ("voxcpm", None, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, None),
+            ("voxcpm", DELIVERY, "   ", None),
+            ("voxcpm", DELIVERY, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", None, None, None),
+            ("qwen_custom_voice", DELIVERY, DESCRIPTION, DELIVERY),
+            ("qwen_custom_voice", None, DESCRIPTION, None),
+            ("qwen", DELIVERY, None, DELIVERY),
+            ("not-an-engine", DELIVERY, DESCRIPTION, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_table(engine, instruct, description, expected) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       assert generation_service.resolve_backend_instruct(engine, instruct, description) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'
+
+backend\tests\test_voxcpm_backend.py:1407: AttributeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[voxcpm-whisper-None-None]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'">engine = 'voxcpm', instruct = 'whisper', description = None, expected = None
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "expected"),
+        [
+            ("voxcpm", None, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, None),
+            ("voxcpm", DELIVERY, "   ", None),
+            ("voxcpm", DELIVERY, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", None, None, None),
+            ("qwen_custom_voice", DELIVERY, DESCRIPTION, DELIVERY),
+            ("qwen_custom_voice", None, DESCRIPTION, None),
+            ("qwen", DELIVERY, None, DELIVERY),
+            ("not-an-engine", DELIVERY, DESCRIPTION, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_table(engine, instruct, description, expected) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       assert generation_service.resolve_backend_instruct(engine, instruct, description) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'
+
+backend\tests\test_voxcpm_backend.py:1407: AttributeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[voxcpm-whisper-   -None]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'">engine = 'voxcpm', instruct = 'whisper', description = '   ', expected = None
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "expected"),
+        [
+            ("voxcpm", None, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, None),
+            ("voxcpm", DELIVERY, "   ", None),
+            ("voxcpm", DELIVERY, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", None, None, None),
+            ("qwen_custom_voice", DELIVERY, DESCRIPTION, DELIVERY),
+            ("qwen_custom_voice", None, DESCRIPTION, None),
+            ("qwen", DELIVERY, None, DELIVERY),
+            ("not-an-engine", DELIVERY, DESCRIPTION, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_table(engine, instruct, description, expected) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       assert generation_service.resolve_backend_instruct(engine, instruct, description) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'
+
+backend\tests\test_voxcpm_backend.py:1407: AttributeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[voxcpm-whisper-An old man, deep, slow and raspy voice-An old man, deep, slow and raspy voice]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'">engine = 'voxcpm', instruct = 'whisper'
+description = 'An old man, deep, slow and raspy voice'
+expected = 'An old man, deep, slow and raspy voice'
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "expected"),
+        [
+            ("voxcpm", None, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, None),
+            ("voxcpm", DELIVERY, "   ", None),
+            ("voxcpm", DELIVERY, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", None, None, None),
+            ("qwen_custom_voice", DELIVERY, DESCRIPTION, DELIVERY),
+            ("qwen_custom_voice", None, DESCRIPTION, None),
+            ("qwen", DELIVERY, None, DELIVERY),
+            ("not-an-engine", DELIVERY, DESCRIPTION, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_table(engine, instruct, description, expected) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       assert generation_service.resolve_backend_instruct(engine, instruct, description) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'
+
+backend\tests\test_voxcpm_backend.py:1407: AttributeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[voxcpm-None-None-None]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'">engine = 'voxcpm', instruct = None, description = None, expected = None
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "expected"),
+        [
+            ("voxcpm", None, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, None),
+            ("voxcpm", DELIVERY, "   ", None),
+            ("voxcpm", DELIVERY, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", None, None, None),
+            ("qwen_custom_voice", DELIVERY, DESCRIPTION, DELIVERY),
+            ("qwen_custom_voice", None, DESCRIPTION, None),
+            ("qwen", DELIVERY, None, DELIVERY),
+            ("not-an-engine", DELIVERY, DESCRIPTION, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_table(engine, instruct, description, expected) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       assert generation_service.resolve_backend_instruct(engine, instruct, description) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'
+
+backend\tests\test_voxcpm_backend.py:1407: AttributeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[qwen_custom_voice-whisper-An old man, deep, slow and raspy voice-whisper]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'">engine = 'qwen_custom_voice', instruct = 'whisper'
+description = 'An old man, deep, slow and raspy voice', expected = 'whisper'
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "expected"),
+        [
+            ("voxcpm", None, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, None),
+            ("voxcpm", DELIVERY, "   ", None),
+            ("voxcpm", DELIVERY, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", None, None, None),
+            ("qwen_custom_voice", DELIVERY, DESCRIPTION, DELIVERY),
+            ("qwen_custom_voice", None, DESCRIPTION, None),
+            ("qwen", DELIVERY, None, DELIVERY),
+            ("not-an-engine", DELIVERY, DESCRIPTION, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_table(engine, instruct, description, expected) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       assert generation_service.resolve_backend_instruct(engine, instruct, description) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'
+
+backend\tests\test_voxcpm_backend.py:1407: AttributeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[qwen_custom_voice-None-An old man, deep, slow and raspy voice-None]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'">engine = 'qwen_custom_voice', instruct = None
+description = 'An old man, deep, slow and raspy voice', expected = None
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "expected"),
+        [
+            ("voxcpm", None, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, None),
+            ("voxcpm", DELIVERY, "   ", None),
+            ("voxcpm", DELIVERY, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", None, None, None),
+            ("qwen_custom_voice", DELIVERY, DESCRIPTION, DELIVERY),
+            ("qwen_custom_voice", None, DESCRIPTION, None),
+            ("qwen", DELIVERY, None, DELIVERY),
+            ("not-an-engine", DELIVERY, DESCRIPTION, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_table(engine, instruct, description, expected) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       assert generation_service.resolve_backend_instruct(engine, instruct, description) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'
+
+backend\tests\test_voxcpm_backend.py:1407: AttributeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[qwen-whisper-None-whisper]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'">engine = 'qwen', instruct = 'whisper', description = None, expected = 'whisper'
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "expected"),
+        [
+            ("voxcpm", None, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, None),
+            ("voxcpm", DELIVERY, "   ", None),
+            ("voxcpm", DELIVERY, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", None, None, None),
+            ("qwen_custom_voice", DELIVERY, DESCRIPTION, DELIVERY),
+            ("qwen_custom_voice", None, DESCRIPTION, None),
+            ("qwen", DELIVERY, None, DELIVERY),
+            ("not-an-engine", DELIVERY, DESCRIPTION, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_table(engine, instruct, description, expected) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       assert generation_service.resolve_backend_instruct(engine, instruct, description) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'
+
+backend\tests\test_voxcpm_backend.py:1407: AttributeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[not-an-engine-whisper-An old man, deep, slow and raspy voice-whisper]" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'">engine = 'not-an-engine', instruct = 'whisper'
+description = 'An old man, deep, slow and raspy voice', expected = 'whisper'
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "expected"),
+        [
+            ("voxcpm", None, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, None),
+            ("voxcpm", DELIVERY, "   ", None),
+            ("voxcpm", DELIVERY, DESCRIPTION, DESCRIPTION),
+            ("voxcpm", None, None, None),
+            ("qwen_custom_voice", DELIVERY, DESCRIPTION, DELIVERY),
+            ("qwen_custom_voice", None, DESCRIPTION, None),
+            ("qwen", DELIVERY, None, DELIVERY),
+            ("not-an-engine", DELIVERY, DESCRIPTION, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_table(engine, instruct, description, expected) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       assert generation_service.resolve_backend_instruct(engine, instruct, description) == expected
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'
+
+backend\tests\test_voxcpm_backend.py:1407: AttributeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_reads_capability_data_not_engine_names" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000157D4EDAF30&gt;
+
+    def test_resolve_backend_instruct_reads_capability_data_not_engine_names(monkeypatch: pytest.MonkeyPatch) -&gt; None:
+        """A made-up engine that declares supports_voice_design gets the description: no name branching."""
+        import backend.backends as backends_pkg
+        from backend.backends import ModelConfig
+        from backend.services import generation as generation_service
+    
+        real_configs = backends_pkg.get_tts_model_configs()
+        designer = ModelConfig(
+            model_name="fake-designer",
+            display_name="Fake Designer",
+            engine="fake_designer",
+            hf_repo_id="example/fake-designer",
+            supports_voice_design=True,
+            supports_instruct=True,
+        )
+        silent = ModelConfig(
+            model_name="fake-silent-designer",
+            display_name="Fake Silent Designer",
+            engine="fake_silent_designer",
+            hf_repo_id="example/fake-silent-designer",
+            supports_voice_design=True,
+            supports_instruct=False,
+        )
+        # voxcpm redeclared without voice design: it must then behave like any existing engine.
+        plain_voxcpm = ModelConfig(model_name="voxcpm2", display_name="VoxCPM2", engine="voxcpm", hf_repo_id="openbmb/VoxCPM2")
+        configs = [c for c in real_configs if c.engine != "voxcpm"] + [designer, silent, plain_voxcpm]
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", lambda: configs)
+    
+&gt;       resolve = generation_service.resolve_backend_instruct
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'resolve_backend_instruct'
+
+backend\tests\test_voxcpm_backend.py:1438: AttributeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_generate_audio_sync_applies_the_same_mapping" time="0.002"><failure message="TypeError: generate_audio_sync() got an unexpected keyword argument 'voice_description'">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CD0F7650&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x00000157CD0F70B0&gt;
+design_service = namespace(backend=&lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CD0F7650&gt;, voice_prompt={}, statuses=[])
+
+    @pytest.mark.asyncio
+    async def test_generate_audio_sync_applies_the_same_mapping(backend, recorder: _Recorder, design_service) -&gt; None:
+        from backend.services import generation as generation_service
+    
+        design_service.backend = backend
+    
+&gt;       await generation_service.generate_audio_sync(
+            profile_id="p1",
+            text="Hello there.",
+            language="en",
+            engine="voxcpm",
+            model_size="default",
+            instruct=DELIVERY,
+            voice_description=DESCRIPTION,
+        )
+E       TypeError: generate_audio_sync() got an unexpected keyword argument 'voice_description'
+
+backend\tests\test_voxcpm_backend.py:1452: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_generate_route_forwards_voice_description_to_the_service" time="0.026"><failure message="KeyError: 'voice_description'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000157CD0F7890&gt;
+
+    @pytest.mark.asyncio
+    async def test_generate_route_forwards_voice_description_to_the_service(monkeypatch: pytest.MonkeyPatch) -&gt; None:
+        from types import SimpleNamespace
+    
+        from backend import models
+        from backend.routes import generations as routes_mod
+    
+        captured: dict = {}
+        created: dict = {}
+    
+        async def fake_get_profile(*_a, **_k):
+            return SimpleNamespace(default_engine=None, preset_engine=None, personality=None, effects_chain=None)
+    
+        async def fake_create_generation(**kwargs):
+            created.update(kwargs)
+            return SimpleNamespace(id=kwargs["generation_id"])
+    
+        def fake_run_generation(**kwargs):
+            captured.update(kwargs)
+            return "job"
+    
+        class FakeQuery:
+            def filter_by(self, **_k):
+                return self
+    
+            def first(self):
+                return None
+    
+        fake_db = SimpleNamespace(query=lambda *_a: FakeQuery())
+    
+        monkeypatch.setattr(routes_mod.profiles, "get_profile", fake_get_profile)
+        monkeypatch.setattr(routes_mod.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+        monkeypatch.setattr(routes_mod.history, "create_generation", fake_create_generation)
+        monkeypatch.setattr(routes_mod, "run_generation", fake_run_generation)
+        monkeypatch.setattr(routes_mod, "enqueue_generation", lambda *_a, **_k: None)
+        monkeypatch.setattr(routes_mod, "_require_available_engine", lambda _engine: None)
+    
+        data = models.GenerationRequest(
+            profile_id="p1", text="Hello.", engine="voxcpm", instruct=DELIVERY, voice_description=DESCRIPTION
+        )
+        await routes_mod.generate_speech(data, db=fake_db)
+    
+&gt;       assert captured["voice_description"] == DESCRIPTION
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'voice_description'
+
+backend\tests\test_voxcpm_backend.py:1510: KeyError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_stream_route_encodes_the_description_and_drops_delivery_for_voxcpm" time="0.005"><failure message="AssertionError: assert ['(whisper)He...isper)Hello.'] == ['(An old man...o.', 'Hello.']&#10;  &#10;  At index 0 diff: '(whisper)Hello.' != '(An old man, deep, slow and raspy voice)Hello.'&#10;  &#10;  Full diff:&#10;    [&#10;  -     '(An old man, deep, slow and raspy voice)Hello.',&#10;  -     'Hello.',...&#10;  &#10;  ...Full output truncated (3 lines hidden), use '-vv' to show">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000157CE2A5C10&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x00000157CE2A5E50&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000157CE2A5D90&gt;
+
+    @pytest.mark.asyncio
+    async def test_stream_route_encodes_the_description_and_drops_delivery_for_voxcpm(
+        backend, recorder: _Recorder, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        from types import SimpleNamespace
+    
+        import backend.backends as backends_pkg
+        from backend import models
+        from backend.routes import generations as routes_mod
+    
+        async def fake_get_profile(*_a, **_k):
+            return SimpleNamespace(default_engine=None, preset_engine=None, personality=None, effects_chain=None)
+    
+        async def noop(*_a, **_k):
+            return None
+    
+        async def fake_voice_prompt(*_a, **_k):
+            return {}
+    
+        monkeypatch.setattr(routes_mod.profiles, "get_profile", fake_get_profile)
+        monkeypatch.setattr(routes_mod.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+        monkeypatch.setattr(routes_mod.profiles, "create_voice_prompt_for_profile", fake_voice_prompt)
+        monkeypatch.setattr(routes_mod.pronunciation, "apply_pronunciations", lambda text, *_a, **_k: (text, []))
+        monkeypatch.setattr(routes_mod, "_require_available_engine", lambda _engine: None)
+        monkeypatch.setattr(backends_pkg, "get_tts_backend_for_engine", lambda _engine: backend)
+        monkeypatch.setattr(backends_pkg, "ensure_model_cached_or_raise", noop)
+        monkeypatch.setattr(backends_pkg, "load_engine_model", noop)
+    
+        with_description = models.GenerationRequest(
+            profile_id="p1", text="Hello.", engine="voxcpm", instruct=DELIVERY, voice_description=DESCRIPTION
+        )
+        delivery_only = models.GenerationRequest(profile_id="p1", text="Hello.", engine="voxcpm", instruct=DELIVERY)
+        await routes_mod.stream_speech(with_description, db=None)
+        await routes_mod.stream_speech(delivery_only, db=None)
+    
+&gt;       assert [c["text"] for c in recorder.generate_calls] == [f"({DESCRIPTION})Hello.", "Hello."]
+E       AssertionError: assert ['(whisper)He...isper)Hello.'] == ['(An old man...o.', 'Hello.']
+E         
+E         At index 0 diff: '(whisper)Hello.' != '(An old man, deep, slow and raspy voice)Hello.'
+E         
+E         Full diff:
+E           [
+E         -     '(An old man, deep, slow and raspy voice)Hello.',
+E         -     'Hello.',...
+E         
+E         ...Full output truncated (3 lines hidden), use '-vv' to show
+
+backend\tests\test_voxcpm_backend.py:1551: AssertionError</failure></testcase></testsuite></testsuites>

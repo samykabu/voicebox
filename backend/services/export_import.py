@@ -42,6 +42,20 @@ def _get_unique_profile_name(name: str, db: Session) -> str:
         counter += 1
 
 
+# Manifest 1.1 adds provenance (FR-027): voice_type, design_prompt,
+# default_engine, and the preset engine/voice id that preset profiles need
+# to be valid. Import still accepts 1.0 manifests, which lack these fields.
+PROFILE_MANIFEST_VERSION = "1.1"
+
+PROVENANCE_FIELDS = (
+    "voice_type",
+    "preset_engine",
+    "preset_voice_id",
+    "design_prompt",
+    "default_engine",
+)
+
+
 def export_profile_to_zip(profile_id: str, db: Session) -> bytes:
     """
     Export a voice profile to a ZIP archive.
@@ -54,16 +68,19 @@ def export_profile_to_zip(profile_id: str, db: Session) -> bytes:
         ZIP file contents as bytes
         
     Raises:
-        ValueError: If profile not found or has no samples
+        ValueError: If profile not found, or a cloned profile has no samples
     """
     # Get profile
     profile = db.query(DBVoiceProfile).filter_by(id=profile_id).first()
     if not profile:
         raise ValueError(f"Profile {profile_id} not found")
-    
-    # Get all samples
+
+    voice_type = profile.voice_type or "cloned"
+
+    # Get all samples. Only cloned profiles depend on reference audio; designed
+    # and preset profiles are fully described by their metadata.
     samples = db.query(DBProfileSample).filter_by(profile_id=profile_id).all()
-    if not samples:
+    if not samples and voice_type == "cloned":
         raise ValueError(f"Profile {profile_id} has no samples")
     
     # Create ZIP in memory
@@ -82,11 +99,16 @@ def export_profile_to_zip(profile_id: str, db: Session) -> bytes:
 
         # Create manifest.json
         manifest = {
-            "version": "1.0",
+            "version": PROFILE_MANIFEST_VERSION,
             "profile": {
                 "name": profile.name,
                 "description": profile.description,
                 "language": profile.language,
+                "voice_type": voice_type,
+                "preset_engine": profile.preset_engine,
+                "preset_voice_id": profile.preset_voice_id,
+                "design_prompt": profile.design_prompt,
+                "default_engine": profile.default_engine,
             },
             "has_avatar": has_avatar,
         }
@@ -168,13 +190,26 @@ async def import_profile_from_zip(file_bytes: bytes, db: Session) -> VoiceProfil
             original_name = profile_data.get("name", "Imported Profile")
             unique_name = _get_unique_profile_name(original_name, db)
             
+            # Restore provenance (FR-027) when the manifest carries it. Older
+            # 1.0 manifests have none of these keys and import as cloned with
+            # no default engine, as before. create_profile validates the
+            # combination and raises ValueError on an invalid one (e.g. a
+            # designed profile with a blank design_prompt) rather than
+            # silently downgrading it.
+            provenance = {
+                field: profile_data[field]
+                for field in PROVENANCE_FIELDS
+                if profile_data.get(field) is not None
+            }
+
             # Create profile
             profile_create = VoiceProfileCreate(
                 name=unique_name,
                 description=profile_data.get("description"),
                 language=profile_data.get("language", "en"),
+                **provenance,
             )
-            
+
             profile = await create_profile(profile_create, db)
 
             # Extract and add samples

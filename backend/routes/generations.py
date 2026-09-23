@@ -17,6 +17,8 @@ from ..services.generation import (
     EngineUnavailableError,
     backend_with_generation_options,
     ensure_engine_available,
+    profile_design_prompt,
+    resolve_backend_instruct,
     run_generation,
 )
 from ..services.task_queue import cancel_generation as cancel_generation_job, enqueue_generation
@@ -160,6 +162,7 @@ async def generate_speech(
             max_chunk_chars=data.max_chunk_chars,
             crossfade_ms=data.crossfade_ms,
             advanced_settings=data.advanced_settings,
+            voice_description=data.voice_description,
         )
     )
 
@@ -402,7 +405,12 @@ async def stream_speech(
         voice_prompt,
         language=data.language,
         seed=data.seed,
-        instruct=data.instruct,
+        instruct=resolve_backend_instruct(
+            engine,
+            data.instruct,
+            data.voice_description,
+            profile_design_prompt=profile_design_prompt(voice_prompt),
+        ),
         max_chunk_chars=data.max_chunk_chars,
         crossfade_ms=data.crossfade_ms,
         trim_fn=trim_fn,

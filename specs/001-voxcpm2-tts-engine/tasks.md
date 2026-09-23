@@ -86,35 +86,35 @@ beneath it.
 
 ### Tests for User Story 1
 
-- [ ] T014 [TDD] [US1] Test the VoxCPM2 backend contract in backend/tests/test_voxcpm_backend.py
+- [x] T014 [TDD] [US1] Test the VoxCPM2 backend contract in backend/tests/test_voxcpm_backend.py
   - Write `backend/tests/test_voxcpm_backend.py` with a fake `voxcpm` module injected into `sys.modules`, following `test_f5tts_backend.py`. Assert, per [contracts/tts-backend-protocol.md](./contracts/tts-backend-protocol.md): `load_model` is idempotent, passes `load_denoiser=False`, passes an explicit device (never `"auto"`), and runs inside `model_load_progress`; `generate` returns `(ndarray, model.tts_model.sample_rate)` — the fake uses a non-48000 rate so a hardcoded literal fails; `normalize=False` is passed; `manual_seed` is applied before the vendor call and no `seed` argument reaches the vendor (voxcpm 2.0.3 has none; research R5 correction); no heavy import happens at module import time; `unload_model` calls `empty_device_cache` and leaves `is_loaded()` false; `_is_model_cached` recognises `.pth` as well as `.safetensors`. Watch it fail. **Covers**: FR-006, FR-009, FR-016, FR-017.
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Create backend/backends/voxcpm_backend.py (load, generate, unload)
+- [x] T015 [US1] Create backend/backends/voxcpm_backend.py (load, generate, unload)
   - Create `backend/backends/voxcpm_backend.py` modelled on `luxtts_backend.py` with the three deviations in research R7: runtime sample rate, explicit device from `get_torch_device(allow_mps=True, ...)`, and a transcript-carrying voice prompt. Implement `load_model`, `generate`, `unload_model`, `is_loaded`, `_get_model_path`, `_is_model_cached`. T014 passes. **Covers**: FR-006, FR-016, FR-017.
-- [ ] T016 [US1] Register VoxCPM2 in TTS_ENGINES, the model configs and the backend dispatcher
+- [x] T016 [US1] Register VoxCPM2 in TTS_ENGINES, the model configs and the backend dispatcher
   - Register the engine in `backend/backends/__init__.py`: `"voxcpm": "VoxCPM2"` in `TTS_ENGINES` (line 214); the `ModelConfig` from [data-model.md](./data-model.md) §1 in `_get_non_qwen_tts_configs()` (line 296), using the probe's size, language list and accelerators, with `supports_instruct=False`, `supports_voice_design=True`, `requires_download_confirmation=True` and the two declared `advanced_settings`; the lazy-import dispatch branch in `get_tts_backend_for_engine()` (line 798). **Covers**: FR-001, FR-005, FR-007.
-- [ ] T017 [P] [US1] [SUBAGENT] Add VoxCPM2 hidden imports and data files to backend/build_binary.py
+- [x] T017 [P] [US1] [SUBAGENT] Add VoxCPM2 hidden imports and data files to backend/build_binary.py
   - Add `voxcpm` hidden imports and data collection to `backend/build_binary.py`, mirroring the `kokoro` (line 276) and `f5_tts` (line 310) entries. Account for `torchcodec` and its FFmpeg shared libraries (research R4). **Covers**: FR-020.
-- [ ] T018 [P] [US1] Add 'voxcpm' to the engine union in app/src/lib/api/types.ts
+- [x] T018 [P] [US1] Add 'voxcpm' to the engine union in app/src/lib/api/types.ts
   - Add `'voxcpm'` to the engine union in `app/src/lib/api/types.ts` (hand-written). **Covers**: FR-001.
-- [ ] T019 [US1] Add VoxCPM2 to the engine picker in EngineModelSelector.tsx
+- [x] T019 [US1] Add VoxCPM2 to the engine picker in EngineModelSelector.tsx
   - Add the VoxCPM2 option to `ENGINE_OPTIONS` in `app/src/components/Generation/EngineModelSelector.tsx`. Registration is the only per-engine line allowed; any availability or capability decision reads `useEngineCapabilities`, never the engine name (FR-004). **Covers**: FR-001, FR-004.
-- [ ] T020 [US1] Read VoxCPM2 languages from its capability declaration in languages.ts
+- [x] T020 [US1] Read VoxCPM2 languages from its capability declaration in languages.ts
   - Make `getLanguageOptionsForEngine` in `app/src/lib/constants/languages.ts` prefer the engine's declared `languages` from `useEngineCapabilities` when present, falling back to the existing hardcoded map for the seven unmigrated engines (FR-007, FR-024). **Covers**: FR-007, FR-024.
-- [ ] T021 [P] [US1] Wire VoxCPM2 through useGenerationForm, FloatingGenerateBox and format.ts
+- [x] T021 [P] [US1] Wire VoxCPM2 through useGenerationForm, FloatingGenerateBox and format.ts
   - Wire the engine through `app/src/lib/hooks/useGenerationForm.ts`, `app/src/components/Generation/FloatingGenerateBox.tsx` and `app/src/lib/utils/format.ts` (display name, engine label). **Covers**: FR-001.
-- [ ] T022 [US1] Show VoxCPM2 licence, size and a download confirmation in ModelManagement.tsx
+- [x] T022 [US1] Show VoxCPM2 licence, size and a download confirmation in ModelManagement.tsx
   - Add a VoxCPM2 entry to the model description map in `app/src/components/ServerSettings/ModelManagement.tsx` (around line 76) stating Apache-2.0 and commercial use (FR-005). Show the download size and require confirmation before starting the VoxCPM2 download in `app/src/components/ServerSettings/ModelManagement.tsx` (FR-018, C1Q7). Driven by the capability's `requires_download_confirmation`, never the engine name. **Covers**: FR-005, FR-016, FR-018.
-- [ ] T023 [US1] Expose VoxCPM2 advanced generation settings from its declaration
+- [x] T023 [US1] Expose VoxCPM2 advanced generation settings from its declaration
   - Render advanced controls from the capability's `advanced_settings` with each default preselected (FR-010, C1Q8), send them as the request's `advanced_settings`, pass them as the optional `options` argument only to engines that declare settings (in `backend/services/generation.py`), and apply them in `voxcpm_backend.generate` with declared defaults as fallback. Bounds come from T001. **Covers**: FR-010.
-- [ ] T024 [US1] Verify Arabic generation respects the pronunciation dictionary
+- [x] T024 [US1] Verify Arabic generation respects the pronunciation dictionary
   - Verify Arabic end to end: add a case to `backend/tests/test_voxcpm_backend.py` proving pronunciation-dictionary-processed text reaches the vendor unchanged with `normalize=False`, then generate Arabic manually per quickstart Step 3 and record the result in `specs/001-voxcpm2-tts-engine/evidence/`. Confirms FR-008 does not regress the PR #11 diacritics work. **Covers**: FR-007, FR-008.
 
-- [ ] T046 [TDD] [US1] Test that a cached VoxCPM2 model loads with the network blocked
+- [x] T046 [TDD] [US1] Test that a cached VoxCPM2 model loads with the network blocked
   - Add an offline-load test to `backend/tests/test_voxcpm_backend.py`: with `_is_model_cached()` true and every socket connection patched to fail, `load_model` succeeds, runs inside `force_offline_if_cached`, and the fake vendor records no HuggingFace or ModelScope resolution. Watch it fail. **Covers**: constitution Principle I.
-- [ ] T047 [US1] Load VoxCPM2 offline from the local HuggingFace cache only
+- [x] T047 [US1] Load VoxCPM2 offline from the local HuggingFace cache only
   - Wrap the cached load in `force_offline_if_cached(True, "VoxCPM2")` from `backend/utils/hf_offline_patch.py` and resolve the model from the local HuggingFace cache only, never the ModelScope hub, in `backend/backends/voxcpm_backend.py`. T046 passes; confirm manually with [quickstart.md](./quickstart.md) Step 2b. **Covers**: constitution Principle I.
 
 **Checkpoint**: VoxCPM2 selectable, downloads with confirmation and progress, generates in English and Arabic. MVP.
@@ -127,13 +127,13 @@ beneath it.
 
 **Independent Test**: [quickstart.md](./quickstart.md) Step 4.
 
-- [ ] T025 [TDD] [US2] Test VoxCPM2 voice prompt caching, pairing and seeding
+- [x] T025 [TDD] [US2] Test VoxCPM2 voice prompt caching, pairing and seeding
   - Extend `backend/tests/test_voxcpm_backend.py`: `create_voice_prompt` uses the `"voxcpm_"` cache-key prefix, returns both `prompt_wav_path` and `prompt_text`, and reports `was_cached=True` on the second call; `generate` never passes exactly one of the pair (the vendor raises); `combine_voice_prompts` uses the model's encode rate, not a literal; the same seed produces identical fake output. Watch it fail. **Covers**: FR-009, FR-011, FR-012, FR-013.
-- [ ] T026 [US2] Implement VoxCPM2 voice prompts, multi-clip combining and seeding
+- [x] T026 [US2] Implement VoxCPM2 voice prompts, multi-clip combining and seeding
   - Implement `create_voice_prompt`, `combine_voice_prompts` (delegating to the shared helper in `backends/base.py`) and seeding with `manual_seed` in `backend/backends/voxcpm_backend.py`. T025 passes. **Covers**: FR-009, FR-011, FR-012, FR-013.
-- [ ] T027 [P] [US2] Add voxcpm to CLONING_ENGINES in backend/services/profiles.py
+- [x] T027 [P] [US2] Add voxcpm to CLONING_ENGINES in backend/services/profiles.py
   - Add `voxcpm` to `CLONING_ENGINES` in `backend/services/profiles.py` (line 27) (FR-014). **Covers**: FR-014.
-- [ ] T028 [US2] Offer cloning profiles for VoxCPM2 from its capability declaration
+- [x] T028 [US2] Offer cloning profiles for VoxCPM2 from its capability declaration
   - Make profile/engine compatibility in `EngineModelSelector.tsx` and `app/src/components/VoiceProfiles/ProfileForm.tsx` offer cloning profiles for VoxCPM2 via the capability's `supports_cloning`, not the engine name. **Covers**: FR-011, FR-014.
 
 **Checkpoint**: cloning works for single- and multi-clip profiles; seeded runs are reproducible.
@@ -146,15 +146,15 @@ beneath it.
 
 **Independent Test**: [quickstart.md](./quickstart.md) Step 5.
 
-- [ ] T029 [TDD] [US3] Test that generation refuses an unavailable engine with its reason
+- [x] T029 [TDD] [US3] Test that generation refuses an unavailable engine with its reason
   - Test that a generation request for an engine the resolver marks unavailable is refused with its stated reason before any model load, in `backend/tests/test_engine_capabilities.py`. The refusal must be generic — driven by the resolver, not an engine-name check in `backend/routes/`. Watch it fail. **Covers**: FR-003.
-- [ ] T030 [US3] Refuse generation for unavailable engines in the generation service
+- [x] T030 [US3] Refuse generation for unavailable engines in the generation service
   - Implement the generic refusal where generation requests are accepted (`backend/routes/generations.py` / `backend/services/generation.py`). T029 passes. **Covers**: FR-003.
-- [ ] T031 [US3] Show an unavailable engine greyed out with its reason in the picker
+- [x] T031 [US3] Show an unavailable engine greyed out with its reason in the picker
   - Render an unavailable engine greyed out with its `reason`, never hidden, and show `warning` when present, in `EngineModelSelector.tsx` (FR-003, C1Q3). **Covers**: FR-003.
-- [ ] T032 [US3] Warn about insufficient memory before the VoxCPM2 download
+- [x] T032 [US3] Warn about insufficient memory before the VoxCPM2 download
   - Surface the insufficient-memory `warning` before the download starts in `ModelManagement.tsx` — advisory only, never blocking (C1Q4). **Covers**: FR-003.
-- [ ] T033 [US3] Verify no engine-name capability branching for voxcpm in app and routes
+- [x] T033 [US3] Verify no engine-name capability branching for voxcpm in app and routes
   - Verify no hardware or capability branching on the engine name: `grep -rn "voxcpm" app/src backend/routes` must show only registration lines. Record the output in `specs/001-voxcpm2-tts-engine/evidence/` (FR-004, SC-009). **Covers**: FR-004.
 
 **Checkpoint**: forcing an unsupported device shows a greyed-out engine with a reason and no path to a crash.
@@ -167,14 +167,26 @@ beneath it.
 
 **Independent Test**: [quickstart.md](./quickstart.md) Step 6.
 
-- [ ] T034 [TDD] [US4] Test VoxCPM2 voice design precedence and encoding
+- [x] T034 [TDD] [US4] Test VoxCPM2 voice design precedence and encoding
   - Extend `backend/tests/test_voxcpm_backend.py` with the precedence table from [data-model.md](./data-model.md) §3: description only → the service passes `voice_description` into the backend's `instruct` parameter, which is encoded into `text` in the form confirmed by T001, and delivery-instruction text in `instruct` never reaches VoxCPM2; profile audio plus description → clone from audio and the description is **not** applied (C1Q6); description in a different language from the text → accepted (C1Q9). Watch it fail. **Covers**: FR-015.
-- [ ] T035 [US4] Implement voice_description mapping and voice design in the backend
+- [x] T035 [US4] Implement voice_description mapping and voice design in the backend
   - Map `voice_description` into the backend `instruct` parameter only for engines declaring `supports_voice_design` in `backend/services/generation.py`, and implement the encoding and precedence in `voxcpm_backend.generate`. T034 passes. **Covers**: FR-015.
-- [ ] T036 [US4] Add a labelled voice-description input to FloatingGenerateBox.tsx
+- [x] T036 [US4] Add a labelled voice-description input to FloatingGenerateBox.tsx
   - Add a distinct, clearly labelled voice-description input to `app/src/components/Generation/FloatingGenerateBox.tsx`, separate from the delivery-instruction field and shown only when the engine's `supports_voice_design` is true and sent as `voice_description`, never as `instruct` (FR-015, C1Q5). When a profile with reference audio is selected, state plainly that the description is not being used (C1Q6). **Covers**: FR-015.
 - [ ] T037 [REVIEW] [HUMAN-REVIEW] [US4] Consent and disclosure review of the voice design path (Principle II)
-  - Principle II consent review: confirm the voice-design path carries the same responsible-use acknowledgement and AI-generated disclosure affordances as the cloning path, since it creates a voice without the reference-audio step (plan.md Human Checkpoint 3). **Covers**: FR-015; constitution Principle II.
+  - Principle II consent review: confirm the voice-design path, including the new "Describe a voice" profile source (T049), carries the same responsible-use acknowledgement and AI-generated disclosure affordances as the cloning path, since it creates a voice without the reference-audio step (plan.md Human Checkpoint 3). **Covers**: FR-015; constitution Principle II.
+
+- [x] T048 [TDD] [US4] Use a designed profile's saved description when a request supplies none
+  - Test first, then implement in `backend/services/generation.py`: when the selected profile is designed (`voice_type` designed) and the request's `voice_description` is blank, pass the profile's `design_prompt` as the voice description, only for engines whose capability declares `supports_voice_design`. A request description always takes precedence; a profile with reference audio still wins over both (C1Q6). Other engines are unaffected. Report JUnit counts from XML. **Covers**: FR-015, FR-015a.
+- [x] T049 [US4] Add a "Describe a voice" source to the profile form
+  - In `app/src/components/VoiceProfiles/ProfileForm.tsx`, add a third source beside Clone and Built-in that creates a profile with `voice_type` designed and a required `design_prompt`, using the existing profile API. Offer it only when the selected engine's capability declares `supports_voice_design`; tighten the designed branch of `isProfileCompatibleWithEngine` in `EngineModelSelector.tsx` to the same capability. No engine-name branching. Add i18n strings. `bun run typecheck` and Biome clean on touched files. **Covers**: FR-015a.
+
+- [ ] T050 [US4] Show a responsible-use acknowledgement in the profile dialog for every source
+  - In `app/src/components/VoiceProfiles/ProfileForm.tsx` near the dialog description (about line 922; `en` translation `createDescription` about line 240), show one sentence for all three sources (clone, built-in, describe): "Only create voices you have the right to use. See Responsible Use." Link to the Responsible Use guidance. Update `createDescription` to mention the describe source. i18n key in the `en` locale. `bun run typecheck` and Biome clean on touched files. **Covers**: FR-025.
+- [ ] T051 [TDD] Tag every saved audio file as AI-generated
+  - Test first, then implement at the single save point `backend/utils/audio.py` (`save_audio`, about line 97): write an "AI-generated by Voicebox" disclosure into the WAV metadata (e.g. an INFO comment/software tag via soundfile), for every engine. Verify by reading the tag back from a saved file. Existing callers and output audio samples must be unchanged apart from the metadata. JUnit counts from XML. **Covers**: FR-026.
+- [ ] T052 [TDD] Preserve profile provenance through export and import
+  - Test first, then change `backend/services/export_import.py`: the manifest (about lines 84-92) carries `voice_type`, `design_prompt` and `default_engine`; import (about lines 170-177) restores them instead of rebuilding as cloned; a designed profile with no samples can be exported (about lines 65-67). Older manifests without these fields still import as before. Round-trip tests for cloned and designed profiles. JUnit counts from XML. **Covers**: FR-027.
 
 **Checkpoint**: voice design works and has passed the consent review.
 

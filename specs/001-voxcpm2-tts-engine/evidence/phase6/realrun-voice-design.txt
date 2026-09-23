@@ -1,0 +1,150 @@
+# Phase 6 real voice-design run (T035, quickstart Step 6): resolve_backend_instruct + VoxCPMBackend direct, backend/venv, CUDA, no server, nothing installed.
+# HF_HUB_OFFLINE=1 / TRANSFORMERS_OFFLINE=1 set: the model loaded from the default HF cache with no network.
+# WAVs written outside the repo to C:\Users\sabus\voxcpm-probe-out\phase6\. Peak CUDA memory includes model load (stats reset before load_model).
+# Whether the voice matches the description (an old man, deep, slow and raspy) NEEDS A HUMAN LISTEN; not judged here.
+# tqdm progress-bar lines removed; everything else verbatim.
+
+===== script: <scratchpad>/phase6/phase6_voice_design.py =====
+"""Phase 6 real voice-design run (T035 / quickstart Step 6): resolve helper + VoxCPMBackend on CUDA."""
+
+import asyncio
+import hashlib
+import os
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+# The model is already in the default HF cache; prove loading needs no network.
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+
+sys.path.insert(0, r"D:\Projects\Personal\voicebox")
+
+import numpy as np  # noqa: E402
+import soundfile as sf  # noqa: E402
+import torch  # noqa: E402
+
+from backend import config  # noqa: E402
+
+OUT = Path(r"C:\Users\sabus\voxcpm-probe-out\phase6")
+OUT.mkdir(parents=True, exist_ok=True)
+config.set_data_dir(OUT / "data")  # keep any cache writes outside the repo
+
+from backend.backends.voxcpm_backend import VoxCPMBackend  # noqa: E402
+from backend.services.generation import resolve_backend_instruct  # noqa: E402
+from backend.utils.audio import save_audio  # noqa: E402
+
+ENGINE = "voxcpm"
+DELIVERY = "whisper softly"
+DESCRIPTION = "An old man, deep, slow and raspy voice"
+SEED = 42
+CASES = [
+    ("design_en_seed42", "Hello, this voice was designed from a written description."),
+    ("design_ar_seed42", "مرحبا، هذا صوت مصمم من وصف مكتوب."),
+]
+
+
+def sha(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+async def main() -> None:
+    print(f"# {datetime.now().isoformat(timespec='seconds')}")
+    print(f"torch={torch.__version__} cuda_available={torch.cuda.is_available()} device0={torch.cuda.get_device_name(0)}")
+    print(f"HF_HUB_OFFLINE={os.environ['HF_HUB_OFFLINE']}")
+
+    resolved = resolve_backend_instruct(ENGINE, DELIVERY, DESCRIPTION)
+    print(f"resolve_backend_instruct({ENGINE!r}, instruct={DELIVERY!r}, voice_description={DESCRIPTION!r}) -> {resolved!r}")
+    print(f"resolve_backend_instruct({ENGINE!r}, instruct={DELIVERY!r}, voice_description=None) -> "
+          f"{resolve_backend_instruct(ENGINE, DELIVERY, None)!r}")
+    assert resolved == DESCRIPTION
+
+    b = VoxCPMBackend()
+    torch.cuda.reset_peak_memory_stats()
+    t0 = time.perf_counter()
+    await b.load_model()
+    load_s = time.perf_counter() - t0
+    print(f"device={b.device} load_s={load_s:.2f} output_rate={int(b.model.tts_model.sample_rate)}")
+
+    captured: list[dict] = []
+    real_generate = b.model.generate
+
+    def capturing_generate(**kwargs):
+        captured.append(dict(kwargs))
+        return real_generate(**kwargs)
+
+    b.model.generate = capturing_generate
+
+    for label, text in CASES:
+        t0 = time.perf_counter()
+        audio, sr = await b.generate(text, {}, language="en", seed=SEED, instruct=resolved)
+        wall = time.perf_counter() - t0
+        path = OUT / f"{label}.wav"
+        save_audio(audio, str(path), sr)
+        info = sf.info(str(path))
+        duration = audio.shape[0] / sr
+        vendor = captured[-1]
+        vt = vendor["text"]
+        expected = f"({DESCRIPTION}){text}"
+        print(
+            f"{label}: wall_s={wall:.2f} samples={audio.shape[0]} returned_sr={sr} file_sr={info.samplerate} "
+            f"duration_s={duration:.3f} rtf={wall / duration:.3f} rms={float(np.sqrt(np.mean(audio**2))):.4f} "
+            f"file={path} sha256={sha(path)}"
+        )
+        print(f"  vendor text: {vt!r}")
+        print(f"  vendor text utf-8 hex: {vt.encode('utf-8').hex()}")
+        print(f"  vendor text == '(description)' + text byte for byte: {vt.encode('utf-8') == expected.encode('utf-8')}")
+        print(f"  delivery text present: {'whisper' in vt}; full-width brackets present: {'（' in vt or '）' in vt}")
+        print(f"  prompt_wav_path={vendor['prompt_wav_path']!r} prompt_text={vendor['prompt_text']!r} "
+              f"cfg_value={vendor['cfg_value']} inference_timesteps={vendor['inference_timesteps']} normalize={vendor['normalize']}")
+
+    print(f"peak_cuda_allocated_mb={torch.cuda.max_memory_allocated() / 2**20:.0f} "
+          f"peak_cuda_reserved_mb={torch.cuda.max_memory_reserved() / 2**20:.0f}")
+    b.unload_model()
+    print(f"unloaded is_loaded={b.is_loaded()}")
+    print("NOTE: whether the voice matches the description (old man, deep, slow, raspy) needs a human listen.")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+===== end script =====
+
+$ cd <scratchpad>/phase6 && PYTHONIOENCODING=utf-8 D:/Projects/Personal/voicebox/backend/venv/Scripts/python.exe phase6_voice_design.py
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+The class this function is called from is 'LlamaTokenizerFast'.
+D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cuda, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Warning: torch.compile disabled - triton is not installed
+Loaded VoxCPM2Model
+Warm up VoxCPMModel...
+# 2026-09-23T18:11:15
+torch=2.11.0+cu128 cuda_available=True device0=NVIDIA GeForce RTX 5070
+HF_HUB_OFFLINE=1
+resolve_backend_instruct('voxcpm', instruct='whisper softly', voice_description='An old man, deep, slow and raspy voice') -> 'An old man, deep, slow and raspy voice'
+resolve_backend_instruct('voxcpm', instruct='whisper softly', voice_description=None) -> None
+device=cuda load_s=13.89 output_rate=48000
+design_en_seed42: wall_s=5.10 samples=245760 returned_sr=48000 file_sr=48000 duration_s=5.120 rtf=0.996 rms=0.0657 file=C:\Users\sabus\voxcpm-probe-out\phase6\design_en_seed42.wav sha256=1ba044d6c610591aa0d4c224ae7ec1ae92d84ab4783a4c30f299231c4a80690a
+  vendor text: '(An old man, deep, slow and raspy voice)Hello, this voice was designed from a written description.'
+  vendor text utf-8 hex: 28416e206f6c64206d616e2c20646565702c20736c6f7720616e6420726173707920766f6963652948656c6c6f2c207468697320766f696365207761732064657369676e65642066726f6d2061207772697474656e206465736372697074696f6e2e
+  vendor text == '(description)' + text byte for byte: True
+  delivery text present: False; full-width brackets present: False
+  prompt_wav_path=None prompt_text=None cfg_value=2.0 inference_timesteps=10 normalize=False
+design_ar_seed42: wall_s=4.25 samples=215040 returned_sr=48000 file_sr=48000 duration_s=4.480 rtf=0.949 rms=0.0241 file=C:\Users\sabus\voxcpm-probe-out\phase6\design_ar_seed42.wav sha256=62330e349f630f18adbddacdff10b8d47be8ce8360ca36d81bf2f2c9d86ae05f
+  vendor text: '(An old man, deep, slow and raspy voice)مرحبا، هذا صوت مصمم من وصف مكتوب.'
+  vendor text utf-8 hex: 28416e206f6c64206d616e2c20646565702c20736c6f7720616e6420726173707920766f69636529d985d8b1d8add8a8d8a7d88c20d987d8b0d8a720d8b5d988d8aa20d985d8b5d985d98520d985d98620d988d8b5d98120d985d983d8aad988d8a82e
+  vendor text == '(description)' + text byte for byte: True
+  delivery text present: False; full-width brackets present: False
+  prompt_wav_path=None prompt_text=None cfg_value=2.0 inference_timesteps=10 normalize=False
+peak_cuda_allocated_mb=5459 peak_cuda_reserved_mb=5690
+unloaded is_loaded=False
+NOTE: whether the voice matches the description (old man, deep, slow, raspy) needs a human listen.
+exit 0
+
+$ backend/venv/Scripts/python.exe -c "import torch;print(torch.__version__, torch.cuda.is_available())"
+2.11.0+cu128 True

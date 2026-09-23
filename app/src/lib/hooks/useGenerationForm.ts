@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api/client';
-import type { EffectConfig } from '@/lib/api/types';
+import type { EffectConfig, VoiceProfileResponse } from '@/lib/api/types';
 import {
   DEFAULT_HABIBI_MODEL_ID,
   getHabibiModel,
@@ -13,6 +13,7 @@ import {
 import { LANGUAGE_CODES, type LanguageCode } from '@/lib/constants/languages';
 import {
   buildAdvancedSettingsPayload,
+  buildVoiceDescriptionPayload,
   type DownloadConfirmationDetails,
   downloadConfirmationDetails,
   isEngineSelectable,
@@ -47,6 +48,8 @@ const generationSchema = z.object({
   personality: z.boolean().optional(),
   /** Values for the selected engine's declared advanced settings, keyed by setting name. */
   advancedSettings: z.record(z.number()).optional(),
+  /** A written description of the voice to create, for engines with voice design (FR-015). */
+  voiceDescription: z.string().max(500).optional(),
 });
 
 export type GenerationFormValues = z.infer<typeof generationSchema>;
@@ -105,6 +108,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
   async function handleSubmit(
     data: GenerationFormValues,
     selectedProfileId: string | null,
+    selectedProfile?: Pick<VoiceProfileResponse, 'voice_type'>,
   ): Promise<void> {
     if (!selectedProfileId) {
       toast({
@@ -222,6 +226,13 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
         effects_chain: effectsChain?.length ? effectsChain : undefined,
         // FR-010: only engines that declare advanced settings receive them.
         advanced_settings: buildAdvancedSettingsPayload(capability, data.advancedSettings),
+        // FR-015 / C1Q5: its own field, never `instruct`; omitted unless the engine declares
+        // voice design and the profile has no recording that would win over it (C1Q6).
+        voice_description: buildVoiceDescriptionPayload(
+          capability,
+          selectedProfile,
+          data.voiceDescription,
+        ),
       });
 
       // Track this generation for SSE status updates
@@ -237,6 +248,8 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
         engine: data.engine,
         personality: data.personality,
         advancedSettings: data.advancedSettings,
+        // Kept so the next text can be generated with the same designed voice.
+        voiceDescription: data.voiceDescription,
       });
       options.onSuccess?.(result.id);
     } catch (error) {

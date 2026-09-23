@@ -1166,3 +1166,614 @@ async def test_pronunciation_processed_arabic_reaches_the_vendor_byte_for_byte(
     assert kwargs["normalize"] is False
     assert sample_rate == FAKE_SAMPLE_RATE
     assert audio.dtype == np.float32
+
+
+
+# ---------------------------------------------------------------------------
+# T034: voice design precedence and encoding through the generation service (FR-015)
+#
+# data-model.md §3 precedence, driven through services/generation.py with the real
+# VoxCPM2 backend in front of the fake vendor:
+#   reference audio + description -> clone from audio, no prefix (C1Q6)
+#   description only              -> "(description)text" (probe Q9)
+#   neither                       -> plain text
+# The request's delivery ``instruct`` never reaches VoxCPM2 (supports_instruct=False,
+# C1Q5), and every other engine keeps today's behaviour: ``instruct`` unchanged,
+# ``voice_description`` dropped.
+# ---------------------------------------------------------------------------
+
+DESCRIPTION = "An old man, deep, slow and raspy voice"
+DELIVERY = "whisper"
+
+
+class _KwargsBackend:
+    """A pre-existing-style backend recording what generate() receives."""
+
+    def __init__(self) -> None:
+        self.calls: list[dict] = []
+
+    def is_loaded(self) -> bool:
+        return True
+
+    async def generate(self, text, voice_prompt, language="en", seed=None, instruct=None):
+        self.calls.append({"text": text, "voice_prompt": voice_prompt, "instruct": instruct})
+        return np.zeros(2400, dtype=np.float32), 24000
+
+
+@pytest.fixture
+def design_service(monkeypatch: pytest.MonkeyPatch):
+    """run_generation with the database, history, profiles and model loading faked.
+
+    ``state.backend`` is what the engine dispatch returns; ``state.voice_prompt`` is what
+    the profile service returns (``{}`` for a designed profile, a pair for a cloned one).
+    """
+    from types import SimpleNamespace
+
+    import backend.backends as backends_pkg
+    from backend.services import generation as generation_service
+
+    state = SimpleNamespace(backend=None, voice_prompt={}, statuses=[])
+
+    class FakeSession:
+        def close(self) -> None:
+            pass
+
+    def fake_get_db():
+        yield FakeSession()
+
+    async def fake_update_status(generation_id, status, db, **kwargs):
+        state.statuses.append((status, kwargs.get("error")))
+
+    async def fake_voice_prompt(*_a, **_k):
+        return state.voice_prompt
+
+    async def fake_load(*_a, **_k):
+        return None
+
+    monkeypatch.setattr(generation_service, "get_db", fake_get_db)
+    monkeypatch.setattr(generation_service.history, "update_generation_status", fake_update_status)
+    monkeypatch.setattr(generation_service.profiles, "create_voice_prompt_for_profile", fake_voice_prompt)
+    monkeypatch.setattr(generation_service.pronunciation, "apply_pronunciations", lambda text, *_a, **_k: (text, []))
+    monkeypatch.setattr(generation_service, "_save_generate", lambda **_k: "generations/fake.wav")
+    monkeypatch.setattr(generation_service, "ensure_engine_available", lambda _engine: None)
+    monkeypatch.setattr(backends_pkg, "get_tts_backend_for_engine", lambda _engine: state.backend)
+    monkeypatch.setattr(backends_pkg, "load_engine_model", fake_load)
+    return state
+
+
+async def _run_design(engine: str, *, text: str = "Hello there.", language: str = "en", **kwargs) -> None:
+    from backend.services import generation as generation_service
+
+    await generation_service.run_generation(
+        generation_id="gen-design",
+        profile_id="profile-1",
+        text=text,
+        language=language,
+        engine=engine,
+        model_size="default",
+        seed=None,
+        mode="generate",
+        **kwargs,
+    )
+
+
+def _spy_instruct(backend, monkeypatch: pytest.MonkeyPatch) -> list:
+    """Record the ``instruct`` the service hands to backend.generate()."""
+    seen: list = []
+    original_generate = backend.generate
+
+    async def spy_generate(*args, **kwargs):
+        seen.append(kwargs["instruct"] if "instruct" in kwargs else (args[4] if len(args) > 4 else None))
+        return await original_generate(*args, **kwargs)
+
+    monkeypatch.setattr(backend, "generate", spy_generate)
+    return seen
+
+
+@pytest.mark.asyncio
+async def test_service_description_only_becomes_the_voxcpm_prefix(
+    backend, recorder: _Recorder, design_service, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Description only -> the backend's instruct is the description; the vendor text is "(description)text"."""
+    seen_instruct = _spy_instruct(backend, monkeypatch)
+    design_service.backend = backend
+
+    await _run_design("voxcpm", voice_description=f"  {DESCRIPTION}  ")
+
+    assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+    assert seen_instruct == [DESCRIPTION]
+    (kwargs,) = recorder.generate_calls
+    assert kwargs["text"] == f"({DESCRIPTION})Hello there."
+    assert kwargs["prompt_wav_path"] is None
+    assert kwargs["prompt_text"] is None
+
+
+@pytest.mark.asyncio
+async def test_service_delivery_instruct_never_reaches_voxcpm(
+    backend, recorder: _Recorder, design_service, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A delivery instruction alone is dropped for VoxCPM2 (supports_instruct=False, C1Q5)."""
+    seen_instruct = _spy_instruct(backend, monkeypatch)
+    design_service.backend = backend
+
+    await _run_design("voxcpm", instruct=DELIVERY)
+
+    assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+    assert seen_instruct == [None]
+    (kwargs,) = recorder.generate_calls
+    assert kwargs["text"] == "Hello there."
+    assert "(" not in kwargs["text"]
+    assert DELIVERY not in kwargs["text"]
+
+
+@pytest.mark.asyncio
+async def test_service_description_wins_over_delivery_instruct_for_voxcpm(
+    backend, recorder: _Recorder, design_service
+) -> None:
+    design_service.backend = backend
+
+    await _run_design("voxcpm", instruct=DELIVERY, voice_description=DESCRIPTION)
+
+    assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+    (kwargs,) = recorder.generate_calls
+    assert kwargs["text"] == f"({DESCRIPTION})Hello there."
+    assert DELIVERY not in kwargs["text"]
+
+
+@pytest.mark.asyncio
+async def test_service_neither_gives_plain_text_for_voxcpm(backend, recorder: _Recorder, design_service) -> None:
+    design_service.backend = backend
+
+    await _run_design("voxcpm", voice_description=None)
+
+    assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+    assert recorder.generate_calls[0]["text"] == "Hello there."
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("engine", ["qwen_custom_voice", "qwen", "kokoro"])
+async def test_service_existing_engines_keep_instruct_and_drop_the_description(design_service, engine) -> None:
+    """Regression guard: existing engines receive the delivery instruct unchanged and never the description."""
+    design_service.backend = _KwargsBackend()
+
+    await _run_design(engine, instruct=DELIVERY, voice_description=DESCRIPTION)
+
+    assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+    (call,) = design_service.backend.calls
+    assert call["instruct"] == DELIVERY
+    assert call["text"] == "Hello there."
+    assert DESCRIPTION not in repr(call)
+
+
+@pytest.mark.asyncio
+async def test_service_cloned_profile_ignores_the_description(
+    backend, recorder: _Recorder, design_service, reference_file: Path
+) -> None:
+    """Reference audio + description -> cloned from audio with plain text, no prefix (C1Q6)."""
+    design_service.backend = backend
+    design_service.voice_prompt = _clone_prompt(reference_file)
+
+    await _run_design("voxcpm", voice_description=DESCRIPTION)
+
+    assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+    (kwargs,) = recorder.generate_calls
+    assert kwargs["prompt_wav_path"] == str(reference_file)
+    assert kwargs["prompt_text"] == "The reference transcript."
+    assert kwargs["text"] == "Hello there."
+    assert DESCRIPTION not in kwargs["text"]
+
+
+@pytest.mark.asyncio
+async def test_service_english_description_with_arabic_text_is_encoded_byte_for_byte(
+    backend, recorder: _Recorder, design_service
+) -> None:
+    """C1Q9: a description in another language than the text is accepted; no language check."""
+    from backend import models
+
+    arabic = "مرحبا، هذا صوت مصمم من وصف مكتوب."
+    request = models.GenerationRequest(
+        profile_id="p1", text=arabic, language="ar", engine="voxcpm", voice_description=DESCRIPTION
+    )
+    assert request.voice_description == DESCRIPTION
+    design_service.backend = backend
+
+    await _run_design(
+        "voxcpm", text=request.text, language=request.language, voice_description=request.voice_description
+    )
+
+    assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+    (kwargs,) = recorder.generate_calls
+    expected = f"({DESCRIPTION}){arabic}"
+    assert kwargs["text"].encode("utf-8") == expected.encode("utf-8")
+
+
+@pytest.mark.parametrize(
+    ("engine", "instruct", "description", "expected"),
+    [
+        ("voxcpm", None, DESCRIPTION, DESCRIPTION),
+        ("voxcpm", DELIVERY, None, None),
+        ("voxcpm", DELIVERY, "   ", None),
+        ("voxcpm", DELIVERY, DESCRIPTION, DESCRIPTION),
+        ("voxcpm", None, None, None),
+        ("qwen_custom_voice", DELIVERY, DESCRIPTION, DELIVERY),
+        ("qwen_custom_voice", None, DESCRIPTION, None),
+        ("qwen", DELIVERY, None, DELIVERY),
+        ("not-an-engine", DELIVERY, DESCRIPTION, DELIVERY),
+    ],
+)
+def test_resolve_backend_instruct_table(engine, instruct, description, expected) -> None:
+    from backend.services import generation as generation_service
+
+    assert generation_service.resolve_backend_instruct(engine, instruct, description) == expected
+
+
+def test_resolve_backend_instruct_reads_capability_data_not_engine_names(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A made-up engine that declares supports_voice_design gets the description: no name branching."""
+    import backend.backends as backends_pkg
+    from backend.backends import ModelConfig
+    from backend.services import generation as generation_service
+
+    real_configs = backends_pkg.get_tts_model_configs()
+    designer = ModelConfig(
+        model_name="fake-designer",
+        display_name="Fake Designer",
+        engine="fake_designer",
+        hf_repo_id="example/fake-designer",
+        supports_voice_design=True,
+        supports_instruct=True,
+    )
+    silent = ModelConfig(
+        model_name="fake-silent-designer",
+        display_name="Fake Silent Designer",
+        engine="fake_silent_designer",
+        hf_repo_id="example/fake-silent-designer",
+        supports_voice_design=True,
+        supports_instruct=False,
+    )
+    # voxcpm redeclared without voice design: it must then behave like any existing engine.
+    plain_voxcpm = ModelConfig(model_name="voxcpm2", display_name="VoxCPM2", engine="voxcpm", hf_repo_id="openbmb/VoxCPM2")
+    configs = [c for c in real_configs if c.engine != "voxcpm"] + [designer, silent, plain_voxcpm]
+    monkeypatch.setattr(backends_pkg, "get_tts_model_configs", lambda: configs)
+
+    resolve = generation_service.resolve_backend_instruct
+    assert resolve("fake_designer", DELIVERY, DESCRIPTION) == DESCRIPTION
+    assert resolve("fake_designer", DELIVERY, None) == DELIVERY
+    assert resolve("fake_silent_designer", DELIVERY, None) is None
+    assert resolve("fake_silent_designer", None, DESCRIPTION) == DESCRIPTION
+    assert resolve("voxcpm", DELIVERY, DESCRIPTION) == DELIVERY
+
+
+@pytest.mark.asyncio
+async def test_generate_audio_sync_applies_the_same_mapping(backend, recorder: _Recorder, design_service) -> None:
+    from backend.services import generation as generation_service
+
+    design_service.backend = backend
+
+    await generation_service.generate_audio_sync(
+        profile_id="p1",
+        text="Hello there.",
+        language="en",
+        engine="voxcpm",
+        model_size="default",
+        instruct=DELIVERY,
+        voice_description=DESCRIPTION,
+    )
+    await generation_service.generate_audio_sync(
+        profile_id="p1", text="Hello there.", language="en", engine="voxcpm", model_size="default", instruct=DELIVERY
+    )
+
+    assert [c["text"] for c in recorder.generate_calls] == [f"({DESCRIPTION})Hello there.", "Hello there."]
+
+
+@pytest.mark.asyncio
+async def test_generate_route_forwards_voice_description_to_the_service(monkeypatch: pytest.MonkeyPatch) -> None:
+    from types import SimpleNamespace
+
+    from backend import models
+    from backend.routes import generations as routes_mod
+
+    captured: dict = {}
+    created: dict = {}
+
+    async def fake_get_profile(*_a, **_k):
+        return SimpleNamespace(default_engine=None, preset_engine=None, personality=None, effects_chain=None)
+
+    async def fake_create_generation(**kwargs):
+        created.update(kwargs)
+        return SimpleNamespace(id=kwargs["generation_id"])
+
+    def fake_run_generation(**kwargs):
+        captured.update(kwargs)
+        return "job"
+
+    class FakeQuery:
+        def filter_by(self, **_k):
+            return self
+
+        def first(self):
+            return None
+
+    fake_db = SimpleNamespace(query=lambda *_a: FakeQuery())
+
+    monkeypatch.setattr(routes_mod.profiles, "get_profile", fake_get_profile)
+    monkeypatch.setattr(routes_mod.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+    monkeypatch.setattr(routes_mod.history, "create_generation", fake_create_generation)
+    monkeypatch.setattr(routes_mod, "run_generation", fake_run_generation)
+    monkeypatch.setattr(routes_mod, "enqueue_generation", lambda *_a, **_k: None)
+    monkeypatch.setattr(routes_mod, "_require_available_engine", lambda _engine: None)
+
+    data = models.GenerationRequest(
+        profile_id="p1", text="Hello.", engine="voxcpm", instruct=DELIVERY, voice_description=DESCRIPTION
+    )
+    await routes_mod.generate_speech(data, db=fake_db)
+
+    assert captured["voice_description"] == DESCRIPTION
+    assert captured["instruct"] == DELIVERY
+    # History keeps the delivery instruction as today; the description is not persisted in v1.
+    assert created.get("instruct") == DELIVERY
+
+
+@pytest.mark.asyncio
+async def test_stream_route_encodes_the_description_and_drops_delivery_for_voxcpm(
+    backend, recorder: _Recorder, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from types import SimpleNamespace
+
+    import backend.backends as backends_pkg
+    from backend import models
+    from backend.routes import generations as routes_mod
+
+    async def fake_get_profile(*_a, **_k):
+        return SimpleNamespace(default_engine=None, preset_engine=None, personality=None, effects_chain=None)
+
+    async def noop(*_a, **_k):
+        return None
+
+    async def fake_voice_prompt(*_a, **_k):
+        return {}
+
+    monkeypatch.setattr(routes_mod.profiles, "get_profile", fake_get_profile)
+    monkeypatch.setattr(routes_mod.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+    monkeypatch.setattr(routes_mod.profiles, "create_voice_prompt_for_profile", fake_voice_prompt)
+    monkeypatch.setattr(routes_mod.pronunciation, "apply_pronunciations", lambda text, *_a, **_k: (text, []))
+    monkeypatch.setattr(routes_mod, "_require_available_engine", lambda _engine: None)
+    monkeypatch.setattr(backends_pkg, "get_tts_backend_for_engine", lambda _engine: backend)
+    monkeypatch.setattr(backends_pkg, "ensure_model_cached_or_raise", noop)
+    monkeypatch.setattr(backends_pkg, "load_engine_model", noop)
+
+    with_description = models.GenerationRequest(
+        profile_id="p1", text="Hello.", engine="voxcpm", instruct=DELIVERY, voice_description=DESCRIPTION
+    )
+    delivery_only = models.GenerationRequest(profile_id="p1", text="Hello.", engine="voxcpm", instruct=DELIVERY)
+    await routes_mod.stream_speech(with_description, db=None)
+    await routes_mod.stream_speech(delivery_only, db=None)
+
+    assert [c["text"] for c in recorder.generate_calls] == [f"({DESCRIPTION})Hello.", "Hello."]
+
+
+
+# ---------------------------------------------------------------------------
+# T048: a designed profile's saved description is used when the request has none (FR-015a)
+#
+# profiles.create_voice_prompt_for_profile returns {"voice_type": "designed",
+# "design_prompt": ...} for a designed profile. For engines declaring
+# supports_voice_design, that design_prompt is the fallback voice description after a
+# non-blank request description; a profile with reference audio still wins (C1Q6).
+# ---------------------------------------------------------------------------
+
+DESIGN_PROMPT = "A young woman, gentle and sweet voice"
+
+
+def _designed_prompt() -> dict:
+    return {"voice_type": "designed", "design_prompt": DESIGN_PROMPT}
+
+
+@pytest.mark.parametrize(
+    ("engine", "instruct", "description", "design_prompt", "expected"),
+    [
+        ("voxcpm", None, None, DESIGN_PROMPT, DESIGN_PROMPT),
+        ("voxcpm", DELIVERY, None, DESIGN_PROMPT, DESIGN_PROMPT),
+        ("voxcpm", None, "   ", f"  {DESIGN_PROMPT}  ", DESIGN_PROMPT),
+        ("voxcpm", None, DESCRIPTION, DESIGN_PROMPT, DESCRIPTION),
+        ("voxcpm", DELIVERY, None, "   ", None),
+        ("qwen_custom_voice", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+        ("qwen_custom_voice", None, None, DESIGN_PROMPT, None),
+        ("not-an-engine", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+    ],
+)
+def test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt(
+    engine, instruct, description, design_prompt, expected
+) -> None:
+    from backend.services import generation as generation_service
+
+    resolved = generation_service.resolve_backend_instruct(
+        engine, instruct, description, profile_design_prompt=design_prompt
+    )
+    assert resolved == expected
+
+
+def test_design_prompt_fallback_reads_capability_data_not_engine_names(monkeypatch: pytest.MonkeyPatch) -> None:
+    import backend.backends as backends_pkg
+    from backend.backends import ModelConfig
+    from backend.services import generation as generation_service
+
+    real_configs = backends_pkg.get_tts_model_configs()
+    designer = ModelConfig(
+        model_name="fake-designer",
+        display_name="Fake Designer",
+        engine="fake_designer",
+        hf_repo_id="example/fake-designer",
+        supports_voice_design=True,
+    )
+    plain_voxcpm = ModelConfig(model_name="voxcpm2", display_name="VoxCPM2", engine="voxcpm", hf_repo_id="openbmb/VoxCPM2")
+    configs = [c for c in real_configs if c.engine != "voxcpm"] + [designer, plain_voxcpm]
+    monkeypatch.setattr(backends_pkg, "get_tts_model_configs", lambda: configs)
+
+    resolve = generation_service.resolve_backend_instruct
+    assert resolve("fake_designer", DELIVERY, None, profile_design_prompt=DESIGN_PROMPT) == DESIGN_PROMPT
+    assert resolve("voxcpm", DELIVERY, None, profile_design_prompt=DESIGN_PROMPT) == DELIVERY
+
+
+def test_profile_design_prompt_is_read_only_from_designed_voice_prompts(reference_file: Path) -> None:
+    from backend.services import generation as generation_service
+
+    extract = generation_service.profile_design_prompt
+    assert extract(_designed_prompt()) == DESIGN_PROMPT
+    assert extract({"voice_type": "cloned", "design_prompt": DESIGN_PROMPT}) is None
+    assert extract(_clone_prompt(reference_file)) is None
+    assert extract({}) is None
+    assert extract(None) is None
+    assert extract(object()) is None
+
+
+@pytest.mark.asyncio
+async def test_service_designed_profile_without_request_description_uses_its_design_prompt(
+    backend, recorder: _Recorder, design_service
+) -> None:
+    design_service.backend = backend
+    design_service.voice_prompt = _designed_prompt()
+
+    await _run_design("voxcpm", instruct=DELIVERY)
+
+    assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+    (kwargs,) = recorder.generate_calls
+    assert kwargs["text"] == f"({DESIGN_PROMPT})Hello there."
+    assert kwargs["prompt_wav_path"] is None
+    assert kwargs["prompt_text"] is None
+    assert DELIVERY not in kwargs["text"]
+
+
+@pytest.mark.asyncio
+async def test_service_request_description_beats_the_profile_design_prompt(
+    backend, recorder: _Recorder, design_service
+) -> None:
+    design_service.backend = backend
+    design_service.voice_prompt = _designed_prompt()
+
+    await _run_design("voxcpm", voice_description=DESCRIPTION)
+
+    assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+    assert recorder.generate_calls[0]["text"] == f"({DESCRIPTION})Hello there."
+
+
+@pytest.mark.asyncio
+async def test_service_whitespace_request_description_falls_back_to_the_design_prompt(
+    backend, recorder: _Recorder, design_service
+) -> None:
+    design_service.backend = backend
+    design_service.voice_prompt = _designed_prompt()
+
+    await _run_design("voxcpm", voice_description="   ")
+
+    assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+    assert recorder.generate_calls[0]["text"] == f"({DESIGN_PROMPT})Hello there."
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("mode", ["retry", "regenerate"])
+async def test_service_retry_and_regenerate_reproduce_the_designed_voice(
+    backend, recorder: _Recorder, design_service, monkeypatch: pytest.MonkeyPatch, mode
+) -> None:
+    from backend.services import generation as generation_service
+
+    monkeypatch.setattr(generation_service, "_save_retry", lambda **_k: "generations/fake.wav")
+    monkeypatch.setattr(generation_service, "_save_regenerate", lambda **_k: "generations/fake.wav")
+    design_service.backend = backend
+    design_service.voice_prompt = _designed_prompt()
+
+    await generation_service.run_generation(
+        generation_id="gen-design",
+        profile_id="profile-1",
+        text="Hello there.",
+        language="en",
+        engine="voxcpm",
+        model_size="default",
+        seed=3,
+        mode=mode,
+    )
+
+    assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+    assert recorder.generate_calls[0]["text"] == f"({DESIGN_PROMPT})Hello there."
+
+
+@pytest.mark.asyncio
+async def test_service_cloned_profile_with_description_still_has_no_prefix(
+    backend, recorder: _Recorder, design_service, reference_file: Path
+) -> None:
+    design_service.backend = backend
+    design_service.voice_prompt = _clone_prompt(reference_file)
+
+    await _run_design("voxcpm", instruct=DELIVERY, voice_description=DESCRIPTION)
+
+    (kwargs,) = recorder.generate_calls
+    assert kwargs["prompt_wav_path"] == str(reference_file)
+    assert kwargs["text"] == "Hello there."
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("engine", ["qwen_custom_voice", "qwen"])
+async def test_service_designed_profile_on_other_engines_keeps_instruct(design_service, engine) -> None:
+    design_service.backend = _KwargsBackend()
+    design_service.voice_prompt = _designed_prompt()
+
+    await _run_design(engine, instruct=DELIVERY)
+
+    assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+    (call,) = design_service.backend.calls
+    assert call["instruct"] == DELIVERY
+    assert call["text"] == "Hello there."
+
+
+@pytest.mark.asyncio
+async def test_generate_audio_sync_uses_the_designed_profile_prompt(
+    backend, recorder: _Recorder, design_service
+) -> None:
+    from backend.services import generation as generation_service
+
+    design_service.backend = backend
+    design_service.voice_prompt = _designed_prompt()
+
+    await generation_service.generate_audio_sync(
+        profile_id="p1", text="Hello there.", language="en", engine="voxcpm", model_size="default", instruct=DELIVERY
+    )
+
+    assert recorder.generate_calls[0]["text"] == f"({DESIGN_PROMPT})Hello there."
+
+
+@pytest.mark.asyncio
+async def test_stream_route_uses_the_designed_profile_prompt(
+    backend, recorder: _Recorder, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from types import SimpleNamespace
+
+    import backend.backends as backends_pkg
+    from backend import models
+    from backend.routes import generations as routes_mod
+
+    async def fake_get_profile(*_a, **_k):
+        return SimpleNamespace(default_engine=None, preset_engine=None, personality=None, effects_chain=None)
+
+    async def noop(*_a, **_k):
+        return None
+
+    async def fake_voice_prompt(*_a, **_k):
+        return _designed_prompt()
+
+    monkeypatch.setattr(routes_mod.profiles, "get_profile", fake_get_profile)
+    monkeypatch.setattr(routes_mod.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+    monkeypatch.setattr(routes_mod.profiles, "create_voice_prompt_for_profile", fake_voice_prompt)
+    monkeypatch.setattr(routes_mod.pronunciation, "apply_pronunciations", lambda text, *_a, **_k: (text, []))
+    monkeypatch.setattr(routes_mod, "_require_available_engine", lambda _engine: None)
+    monkeypatch.setattr(backends_pkg, "get_tts_backend_for_engine", lambda _engine: backend)
+    monkeypatch.setattr(backends_pkg, "ensure_model_cached_or_raise", noop)
+    monkeypatch.setattr(backends_pkg, "load_engine_model", noop)
+
+    await routes_mod.stream_speech(
+        models.GenerationRequest(profile_id="p1", text="Hello.", engine="voxcpm", instruct=DELIVERY), db=None
+    )
+    await routes_mod.stream_speech(
+        models.GenerationRequest(profile_id="p1", text="Hello.", engine="voxcpm", voice_description=DESCRIPTION),
+        db=None,
+    )
+
+    assert [c["text"] for c in recorder.generate_calls] == [f"({DESIGN_PROMPT})Hello.", f"({DESCRIPTION})Hello."]

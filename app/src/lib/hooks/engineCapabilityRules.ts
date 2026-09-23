@@ -145,3 +145,88 @@ export function advancedSettingStep(setting: EngineAdvancedSettingResponse): num
   const integral = [setting.default, setting.min, setting.max].every(Number.isInteger);
   return integral && setting.max - setting.min >= 10 ? 1 : 0.1;
 }
+
+/** Whether the engine can create a voice from a written description (FR-015). */
+export function supportsVoiceDesign(capability: EngineCapabilityResponse | undefined): boolean {
+  return capability?.supports_voice_design === true;
+}
+
+/**
+ * The voice description's state for the selected engine and profile (FR-015, C1Q5, C1Q6).
+ *
+ * - `hidden`: the engine does not declare voice design, so the input is not shown.
+ * - `unused`: the profile has reference audio (a cloned profile; a profile with no
+ *   `voice_type` is a legacy cloned one). The recording wins and the UI says so.
+ * - `active`: the description is sent as `voice_description`.
+ */
+export type VoiceDescriptionState = 'hidden' | 'unused' | 'active';
+
+export function voiceDescriptionState(
+  capability: EngineCapabilityResponse | undefined,
+  profile: { voice_type?: string | null } | undefined,
+): VoiceDescriptionState {
+  if (!supportsVoiceDesign(capability)) return 'hidden';
+  if (profile && (!profile.voice_type || profile.voice_type === 'cloned')) return 'unused';
+  return 'active';
+}
+
+/**
+ * The request's `voice_description`: the trimmed text when the description is active and not
+ * blank, otherwise `undefined`, so the field is omitted and existing engines' requests are
+ * unchanged. It is never sent as `instruct` (C1Q5).
+ */
+export function buildVoiceDescriptionPayload(
+  capability: EngineCapabilityResponse | undefined,
+  profile: { voice_type?: string | null } | undefined,
+  text: string | undefined,
+): string | undefined {
+  if (voiceDescriptionState(capability, profile) !== 'active') return undefined;
+  const trimmed = text?.trim();
+  return trimmed ? trimmed : undefined;
+}
+
+/** An engine offered for the "Describe a voice" profile source (FR-015a). */
+export interface VoiceDesignEngineOption {
+  value: string;
+  label: string;
+  available: boolean;
+}
+
+/**
+ * Engines whose capability declares `supports_voice_design`, labelled with each engine's
+ * declared `display_name` (FR-015a). An unavailable engine is still listed, marked as such,
+ * so availability is shown rather than hidden (FR-003).
+ */
+export function voiceDesignEngineOptions(
+  capabilities: EngineCapabilitiesResponse | undefined,
+): VoiceDesignEngineOption[] {
+  return (capabilities?.engines ?? [])
+    .filter((entry) => supportsVoiceDesign(entry))
+    .map((entry) => ({
+      value: entry.engine,
+      label: entry.display_name,
+      available: entry.available,
+    }));
+}
+
+/**
+ * The engine a designed profile is created for: the current choice when it is a voice-design
+ * engine, otherwise the first available one, otherwise the first declared one ('' if none).
+ */
+export function pickVoiceDesignEngine(
+  options: readonly VoiceDesignEngineOption[],
+  current?: string,
+): string {
+  if (current && options.some((option) => option.value === current)) return current;
+  return (options.find((option) => option.available) ?? options[0])?.value ?? '';
+}
+
+/** Matches `design_prompt` in the backend's VoiceProfileCreate (max_length=2000). */
+export const MAX_DESIGN_PROMPT_CHARS = 2000;
+
+/** Validation for a designed profile's description: required, and within the backend limit. */
+export function designPromptError(text: string | undefined): 'required' | 'tooLong' | null {
+  if (!text?.trim()) return 'required';
+  if (text.length > MAX_DESIGN_PROMPT_CHARS) return 'tooLong';
+  return null;
+}

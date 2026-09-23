@@ -145,3 +145,40 @@ Inspect git status before continuing; do not discard uncommitted files.
   6. There is no frontend test runner. The capability-logic tests were run from the scratchpad (16 tests, 0 failures) and are not committed.
   7. Suggest adding `step` to the `advanced_settings` contract.
   8. During T017 the worker accidentally swapped torch in the venv; it was restored.
+- Phase 3 commit `00088a37cae79377bc8a1827da4343e950e33a01`: 52 files, pushed as `d6a3a11..00088a3`. `git ls-remote` returns the same SHA. No git hooks are installed.
+- Phase 4–6 round, owners:
+  - Languages follow-up → `a8a4cd72ea6da5edb`: the `language` patterns in `models.py`, `languages.ts` and a new `test_language_patterns.py`.
+  - T025–T027 → `acf4d360a49948247`.
+  - T029–T030 → `af85e7a5329f8239b`.
+  - T028 → `a83e9692e49cb6228`.
+- Sequencing:
+  - T031 waits for the Phase 4 commit, because it shares `EngineModelSelector.tsx`.
+  - Phase 6 waits for the Phase 4 and 5 commits, because it shares `voxcpm_backend.py`, `test_voxcpm_backend.py` and `generation.py`.
+  - T037 is a human-review gate.
+- Languages follow-up `e7096ed` pushed. Phase 4 `60cd4fe` pushed. Both remotes verified.
+- Phase 5 backend (T029, T030) is implemented. Unavailable engines are refused with a 400 whose detail is the resolver's reason; this covers /generate, /generate/stream, retry, regenerate, /speak and MCP speak.
+- T031–T033 are assigned to `a83e9692e49cb6228`.
+- 2026-09-23 orchestrator replaced: `a84da14fd8a1b2bec` terminated (OAuth session expired). New orchestration agent: `aed3c1ace8aa4fc0b`. It took over from this handoff at `2ade0e0` (Phase 5). All of the previous orchestrator's workers are gone. Scope: Phase 6 (T034–T036), stopping at the T037 human-review gate with no Phase 6 commit.
+- Phase 6 assignments (parallel, disjoint files):
+  - T034 then T035 → `a8f1f91eb498b8af9`. Owns `backend/tests/test_voxcpm_backend.py` (append), `backend/services/generation.py`, `backend/routes/generations.py`; `voxcpm_backend.py` only if a test requires it. Also runs the real CUDA voice-design generation (WAVs outside the repo).
+  - T036 → `a41849b6294dd5e7e`. Owns `FloatingGenerateBox.tsx`, `useGenerationForm.ts`, `engineCapabilityRules.ts` and the i18n locale files. Independent of T035 because `voice_description` already exists in the request and the API client.
+  - T037 review material: read-only survey by `a6432c06152d70119`, verified by the orchestrator.
+  - Evidence: `evidence/phase6/`.
+- T037 survey (`a6432c06152d70119`) done and spot-checked by the orchestrator. No responsible-use acknowledgement, consent prompt or AI-generated disclosure exists anywhere in the app, Tauri or backend. The only marker is the library-internal Perth watermark on Chatterbox. Profile export keeps only name, description and language (`export_import.py:84-92`).
+- T034/T035 worker hand-back reviewed. Diff: `resolve_backend_instruct` in generation.py reads capability data only and is wired into run_generation, generate_audio_sync, POST /generate and /generate/stream. JUnit from XML: red 97 tests / 22 failures, green 464 / 0. Real CUDA run (HF offline): EN 5.12 s and AR 4.48 s at 48 kHz, peak 5459 MiB, vendor text `(description)text` byte for byte, WAVs in `C:\Users\sabus\voxcpm-probe-out\phase6\`. The match to the description needs a human listen. The orchestrator re-runs the tests after T048.
+- T036 reviewed and accepted. Orchestrator re-run of the bun logic tests: 43 tests, 0 failures (XML). Minor: collapsing the description toggle keeps the text, and it is still sent.
+- User decision A+B: T048 → `a8f1f91eb498b8af9` (resumed; owns generation.py). T049 → `a41849b6294dd5e7e` (resumed after T036; also owns the i18n locale files, so there is no shared-writer conflict). The report was re-initialised to add T048/T049; T033 was restored to done afterwards.
+- T048 (`a8f1f91eb498b8af9`) accepted. `profile_design_prompt()` plus a keyword fallback in `resolve_backend_instruct`, wired into run_generation, generate_audio_sync and /generate/stream. JUnit: red 117/16, green 484/0; the orchestrator's re-run gave 484/0 (`evidence/phase6/orch-phase6-backend.xml`). Retry and regenerate now reproduce a designed profile's voice; a one-off request description is still not persisted.
+- T049 (`a41849b6294dd5e7e`) accepted. "Describe a voice" source in ProfileForm.tsx, gated on `supports_voice_design`; `isProfileCompatibleWithEngine` designed branch → `supportsVoiceDesign`. bun: red 55/11, green 55/0 (orchestrator re-run 55/0). A designed profile's `design_prompt` is read-only when editing, because backend update_profile ignores it.
+- Phase 6 checks (`evidence/phase6/orch-phase6-checks.txt`): full suite 952 tests, 1 failure (baseline `test_hf_progress_tracker`), 0 errors, 8 skipped; typecheck exit 0; Biome no new findings; torch 2.11.0+cu128, CUDA True.
+- STOPPED at T037 (human consent review). No Phase 6 commit. The T037 material went to the dispatcher.
+- T037 decided by the user: approve voice design and add three fixes. Assignments, in parallel on disjoint files:
+  - T050 (acknowledgement in the profile dialog) → `a41849b6294dd5e7e`. Owns ProfileForm.tsx and the en locale.
+  - T051 (AI-generated WAV tag at `save_audio`) → `a8f1f91eb498b8af9`. Owns backend/utils/audio.py and the new test_audio_disclosure.py. It also inventories save_audio callers that write non-generated audio, and WAV writers that bypass save_audio.
+  - T052 (export/import provenance) → new worker `a2705e58b5a777796`. Owns backend/services/export_import.py and the provenance tests.
+- T050 accepted: responsible-use sentence at `ProfileForm.tsx:926-945`, linking to RESPONSIBLE_USE.md on samykabu/voicebox main.
+- T051 accepted: `save_audio` writes the ICMT "AI-generated by Voicebox" tag with byte-identical sample data. JUnit red 25/13, green 163/0; real CUDA tag read-back in `realrun-t051-tag.txt`.
+  - Open for the user: three `save_audio` callers save the user's own recordings and now carry the AI-generated tag: `profiles.py:236` (reference samples), `profiles.py:623` (the combined reference) and `transcription.py:55` (a temporary WAV).
+  - Also open: two in-memory writers of generated audio are untagged: `services/tts.py:32` (/generate/stream, /speak persist=false) and `routes/effects.py:53` (effects preview).
+- T052 accepted: manifest 1.1 carries provenance; designed and preset profiles export without samples. JUnit red 8/6, green 14/0.
+- Phase 6 final checks: full suite 985 tests, 1 failure (baseline), 8 skipped; typecheck 0; Biome no new findings; torch +cu128.

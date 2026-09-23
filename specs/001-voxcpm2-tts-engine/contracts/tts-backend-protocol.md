@@ -39,7 +39,7 @@ VoxCPM.from_pretrained(
 ## `combine_voice_prompts(audio_paths, reference_texts) -> tuple[np.ndarray, str]`
 
 - Delegates to the shared `combine_voice_prompts` in `backends/base.py` (FR-012).
-- Sample rate argument comes from the model's own encode rate, not a literal — see the sample-rate note below.
+- Combined audio is produced at 24000 Hz, the same rate `backend/services/profiles.py` uses when it saves a combined reference WAV, so the file the profile stores and the prompt VoxCPM2 receives agree. VoxCPM2 resamples its prompt to its own 16 kHz encode rate on load, so the combine rate does not need to match it. Amended 2026-09-23 after Phase 3 review; this replaces the earlier instruction to combine at the encode rate.
 
 ## `generate(text, voice_prompt, language="en", seed=None, instruct=None) -> tuple[np.ndarray, int]`
 
