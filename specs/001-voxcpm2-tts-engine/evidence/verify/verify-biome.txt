@@ -1,6 +1,8 @@
-$ bun run check (biome)
-2026-09-23T20:57:58+03:00
-  × Some errors were emitted while running checks.
-  
+$ bun run check (biome) (HEAD 68e9cc0)
+2026-09-23T21:58:52+03:00
+Checked 526 files in 143ms. No fixes applied.
+Found 492 errors.
+Found 253 warnings.
+Found 5 infos.
 
-error: script "check" exited with code 1
+Note: Biome's format check reads the working copy. With core.autocrlf=true, files git rewrote on checkout carry CRLF, and Biome reports them as format errors even though the committed (LF) content is formatted. uiStore.ts was the only app file where this was new since 90913de; rewriting it with LF (no git diff) brought the count back to 492. The one other new error is the organizeImports finding in the evidence copy specs/.../evidence/review/F-capability-logic.test.ts, which is not shipped code.
