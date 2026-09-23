@@ -1,0 +1,215 @@
+...s.................................................................... [  7%]
+..ss.................................................................... [ 14%]
+........................................................................ [ 21%]
+........................................................................ [ 28%]
+........................................................................ [ 35%]
+........................................................................ [ 42%]
+........................................................................ [ 49%]
+........................................................................ [ 57%]
+........................................................................ [ 64%]
+........................................................................ [ 71%]
+......................ssss.............................................. [ 78%]
+..F..................................................................... [ 85%]
+.............s......s................................................... [ 92%]
+........................................................................ [ 99%]
+.                                                                        [100%]
+================================== FAILURES ===================================
+__________________________ test_hf_progress_tracker ___________________________
+
+    def test_hf_progress_tracker():
+        """Test 3: HFProgressTracker tqdm patching."""
+        print("\n" + "=" * 60)
+        print("Test 3: HFProgressTracker tqdm Patching")
+        print("=" * 60)
+    
+        captured_progress: List[tuple] = []
+    
+        def progress_callback(downloaded: int, total: int, filename: str):
+            """Capture progress updates."""
+            captured_progress.append((downloaded, total, filename))
+            print(f"  Progress callback: {downloaded}/{total} bytes ({filename})")
+    
+        tracker = HFProgressTracker(progress_callback)
+    
+        # Simulate a download with tqdm
+        with tracker.patch_download():
+            try:
+                from tqdm import tqdm
+    
+                # Simulate downloading a file
+                print("  Simulating download with tqdm...")
+                total_size = 1000
+                with tqdm(total=total_size, desc="model.bin", unit="B", unit_scale=True) as pbar:
+                    for chunk in range(0, total_size, 100):
+                        pbar.update(100)
+                        time.sleep(0.01)
+    
+                print(f"  Captured {len(captured_progress)} progress updates")
+>               assert len(captured_progress) > 0, "Should have captured progress updates"
+E               AssertionError: Should have captured progress updates
+E               assert 0 > 0
+E                +  where 0 = len([])
+
+backend\tests\test_progress.py:149: AssertionError
+---------------------------- Captured stdout call -----------------------------
+
+============================================================
+Test 3: HFProgressTracker tqdm Patching
+============================================================
+  Simulating download with tqdm...
+  Captured 0 progress updates
+---------------------------- Captured stderr call -----------------------------
+\rmodel.bin:   0%|          | 0.00/1.00k [00:00<?, ?B/s]\rmodel.bin: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1.00k/1.00k [00:00<00:00, 9.72kB/s]
+============================== warnings summary ===============================
+backend\tests\test_audio_failed_generation.py:21
+  D:\Projects\Personal\voicebox\backend\tests\test_audio_failed_generation.py:21: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient
+
+backend\database\models.py:26
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+backend\models.py:33
+  D:\Projects\Personal\voicebox\backend\models.py:33: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(BaseModel):
+
+backend\models.py:69
+  D:\Projects\Personal\voicebox\backend\models.py:69: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ProfileSampleResponse(BaseModel):
+
+backend\models.py:146
+  D:\Projects\Personal\voicebox\backend\models.py:146: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationResponse(BaseModel):
+
+backend\models.py:211
+  D:\Projects\Personal\voicebox\backend\models.py:211: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationEntryResponse(BaseModel):
+
+backend\models.py:269
+  D:\Projects\Personal\voicebox\backend\models.py:269: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class HistoryResponse(BaseModel):
+
+backend\models.py:323
+  D:\Projects\Personal\voicebox\backend\models.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureResponse(BaseModel):
+
+backend\models.py:378
+  D:\Projects\Personal\voicebox\backend\models.py:378: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureSettingsResponse(BaseModel):
+
+backend\models.py:419
+  D:\Projects\Personal\voicebox\backend\models.py:419: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationSettingsResponse(BaseModel):
+
+backend\models.py:440
+  D:\Projects\Personal\voicebox\backend\models.py:440: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class MCPClientBindingResponse(BaseModel):
+
+backend\models.py:720
+  D:\Projects\Personal\voicebox\backend\models.py:720: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioChannelResponse(BaseModel):
+
+backend\models.py:752
+  D:\Projects\Personal\voicebox\backend\models.py:752: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+backend\models.py:766
+  D:\Projects\Personal\voicebox\backend\models.py:766: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+backend\models.py:798
+  D:\Projects\Personal\voicebox\backend\models.py:798: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+backend\models.py:906
+  D:\Projects\Personal\voicebox\backend\models.py:906: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+backend\models.py:920
+  D:\Projects\Personal\voicebox\backend\models.py:920: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+backend\tests\test_rocm_build.py:82
+  D:\Projects\Personal\voicebox\backend\tests\test_rocm_build.py:82: PytestUnknownMarkWarning: Unknown pytest.mark.slow - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.slow()
+
+backend\tests\test_rocm_requirements.py:66
+  D:\Projects\Personal\voicebox\backend\tests\test_rocm_requirements.py:66: PytestUnknownMarkWarning: Unknown pytest.mark.timeout - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.timeout(900)
+
+tests/test_audio_disclosure.py: 2 warnings
+tests/test_profile_duplicate_names.py: 9 warnings
+tests/test_profile_export_provenance.py: 10 warnings
+tests/test_pronunciation.py: 3 warnings
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:186: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+tests/test_audio_disclosure.py: 2 warnings
+tests/test_profile_duplicate_names.py: 9 warnings
+tests/test_profile_export_provenance.py: 10 warnings
+tests/test_pronunciation.py: 3 warnings
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:187: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    updated_at=datetime.utcnow(),
+
+tests/test_audio_disclosure.py::test_profile_reference_sample_is_not_tagged
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:16: DeprecationWarning: 'aifc' is deprecated and slated for removal in Python 3.13
+    import aifc
+
+tests/test_audio_disclosure.py::test_profile_reference_sample_is_not_tagged
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:17: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+tests/test_audio_disclosure.py::test_profile_reference_sample_is_not_tagged
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:19: DeprecationWarning: 'sunau' is deprecated and slated for removal in Python 3.13
+    import sunau
+
+tests/test_audio_disclosure.py::test_profile_reference_sample_is_not_tagged
+tests/test_audio_disclosure.py::test_combined_reference_is_not_tagged
+tests/test_audio_disclosure.py::test_combined_reference_is_not_tagged
+tests/test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys
+tests/test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine
+tests/test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine
+tests/test_profile_export_provenance.py::test_legacy_1_0_manifest_imports_as_cloned
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:248: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    profile.updated_at = datetime.utcnow()
+
+tests/test_audio_failed_generation.py: 49 warnings
+tests/test_history_bulk_delete.py: 2407 warnings
+tests/test_pronunciation.py: 100 warnings
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\sqlalchemy\sql\schema.py:3627: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+tests/test_generation_advanced_settings.py::test_generate_route_threads_advanced_settings_to_the_service
+tests/test_voxcpm_backend.py::test_generate_route_forwards_voice_description_to_the_service
+  <string>:6: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+
+tests/test_model_status_pending_downloads.py::test_errored_download_is_not_pending
+tests/test_model_status_pending_downloads.py::test_retry_after_error_is_pending_again
+tests/test_model_status_pending_downloads.py::test_retry_after_error_is_pending_again
+tests/test_model_status_pending_downloads.py::test_completed_download_is_removed_everywhere
+tests/test_model_status_pending_downloads.py::test_cancel_dismisses_errored_download
+  <string>:5: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+
+tests/test_profile_duplicate_names.py::test_update_profile_keep_same_name_succeeds
+tests/test_profile_duplicate_names.py::test_update_profile_to_new_unique_name_succeeds
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:407: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    profile.updated_at = datetime.utcnow()
+
+tests/test_progress.py::test_progress_manager_basic
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\_pytest\python.py:171: PytestReturnNotNoneWarning: Test functions should return None, but tests/test_progress.py::test_progress_manager_basic returned <class 'bool'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+tests/test_pronunciation.py::test_replaces_a_term
+  D:\Projects\Personal\voicebox\backend\database\migrations.py:74: SAWarning: Skipped unsupported reflection of expression-based index uq_pronunciation_scope
+    existing = {ix["name"] for ix in inspector.get_indexes("pronunciation_entries")}
+
+tests/test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original
+  D:\Projects\Personal\voicebox\backend\services\history.py:107: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\test_progress.py::test_hf_progress_tracker - AssertionEr...
+1 failed, 999 passed, 9 skipped, 2645 warnings in 25.76s

@@ -182,3 +182,16 @@ Inspect git status before continuing; do not discard uncommitted files.
   - Also open: two in-memory writers of generated audio are untagged: `services/tts.py:32` (/generate/stream, /speak persist=false) and `routes/effects.py:53` (effects preview).
 - T052 accepted: manifest 1.1 carries provenance; designed and preset profiles export without samples. JUnit red 8/6, green 14/0.
 - Phase 6 final checks: full suite 985 tests, 1 failure (baseline), 8 skipped; typecheck 0; Biome no new findings; torch +cu128.
+- Phase 6 commit `6e4867390c12b21d550061946dda1009a61043c0`: 62 files. Staged were only the Phase 6 code files and `specs/001-voxcpm2-tts-engine/`. The secret scan was clean (gitleaks is not installed; a regex scan of the staged diff found nothing). Pushed `2ade0e0..6e48673`, exit 0, and `git ls-remote` returns the same SHA. Phase 6 is marked complete in the report. The T037 checkbox is left to the dispatcher. Phase 7 has not started.
+- 2026-09-23. The user approved both open disclosure decisions (T053, T054) and Phase 7 up to T045. Assignments:
+  - T053 then T054 → `a8f1f91eb498b8af9`. Owns utils/audio.py, services/tts.py and the save_audio call sites in profiles.py, transcription.py and effects.py.
+  - T038–T040 → `adf34544ed5f65383`. Owns tts-engines.mdx, model-management.mdx and CHANGELOG.md.
+  - T041 and T042 → `abddad5a3c5d64de6`. Owns test_all_models_e2e.py. The build runs in a throwaway venv `C:\Users\sabus\voicebox-buildenv`, never backend/venv.
+  - T044 → `adf7f5d7ab1ea52d5`. Uses fresh clones: `C:\Users\sabus\voicebox-setupcheck-win` and WSL `Ubuntu-26.04` `~/voicebox-setupcheck`. The quickstart runs through the API on :17693.
+  - T043 gates are run by the orchestrator after all code lands. T045 is a human gate: stop there.
+  - Evidence goes to `evidence/phase7/`.
+- T053 and T054 accepted.
+  - `save_audio(..., disclosure=None)` is used by reference samples, the combined reference and the transcription temp WAV.
+  - `wav_bytes()` tags /generate/stream, /speak persist=false, MCP speak and the effects preview.
+  - JUnit: T053 red 37/9, green 602/0; T054 red 45/8, green 613/0. Orchestrator re-run 608/0. Full suite 1009 tests, 1 failure (baseline), 9 skipped.
+  - WAV writers left untagged are all user audio: captures.py:82 and :114, and generations.py:494 (import_audio).

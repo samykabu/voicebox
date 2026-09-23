@@ -1,0 +1,382 @@
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_audio_disclosure.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase7/T054-red.xml
+# 2026-09-23T18:44:34+03:00
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 45 items
+
+backend\tests\test_audio_disclosure.py::test_disclosure_constant_is_the_fr026_text PASSED [  2%]
+backend\tests\test_audio_disclosure.py::test_saved_wav_carries_the_disclosure_read_back_through_soundfile PASSED [  4%]
+backend\tests\test_audio_disclosure.py::test_saved_wav_carries_the_disclosure_in_the_raw_riff_info_chunk PASSED [  6%]
+backend\tests\test_audio_disclosure.py::test_every_rate_and_layout_is_tagged[1-16000] PASSED [  8%]
+backend\tests\test_audio_disclosure.py::test_every_rate_and_layout_is_tagged[1-24000] PASSED [ 11%]
+backend\tests\test_audio_disclosure.py::test_every_rate_and_layout_is_tagged[1-44100] PASSED [ 13%]
+backend\tests\test_audio_disclosure.py::test_every_rate_and_layout_is_tagged[1-48000] PASSED [ 15%]
+backend\tests\test_audio_disclosure.py::test_every_rate_and_layout_is_tagged[2-16000] PASSED [ 17%]
+backend\tests\test_audio_disclosure.py::test_every_rate_and_layout_is_tagged[2-24000] PASSED [ 20%]
+backend\tests\test_audio_disclosure.py::test_every_rate_and_layout_is_tagged[2-44100] PASSED [ 22%]
+backend\tests\test_audio_disclosure.py::test_every_rate_and_layout_is_tagged[2-48000] PASSED [ 24%]
+backend\tests\test_audio_disclosure.py::test_positional_call_still_works_and_default_rate_is_24000 PASSED [ 26%]
+backend\tests\test_audio_disclosure.py::test_data_chunk_is_byte_identical_to_the_pre_t051_write[float32-1-24000] PASSED [ 28%]
+backend\tests\test_audio_disclosure.py::test_data_chunk_is_byte_identical_to_the_pre_t051_write[float32-1-48000] PASSED [ 31%]
+backend\tests\test_audio_disclosure.py::test_data_chunk_is_byte_identical_to_the_pre_t051_write[float32-2-24000] PASSED [ 33%]
+backend\tests\test_audio_disclosure.py::test_data_chunk_is_byte_identical_to_the_pre_t051_write[float32-2-48000] PASSED [ 35%]
+backend\tests\test_audio_disclosure.py::test_data_chunk_is_byte_identical_to_the_pre_t051_write[float64-1-24000] PASSED [ 37%]
+backend\tests\test_audio_disclosure.py::test_data_chunk_is_byte_identical_to_the_pre_t051_write[float64-1-48000] PASSED [ 40%]
+backend\tests\test_audio_disclosure.py::test_data_chunk_is_byte_identical_to_the_pre_t051_write[float64-2-24000] PASSED [ 42%]
+backend\tests\test_audio_disclosure.py::test_data_chunk_is_byte_identical_to_the_pre_t051_write[float64-2-48000] PASSED [ 44%]
+backend\tests\test_audio_disclosure.py::test_samples_rate_and_subtype_read_back_unchanged PASSED [ 46%]
+backend\tests\test_audio_disclosure.py::test_no_temp_file_is_left_after_a_successful_save PASSED [ 48%]
+backend\tests\test_audio_disclosure.py::test_overwrite_replaces_the_file_atomically PASSED [ 51%]
+backend\tests\test_audio_disclosure.py::test_failed_rename_cleans_up_and_keeps_the_old_file PASSED [ 53%]
+backend\tests\test_audio_disclosure.py::test_failed_encode_cleans_up_and_creates_nothing PASSED [ 55%]
+backend\tests\test_audio_disclosure.py::test_disclosure_none_writes_the_pre_t051_file_byte_for_byte[16000-1] PASSED [ 57%]
+backend\tests\test_audio_disclosure.py::test_disclosure_none_writes_the_pre_t051_file_byte_for_byte[16000-2] PASSED [ 60%]
+backend\tests\test_audio_disclosure.py::test_disclosure_none_writes_the_pre_t051_file_byte_for_byte[24000-1] PASSED [ 62%]
+backend\tests\test_audio_disclosure.py::test_disclosure_none_writes_the_pre_t051_file_byte_for_byte[24000-2] PASSED [ 64%]
+backend\tests\test_audio_disclosure.py::test_disclosure_none_writes_the_pre_t051_file_byte_for_byte[48000-1] PASSED [ 66%]
+backend\tests\test_audio_disclosure.py::test_disclosure_none_writes_the_pre_t051_file_byte_for_byte[48000-2] PASSED [ 68%]
+backend\tests\test_audio_disclosure.py::test_plain_libsndfile_wav_has_no_info_chunk PASSED [ 71%]
+backend\tests\test_audio_disclosure.py::test_default_save_is_still_tagged PASSED [ 73%]
+backend\tests\test_audio_disclosure.py::test_generation_service_saves_are_tagged PASSED [ 75%]
+backend\tests\test_audio_disclosure.py::test_profile_reference_sample_is_not_tagged PASSED [ 77%]
+backend\tests\test_audio_disclosure.py::test_combined_reference_is_not_tagged PASSED [ 80%]
+backend\tests\test_audio_disclosure.py::test_transcription_reencode_is_not_tagged PASSED [ 82%]
+backend\tests\test_audio_disclosure.py::test_wav_bytes_is_tagged_and_keeps_the_samples[24000-1] FAILED [ 84%]
+backend\tests\test_audio_disclosure.py::test_wav_bytes_is_tagged_and_keeps_the_samples[24000-2] FAILED [ 86%]
+backend\tests\test_audio_disclosure.py::test_wav_bytes_is_tagged_and_keeps_the_samples[48000-1] FAILED [ 88%]
+backend\tests\test_audio_disclosure.py::test_wav_bytes_is_tagged_and_keeps_the_samples[48000-2] FAILED [ 91%]
+backend\tests\test_audio_disclosure.py::test_wav_bytes_without_disclosure_matches_sf_write_exactly FAILED [ 93%]
+backend\tests\test_audio_disclosure.py::test_audio_to_wav_bytes_is_tagged_and_keeps_the_samples FAILED [ 95%]
+backend\tests\test_audio_disclosure.py::test_generate_stream_response_is_tagged FAILED [ 97%]
+backend\tests\test_audio_disclosure.py::test_effects_preview_response_is_tagged FAILED [100%]
+
+================================== FAILURES ===================================
+___________ test_wav_bytes_is_tagged_and_keeps_the_samples[24000-1] ___________
+
+channels = 1, sample_rate = 24000
+
+    @pytest.mark.parametrize("channels", [1, 2])
+    @pytest.mark.parametrize("sample_rate", [24000, 48000])
+    def test_wav_bytes_is_tagged_and_keeps_the_samples(channels, sample_rate) -> None:
+        audio = _signal(channels)
+    
+>       raw = audio_mod.wav_bytes(audio, sample_rate)
+              ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.utils.audio' has no attribute 'wav_bytes'
+
+backend\tests\test_audio_disclosure.py:420: AttributeError
+___________ test_wav_bytes_is_tagged_and_keeps_the_samples[24000-2] ___________
+
+channels = 2, sample_rate = 24000
+
+    @pytest.mark.parametrize("channels", [1, 2])
+    @pytest.mark.parametrize("sample_rate", [24000, 48000])
+    def test_wav_bytes_is_tagged_and_keeps_the_samples(channels, sample_rate) -> None:
+        audio = _signal(channels)
+    
+>       raw = audio_mod.wav_bytes(audio, sample_rate)
+              ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.utils.audio' has no attribute 'wav_bytes'
+
+backend\tests\test_audio_disclosure.py:420: AttributeError
+___________ test_wav_bytes_is_tagged_and_keeps_the_samples[48000-1] ___________
+
+channels = 1, sample_rate = 48000
+
+    @pytest.mark.parametrize("channels", [1, 2])
+    @pytest.mark.parametrize("sample_rate", [24000, 48000])
+    def test_wav_bytes_is_tagged_and_keeps_the_samples(channels, sample_rate) -> None:
+        audio = _signal(channels)
+    
+>       raw = audio_mod.wav_bytes(audio, sample_rate)
+              ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.utils.audio' has no attribute 'wav_bytes'
+
+backend\tests\test_audio_disclosure.py:420: AttributeError
+___________ test_wav_bytes_is_tagged_and_keeps_the_samples[48000-2] ___________
+
+channels = 2, sample_rate = 48000
+
+    @pytest.mark.parametrize("channels", [1, 2])
+    @pytest.mark.parametrize("sample_rate", [24000, 48000])
+    def test_wav_bytes_is_tagged_and_keeps_the_samples(channels, sample_rate) -> None:
+        audio = _signal(channels)
+    
+>       raw = audio_mod.wav_bytes(audio, sample_rate)
+              ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.utils.audio' has no attribute 'wav_bytes'
+
+backend\tests\test_audio_disclosure.py:420: AttributeError
+_________ test_wav_bytes_without_disclosure_matches_sf_write_exactly __________
+
+    def test_wav_bytes_without_disclosure_matches_sf_write_exactly() -> None:
+        audio = _signal()
+    
+>       assert audio_mod.wav_bytes(audio, 24000, disclosure=None) == _pre_t054_bytes(audio, 24000)
+               ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.utils.audio' has no attribute 'wav_bytes'
+
+backend\tests\test_audio_disclosure.py:429: AttributeError
+___________ test_audio_to_wav_bytes_is_tagged_and_keeps_the_samples ___________
+
+    def test_audio_to_wav_bytes_is_tagged_and_keeps_the_samples() -> None:
+        from backend.services import tts
+    
+        audio = _signal()
+    
+        raw = tts.audio_to_wav_bytes(audio, 48000)
+    
+>       _assert_tagged_and_unchanged(raw, audio, 48000)
+
+backend\tests\test_audio_disclosure.py:439: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = b'RIFF\xa6%\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\x80\xbb\x00\x00\x00w\x01\x00\x02\x00\x10\x00data\x82%\x00\...6\x15\xfd\x10\xd9]\x04\xeb\xe9O\x16\x03\xea\xa3\xf9[\xf6;\x00\x19\xca\xd7\xda\xf4W\xbb\xc6A\xbcM \xcd\xee\x8f\xd7\xc7&'
+audio = array([-0.64153475,  0.02563997,  0.29635653, ..., -0.13434632,
+       -0.31593305,  0.3029736 ], dtype=float32)
+sample_rate = 48000
+
+    def _assert_tagged_and_unchanged(raw: bytes, audio: np.ndarray, sample_rate: int) -> None:
+        import io
+    
+>       assert _info_tags(raw).get("ICMT") == DISCLOSURE, _info_tags(raw)
+E       AssertionError: {}
+E       assert None == 'AI-generated by Voicebox'
+E        +  where None = <built-in method get of dict object at 0x0000028D7C8674C0>('ICMT')
+E        +    where <built-in method get of dict object at 0x0000028D7C8674C0> = {}.get
+E        +      where {} = _info_tags(b'RIFF\xa6%\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\x80\xbb\x00\x00\x00w\x01\x00\x02\x00\x10\x00data\x82%\x00\x00\xe2\xadH\x03\xef%\xd0\x079,\xff\x7fH\xb4h0\xb1\xaa\x99\x11\xc3\xe5\xc6C\xf4\xd3\x99\x1a9\xbfs\x91B\x16\xbeX\xa1\x1a\xb0\xcc\xbd\rG\'\xfe<\xbd\xc4\xa6#\xfd\x11W\xfe\xac\x008\xdd:\xe0(D@\rY\xe7k\x80\x1e\xd3\x1e\xe6M\xbe\xe3\xbbJ*W\xf3\xf9\xa8\xa3\xbb\xa8\xf0\x139\xdf\xb2iQ\x0c\xe7d\xa8E\x1a\x94I\xa4\xf48!\xb9\xefp\xffDU\xdd-m\xc2\xff\x7f\xb6\xcbl+\x80\x19\xad\xfb^\n\x9c\xf7\xdb*\x85\xdb\xe2\xc3U\x18\xf4X\x00\xf95W{\xfb\xbbOS1\xc3\x1a\xfb/&\xd5\x05\x05\x96\xaf\xde\xa4\x0b/^\xf8}3\xb5\x06k\xd8\xff\x7f\x81F\xc7\x08#\x01\x9eT\x85\xef\x0eN\x84!R\xbc\r&59\xfa\x1b\\1cF\xd8\xe6fsF\x08\xb0*\x19\xaf\xbd3\xf5$\x1e\xe2\xf6"\xdf\x19F3\xa6$\x9d\xe3\xcf\x02\x07\xa9\x19\x01\x98\xe5\xb96\xbdD\xd5 .\xa1\xac\x1am\xc7k\x16\x1a\x08)\xc8n\xbc\xf0*\x88lv\xfd\xac\x10\xed\xe3(\xf2Z\xaa=\x04\xbc\t8\xf0{\x05\xb8\xed{D\x18\xfc|\r31\xbc\t\xb0\x14\x8a\xa2A\xf3\x05b\xff\x13m4 \x14Z`\xb0\xd9\xae\xd6\xa8!A(>\x10(\x0f\xeb\xdd\x025\xdd\x01\x86\x19\x86\xe7\xffh\xf6\xe8\x89\x08\x8b\xc7m\xd6\xa8\xfd\xe2\xd5s\x06\x01\xd5<\x06n\x01\x11?\'\xe6\xac\xc7\xee\xd67\x91\xf1\x8f\x833\xd2ld\xec\xbb\x04\xdb\xe8...x96\x9a5\xea$\xa8\nw-\x8e\x11\xa9\xe6>\x0cn\x19#&q\x1cl\xfb\xb17h\xd9\xf08\x91\xfe\xe8\xe7\xb85\xdd\x01\xbd\x1c\x8f\x18\xef\xdb\n\xce{\n\xab\xe1=\x05\x03fP\x04\xab\xe3\x05\x1e)\xe7\xfb\xe8]\x07\x8a\x0f\x08\x13\xdc\x19\xa7\xa8\xd2\xc3\x93 \xb0\x0bY\xe3u\xc0\xa8\x14\x87\xda\xa8,5\xe7\x17B\x00\x80O\xa6\x02\n\xbe\xd4\xaa\xf4\x15\xf9 \xb4\x99 \xc2%N\xaa(\x03\xe0,l\xfb\xd8\xe3\xb4"0\x0e9\x0c\xe3d\xa5\xe2\x1d\xe1-\xe9\xae\xde\xe0\xca"\n^\xb8\x02\xc1W\x15t\xaeG\xe9(\xe2\xe3\xbc;\x08\r\xbc1\xf6\xd5\x15\xef\x0b\xf7\xd4\xf1 s\xda\x986\xab\xc4l`\xa48\x1b\xf5\xf1\xce\x18\x92\xb5\x15\x06,\x11%\xd66\xa5\xdd\xe1\xbd\xb9\xfc\x8a2\x8c\xf5V\xf0\xf6\xb89\xa5F\x13\x00\x80\x80N\xb1\x01\\\xba\xff\x7f,,\xdd\x02\x12q\xf0\xf1\x96\x01\x03\xdb$\xfa#\x0f\xd9\xf8\xf40\x96/S\x01\r\xc9\x8fO\x03\x07\x13W\x9aA\x19\xd6\x8d\x04\xf48\xc4\xfd\xc8\xd8\x8e\xaa\x88\x8d\x08\x15\x11\xe6bJj\xc8\r\xc5\xff\x7fn(\xc1\xeeN\x17\xac\x13\x18\x17\x18\x05\xa8\xfd\xb5\xfc\x96\xd8"I\xc2\x1b\x93\xd6\xac(|\xefh\x1c\xe4\xf9z\x1e\x15\xd8\xd5\x0b\xcc\x18\xa8\x9e\x7f\xe6L\x03\xbb\x05e\xe7\xe8N\xbe\x14\x8f\xdd\x93\xe4\xed\x16\x15\xfd\x10\xd9]\x04\xeb\xe9O\x16\x03\xea\xa3\xf9[\xf6;\x00\x19\xca\xd7\xda\xf4W\xbb\xc6A\xbcM \xcd\xee\x8f\xd7\xc7&')
+
+backend\tests\test_audio_disclosure.py:403: AssertionError
+___________________ test_generate_stream_response_is_tagged ___________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028D7C757E90>
+
+    @pytest.mark.asyncio
+    async def test_generate_stream_response_is_tagged(monkeypatch: pytest.MonkeyPatch) -> None:
+        from types import SimpleNamespace
+    
+        import backend.backends as backends_pkg
+        from backend import models
+        from backend.routes import generations as routes_mod
+    
+        audio = _signal()
+    
+        class Backend:
+            def is_loaded(self) -> bool:
+                return True
+    
+            async def generate(self, text, voice_prompt, language="en", seed=None, instruct=None, options=None):
+                return audio, 24000
+    
+        async def fake_get_profile(*_a, **_k):
+            return SimpleNamespace(default_engine=None, preset_engine=None, personality=None, effects_chain=None)
+    
+        async def noop(*_a, **_k):
+            return None
+    
+        async def fake_voice_prompt(*_a, **_k):
+            return {}
+    
+        monkeypatch.setattr(routes_mod.profiles, "get_profile", fake_get_profile)
+        monkeypatch.setattr(routes_mod.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+        monkeypatch.setattr(routes_mod.profiles, "create_voice_prompt_for_profile", fake_voice_prompt)
+        monkeypatch.setattr(routes_mod.pronunciation, "apply_pronunciations", lambda text, *_a, **_k: (text, []))
+        monkeypatch.setattr(routes_mod, "_require_available_engine", lambda _engine: None)
+        monkeypatch.setattr(backends_pkg, "get_tts_backend_for_engine", lambda _engine: Backend())
+        monkeypatch.setattr(backends_pkg, "ensure_model_cached_or_raise", noop)
+        monkeypatch.setattr(backends_pkg, "load_engine_model", noop)
+    
+        data = models.GenerationRequest(profile_id="p1", text="Hello.", engine="kokoro", normalize=False)
+        response = await routes_mod.stream_speech(data, db=None)
+    
+        raw = await _body(response)
+        assert response.media_type == "audio/wav"
+>       _assert_tagged_and_unchanged(raw, audio, 24000)
+
+backend\tests\test_audio_disclosure.py:489: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = b'RIFF\xa6%\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\xc0]\x00\x00\x80\xbb\x00\x00\x02\x00\x10\x00data\x82%\x00\...6\x15\xfd\x10\xd9]\x04\xeb\xe9O\x16\x03\xea\xa3\xf9[\xf6;\x00\x19\xca\xd7\xda\xf4W\xbb\xc6A\xbcM \xcd\xee\x8f\xd7\xc7&'
+audio = array([-0.64153475,  0.02563997,  0.29635653, ..., -0.13434632,
+       -0.31593305,  0.3029736 ], dtype=float32)
+sample_rate = 24000
+
+    def _assert_tagged_and_unchanged(raw: bytes, audio: np.ndarray, sample_rate: int) -> None:
+        import io
+    
+>       assert _info_tags(raw).get("ICMT") == DISCLOSURE, _info_tags(raw)
+E       AssertionError: {}
+E       assert None == 'AI-generated by Voicebox'
+E        +  where None = <built-in method get of dict object at 0x0000028D7C865F80>('ICMT')
+E        +    where <built-in method get of dict object at 0x0000028D7C865F80> = {}.get
+E        +      where {} = _info_tags(b'RIFF\xa6%\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\xc0]\x00\x00\x80\xbb\x00\x00\x02\x00\x10\x00data\x82%\x00\x00\xe2\xadH\x03\xef%\xd0\x079,\xff\x7fH\xb4h0\xb1\xaa\x99\x11\xc3\xe5\xc6C\xf4\xd3\x99\x1a9\xbfs\x91B\x16\xbeX\xa1\x1a\xb0\xcc\xbd\rG\'\xfe<\xbd\xc4\xa6#\xfd\x11W\xfe\xac\x008\xdd:\xe0(D@\rY\xe7k\x80\x1e\xd3\x1e\xe6M\xbe\xe3\xbbJ*W\xf3\xf9\xa8\xa3\xbb\xa8\xf0\x139\xdf\xb2iQ\x0c\xe7d\xa8E\x1a\x94I\xa4\xf48!\xb9\xefp\xffDU\xdd-m\xc2\xff\x7f\xb6\xcbl+\x80\x19\xad\xfb^\n\x9c\xf7\xdb*\x85\xdb\xe2\xc3U\x18\xf4X\x00\xf95W{\xfb\xbbOS1\xc3\x1a\xfb/&\xd5\x05\x05\x96\xaf\xde\xa4\x0b/^\xf8}3\xb5\x06k\xd8\xff\x7f\x81F\xc7\x08#\x01\x9eT\x85\xef\x0eN\x84!R\xbc\r&59\xfa\x1b\\1cF\xd8\xe6fsF\x08\xb0*\x19\xaf\xbd3\xf5$\x1e\xe2\xf6"\xdf\x19F3\xa6$\x9d\xe3\xcf\x02\x07\xa9\x19\x01\x98\xe5\xb96\xbdD\xd5 .\xa1\xac\x1am\xc7k\x16\x1a\x08)\xc8n\xbc\xf0*\x88lv\xfd\xac\x10\xed\xe3(\xf2Z\xaa=\x04\xbc\t8\xf0{\x05\xb8\xed{D\x18\xfc|\r31\xbc\t\xb0\x14\x8a\xa2A\xf3\x05b\xff\x13m4 \x14Z`\xb0\xd9\xae\xd6\xa8!A(>\x10(\x0f\xeb\xdd\x025\xdd\x01\x86\x19\x86\xe7\xffh\xf6\xe8\x89\x08\x8b\xc7m\xd6\xa8\xfd\xe2\xd5s\x06\x01\xd5<\x06n\x01\x11?\'\xe6\xac\xc7\xee\xd67\x91\xf1\x8f\x833\xd2ld\xec\xbb\x04\xdb\xe8...x96\x9a5\xea$\xa8\nw-\x8e\x11\xa9\xe6>\x0cn\x19#&q\x1cl\xfb\xb17h\xd9\xf08\x91\xfe\xe8\xe7\xb85\xdd\x01\xbd\x1c\x8f\x18\xef\xdb\n\xce{\n\xab\xe1=\x05\x03fP\x04\xab\xe3\x05\x1e)\xe7\xfb\xe8]\x07\x8a\x0f\x08\x13\xdc\x19\xa7\xa8\xd2\xc3\x93 \xb0\x0bY\xe3u\xc0\xa8\x14\x87\xda\xa8,5\xe7\x17B\x00\x80O\xa6\x02\n\xbe\xd4\xaa\xf4\x15\xf9 \xb4\x99 \xc2%N\xaa(\x03\xe0,l\xfb\xd8\xe3\xb4"0\x0e9\x0c\xe3d\xa5\xe2\x1d\xe1-\xe9\xae\xde\xe0\xca"\n^\xb8\x02\xc1W\x15t\xaeG\xe9(\xe2\xe3\xbc;\x08\r\xbc1\xf6\xd5\x15\xef\x0b\xf7\xd4\xf1 s\xda\x986\xab\xc4l`\xa48\x1b\xf5\xf1\xce\x18\x92\xb5\x15\x06,\x11%\xd66\xa5\xdd\xe1\xbd\xb9\xfc\x8a2\x8c\xf5V\xf0\xf6\xb89\xa5F\x13\x00\x80\x80N\xb1\x01\\\xba\xff\x7f,,\xdd\x02\x12q\xf0\xf1\x96\x01\x03\xdb$\xfa#\x0f\xd9\xf8\xf40\x96/S\x01\r\xc9\x8fO\x03\x07\x13W\x9aA\x19\xd6\x8d\x04\xf48\xc4\xfd\xc8\xd8\x8e\xaa\x88\x8d\x08\x15\x11\xe6bJj\xc8\r\xc5\xff\x7fn(\xc1\xeeN\x17\xac\x13\x18\x17\x18\x05\xa8\xfd\xb5\xfc\x96\xd8"I\xc2\x1b\x93\xd6\xac(|\xefh\x1c\xe4\xf9z\x1e\x15\xd8\xd5\x0b\xcc\x18\xa8\x9e\x7f\xe6L\x03\xbb\x05e\xe7\xe8N\xbe\x14\x8f\xdd\x93\xe4\xed\x16\x15\xfd\x10\xd9]\x04\xeb\xe9O\x16\x03\xea\xa3\xf9[\xf6;\x00\x19\xca\xd7\xda\xf4W\xbb\xc6A\xbcM \xcd\xee\x8f\xd7\xc7&')
+
+backend\tests\test_audio_disclosure.py:403: AssertionError
+___________________ test_effects_preview_response_is_tagged ___________________
+
+tmp_path = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-58/test_effects_preview_response_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028D7C7A55B0>
+
+    @pytest.mark.asyncio
+    async def test_effects_preview_response_is_tagged(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        from types import SimpleNamespace
+    
+        from backend import config, models
+        from backend.routes import effects as effects_mod
+        from backend.services import versions as versions_mod
+        from backend.utils import effects as effects_utils
+    
+        processed = _signal()
+        source = tmp_path / "gen.wav"
+        source.write_bytes(b"placeholder")
+        gen = SimpleNamespace(id="gen-1", status="completed", audio_path="generations/gen.wav")
+    
+        class FakeQuery:
+            def filter_by(self, **_k):
+                return self
+    
+            def first(self):
+                return gen
+    
+        fake_db = SimpleNamespace(query=lambda *_a: FakeQuery())
+        monkeypatch.setattr(versions_mod, "list_versions", lambda *_a, **_k: [])
+        monkeypatch.setattr(config, "resolve_storage_path", lambda _p: source)
+        monkeypatch.setattr(audio_mod, "load_audio", lambda *_a, **_k: (np.zeros(10, dtype=np.float32), 24000))
+        monkeypatch.setattr(effects_utils, "validate_effects_chain", lambda _chain: None)
+        monkeypatch.setattr(effects_utils, "apply_effects", lambda *_a, **_k: processed)
+    
+        request = models.ApplyEffectsRequest(effects_chain=[models.EffectConfig(type="reverb")])
+        response = await effects_mod.preview_effects("gen-1", request, db=fake_db)
+    
+        raw = await _body(response)
+        assert response.media_type == "audio/wav"
+>       _assert_tagged_and_unchanged(raw, processed, 24000)
+
+backend\tests\test_audio_disclosure.py:525: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = b'RIFF\xa6%\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\xc0]\x00\x00\x80\xbb\x00\x00\x02\x00\x10\x00data\x82%\x00\...6\x15\xfd\x10\xd9]\x04\xeb\xe9O\x16\x03\xea\xa3\xf9[\xf6;\x00\x19\xca\xd7\xda\xf4W\xbb\xc6A\xbcM \xcd\xee\x8f\xd7\xc7&'
+audio = array([-0.64153475,  0.02563997,  0.29635653, ..., -0.13434632,
+       -0.31593305,  0.3029736 ], dtype=float32)
+sample_rate = 24000
+
+    def _assert_tagged_and_unchanged(raw: bytes, audio: np.ndarray, sample_rate: int) -> None:
+        import io
+    
+>       assert _info_tags(raw).get("ICMT") == DISCLOSURE, _info_tags(raw)
+E       AssertionError: {}
+E       assert None == 'AI-generated by Voicebox'
+E        +  where None = <built-in method get of dict object at 0x0000028D7C880B40>('ICMT')
+E        +    where <built-in method get of dict object at 0x0000028D7C880B40> = {}.get
+E        +      where {} = _info_tags(b'RIFF\xa6%\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00\xc0]\x00\x00\x80\xbb\x00\x00\x02\x00\x10\x00data\x82%\x00\x00\xe2\xadH\x03\xef%\xd0\x079,\xff\x7fH\xb4h0\xb1\xaa\x99\x11\xc3\xe5\xc6C\xf4\xd3\x99\x1a9\xbfs\x91B\x16\xbeX\xa1\x1a\xb0\xcc\xbd\rG\'\xfe<\xbd\xc4\xa6#\xfd\x11W\xfe\xac\x008\xdd:\xe0(D@\rY\xe7k\x80\x1e\xd3\x1e\xe6M\xbe\xe3\xbbJ*W\xf3\xf9\xa8\xa3\xbb\xa8\xf0\x139\xdf\xb2iQ\x0c\xe7d\xa8E\x1a\x94I\xa4\xf48!\xb9\xefp\xffDU\xdd-m\xc2\xff\x7f\xb6\xcbl+\x80\x19\xad\xfb^\n\x9c\xf7\xdb*\x85\xdb\xe2\xc3U\x18\xf4X\x00\xf95W{\xfb\xbbOS1\xc3\x1a\xfb/&\xd5\x05\x05\x96\xaf\xde\xa4\x0b/^\xf8}3\xb5\x06k\xd8\xff\x7f\x81F\xc7\x08#\x01\x9eT\x85\xef\x0eN\x84!R\xbc\r&59\xfa\x1b\\1cF\xd8\xe6fsF\x08\xb0*\x19\xaf\xbd3\xf5$\x1e\xe2\xf6"\xdf\x19F3\xa6$\x9d\xe3\xcf\x02\x07\xa9\x19\x01\x98\xe5\xb96\xbdD\xd5 .\xa1\xac\x1am\xc7k\x16\x1a\x08)\xc8n\xbc\xf0*\x88lv\xfd\xac\x10\xed\xe3(\xf2Z\xaa=\x04\xbc\t8\xf0{\x05\xb8\xed{D\x18\xfc|\r31\xbc\t\xb0\x14\x8a\xa2A\xf3\x05b\xff\x13m4 \x14Z`\xb0\xd9\xae\xd6\xa8!A(>\x10(\x0f\xeb\xdd\x025\xdd\x01\x86\x19\x86\xe7\xffh\xf6\xe8\x89\x08\x8b\xc7m\xd6\xa8\xfd\xe2\xd5s\x06\x01\xd5<\x06n\x01\x11?\'\xe6\xac\xc7\xee\xd67\x91\xf1\x8f\x833\xd2ld\xec\xbb\x04\xdb\xe8...x96\x9a5\xea$\xa8\nw-\x8e\x11\xa9\xe6>\x0cn\x19#&q\x1cl\xfb\xb17h\xd9\xf08\x91\xfe\xe8\xe7\xb85\xdd\x01\xbd\x1c\x8f\x18\xef\xdb\n\xce{\n\xab\xe1=\x05\x03fP\x04\xab\xe3\x05\x1e)\xe7\xfb\xe8]\x07\x8a\x0f\x08\x13\xdc\x19\xa7\xa8\xd2\xc3\x93 \xb0\x0bY\xe3u\xc0\xa8\x14\x87\xda\xa8,5\xe7\x17B\x00\x80O\xa6\x02\n\xbe\xd4\xaa\xf4\x15\xf9 \xb4\x99 \xc2%N\xaa(\x03\xe0,l\xfb\xd8\xe3\xb4"0\x0e9\x0c\xe3d\xa5\xe2\x1d\xe1-\xe9\xae\xde\xe0\xca"\n^\xb8\x02\xc1W\x15t\xaeG\xe9(\xe2\xe3\xbc;\x08\r\xbc1\xf6\xd5\x15\xef\x0b\xf7\xd4\xf1 s\xda\x986\xab\xc4l`\xa48\x1b\xf5\xf1\xce\x18\x92\xb5\x15\x06,\x11%\xd66\xa5\xdd\xe1\xbd\xb9\xfc\x8a2\x8c\xf5V\xf0\xf6\xb89\xa5F\x13\x00\x80\x80N\xb1\x01\\\xba\xff\x7f,,\xdd\x02\x12q\xf0\xf1\x96\x01\x03\xdb$\xfa#\x0f\xd9\xf8\xf40\x96/S\x01\r\xc9\x8fO\x03\x07\x13W\x9aA\x19\xd6\x8d\x04\xf48\xc4\xfd\xc8\xd8\x8e\xaa\x88\x8d\x08\x15\x11\xe6bJj\xc8\r\xc5\xff\x7fn(\xc1\xeeN\x17\xac\x13\x18\x17\x18\x05\xa8\xfd\xb5\xfc\x96\xd8"I\xc2\x1b\x93\xd6\xac(|\xefh\x1c\xe4\xf9z\x1e\x15\xd8\xd5\x0b\xcc\x18\xa8\x9e\x7f\xe6L\x03\xbb\x05e\xe7\xe8N\xbe\x14\x8f\xdd\x93\xe4\xed\x16\x15\xfd\x10\xd9]\x04\xeb\xe9O\x16\x03\xea\xa3\xf9[\xf6;\x00\x19\xca\xd7\xda\xf4W\xbb\xc6A\xbcM \xcd\xee\x8f\xd7\xc7&')
+
+backend\tests\test_audio_disclosure.py:403: AssertionError
+============================== warnings summary ===============================
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:33: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:69: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ProfileSampleResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:146: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:211: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationEntryResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:269: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class HistoryResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:378: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureSettingsResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:419: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationSettingsResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:440: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class MCPClientBindingResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:720: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioChannelResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:752: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:766: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:798: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:906: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\models.py:920: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+tests/test_audio_disclosure.py::test_generation_service_saves_are_tagged
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+tests/test_audio_disclosure.py::test_profile_reference_sample_is_not_tagged
+tests/test_audio_disclosure.py::test_combined_reference_is_not_tagged
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:186: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+tests/test_audio_disclosure.py::test_profile_reference_sample_is_not_tagged
+tests/test_audio_disclosure.py::test_combined_reference_is_not_tagged
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:187: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    updated_at=datetime.utcnow(),
+
+tests/test_audio_disclosure.py::test_profile_reference_sample_is_not_tagged
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:16: DeprecationWarning: 'aifc' is deprecated and slated for removal in Python 3.13
+    import aifc
+
+tests/test_audio_disclosure.py::test_profile_reference_sample_is_not_tagged
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:17: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+tests/test_audio_disclosure.py::test_profile_reference_sample_is_not_tagged
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:19: DeprecationWarning: 'sunau' is deprecated and slated for removal in Python 3.13
+    import sunau
+
+tests/test_audio_disclosure.py::test_profile_reference_sample_is_not_tagged
+tests/test_audio_disclosure.py::test_combined_reference_is_not_tagged
+tests/test_audio_disclosure.py::test_combined_reference_is_not_tagged
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:248: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    profile.updated_at = datetime.utcnow()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase7\T054-red.xml -
+=========================== short test summary info ===========================
+FAILED backend\tests\test_audio_disclosure.py::test_wav_bytes_is_tagged_and_keeps_the_samples[24000-1]
+FAILED backend\tests\test_audio_disclosure.py::test_wav_bytes_is_tagged_and_keeps_the_samples[24000-2]
+FAILED backend\tests\test_audio_disclosure.py::test_wav_bytes_is_tagged_and_keeps_the_samples[48000-1]
+FAILED backend\tests\test_audio_disclosure.py::test_wav_bytes_is_tagged_and_keeps_the_samples[48000-2]
+FAILED backend\tests\test_audio_disclosure.py::test_wav_bytes_without_disclosure_matches_sf_write_exactly
+FAILED backend\tests\test_audio_disclosure.py::test_audio_to_wav_bytes_is_tagged_and_keeps_the_samples
+FAILED backend\tests\test_audio_disclosure.py::test_generate_stream_response_is_tagged
+FAILED backend\tests\test_audio_disclosure.py::test_effects_preview_response_is_tagged
+================== 8 failed, 37 passed, 26 warnings in 4.79s ==================

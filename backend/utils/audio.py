@@ -67,23 +67,64 @@ def load_audio(
     return audio, sr
 
 
+def _write_wav(target, audio: np.ndarray, sample_rate: int, disclosure: str | None) -> None:
+    """Write *audio* as WAV to a path or file-like *target*, like ``sf.write(..., format='WAV')``.
+
+    Same channel layout and default subtype as ``sf.write``, so the samples are
+    unchanged. With a *disclosure* the RIFF INFO chunk carries it as the ICMT
+    comment plus an ISFT software tag (FR-026); with ``None`` nothing is added.
+    """
+    data = np.asarray(audio)
+    channels = data.shape[1] if data.ndim == 2 else 1
+    with sf.SoundFile(target, 'w', samplerate=sample_rate, channels=channels, format='WAV') as f:
+        if disclosure is not None:
+            f.comment = disclosure
+            f.software = "Voicebox"
+        f.write(data)
+
+
+def wav_bytes(
+    audio: np.ndarray,
+    sample_rate: int,
+    *,
+    disclosure: str | None = AI_GENERATED_DISCLOSURE,
+) -> bytes:
+    """Encode *audio* as in-memory WAV bytes carrying the FR-026 disclosure.
+
+    The in-memory counterpart of :func:`save_audio`, for generated audio that is
+    streamed rather than saved (``/generate/stream``, non-persisted ``/speak``,
+    the effects preview). Samples and subtype are those of
+    ``sf.write(buf, audio, sample_rate, format='WAV')``.
+    """
+    import io
+
+    buf = io.BytesIO()
+    _write_wav(buf, audio, sample_rate, disclosure)
+    return buf.getvalue()
+
+
 def save_audio(
     audio: np.ndarray,
     path: str,
     sample_rate: int = 24000,
+    *,
+    disclosure: str | None = AI_GENERATED_DISCLOSURE,
 ) -> None:
     """
     Save audio file with atomic write and error handling.
 
     Writes to a temporary file first, then atomically renames to the
     target path.  This prevents corrupted/partial WAV files if the
-    process is interrupted mid-write.  The WAV's INFO chunk carries the
-    ``AI_GENERATED_DISCLOSURE`` comment (FR-026).
+    process is interrupted mid-write.  By default the WAV's INFO chunk
+    carries the ``AI_GENERATED_DISCLOSURE`` comment (FR-026).
 
     Args:
         audio: Audio array
         path: Output path
         sample_rate: Sample rate
+        disclosure: INFO comment to write. ``None`` for the user's own
+            recordings: no comment and no software tag, so libsndfile
+            writes no INFO chunk at all.
 
     Raises:
         OSError: If file cannot be written
@@ -97,15 +138,8 @@ def save_audio(
         Path(path).parent.mkdir(parents=True, exist_ok=True)
 
         # Write to temporary file first (explicit format since .tmp
-        # extension is not recognised by soundfile). Same channel layout and
-        # default subtype as sf.write, plus the FR-026 disclosure in the
-        # RIFF INFO chunk (ICMT comment, ISFT software); samples are unchanged.
-        data = np.asarray(audio)
-        channels = data.shape[1] if data.ndim == 2 else 1
-        with sf.SoundFile(temp_path, 'w', samplerate=sample_rate, channels=channels, format='WAV') as f:
-            f.comment = AI_GENERATED_DISCLOSURE
-            f.software = "Voicebox"
-            f.write(data)
+        # extension is not recognised by soundfile).
+        _write_wav(temp_path, audio, sample_rate, disclosure)
 
         # Atomic rename to final path
         os.replace(temp_path, path)

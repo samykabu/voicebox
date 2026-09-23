@@ -200,3 +200,326 @@ def test_failed_encode_cleans_up_and_creates_nothing(tmp_path: Path) -> None:
 
     assert not path.exists()
     assert not Path(f"{path}.tmp").exists()
+
+
+# ---------------------------------------------------------------------------
+# T053: the user's own recordings are not tagged as AI-generated (FR-026)
+#
+# save_audio(..., disclosure=None) writes exactly what the pre-T051 sf.write path
+# wrote (no LIST/INFO chunk). The callers that save real user audio pass it: profile
+# reference samples, the combined reference, and the transcription re-encode.
+# Generated saves stay tagged by default.
+# ---------------------------------------------------------------------------
+
+
+def _has_ai_tag(raw: bytes) -> bool:
+    return DISCLOSURE.encode() in raw or "ICMT" in _info_tags(raw) or "ISFT" in _info_tags(raw)
+
+
+@pytest.mark.parametrize("channels", [1, 2])
+@pytest.mark.parametrize("sample_rate", [16000, 24000, 48000])
+def test_disclosure_none_writes_the_pre_t051_file_byte_for_byte(tmp_path: Path, channels, sample_rate) -> None:
+    audio = _signal(channels)
+    untagged = tmp_path / "untagged.wav"
+    reference = tmp_path / "reference.wav"
+
+    audio_mod.save_audio(audio, str(untagged), sample_rate, disclosure=None)
+    _pre_t051_write(audio, reference, sample_rate)
+
+    assert untagged.read_bytes() == reference.read_bytes()
+    assert b"LIST" not in untagged.read_bytes()
+    assert not Path(f"{untagged}.tmp").exists()
+    with sf.SoundFile(str(untagged)) as f:
+        assert f.comment == ""
+        assert f.software == ""
+
+
+def test_plain_libsndfile_wav_has_no_info_chunk(tmp_path: Path) -> None:
+    """With neither comment nor software set, libsndfile writes no LIST/INFO chunk at all."""
+    path = tmp_path / "plain.wav"
+    _pre_t051_write(_signal(), path, 24000)
+
+    assert set(_riff_chunks(path.read_bytes())) == {b"fmt ", b"data"}
+
+
+def test_default_save_is_still_tagged(tmp_path: Path) -> None:
+    path = tmp_path / "generated.wav"
+
+    audio_mod.save_audio(_signal(), str(path), 24000)
+
+    assert _info_tags(path.read_bytes()).get("ICMT") == DISCLOSURE
+
+
+def test_generation_service_saves_are_tagged(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from backend import config
+    from backend.services import generation as generation_service
+
+    monkeypatch.setattr(config, "_data_dir", (tmp_path / "data").resolve())
+
+    stored = generation_service._save_retry(
+        generation_id="gen-1", audio=_signal(), sample_rate=24000, save_audio=audio_mod.save_audio
+    )
+
+    path = config.resolve_storage_path(stored)
+    assert _info_tags(Path(path).read_bytes()).get("ICMT") == DISCLOSURE
+
+
+@pytest.fixture
+def profile_db(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    from backend import config
+    from backend.database import Base
+
+    root = (tmp_path / "data").resolve()
+    root.mkdir()
+    monkeypatch.setattr(config, "_data_dir", root)
+    engine = create_engine(f"sqlite:///{tmp_path / 'test.db'}")
+    Base.metadata.create_all(bind=engine)
+    session = sessionmaker(autocommit=False, autoflush=False, bind=engine)()
+    yield session
+    session.close()
+    engine.dispose()
+
+
+def _tone_wav(path: Path, seconds: float = 3.0, sr: int = 24000, freq: float = 220.0) -> Path:
+    t = np.linspace(0, seconds, int(sr * seconds), endpoint=False)
+    sf.write(str(path), (0.3 * np.sin(2 * np.pi * freq * t)).astype(np.float32), sr)
+    return path
+
+
+async def _cloned_profile(db, reference: Path, n_samples: int = 1):
+    from backend.models import VoiceProfileCreate
+    from backend.services.profiles import add_profile_sample, create_profile
+
+    profile = await create_profile(
+        VoiceProfileCreate(name="Me", language="en", voice_type="cloned", default_engine="voxcpm"), db
+    )
+    samples = [await add_profile_sample(profile.id, str(reference), f"Sample {i}.", db) for i in range(n_samples)]
+    return profile, samples
+
+
+@pytest.mark.asyncio
+async def test_profile_reference_sample_is_not_tagged(profile_db, tmp_path: Path) -> None:
+    from backend import config
+
+    _, (sample,) = await _cloned_profile(profile_db, _tone_wav(tmp_path / "me.wav"))
+
+    saved = Path(config.resolve_storage_path(sample.audio_path))
+    raw = saved.read_bytes()
+    assert not _has_ai_tag(raw), _info_tags(raw)
+    assert set(_riff_chunks(raw)) == {b"fmt ", b"data"}
+
+
+@pytest.mark.asyncio
+async def test_combined_reference_is_not_tagged(profile_db, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import backend.backends as backends_pkg
+    from backend.services import profiles as profiles_mod
+
+    profile, _ = await _cloned_profile(profile_db, _tone_wav(tmp_path / "me.wav"), n_samples=2)
+    seen: dict = {}
+
+    class FakeBackend:
+        async def combine_voice_prompts(self, audio_paths, reference_texts):
+            return np.concatenate([_signal(), _signal()]), " ".join(reference_texts)
+
+        async def create_voice_prompt(self, audio_path, reference_text, **_k):
+            seen["path"] = audio_path
+            seen["raw"] = Path(audio_path).read_bytes()
+            return {"prompt_wav_path": audio_path, "prompt_text": reference_text}, False
+
+    cache_dir = tmp_path / "cache"
+    monkeypatch.setattr(profiles_mod, "_get_cache_dir", lambda: cache_dir)
+    monkeypatch.setattr(backends_pkg, "get_tts_backend_for_engine", lambda _engine: FakeBackend())
+
+    await profiles_mod.create_voice_prompt_for_profile(profile.id, profile_db, use_cache=False, engine="voxcpm")
+
+    assert Path(seen["path"]).name.startswith("combined_")
+    assert not _has_ai_tag(seen["raw"]), _info_tags(seen["raw"])
+    assert set(_riff_chunks(seen["raw"])) == {b"fmt ", b"data"}
+
+
+@pytest.mark.asyncio
+async def test_transcription_reencode_is_not_tagged(monkeypatch: pytest.MonkeyPatch) -> None:
+    import io
+
+    from fastapi import UploadFile
+
+    from backend.backends import WHISPER_HF_REPOS
+    from backend.routes import transcription as transcription_mod
+
+    seen: dict = {}
+    size = next(iter(WHISPER_HF_REPOS))
+
+    class FakeWhisper:
+        model_size = size
+
+        def is_loaded(self) -> bool:
+            return True
+
+        def _is_model_cached(self, _size) -> bool:
+            return True
+
+        async def transcribe(self, path, language, model_size):
+            seen["path"] = path
+            seen["raw"] = Path(path).read_bytes()
+            return "hello"
+
+    monkeypatch.setattr(audio_mod, "load_audio", lambda *_a, **_k: (_signal(), 24000))
+    monkeypatch.setattr(transcription_mod.transcribe, "get_whisper_model", lambda: FakeWhisper())
+
+    upload = UploadFile(file=io.BytesIO(b"not-really-webm"), filename="dictation.webm")
+    result = await transcription_mod.transcribe_audio(file=upload, language=None, model=None)
+
+    assert result.text == "hello"
+    assert seen["path"].endswith(".stt.wav")
+    assert not _has_ai_tag(seen["raw"]), _info_tags(seen["raw"])
+    assert set(_riff_chunks(seen["raw"])) == {b"fmt ", b"data"}
+
+
+# ---------------------------------------------------------------------------
+# T054: generated audio written to memory is tagged too (FR-026)
+#
+# /generate/stream and non-persisted /speak go through services.tts.audio_to_wav_bytes;
+# the effects preview wrote its own BytesIO. Both now use utils.audio.wav_bytes, which
+# writes the same INFO disclosure. The fmt and data chunks stay byte-identical to the
+# old sf.write(buf, ..., format="WAV") output.
+# ---------------------------------------------------------------------------
+
+
+def _pre_t054_bytes(audio: np.ndarray, sample_rate: int) -> bytes:
+    """What audio_to_wav_bytes and the effects preview wrote before T054."""
+    import io
+
+    buf = io.BytesIO()
+    sf.write(buf, audio, sample_rate, format="WAV")
+    return buf.getvalue()
+
+
+def _assert_tagged_and_unchanged(raw: bytes, audio: np.ndarray, sample_rate: int) -> None:
+    import io
+
+    assert _info_tags(raw).get("ICMT") == DISCLOSURE, _info_tags(raw)
+    assert _info_tags(raw).get("ISFT", "").startswith("Voicebox")
+    with sf.SoundFile(io.BytesIO(raw)) as f:
+        assert f.comment == DISCLOSURE
+        assert f.samplerate == sample_rate
+        assert f.subtype == "PCM_16"
+    reference = _riff_chunks(_pre_t054_bytes(audio, sample_rate))
+    got = _riff_chunks(raw)
+    assert got[b"data"] == reference[b"data"]
+    assert got[b"fmt "] == reference[b"fmt "]
+
+
+@pytest.mark.parametrize("channels", [1, 2])
+@pytest.mark.parametrize("sample_rate", [24000, 48000])
+def test_wav_bytes_is_tagged_and_keeps_the_samples(channels, sample_rate) -> None:
+    audio = _signal(channels)
+
+    raw = audio_mod.wav_bytes(audio, sample_rate)
+
+    assert isinstance(raw, bytes)
+    _assert_tagged_and_unchanged(raw, audio, sample_rate)
+
+
+def test_wav_bytes_without_disclosure_matches_sf_write_exactly() -> None:
+    audio = _signal()
+
+    assert audio_mod.wav_bytes(audio, 24000, disclosure=None) == _pre_t054_bytes(audio, 24000)
+
+
+def test_audio_to_wav_bytes_is_tagged_and_keeps_the_samples() -> None:
+    from backend.services import tts
+
+    audio = _signal()
+
+    raw = tts.audio_to_wav_bytes(audio, 48000)
+
+    _assert_tagged_and_unchanged(raw, audio, 48000)
+
+
+async def _body(response) -> bytes:
+    chunks = []
+    async for chunk in response.body_iterator:
+        chunks.append(chunk if isinstance(chunk, bytes) else chunk.encode())
+    return b"".join(chunks)
+
+
+@pytest.mark.asyncio
+async def test_generate_stream_response_is_tagged(monkeypatch: pytest.MonkeyPatch) -> None:
+    from types import SimpleNamespace
+
+    import backend.backends as backends_pkg
+    from backend import models
+    from backend.routes import generations as routes_mod
+
+    audio = _signal()
+
+    class Backend:
+        def is_loaded(self) -> bool:
+            return True
+
+        async def generate(self, text, voice_prompt, language="en", seed=None, instruct=None, options=None):
+            return audio, 24000
+
+    async def fake_get_profile(*_a, **_k):
+        return SimpleNamespace(default_engine=None, preset_engine=None, personality=None, effects_chain=None)
+
+    async def noop(*_a, **_k):
+        return None
+
+    async def fake_voice_prompt(*_a, **_k):
+        return {}
+
+    monkeypatch.setattr(routes_mod.profiles, "get_profile", fake_get_profile)
+    monkeypatch.setattr(routes_mod.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+    monkeypatch.setattr(routes_mod.profiles, "create_voice_prompt_for_profile", fake_voice_prompt)
+    monkeypatch.setattr(routes_mod.pronunciation, "apply_pronunciations", lambda text, *_a, **_k: (text, []))
+    monkeypatch.setattr(routes_mod, "_require_available_engine", lambda _engine: None)
+    monkeypatch.setattr(backends_pkg, "get_tts_backend_for_engine", lambda _engine: Backend())
+    monkeypatch.setattr(backends_pkg, "ensure_model_cached_or_raise", noop)
+    monkeypatch.setattr(backends_pkg, "load_engine_model", noop)
+
+    data = models.GenerationRequest(profile_id="p1", text="Hello.", engine="kokoro", normalize=False)
+    response = await routes_mod.stream_speech(data, db=None)
+
+    raw = await _body(response)
+    assert response.media_type == "audio/wav"
+    _assert_tagged_and_unchanged(raw, audio, 24000)
+
+
+@pytest.mark.asyncio
+async def test_effects_preview_response_is_tagged(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from types import SimpleNamespace
+
+    from backend import config, models
+    from backend.routes import effects as effects_mod
+    from backend.services import versions as versions_mod
+    from backend.utils import effects as effects_utils
+
+    processed = _signal()
+    source = tmp_path / "gen.wav"
+    source.write_bytes(b"placeholder")
+    gen = SimpleNamespace(id="gen-1", status="completed", audio_path="generations/gen.wav")
+
+    class FakeQuery:
+        def filter_by(self, **_k):
+            return self
+
+        def first(self):
+            return gen
+
+    fake_db = SimpleNamespace(query=lambda *_a: FakeQuery())
+    monkeypatch.setattr(versions_mod, "list_versions", lambda *_a, **_k: [])
+    monkeypatch.setattr(config, "resolve_storage_path", lambda _p: source)
+    monkeypatch.setattr(audio_mod, "load_audio", lambda *_a, **_k: (np.zeros(10, dtype=np.float32), 24000))
+    monkeypatch.setattr(effects_utils, "validate_effects_chain", lambda _chain: None)
+    monkeypatch.setattr(effects_utils, "apply_effects", lambda *_a, **_k: processed)
+
+    request = models.ApplyEffectsRequest(effects_chain=[models.EffectConfig(type="reverb")])
+    response = await effects_mod.preview_effects("gen-1", request, db=fake_db)
+
+    raw = await _body(response)
+    assert response.media_type == "audio/wav"
+    _assert_tagged_and_unchanged(raw, processed, 24000)

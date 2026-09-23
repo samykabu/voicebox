@@ -47,11 +47,10 @@ async def preview_effects(
     audio, sample_rate = await asyncio.to_thread(load_audio, str(resolved_source_path))
     processed = await asyncio.to_thread(apply_effects, audio, sample_rate, chain_dicts)
 
-    import soundfile as sf
+    from ..utils.audio import wav_bytes
 
-    buf = io.BytesIO()
-    await asyncio.to_thread(lambda: sf.write(buf, processed, sample_rate, format="WAV"))
-    buf.seek(0)
+    # Generated audio with effects applied: tagged like saved audio (FR-026).
+    buf = io.BytesIO(await asyncio.to_thread(wav_bytes, processed, sample_rate))
 
     return StreamingResponse(
         buf,

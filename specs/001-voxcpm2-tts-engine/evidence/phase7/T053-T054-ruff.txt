@@ -1,0 +1,114 @@
+# 2026-09-23T18:45:53+03:00
+# ruff: ruff 0.16.8; HEAD=6e48673; HEAD copies checked via stdin with --stdin-filename (same config), no git stash
+
+=== backend/utils/audio.py : HEAD ===
+backend\utils\audio.py:5:1: I001 [*] Import block is un-sorted or un-formatted
+backend\utils\audio.py:8:1: UP035 `typing.Tuple` is deprecated, use `tuple` instead
+backend\utils\audio.py:21:1: W293 Blank line contains whitespace
+backend\utils\audio.py:26:1: W293 Blank line contains whitespace
+backend\utils\audio.py:32:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:35:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:38:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:43:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:46:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:54:6: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backend\utils\audio.py:57:1: W293 Blank line contains whitespace
+backend\utils\audio.py:62:1: W293 Blank line contains whitespace
+backend\utils\audio.py:91:5: I001 [*] Import block is un-sorted or un-formatted
+backend\utils\audio.py:315:6: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backend\utils\audio.py:315:18: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:339:6: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backend\utils\audio.py:339:18: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:339:33: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:339:55: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:366:50: RUF010 [*] Use explicit conversion flag
+Found 20 errors.
+[*] 15 fixable with the `--fix` option (4 hidden fixes can be enabled with the `--unsafe-fixes` option).
+=== backend/utils/audio.py : working tree ===
+backend\utils\audio.py:5:1: I001 [*] Import block is un-sorted or un-formatted
+backend\utils\audio.py:8:1: UP035 `typing.Tuple` is deprecated, use `tuple` instead
+backend\utils\audio.py:21:1: W293 Blank line contains whitespace
+backend\utils\audio.py:26:1: W293 Blank line contains whitespace
+backend\utils\audio.py:32:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:35:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:38:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:43:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:46:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:54:6: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backend\utils\audio.py:57:1: W293 Blank line contains whitespace
+backend\utils\audio.py:62:1: W293 Blank line contains whitespace
+backend\utils\audio.py:132:5: I001 [*] Import block is un-sorted or un-formatted
+backend\utils\audio.py:349:6: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backend\utils\audio.py:349:18: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:373:6: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backend\utils\audio.py:373:18: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:373:33: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:373:55: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:400:50: RUF010 [*] Use explicit conversion flag
+Found 20 errors.
+[*] 15 fixable with the `--fix` option (4 hidden fixes can be enabled with the `--unsafe-fixes` option).
+--- HEAD rules:  2 : I001  1 : RUF010  3 : UP006  1 : UP035  4 : UP045  9 : W293 | working tree rules:  2 : I001  1 : RUF010  3 : UP006  1 : UP035  4 : UP045  9 : W293 
+
+=== backend/services/profiles.py : HEAD ===
+backend\services\profiles.py:8:21: F401 [*] `pathlib.Path` imported but unused
+Found 1 error.
+[*] 1 fixable with the `--fix` option.
+=== backend/services/profiles.py : working tree ===
+backend\services\profiles.py:8:21: F401 [*] `pathlib.Path` imported but unused
+Found 1 error.
+[*] 1 fixable with the `--fix` option.
+--- HEAD rules:  1 : F401 | working tree rules:  1 : F401 
+
+=== backend/routes/transcription.py : HEAD ===
+backend\routes\transcription.py:40:9: I001 [*] Import block is un-sorted or un-formatted
+backend\routes\transcription.py:101:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+Found 2 errors.
+[*] 1 fixable with the `--fix` option.
+=== backend/routes/transcription.py : working tree ===
+backend\routes\transcription.py:40:9: I001 [*] Import block is un-sorted or un-formatted
+backend\routes\transcription.py:102:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+Found 2 errors.
+[*] 1 fixable with the `--fix` option.
+--- HEAD rules:  1 : B904  1 : I001 | working tree rules:  1 : B904  1 : I001 
+
+=== backend/services/tts.py : HEAD ===
+backend\services\tts.py:5:1: I001 [*] Import block is un-sorted or un-formatted
+backend\services\tts.py:5:20: F401 [*] `typing.Optional` imported but unused
+backend\services\tts.py:16:1: W293 Blank line contains whitespace
+Found 3 errors.
+[*] 2 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).
+=== backend/services/tts.py : working tree ===
+backend\services\tts.py:5:1: I001 [*] Import block is un-sorted or un-formatted
+backend\services\tts.py:5:20: F401 [*] `typing.Optional` imported but unused
+backend\services\tts.py:14:1: W293 Blank line contains whitespace
+Found 3 errors.
+[*] 2 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).
+--- HEAD rules:  1 : F401  1 : I001  1 : W293 | working tree rules:  1 : F401  1 : I001  1 : W293 
+
+=== backend/routes/effects.py : HEAD ===
+backend\routes\effects.py:3:1: I001 [*] Import block is un-sorted or un-formatted
+backend\routes\effects.py:31:5: I001 [*] Import block is un-sorted or un-formatted
+backend\routes\effects.py:104:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\effects.py:122:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\effects.py:135:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\effects.py:172:5: I001 [*] Import block is un-sorted or un-formatted
+Found 6 errors.
+[*] 3 fixable with the `--fix` option.
+=== backend/routes/effects.py : working tree ===
+backend\routes\effects.py:3:1: I001 [*] Import block is un-sorted or un-formatted
+backend\routes\effects.py:31:5: I001 [*] Import block is un-sorted or un-formatted
+backend\routes\effects.py:103:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\effects.py:121:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\effects.py:134:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\effects.py:171:5: I001 [*] Import block is un-sorted or un-formatted
+Found 6 errors.
+[*] 3 fixable with the `--fix` option.
+--- HEAD rules:  3 : B904  3 : I001 | working tree rules:  3 : B904  3 : I001 
+
+=== backend/tests/test_audio_disclosure.py : HEAD ===
+All checks passed!
+=== backend/tests/test_audio_disclosure.py : working tree ===
+All checks passed!
+--- HEAD rules: | working tree rules: 
+
+# Verdict: no new findings; identical rule counts per file vs HEAD (line numbers shifted only). tts.py F401 is the pre-existing unused typing.Optional in both; the io/soundfile imports made unused by T054 were removed.

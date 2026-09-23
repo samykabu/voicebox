@@ -2,32 +2,26 @@
   "dry_run": false,
   "changes": [
     {
-      "task": "T034",
-      "number": 52,
+      "task": "T037",
+      "number": 55,
       "from": "open",
       "to": "closed"
     },
     {
-      "task": "T035",
-      "number": 53,
+      "task": "T050",
+      "number": 66,
       "from": "open",
       "to": "closed"
     },
     {
-      "task": "T036",
-      "number": 54,
+      "task": "T051",
+      "number": 67,
       "from": "open",
       "to": "closed"
     },
     {
-      "task": "T048",
-      "number": 64,
-      "from": "open",
-      "to": "closed"
-    },
-    {
-      "task": "T049",
-      "number": 65,
+      "task": "T052",
+      "number": 68,
       "from": "open",
       "to": "closed"
     }
