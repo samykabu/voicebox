@@ -66,7 +66,7 @@ All of these are additive. Existing requests and files keep working.
 - Profile export manifests are now version 1.1, with `voice_type`,
   `design_prompt`, `default_engine`, `preset_engine` and `preset_voice_id`.
   Version 1.0 archives still import, as cloned profiles.
-- Generation export manifests are now version 1.1 and carry `voice_description`, `engine` and `model_size`; import restores the description, and restores `engine` and `model_size` only after validating them against the TTS engine registry (an unknown engine falls back to the default engine, an invalid size to that engine's default size, each with a logged warning). 1.0 archives import with no description and the default engine.
+- Generation export manifests are now version 1.1 and carry `voice_description`, `engine` and `model_size`; import restores `engine` and `model_size` only after validating them against the TTS engine registry (an unknown engine falls back to the default engine, an invalid size to that engine's default size, each with a logged warning), and validates the imported `voice_description` like the API does: it is kept, stripped, only when it is a string of at most 500 characters and the restored engine supports voice design, otherwise it is stored as null with a logged warning and the import still succeeds. 1.0 archives import with no description and the default engine.
 - Generated WAV audio now includes a RIFF `LIST/INFO` chunk (`ICMT` comment,
   `ISFT` software). This covers saved files and the bytes returned by
   `/generate/stream` and the effects preview. The audio samples are unchanged.

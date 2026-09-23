@@ -1,0 +1,65 @@
+Command: backend/venv/Scripts/python.exe -m pytest backend/tests/test_review_s6.py -q -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/review/S6-red.xml
+Started: 2026-09-23T18:53:02Z
+Note: MAX_VOICE_DESCRIPTION_CHARS already added to backend/models.py (no behaviour change); export_import.py at HEAD.
+
+  D:\Projects\Personal\voicebox\backend\models.py:773: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+backend\models.py:787
+  D:\Projects\Personal\voicebox\backend\models.py:787: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+backend\models.py:819
+  D:\Projects\Personal\voicebox\backend\models.py:819: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+backend\models.py:927
+  D:\Projects\Personal\voicebox\backend\models.py:927: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+backend\models.py:941
+  D:\Projects\Personal\voicebox\backend\models.py:941: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+tests/test_review_s6.py: 66 warnings
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\sqlalchemy\sql\schema.py:3627: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+tests/test_review_s6.py: 33 warnings
+  D:\Projects\Personal\voicebox\backend\services\export_import.py:533: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_non_string_description_is_stored_as_null_and_the_audio_is_kept[bogus0]
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_non_string_description_is_stored_as_null_and_the_audio_is_kept[bogus1]
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_non_string_description_is_stored_as_null_and_the_audio_is_kept[42]
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_non_string_description_is_stored_as_null_and_the_audio_is_kept[True]
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_over_limit_description_is_stored_as_null_with_a_warning
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_limit_applies_after_stripping
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_description_on_an_engine_without_voice_design_is_stored_as_null[qwen]
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_description_on_an_engine_without_voice_design_is_stored_as_null[kokoro]
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_description_with_no_restored_engine_uses_the_default_engine
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_valid_voxcpm_description_round_trips_stripped
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_whitespace_only_description_is_stored_as_null[]
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_whitespace_only_description_is_stored_as_null[   ]
+FAILED backend\tests\test_review_s6.py::TestImportedVoiceDescription::test_whitespace_only_description_is_stored_as_null[\n\t ]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_matching_type_gets_a_safe_fallback_and_the_audio_is_kept[instruct-bogus0-None]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_matching_type_gets_a_safe_fallback_and_the_audio_is_kept[instruct-bogus1-None]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_matching_type_gets_a_safe_fallback_and_the_audio_is_kept[seed-bogus2-None]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_matching_type_gets_a_safe_fallback_and_the_audio_is_kept[seed-7-None]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_matching_type_gets_a_safe_fallback_and_the_audio_is_kept[seed-True-None]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_matching_type_gets_a_safe_fallback_and_the_audio_is_kept[seed-1.5-None]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_matching_type_gets_a_safe_fallback_and_the_audio_is_kept[duration-bogus6-None]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_matching_type_gets_a_safe_fallback_and_the_audio_is_kept[duration-2.0-None]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_matching_type_gets_a_safe_fallback_and_the_audio_is_kept[duration-True-None]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_matching_type_gets_a_safe_fallback_and_the_audio_is_kept[language-bogus9-en]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_matching_type_gets_a_safe_fallback_and_the_audio_is_kept[language-bogus10-en]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_string_or_blank_text_rejects_the_import_without_leaving_audio[bogus0]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_string_or_blank_text_rejects_the_import_without_leaving_audio[bogus1]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_string_or_blank_text_rejects_the_import_without_leaving_audio[42]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_string_or_blank_text_rejects_the_import_without_leaving_audio[None]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_non_string_or_blank_text_rejects_the_import_without_leaving_audio[   ]
+FAILED backend\tests\test_review_s6.py::TestImportedOtherFields::test_a_failed_commit_removes_the_copied_audio
+30 failed, 4 passed, 115 warnings in 6.77s
+Finished: 2026-09-23T18:53:10Z

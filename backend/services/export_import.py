@@ -427,6 +427,68 @@ def _validated_engine_fields(generation_data: dict) -> dict:
     return {"engine": engine, "model_size": model_size}
 
 
+def _validated_voice_description(generation_data: dict, engine: str) -> str | None:
+    """Return the ``voice_description`` to restore from a generation manifest, or None.
+
+    The manifest value gets the same checks as ``POST /generate``: it must be a string of
+    at most ``MAX_VOICE_DESCRIPTION_CHARS`` characters once stripped (the API rejects a
+    longer one rather than truncating it, so import stores null), and it is then kept only
+    when *engine*, the engine the row is restored with, supports voice design
+    (``stored_voice_description``). A blank value stores null. Every rejected non-blank
+    value is logged as a warning.
+    """
+    from ..models import MAX_VOICE_DESCRIPTION_CHARS
+    from .generation import stored_voice_description
+
+    value = generation_data.get("voice_description")
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        logger.warning(
+            "Generation import: voice_description is a %s, not a string; storing null",
+            type(value).__name__,
+        )
+        return None
+    value = value.strip()
+    if not value:
+        return None
+    if len(value) > MAX_VOICE_DESCRIPTION_CHARS:
+        logger.warning(
+            "Generation import: voice_description has %d characters, over the %d limit; storing null",
+            len(value),
+            MAX_VOICE_DESCRIPTION_CHARS,
+        )
+        return None
+    stored = stored_voice_description(engine, value)
+    if stored is None:
+        logger.warning(
+            "Generation import: engine %r does not support voice design; storing voice_description as null",
+            engine,
+        )
+    return stored
+
+
+def _manifest_value(generation_data: dict, field: str, types: tuple[type, ...], fallback):
+    """Return ``generation_data[field]`` when it is one of *types*, else *fallback*.
+
+    ``bool`` is never accepted (it is an ``int`` subclass). A missing or null value
+    returns *fallback* silently; any other rejected value is logged as a warning, so a
+    crafted manifest cannot fail the database commit.
+    """
+    value = generation_data.get(field)
+    if value is None:
+        return fallback
+    if isinstance(value, bool) or not isinstance(value, types):
+        logger.warning(
+            "Generation import: %s is a %s, not the expected type; using %r",
+            field,
+            type(value).__name__,
+            fallback,
+        )
+        return fallback
+    return value
+
+
 async def import_generation_from_zip(file_bytes: bytes, db: Session) -> dict:
     """
     Import a generation from a ZIP archive.
@@ -474,7 +536,24 @@ async def import_generation_from_zip(file_bytes: bytes, db: Session) -> dict:
             for field in required_fields:
                 if field not in generation_data:
                     raise ValueError(f"Invalid manifest.json: missing generation.{field}")
-            
+
+            # Type-check every restored field before any file is copied, so a crafted
+            # value cannot fail the commit and orphan the audio (review S6).
+            text = generation_data["text"]
+            if not isinstance(text, str) or not text.strip():
+                raise ValueError("Invalid manifest.json: generation.text must be a non-empty string")
+            engine_fields = _validated_engine_fields(generation_data)
+            restored_engine = engine_fields.get("engine") or DBGeneration.__table__.c.engine.default.arg
+            restored_fields = {
+                "text": text,
+                "language": _manifest_value(generation_data, "language", (str,), "en"),
+                "duration": _manifest_value(generation_data, "duration", (int, float), None),
+                "seed": _manifest_value(generation_data, "seed", (int,), None),
+                "instruct": _manifest_value(generation_data, "instruct", (str,), None),
+                "voice_description": _validated_voice_description(generation_data, restored_engine),
+                **engine_fields,
+            }
+
             # Find audio file in archive
             audio_files = [f for f in namelist if f.startswith("audio/") and f.endswith(".wav")]
             if not audio_files:
@@ -523,19 +602,19 @@ async def import_generation_from_zip(file_bytes: bytes, db: Session) -> dict:
                 db_generation = DBGeneration(
                     id=new_generation_id,
                     profile_id=profile_id,
-                    text=generation_data["text"],
-                    language=generation_data["language"],
                     audio_path=config.to_storage_path(audio_dest),
-                    duration=generation_data["duration"],
-                    seed=generation_data.get("seed"),
-                    instruct=generation_data.get("instruct"),
-                    voice_description=generation_data.get("voice_description"),
                     created_at=datetime.utcnow(),
-                    **_validated_engine_fields(generation_data),
+                    **restored_fields,
                 )
-                
-                db.add(db_generation)
-                db.commit()
+
+                try:
+                    db.add(db_generation)
+                    db.commit()
+                except Exception:
+                    # Never leave the copied audio behind without a row that references it.
+                    db.rollback()
+                    audio_dest.unlink(missing_ok=True)
+                    raise
                 db.refresh(db_generation)
                 
                 return {

@@ -78,6 +78,11 @@ class ProfileSampleResponse(BaseModel):
         from_attributes = True
 
 
+# Longest written voice description ``POST /generate`` accepts (a longer one is a 422, not
+# truncated). Generation import applies the same limit to a manifest's voice_description.
+MAX_VOICE_DESCRIPTION_CHARS = 500
+
+
 class GenerationRequest(BaseModel):
     """Request model for voice generation."""
 
@@ -107,7 +112,7 @@ class GenerationRequest(BaseModel):
     )
     voice_description: str | None = Field(
         None,
-        max_length=500,
+        max_length=MAX_VOICE_DESCRIPTION_CHARS,
         description="Written voice description for engines that support voice design. Never sent as instruct.",
     )
     advanced_settings: dict[str, float] | None = Field(

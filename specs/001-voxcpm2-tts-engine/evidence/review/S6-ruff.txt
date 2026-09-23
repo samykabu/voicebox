@@ -1,0 +1,44 @@
+S6 ruff evidence  2026-09-23T18:54:19Z  (ruff 0.16.8)
+
+== ruff check backend/tests/test_review_s6.py (new file)
+All checks passed!
+== ruff format --check backend/tests/test_review_s6.py
+1 file already formatted
+
+== ruff check backend/services/export_import.py : per-rule counts HEAD vs working tree
+-- HEAD
+      6 : B904 
+      1 : F401 
+      2 : F841 
+      2 : I001 
+      2 : RUF010 
+     63 : W293 
+-- working tree
+      6 : B904 
+      1 : F401 
+      2 : F841 
+      2 : I001 
+      2 : RUF010 
+     61 : W293 
+-- totals: HEAD 76 / now 74
+== ruff format --check backend/services/export_import.py (file was already unformatted at HEAD; not reformatted wholesale to keep the diff reviewable)
+-- HEAD: would reformat
+-- now:  would reformat
+
+== ruff check backend/models.py : per-rule counts HEAD vs working tree
+-- HEAD
+      1 : I001 
+     37 : UP006 
+      2 : UP035 
+    147 : UP045 
+-- working tree
+      1 : I001 
+     37 : UP006 
+      2 : UP035 
+    147 : UP045 
+-- totals: HEAD 187 / now 187
+== ruff format --check backend/models.py (file was already unformatted at HEAD; not reformatted wholesale to keep the diff reviewable)
+-- HEAD: would reformat
+-- now:  would reformat
+
+== none of the lines S6 added to export_import.py or models.py appear in 'ruff format --diff' removals (checked by matching the added lines against the formatter's '-' lines: 0 matches); the remaining format drift is pre-existing at HEAD.
