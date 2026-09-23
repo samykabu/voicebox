@@ -36,6 +36,13 @@ inputs:
     default: "auto"
     prompt: "Integration to use (e.g. claude, copilot, gemini; 'auto' uses the project's initialized integration)"
 
+scope:
+  keep_together:
+    target: 20
+    tolerance: 2
+    unit: points
+    inclusive: true
+
 steps:
   - id: specify
     command: speckit.specify
