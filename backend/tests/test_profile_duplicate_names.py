@@ -12,13 +12,9 @@ from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# Add parent directory to path to import backend modules
-import sys
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from database import Base, VoiceProfile as DBVoiceProfile
-from models import VoiceProfileCreate
-from profiles import create_profile, update_profile
+from backend.database import Base, VoiceProfile as DBVoiceProfile
+from backend.models import VoiceProfileCreate
+from backend.services.profiles import create_profile, update_profile
 
 
 @pytest.fixture
@@ -39,6 +35,7 @@ def test_db():
 
     # Cleanup
     db.close()
+    engine.dispose()
     shutil.rmtree(temp_dir)
 
 
