@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  AlertTriangle,
   ChevronDown,
   ChevronRight,
   ChevronUp,
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import { DownloadConfirmDialog } from '@/components/Generation/DownloadConfirmDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,6 +49,18 @@ import {
   HABIBI_MODELS,
   isHabibiModelId,
 } from '@/lib/constants/habibiModels';
+import {
+  type DownloadConfirmationDetails,
+  downloadConfirmationDetails,
+  downloadDecision,
+  engineNotice,
+  PRE_CAPABILITY_ENGINES,
+} from '@/lib/hooks/engineCapabilityRules';
+import {
+  findEngineCapability,
+  loadEngineCapabilities,
+  useEngineCapabilities,
+} from '@/lib/hooks/useEngineCapabilities';
 import { useModelDownloadToast } from '@/lib/hooks/useModelDownloadToast';
 import { usePlatform } from '@/platform/PlatformContext';
 import { useServerStore } from '@/stores/serverStore';
@@ -78,6 +92,8 @@ const MODEL_DESCRIPTIONS: Record<string, string> = {
     'Qwen3-TTS CustomVoice 1.7B by Alibaba. 9 premium preset voices with instruct-based style control for tone, emotion, and prosody. Supports 10 languages.',
   'qwen-custom-voice-0.6B':
     'Qwen3-TTS CustomVoice 0.6B by Alibaba. Lightweight version with the same 9 preset voices and instruct control. Faster inference for lower-end hardware.',
+  voxcpm2:
+    'VoxCPM2 by OpenBMB. Multilingual TTS covering 30 languages including Arabic, with voice design from a written description. Apache-2.0 licensed; commercial use allowed.',
   'whisper-base':
     'Smallest Whisper model (74M parameters). Fast transcription with moderate accuracy.',
   'whisper-small':
@@ -99,6 +115,15 @@ const MODEL_DESCRIPTIONS: Record<string, string> = {
 for (const model of HABIBI_MODELS) {
   MODEL_DESCRIPTIONS[model.id] = model.description;
 }
+
+/**
+ * Engine of each model whose engine the app reads from GET /models/engines. Registration
+ * only: what the UI does with the model (confirmation, size, licence) comes from the
+ * engine's capability, never from this name.
+ */
+const MODEL_ENGINES: Record<string, string> = {
+  voxcpm2: 'voxcpm',
+};
 
 function formatDownloads(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -140,6 +165,7 @@ export function ModelManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const platform = usePlatform();
+  const serverUrl = useServerStore((state) => state.serverUrl);
   const customModelsDir = useServerStore((state) => state.customModelsDir);
   const setCustomModelsDir = useServerStore((state) => state.setCustomModelsDir);
   const [migrating, setMigrating] = useState(false);
@@ -266,7 +292,47 @@ export function ModelManagement() {
     sizeMb?: number;
   } | null>(null);
 
+  const { data: engineCapabilities } = useEngineCapabilities();
+  const getModelCapability = (modelName: string) =>
+    findEngineCapability(engineCapabilities, MODEL_ENGINES[modelName]);
+  const [pendingDownload, setPendingDownload] = useState<
+    (DownloadConfirmationDetails & { modelName: string }) | null
+  >(null);
+
+  // FR-018 / C1Q7: engines whose capability requires it are confirmed before downloading.
+  // It fails closed: a model whose engine depends on a capability that cannot be loaded is
+  // not downloaded. The list is loaded first when it has not arrived yet (cold start).
   const handleDownload = async (modelName: string) => {
+    const engine = MODEL_ENGINES[modelName];
+    const capability =
+      getModelCapability(modelName) ??
+      findEngineCapability(
+        engine ? await loadEngineCapabilities(queryClient, serverUrl) : undefined,
+        engine,
+      );
+    const model = modelStatus?.models.find((m) => m.model_name === modelName);
+    const decision = downloadDecision(engine, capability, model, PRE_CAPABILITY_ENGINES);
+    if (decision === 'refuse') {
+      toast({
+        title: t('engines.detailsUnavailable.title'),
+        description: t('engines.detailsUnavailable.description', {
+          name: model?.display_name || modelName,
+        }),
+        variant: 'destructive',
+      });
+      return;
+    }
+    if (decision === 'confirm' && capability) {
+      setPendingDownload({
+        ...downloadConfirmationDetails(capability, model?.display_name),
+        modelName,
+      });
+      return;
+    }
+    void startDownload(modelName);
+  };
+
+  const startDownload = async (modelName: string) => {
     setDismissedErrors((prev) => {
       const next = new Set(prev);
       next.delete(modelName);
@@ -426,7 +492,8 @@ export function ModelManagement() {
         m.model_name.startsWith('tada') ||
         m.model_name.startsWith('kokoro') ||
         m.model_name.startsWith('f5-tts') ||
-        m.model_name.startsWith('habibi-'),
+        m.model_name.startsWith('habibi-') ||
+        m.model_name.startsWith('voxcpm'),
     ) ?? [];
   const whisperModels = modelStatus?.models.filter((m) => m.model_name.startsWith('whisper')) ?? [];
   const llmModels = modelStatus?.models.filter((m) => m.model_name.startsWith('qwen3-')) ?? [];
@@ -459,6 +526,10 @@ export function ModelManagement() {
   const selectedLicense = freshSelectedModel?.license_id ?? selectedHabibiModel?.license;
   const selectedCommercialUse =
     freshSelectedModel?.commercial_use ?? selectedHabibiModel?.commercialUse;
+  const selectedCapability = freshSelectedModel
+    ? getModelCapability(freshSelectedModel.model_name)
+    : undefined;
+  const selectedNotice = engineNotice(selectedCapability, t);
 
   return (
     <div className="flex flex-col h-full">
@@ -730,7 +801,7 @@ export function ModelManagement() {
                       {t('common.error')}
                     </Badge>
                   )}
-                  {selectedHabibiModel && (
+                  {selectedLicense && (
                     <Badge
                       variant="outline"
                       className={
@@ -830,6 +901,28 @@ export function ModelManagement() {
                   </div>
                 )}
 
+                {/* Declared download size (FR-018) */}
+                {!freshSelectedModel.downloaded && selectedCapability && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Download className="h-3.5 w-3.5" />
+                    <span>
+                      {t('models.detail.downloadSize', {
+                        size: formatSize(selectedCapability.size_mb),
+                        defaultValue: 'Download size: {{size}}',
+                      })}
+                    </span>
+                  </div>
+                )}
+
+                {/* FR-003 / C1Q4: why the engine cannot run here, or an advisory warning
+                    (for example too little memory) shown before Download. Never blocks it. */}
+                {selectedNotice && (
+                  <div className="flex items-start gap-2 text-xs text-amber-600 dark:text-amber-400">
+                    <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                    <span>{selectedNotice.text}</span>
+                  </div>
+                )}
+
                 {/* Disk size */}
                 {freshSelectedModel.downloaded && freshSelectedModel.size_mb && (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -853,7 +946,7 @@ export function ModelManagement() {
                     <>
                       <Button
                         size="sm"
-                        onClick={() => handleDownload(freshSelectedModel.model_name)}
+                        onClick={() => void handleDownload(freshSelectedModel.model_name)}
                         variant="outline"
                         className="flex-1"
                       >
@@ -951,7 +1044,7 @@ export function ModelManagement() {
                   ) : (
                     <Button
                       size="sm"
-                      onClick={() => handleDownload(freshSelectedModel.model_name)}
+                      onClick={() => void handleDownload(freshSelectedModel.model_name)}
                       className="flex-1"
                     >
                       <Download className="h-4 w-4 mr-2" />
@@ -964,6 +1057,16 @@ export function ModelManagement() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Download confirmation for engines that require it (FR-018, C1Q7) */}
+      <DownloadConfirmDialog
+        details={pendingDownload}
+        onConfirm={() => {
+          if (pendingDownload) void startDownload(pendingDownload.modelName);
+          setPendingDownload(null);
+        }}
+        onCancel={() => setPendingDownload(null)}
+      />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

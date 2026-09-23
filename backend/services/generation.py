@@ -26,6 +26,156 @@ from ..database import get_db
 from ..utils.tasks import get_task_manager
 
 
+class EngineUnavailableError(ValueError):
+    """The availability resolver marked an engine unusable on this machine (FR-003).
+
+    ``reason`` is the resolver's user-facing sentence, passed through unchanged.
+    """
+
+    def __init__(self, engine: str, reason: str) -> None:
+        super().__init__(reason)
+        self.engine = engine
+        self.reason = reason
+
+
+def ensure_engine_available(engine: str) -> None:
+    """Refuse *engine* when the availability resolver marks it unavailable here (FR-003).
+
+    Generic: reads the accelerators declared by the engine's default-size config and
+    resolves them against the detected hardware, the same rule ``GET /models/engines``
+    reports. Engines that declare no accelerators (every pre-existing engine) are
+    unconstrained, so hardware is not probed for them and they proceed as before; unknown
+    engines are left to the existing lookups. Detection reads device state only: it never
+    loads a model or starts a download, and torch is imported lazily inside it.
+
+    Raises:
+        EngineUnavailableError: carrying the resolver's ``reason``.
+    """
+    from ..backends import get_default_model_size, get_tts_model_configs
+    from ..backends.base import detect_engine_availability
+
+    variants = [c for c in get_tts_model_configs() if c.engine == engine]
+    if not variants:
+        return
+    default_size = get_default_model_size(engine)
+    config = next((c for c in variants if c.model_size == default_size), variants[0])
+    if not config.accelerators:
+        return
+
+    availability = detect_engine_availability(config, min_memory_mb=config.min_memory_mb)
+    if not availability.available:
+        raise EngineUnavailableError(engine, availability.reason or f"{config.display_name} is unavailable.")
+
+
+def profile_design_prompt(voice_prompt) -> str | None:
+    """Return a designed profile's saved description from its voice prompt, else None (FR-015a).
+
+    ``profiles.create_voice_prompt_for_profile`` returns ``{"voice_type": "designed",
+    "design_prompt": ...}`` for a designed profile; any other prompt yields None.
+    """
+    if not isinstance(voice_prompt, dict) or voice_prompt.get("voice_type") != "designed":
+        return None
+    return voice_prompt.get("design_prompt") or None
+
+
+def resolve_backend_instruct(
+    engine: str,
+    instruct: str | None,
+    voice_description: str | None,
+    *,
+    profile_design_prompt: str | None = None,
+) -> str | None:
+    """Return what goes into the backend's ``instruct`` parameter for *engine* (FR-015).
+
+    Generic: reads the capability flags of the engine's default-size config, never its name.
+
+    * An engine declaring ``supports_voice_design`` gets the stripped written voice
+      description when one is given. Without one it gets the delivery ``instruct`` only if
+      it also declares ``supports_instruct``, so a delivery instruction never reaches an
+      engine that would encode it as a voice description (C1Q5). A blank request
+      description falls back to *profile_design_prompt*, a designed profile's saved
+      description (FR-015a).
+    * Every other engine, and any unknown engine, gets ``instruct`` unchanged and never the
+      description: exactly today's behaviour.
+
+    Precedence against reference audio (C1Q6) is the backend's job: it ignores the
+    description when the voice prompt carries a recording.
+    """
+    config = _default_config(engine)
+    if config is None or not config.supports_voice_design:
+        return instruct
+
+    description = (voice_description or "").strip() or (profile_design_prompt or "").strip()
+    if description:
+        return description
+    return instruct if config.supports_instruct else None
+
+
+def _default_config(engine: str):
+    """Return *engine*'s default-size ``ModelConfig``, or None for an unknown engine."""
+    from ..backends import get_default_model_size, get_tts_model_configs
+
+    variants = [c for c in get_tts_model_configs() if c.engine == engine]
+    if not variants:
+        return None
+    default_size = get_default_model_size(engine)
+    return next((c for c in variants if c.model_size == default_size), variants[0])
+
+
+def stored_voice_description(engine: str, voice_description: str | None) -> str | None:
+    """Return the voice description to store on a generation row, or None (FR-015).
+
+    The request's description, stripped, only when *engine* declares ``supports_voice_design``
+    (the same capability ``resolve_backend_instruct`` reads), so retry and regenerate can
+    replay it. Every other engine, an unknown engine, and a blank description store None.
+    A designed profile's ``design_prompt`` is not copied here: it stays the fallback at run
+    time, so a later edit to the profile still applies to a row that stored None.
+    """
+    config = _default_config(engine)
+    if config is None or not config.supports_voice_design:
+        return None
+    return (voice_description or "").strip() or None
+
+
+def engine_declares_advanced_settings(engine: str) -> bool:
+    """Whether any model config of *engine* declares advanced settings (FR-010)."""
+    from ..backends import get_tts_model_configs
+
+    return any(c.advanced_settings for c in get_tts_model_configs() if c.engine == engine)
+
+
+class _BackendWithOptions:
+    """Forwards ``options`` to ``generate()`` and delegates everything else.
+
+    ``generate_chunked`` calls ``backend.generate(text, voice_prompt, language,
+    seed, instruct)``; wrapping the backend adds the additive ``options`` keyword
+    without changing that call for any other engine.
+    """
+
+    def __init__(self, backend, options: dict[str, float]) -> None:
+        self._backend = backend
+        self._options = options
+
+    async def generate(self, *args, **kwargs):
+        return await self._backend.generate(*args, options=self._options, **kwargs)
+
+    def __getattr__(self, name: str):
+        return getattr(self._backend, name)
+
+
+def backend_with_generation_options(backend, engine: str, advanced_settings: dict[str, float] | None):
+    """Return *backend*, wrapped to receive ``options`` only when that applies.
+
+    Settings go only to engines whose ``ModelConfig.advanced_settings`` is
+    non-empty (VoxCPM2). Every other engine gets the backend unwrapped, so it is
+    never called with an ``options`` keyword. The request was already validated
+    against the declared names and bounds in ``models.GenerationRequest``.
+    """
+    if not advanced_settings or not engine_declares_advanced_settings(engine):
+        return backend
+    return _BackendWithOptions(backend, dict(advanced_settings))
+
+
 async def run_generation(
     *,
     generation_id: str,
@@ -42,6 +192,8 @@ async def run_generation(
     max_chunk_chars: Optional[int] = None,
     crossfade_ms: Optional[int] = None,
     version_id: Optional[str] = None,
+    advanced_settings: dict[str, float] | None = None,
+    voice_description: str | None = None,
 ) -> None:
     """Execute TTS inference and persist the result.
 
@@ -91,7 +243,9 @@ async def run_generation(
         gen_kwargs: dict = dict(
             language=language,
             seed=seed if mode != "regenerate" else None,
-            instruct=instruct,
+            instruct=resolve_backend_instruct(
+                engine, instruct, voice_description, profile_design_prompt=profile_design_prompt(voice_prompt)
+            ),
             trim_fn=trim_fn,
             runaway_detector=runaway_detector,
         )
@@ -100,7 +254,8 @@ async def run_generation(
         if crossfade_ms is not None:
             gen_kwargs["crossfade_ms"] = crossfade_ms
 
-        audio, sample_rate = await generate_chunked(tts_model, text, voice_prompt, **gen_kwargs)
+        generating_model = backend_with_generation_options(tts_model, engine, advanced_settings)
+        audio, sample_rate = await generate_chunked(generating_model, text, voice_prompt, **gen_kwargs)
 
         # --- Normalize (generate and regenerate always; retry skips) -----
         if normalize or mode == "regenerate":
@@ -270,6 +425,7 @@ async def generate_audio_sync(
     normalize: bool = True,
     max_chunk_chars: Optional[int] = None,
     crossfade_ms: Optional[int] = None,
+    voice_description: str | None = None,
 ) -> bytes:
     """Run a TTS generation synchronously and return the resulting wav bytes.
 
@@ -293,6 +449,8 @@ async def generate_audio_sync(
     from ..utils.audio import has_tts_runaway, normalize_audio, trim_tts_output
     from . import tts
 
+    ensure_engine_available(engine)
+
     bg_db = next(get_db())
     try:
         tts_model = get_tts_backend_for_engine(engine)
@@ -314,7 +472,9 @@ async def generate_audio_sync(
     gen_kwargs: dict = dict(
         language=language,
         seed=seed,
-        instruct=instruct,
+        instruct=resolve_backend_instruct(
+            engine, instruct, voice_description, profile_design_prompt=profile_design_prompt(voice_prompt)
+        ),
         trim_fn=trim_fn,
         runaway_detector=runaway_detector,
     )

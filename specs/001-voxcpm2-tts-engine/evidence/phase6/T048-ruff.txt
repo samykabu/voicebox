@@ -1,0 +1,70 @@
+# 2026-09-23T18:14:48+03:00
+# ruff: ruff 0.16.8; HEAD copies checked via stdin with --stdin-filename (same config), no git stash
+
+=== backend/services/generation.py : HEAD ===
+backend\services\generation.py:17:1: I001 [*] Import block is un-sorted or un-formatted
+backend\services\generation.py:117:11: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:119:20: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:120:15: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:122:22: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:123:19: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:124:17: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:132:5: I001 [*] Import block is un-sorted or un-formatted
+backend\services\generation.py:271:20: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:350:11: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:351:15: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:353:22: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:354:19: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:368:5: I001 [*] Import block is un-sorted or un-formatted
+backend\services\generation.py:423:17: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:433:5: I001 [*] Import block is un-sorted or un-formatted
+Found 16 errors.
+[*] 16 fixable with the `--fix` option.
+=== backend/services/generation.py : working tree ===
+backend\services\generation.py:17:1: I001 [*] Import block is un-sorted or un-formatted
+backend\services\generation.py:167:11: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:169:20: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:170:15: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:172:22: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:173:19: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:174:17: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:183:5: I001 [*] Import block is un-sorted or un-formatted
+backend\services\generation.py:324:20: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:403:11: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:404:15: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:406:22: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:407:19: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:422:5: I001 [*] Import block is un-sorted or un-formatted
+backend\services\generation.py:479:17: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:489:5: I001 [*] Import block is un-sorted or un-formatted
+Found 16 errors.
+[*] 16 fixable with the `--fix` option.
+--- HEAD rules:       4 : I001      12 : UP045 | working tree rules:       4 : I001      12 : UP045 
+
+=== backend/routes/generations.py : HEAD ===
+backend\routes\generations.py:3:1: I001 [*] Import block is un-sorted or un-formatted
+backend\routes\generations.py:94:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\generations.py:105:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\generations.py:141:13: SIM105 Use `contextlib.suppress(Exception)` instead of `try`-`except`-`pass`
+backend\routes\generations.py:365:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\generations.py:492:9: SIM105 Use `contextlib.suppress(OSError)` instead of `try`-`except`-`pass`
+Found 6 errors.
+[*] 1 fixable with the `--fix` option (2 hidden fixes can be enabled with the `--unsafe-fixes` option).
+=== backend/routes/generations.py : working tree ===
+backend\routes\generations.py:3:1: I001 [*] Import block is un-sorted or un-formatted
+backend\routes\generations.py:96:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\generations.py:107:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\generations.py:143:13: SIM105 Use `contextlib.suppress(Exception)` instead of `try`-`except`-`pass`
+backend\routes\generations.py:368:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\generations.py:500:9: SIM105 Use `contextlib.suppress(OSError)` instead of `try`-`except`-`pass`
+Found 6 errors.
+[*] 1 fixable with the `--fix` option (2 hidden fixes can be enabled with the `--unsafe-fixes` option).
+--- HEAD rules:       3 : B904       1 : I001       2 : SIM105 | working tree rules:       3 : B904       1 : I001       2 : SIM105 
+
+=== backend/tests/test_voxcpm_backend.py : HEAD ===
+All checks passed!
+=== backend/tests/test_voxcpm_backend.py : working tree ===
+All checks passed!
+--- HEAD rules: | working tree rules: 
+
+# Verdict: no new findings; identical rule counts per file vs HEAD (line numbers shifted only).

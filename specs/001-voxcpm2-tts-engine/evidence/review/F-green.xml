@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="69" assertions="210" failures="0" skipped="0" time="0.1693752">
+  <testsuite name="capability-logic.test.ts" file="capability-logic.test.ts" tests="69" assertions="210" failures="0" skipped="0" time="0.1565341" hostname="">
+    <testsuite name="T020 getLanguageOptionsForEngine" file="capability-logic.test.ts" line="66" tests="6" assertions="83" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="an engine without an app-side list uses its declared languages, in declared order" classname="T020 getLanguageOptionsForEngine" time="0.000107" file="capability-logic.test.ts" line="67" assertions="3" />
+      <testcase name="all 30 declared VoxCPM2 languages are offered, including the 7 added ones" classname="T020 getLanguageOptionsForEngine" time="0.000084" file="capability-logic.test.ts" line="74" assertions="8" />
+      <testcase name="declared codes the app cannot name are still filtered out" classname="T020 getLanguageOptionsForEngine" time="0.000063" file="capability-logic.test.ts" line="82" assertions="2" />
+      <testcase name="every option has a human label" classname="T020 getLanguageOptionsForEngine" time="0.000034" file="capability-logic.test.ts" line="90" assertions="60" />
+      <testcase name="the eight unmigrated engines keep their hardcoded list even when a declaration is passed" classname="T020 getLanguageOptionsForEngine" time="0.000043" file="capability-logic.test.ts" line="97" assertions="8" />
+      <testcase name="no declaration and no app-side list falls back to the previous default list" classname="T020 getLanguageOptionsForEngine" time="0.000023" file="capability-logic.test.ts" line="104" assertions="2" />
+    </testsuite>
+    <testsuite name="T019 isEngineSelectable" file="capability-logic.test.ts" line="113" tests="2" assertions="4" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="available engine is selectable; unavailable is not; unknown capability stays selectable" classname="T019 isEngineSelectable" time="0.000022" file="capability-logic.test.ts" line="114" assertions="3" />
+      <testcase name="a warning never makes an engine unselectable" classname="T019 isEngineSelectable" time="0.000007" file="capability-logic.test.ts" line="120" assertions="1" />
+    </testsuite>
+    <testsuite name="T022 needsDownloadConfirmation" file="capability-logic.test.ts" line="125" tests="3" assertions="5" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="confirmation is required when the capability says so and the model is not downloaded" classname="T022 needsDownloadConfirmation" time="0.000017" file="capability-logic.test.ts" line="126" assertions="1" />
+      <testcase name="no confirmation when the capability does not require it" classname="T022 needsDownloadConfirmation" time="0.000009" file="capability-logic.test.ts" line="130" assertions="2" />
+      <testcase name="no confirmation when the model is already downloaded or already downloading" classname="T022 needsDownloadConfirmation" time="0.000009" file="capability-logic.test.ts" line="139" assertions="2" />
+    </testsuite>
+    <testsuite name="T023 buildAdvancedSettingsPayload" file="capability-logic.test.ts" line="147" tests="5" assertions="7" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="sends every declared default when the user changed nothing" classname="T023 buildAdvancedSettingsPayload" time="0.000051" file="capability-logic.test.ts" line="148" assertions="1" />
+      <testcase name="sends user values, clamped to the declared bounds" classname="T023 buildAdvancedSettingsPayload" time="0.000018" file="capability-logic.test.ts" line="155" assertions="2" />
+      <testcase name="drops names the engine does not declare" classname="T023 buildAdvancedSettingsPayload" time="0.000007" file="capability-logic.test.ts" line="165" assertions="1" />
+      <testcase name="sends nothing for an engine that declares no settings, or with no capability" classname="T023 buildAdvancedSettingsPayload" time="0.000009" file="capability-logic.test.ts" line="172" assertions="2" />
+      <testcase name="non-finite user values fall back to the default" classname="T023 buildAdvancedSettingsPayload" time="0.000008" file="capability-logic.test.ts" line="179" assertions="1" />
+    </testsuite>
+    <testsuite name="T023 advancedSettingStep" file="capability-logic.test.ts" line="187" tests="1" assertions="3" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="integer declarations with a wide range step by 1; narrow or fractional ones by 0.1" classname="T023 advancedSettingStep" time="0.000043" file="capability-logic.test.ts" line="188" assertions="3" />
+    </testsuite>
+    <testsuite name="T028 supportsCloning" file="capability-logic.test.ts" line="204" tests="4" assertions="18" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="an engine outside the app-side set clones only when its capability declares it" classname="T028 supportsCloning" time="0.000022" file="capability-logic.test.ts" line="205" assertions="2" />
+      <testcase name="an unreported engine outside the app-side set does not clone" classname="T028 supportsCloning" time="0.000005" file="capability-logic.test.ts" line="210" assertions="1" />
+      <testcase name="app-side engines keep cloning with or without a capability (scope boundary)" classname="T028 supportsCloning" time="0.000022" file="capability-logic.test.ts" line="214" assertions="12" />
+      <testcase name="the decision reads the capability, not the engine id" classname="T028 supportsCloning" time="0.000017" file="capability-logic.test.ts" line="221" assertions="3" />
+    </testsuite>
+    <testsuite name="T028 declaredCloningEngineOptions" file="capability-logic.test.ts" line="230" tests="3" assertions="4" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="adds reported engines that declare cloning and are not already listed, labelled by display_name" classname="T028 declaredCloningEngineOptions" time="0.000046" file="capability-logic.test.ts" line="233" assertions="1" />
+      <testcase name="an engine this machine cannot run is still offered (FR-003 greys it out at generation time)" classname="T028 declaredCloningEngineOptions" time="0.000014" file="capability-logic.test.ts" line="245" assertions="1" />
+      <testcase name="no capabilities (not loaded, or an older backend) adds nothing" classname="T028 declaredCloningEngineOptions" time="0.000009" file="capability-logic.test.ts" line="250" assertions="2" />
+    </testsuite>
+    <testsuite name="T031 engineNotice" file="capability-logic.test.ts" line="263" tests="5" assertions="9" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="an unavailable engine shows its reason, and stays listed as not selectable" classname="T031 engineNotice" time="0.000025" file="capability-logic.test.ts" line="264" assertions="2" />
+      <testcase name="an unavailable engine without a reason still explains itself, using its display name" classname="T031 engineNotice" time="0.000043" file="capability-logic.test.ts" line="270" assertions="2" />
+      <testcase name="an available engine shows its warning" classname="T031 engineNotice" time="0.000011" file="capability-logic.test.ts" line="276" assertions="1" />
+      <testcase name="a warning never blocks: the engine stays selectable (C1Q4)" classname="T031 engineNotice" time="0.000015" file="capability-logic.test.ts" line="280" assertions="2" />
+      <testcase name="nothing to show for a clean engine or an unreported one" classname="T031 engineNotice" time="0.000014" file="capability-logic.test.ts" line="286" assertions="2" />
+    </testsuite>
+    <testsuite name="T032 downloadConfirmationDetails warning" file="capability-logic.test.ts" line="293" tests="3" assertions="5" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="the capability warning is included in the confirmation details" classname="T032 downloadConfirmationDetails warning" time="0.000016" file="capability-logic.test.ts" line="294" assertions="1" />
+      <testcase name="no warning means none in the details" classname="T032 downloadConfirmationDetails warning" time="0.000005" file="capability-logic.test.ts" line="298" assertions="1" />
+      <testcase name="a warning never blocks the download: confirmation depends only on the declaration and model state" classname="T032 downloadConfirmationDetails warning" time="0.000018" file="capability-logic.test.ts" line="302" assertions="3" />
+    </testsuite>
+    <testsuite name="T036 supportsVoiceDesign" file="capability-logic.test.ts" line="318" tests="1" assertions="3" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="true only when the capability declares supports_voice_design" classname="T036 supportsVoiceDesign" time="0.000013" file="capability-logic.test.ts" line="319" assertions="3" />
+    </testsuite>
+    <testsuite name="T036 voiceDescriptionState" file="capability-logic.test.ts" line="326" tests="4" assertions="11" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="hidden when the engine does not support voice design, whatever the profile" classname="T036 voiceDescriptionState" time="0.000029" file="capability-logic.test.ts" line="330" assertions="4" />
+      <testcase name="unused when the selected profile has reference audio: the recording wins (C1Q6)" classname="T036 voiceDescriptionState" time="0.000009" file="capability-logic.test.ts" line="337" assertions="2" />
+      <testcase name="active for a profile without reference audio, or no profile" classname="T036 voiceDescriptionState" time="0.000009" file="capability-logic.test.ts" line="343" assertions="3" />
+      <testcase name="no engine name decides the result: any engine declaring voice design is active" classname="T036 voiceDescriptionState" time="0.000015" file="capability-logic.test.ts" line="349" assertions="2" />
+    </testsuite>
+    <testsuite name="T036 buildVoiceDescriptionPayload" file="capability-logic.test.ts" line="357" tests="6" assertions="10" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="omitted for engines without voice design, so their requests are unchanged" classname="T036 buildVoiceDescriptionPayload" time="0.000019" file="capability-logic.test.ts" line="361" assertions="2" />
+      <testcase name="omitted when the description is unused because the profile has a recording" classname="T036 buildVoiceDescriptionPayload" time="0.000006" file="capability-logic.test.ts" line="368" assertions="1" />
+      <testcase name="the trimmed text when active" classname="T036 buildVoiceDescriptionPayload" time="0.000011" file="capability-logic.test.ts" line="372" assertions="2" />
+      <testcase name="any language is sent as written (C1Q9)" classname="T036 buildVoiceDescriptionPayload" time="0.000009" file="capability-logic.test.ts" line="377" assertions="1" />
+      <testcase name="blank or missing text is undefined" classname="T036 buildVoiceDescriptionPayload" time="0.000008" file="capability-logic.test.ts" line="382" assertions="3" />
+      <testcase name="no engine name decides the result" classname="T036 buildVoiceDescriptionPayload" time="0.000007" file="capability-logic.test.ts" line="388" assertions="1" />
+    </testsuite>
+    <testsuite name="T049 voiceDesignEngineOptions" file="capability-logic.test.ts" line="395" tests="3" assertions="4" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="lists only engines declaring supports_voice_design, labelled with display_name" classname="T049 voiceDesignEngineOptions" time="0.000038" file="capability-logic.test.ts" line="399" assertions="1" />
+      <testcase name="nothing when no engine declares it, or capabilities are not loaded" classname="T049 voiceDesignEngineOptions" time="0.00001" file="capability-logic.test.ts" line="413" assertions="2" />
+      <testcase name="no engine name decides the result" classname="T049 voiceDesignEngineOptions" time="0.000016" file="capability-logic.test.ts" line="418" assertions="1" />
+    </testsuite>
+    <testsuite name="T049 pickVoiceDesignEngine" file="capability-logic.test.ts" line="429" tests="3" assertions="7" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="keeps the current choice when it is a voice-design engine" classname="T049 pickVoiceDesignEngine" time="0.000039" file="capability-logic.test.ts" line="436" assertions="2" />
+      <testcase name="otherwise the first available voice-design engine" classname="T049 pickVoiceDesignEngine" time="0.000026" file="capability-logic.test.ts" line="441" assertions="3" />
+      <testcase name="the first declared one when none is available, and nothing when none is declared" classname="T049 pickVoiceDesignEngine" time="0.000011" file="capability-logic.test.ts" line="447" assertions="2" />
+    </testsuite>
+    <testsuite name="T049 designPromptError" file="capability-logic.test.ts" line="453" tests="3" assertions="7" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="required: blank or missing text is an error" classname="T049 designPromptError" time="0.000018" file="capability-logic.test.ts" line="454" assertions="3" />
+      <testcase name="at most 2000 characters, matching the backend (models.py design_prompt)" classname="T049 designPromptError" time="0.000015" file="capability-logic.test.ts" line="460" assertions="3" />
+      <testcase name="any language is accepted (C1Q9)" classname="T049 designPromptError" time="0.000005" file="capability-logic.test.ts" line="466" assertions="1" />
+    </testsuite>
+    <testsuite name="T049 isProfileCompatibleWithEngine, designed profiles" file="capability-logic.test.ts" line="471" tests="3" assertions="9" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="a designed profile fits only engines whose capability declares voice design" classname="T049 isProfileCompatibleWithEngine, designed profiles" time="0.000029" file="capability-logic.test.ts" line="474" assertions="3" />
+      <testcase name="no engine name decides the result" classname="T049 isProfileCompatibleWithEngine, designed profiles" time="0.000014" file="capability-logic.test.ts" line="480" assertions="2" />
+      <testcase name="cloned and preset profiles are unchanged" classname="T049 isProfileCompatibleWithEngine, designed profiles" time="0.000021" file="capability-logic.test.ts" line="489" assertions="4" />
+    </testsuite>
+    <testsuite name="F2 PRE_CAPABILITY_ENGINES" file="capability-logic.test.ts" line="505" tests="1" assertions="1" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="is the set of engines with an app-side language list (the scope boundary)" classname="F2 PRE_CAPABILITY_ENGINES" time="0.000023" file="capability-logic.test.ts" line="506" assertions="1" />
+    </testsuite>
+    <testsuite name="F2 downloadDecision" file="capability-logic.test.ts" line="511" tests="7" assertions="12" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="capability requires confirmation and the model is not downloaded: confirm" classname="F2 downloadDecision" time="0.000016" file="capability-logic.test.ts" line="512" assertions="1" />
+      <testcase name="capability requires confirmation but the model state is unknown: still confirm" classname="F2 downloadDecision" time="0.000006" file="capability-logic.test.ts" line="516" assertions="1" />
+      <testcase name="model already downloaded or downloading: proceed, with or without a capability" classname="F2 downloadDecision" time="0.000018" file="capability-logic.test.ts" line="520" assertions="4" />
+      <testcase name="capability does not require confirmation: proceed" classname="F2 downloadDecision" time="0.000007" file="capability-logic.test.ts" line="531" assertions="1" />
+      <testcase name="no capability for a capability-channel engine that may download: refuse" classname="F2 downloadDecision" time="0.00001" file="capability-logic.test.ts" line="542" assertions="2" />
+      <testcase name="no capability for a pre-capability engine, or a model with no engine: proceed as today" classname="F2 downloadDecision" time="0.000008" file="capability-logic.test.ts" line="547" assertions="2" />
+      <testcase name="a pre-capability engine that does report a capability follows it" classname="F2 downloadDecision" time="0.000006" file="capability-logic.test.ts" line="552" assertions="1" />
+    </testsuite>
+    <testsuite name="F1 shouldFallBackFromEngine" file="capability-logic.test.ts" line="560" tests="4" assertions="5" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="falls back when the engine is not offered and capabilities have loaded" classname="F1 shouldFallBackFromEngine" time="0.00001" file="capability-logic.test.ts" line="569" assertions="1" />
+      <testcase name="cold start: a capability-channel engine is kept until capabilities load" classname="F1 shouldFallBackFromEngine" time="0.000006" file="capability-logic.test.ts" line="573" assertions="1" />
+      <testcase name="cold start: an app-side engine is decided without capabilities" classname="F1 shouldFallBackFromEngine" time="0.000005" file="capability-logic.test.ts" line="577" assertions="1" />
+      <testcase name="never when the engine is offered, or when there is nothing to fall back to" classname="F1 shouldFallBackFromEngine" time="0.000007" file="capability-logic.test.ts" line="583" assertions="2" />
+    </testsuite>
+    <testsuite name="F3 engineUnavailableFallback" file="capability-logic.test.ts" line="590" tests="2" assertions="3" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="returns the i18n key and the display name as its parameter" classname="F3 engineUnavailableFallback" time="0.00001" file="capability-logic.test.ts" line="591" assertions="1" />
+      <testcase name="engineNotice translates the fallback through the given t, and keeps a backend reason as is" classname="F3 engineUnavailableFallback" time="0.000013" file="capability-logic.test.ts" line="598" assertions="2" />
+    </testsuite>
+  </testsuite>
+</testsuites>

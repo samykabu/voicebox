@@ -2,6 +2,8 @@
 
 > Last updated: 2026-07-02 | Current version: **v0.5.0** | 402 open issues | 88 open PRs | 1.3M downloads · 34.8k stars
 
+> **Fork update (2026-09-23):** VoxCPM2 is shipped in this fork (samykabu/voicebox), not backlogged. It runs on CUDA, Apple Silicon (MPS, untested) and CPU. Platform gating now exists: `ModelConfig.accelerators` plus `GET /models/engines`. Sections below that call VoxCPM backlogged or say platform gating is missing are marked where they appear. Spec: `specs/001-voxcpm2-tts-engine`.
+
 ---
 
 ## Table of Contents
@@ -23,7 +25,7 @@
 
 The backend exposes:
 
-- **`TTSBackend` Protocol** with seven concrete engine implementations:
+- **`TTSBackend` Protocol** with these concrete engine implementations (the fork also has F5-TTS / Habibi):
   - Qwen3-TTS (PyTorch or MLX depending on platform)
   - Qwen CustomVoice (predefined speakers with instruct)
   - LuxTTS (fast, CPU-friendly)
@@ -31,6 +33,7 @@ The backend exposes:
   - Chatterbox Turbo (English, paralinguistic tags)
   - TADA (1B English, 3B multilingual via HumeAI)
   - Kokoro 82M (pre-built voices, CPU realtime)
+  - VoxCPM2 (30 languages, 48 kHz, cloning and voice design; fork, 2026-09)
 - **`STTBackend` Protocol** for Whisper (PyTorch or MLX-Whisper)
 - **Profiles / History / Stories** services for persistence and timeline editing
 
@@ -50,6 +53,7 @@ The backend exposes:
 | TADA | `backend/backends/hume_backend.py` | HumeAI TADA — 1B English + 3B Multilingual |
 | Kokoro | `backend/backends/kokoro_backend.py` | Kokoro 82M — CPU realtime, pre-built voices |
 | Qwen CustomVoice | `backend/backends/qwen_custom_voice_backend.py` | Qwen CustomVoice — predefined speakers with instruct |
+| VoxCPM2 | `backend/backends/voxcpm_backend.py` | VoxCPM2 — 30 languages, 48 kHz, cloning and voice design (fork) |
 | Platform detect | `backend/platform_detect.py` | Apple Silicon → MLX, else → PyTorch |
 | API types | `backend/models.py` | Pydantic request/response models |
 | HF progress | `backend/utils/hf_progress.py` | HFProgressTracker (tqdm patching for download progress) |
@@ -189,7 +193,7 @@ Shipped 2026-04-25 (PR #544). Voicebox went from a voice-cloning studio to a ful
 | Model | PR / Branch | Reason |
 |-------|-------------|--------|
 | **CosyVoice2/3** | PR #311 | Output quality too poor. Heavy deps, no PyPI, needed 5+ shims. PR should be closed. |
-| **VoxCPM 1.5 / VoxCPM2** | `voicebox-new-models` research (2026-04-18) | **Backlogged.** See detailed analysis below. |
+| **VoxCPM 1.5 / VoxCPM2** | `voicebox-new-models` research (2026-04-18) | Backlogged upstream. **VoxCPM2 shipped in this fork on 2026-09-23** (see the update below the notes). VoxCPM 1.5 is still not integrated. |
 
 #### VoxCPM — Evaluation Notes (2026-04-18)
 
@@ -217,6 +221,16 @@ Shipped 2026-04-25 (PR #544). Voicebox went from a voice-cloning studio to a ful
 - VoxCPM.cpp matures into a viable CPU path we can wrap (currently separate project, C++/GGML, unclear ergonomics).
 
 **Integration shape if we revive it:** Zero-shot cloning maps naturally to the Chatterbox-style backend (store `ref_audio` + `ref_text` paths in the voice prompt dict, process at generate time). Est. ~250 lines for `voxcpm_backend.py` + one `ModelConfig` entry + engine registration in `backends/__init__.py`. Frontend UI gating is the bigger lift.
+
+**Update (2026-09-23, fork): shipped.** A dependency probe against voxcpm 2.0.3 changed the picture above:
+
+- The CPU path works in the Python package (RTF about 2.6–3.0 on a 24-core CPU). CUDA works, including Blackwell with cu128 torch. MPS has a code path upstream but was not tested.
+- It is installed as `voxcpm==2.0.3` with `--no-deps`. A plain install pulls gradio, datasets, modelscope, funasr, transformers 5.x and numpy 2.x.
+- The model is `openbmb/VoxCPM2`, a 4961 MB download, Apache-2.0, 48 kHz output and 30 languages. The app asks before downloading it.
+- It supports cloning (the reference transcript is required) and voice design from a written description (`"(description)text"`).
+- Platform gating was built for it: `ModelConfig.accelerators`, `GET /models/engines`, and a greyed-out engine with a reason in the app.
+
+See `specs/001-voxcpm2-tts-engine` and [`content/docs/developer/tts-engines.mdx`](content/docs/developer/tts-engines.mdx) (Worked Example: VoxCPM2).
 
 ### Funded Roadmap (2026-H2)
 
@@ -255,6 +269,7 @@ Shipped 2026-04-25 (PR #544). Voicebox went from a voice-cloning studio to a ful
 | TADA 1B | `tada-1b` | Cloned | English | ~4 GB | HumeAI speech-language model, 700s+ coherent audio | None |
 | TADA 3B Multilingual | `tada-3b-ml` | Cloned | 10 (en, ar, zh, de, es, fr, it, ja, pl, pt) | ~8 GB | Multilingual, text-acoustic dual alignment | None |
 | Kokoro 82M | `kokoro` | Preset | 8 (en, es, fr, hi, it, pt, ja, zh) | ~350 MB | 82M params, CPU realtime, Apache 2.0, pre-built voices | None |
+| VoxCPM2 (fork) | `voxcpm2` | Cloned or Designed | 30 (incl. ar, my, id, km, lo, tl, th, vi) | 4961 MB | 48 kHz, Apache 2.0, voice design from a description, asks before download | None (voice description is a separate field) |
 
 ### Multi-Engine Architecture (Shipped)
 
@@ -578,7 +593,7 @@ Notable:
 | **HumeAI TADA 1B/3B** | Zero-shot | 5x faster than LLM-TTS | 24 kHz | EN (1B), 10 (3B) | Medium | Partial — prosody | PyTorch | **Shipped** (PR #296) |
 | **Kokoro-82M** | Preset voices | CPU realtime | 24 kHz | 8 | Tiny (82M) | None | All | **Shipped** (PR #325) |
 | ~~**CosyVoice2-0.5B**~~ | 3-10s zero-shot | Very fast | 24 kHz | Multilingual | Low | **Yes** | — | **Abandoned** (PR #311) — poor output quality |
-| ~~**VoxCPM2**~~ | Zero-shot | ~0.15 RTF streaming | 48 kHz | 30 | Medium | Partial — parenthetical style | **CUDA-only in practice** | **Backlogged** (2026-04-18) — see notes above |
+| **VoxCPM2** | Zero-shot + voice design | CUDA RTF ~1.0 (probe, no torch.compile); CPU RTF ~2.6–3.0 | 48 kHz | 30 | ~6 GB GPU | Voice description (parenthetical prefix) | CUDA, CPU; MPS untested | Backlogged upstream (2026-04-18). **Shipped in this fork** (2026-09-23) |
 | **Fish Speech** | 10-30s few-shot | Real-time | 24-44 kHz | 50+ | Medium | **Yes** — word-level inline | All | Candidate — license TBD |
 | **Fish Audio S2** | — | — | — | — | — | — | — | Candidate (#385) |
 | **XTTS-v2** | 6s zero-shot | Mid-GPU | 24 kHz | 17+ | Medium | Partial — style transfer from ref | All | Candidate — CPML license likely blocker |
@@ -653,7 +668,7 @@ With the model config registry and shared `EngineModelSelector` component, addin
 
 `main.py` requires **zero changes** — the registry handles all dispatch automatically.
 
-**Platform gating doesn't exist yet.** If we add a CUDA-only model (e.g. VoxCPM), we need a new `requires_cuda` (or more generally `requires: list[device]`) flag on `ModelConfig`, plumbed through `/models` API and surfaced in `ModelManagement.tsx` and `EngineModelSelector.tsx` as a lock icon + "Requires NVIDIA GPU" state. Backend should hard-error at `load_model()` as a safety net.
+**Platform gating (fork update, 2026-09-23):** this now exists as `ModelConfig.accelerators`, reported by `GET /models/engines`. VoxCPM2 is the first engine to use it. The original note follows. **Platform gating doesn't exist yet.** If we add a CUDA-only model (e.g. VoxCPM), we need a new `requires_cuda` (or more generally `requires: list[device]`) flag on `ModelConfig`, plumbed through `/models` API and surfaced in `ModelManagement.tsx` and `EngineModelSelector.tsx` as a lock icon + "Requires NVIDIA GPU" state. Backend should hard-error at `load_model()` as a safety net.
 
 Total effort: **~1 day** for a well-documented model with a PyPI package, cross-platform. **~2 days** if platform gating is required. See [`content/docs/developer/tts-engines.mdx`](content/docs/developer/tts-engines.mdx) for the full guide.
 
@@ -682,6 +697,8 @@ Model identifiers, HF repo IDs, display names, and engine metadata are now conso
 The generation form now uses a flat model dropdown with engine-based routing. Per-engine language filtering is in place. Model size is only sent for Qwen / Qwen CustomVoice.
 
 ### 6. No Platform Gating on Models — NEW
+
+> **Fork update (2026-09-23):** partly resolved. `ModelConfig.accelerators` declares the hardware an engine runs on. `GET /models/engines` reports it with `available`, `reason` and an advisory `warning`. The warning is either a memory warning (CUDA) or, when an engine that declares the processor finds an accelerator it doesn't support (Intel XPU, DirectML), a note that it will run on the processor, which is slower. Only VoxCPM2 declares accelerators so far, and it declares the processor, so it is never refused; the other engines are still unconstrained. The greyed-out state and the 400 refusal remain for a future engine that declares no processor path.
 
 `ModelConfig` has no way to express hardware requirements. Every engine is shown to every user, regardless of whether it'll actually load. Users on non-CUDA platforms discover failure at load time (or not at all — some fall back silently to CPU and never complete). Blocks shipping CUDA-only engines (VoxCPM) and would improve the Intel Arc / ROCm / CPU-only UX today. See `ModelConfig` TODO: add `requires: list[Literal["cuda", "mps", "xpu", "cpu", "rocm"]]` or equivalent, plumb through `/models` API, render in `ModelManagement.tsx` + `EngineModelSelector.tsx`.
 
@@ -737,7 +754,7 @@ Committed ordering (04-18 cycle), then the 2026-06-27 sweep additions. See Lands
 | 6 | **Fish Speech / Fish Audio S2** | 50+ langs, word-level instruct. **License clarification first.** (#385) |
 | 7 | **XTTS-v2** | 17+ langs, mature pip. CPML likely kills commercial use — verify. |
 | 8 | **index-tts2** (#370) | Unvetted. |
-| — | ~~**VoxCPM2**~~ | **Backlogged** — CUDA-only upstream. Revisit when tier system ships or MPS bugs are fixed upstream. |
+| — | ~~**VoxCPM2**~~ | **Shipped in this fork** (2026-09-23). The probe found a working CPU path in voxcpm 2.0.3. See the VoxCPM notes above. |
 | — | *New (06-27 sweep), in order* → | |
 | 9 | **dots.tts** | 2B end-to-end AR, 48 kHz, Apache-2.0 + fast MeanFlow variant. Top new candidate. Git-source install — smoke-test packaging + VRAM; likely experimental until platform gating exists. |
 | 10 | **LongCat-AudioDiT** | 3.5B diffusion, has an MLX/`mlx_audio` path — best Apple Silicon fit. zh/en only, not realtime. |

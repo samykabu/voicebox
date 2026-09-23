@@ -1,0 +1,11 @@
+timestamp: 2026-09-23T18:32:43Z
+ruff: ruff 0.16.8
+method: ruff check --output-format concise on the working file vs 'git show HEAD:<f> | ruff check --stdin-filename <f> -' (finding set compared with line numbers stripped); ruff format --check / --diff line counts for format drift
+
+backend/services/export_import.py: check HEAD=76 now=76 new=0; format-diff lines HEAD=104 now=104
+backend/utils/chunked_tts.py: check HEAD=10 now=10 new=0; format-diff lines HEAD=10 now=10
+backend/backends/voxcpm_backend.py: check HEAD=0 now=0 new=0; format-diff lines HEAD=0 now=0
+backend/tests/test_voxcpm_review.py: check HEAD=0 now=0 new=0; format-diff lines HEAD=0 now=0
+backend/tests/test_review_q3_s4.py: check HEAD=n/a (new) now=0 new=0; format-diff lines HEAD=n/a now=0
+
+Result: no new ruff check findings and no new format drift in touched files (pre-existing findings in export_import.py/chunked_tts.py unchanged).

@@ -1,0 +1,32 @@
+timestamp: 2026-09-23T21:39:02+03:00
+command: backend/venv/Scripts/ruff.exe check --output-format concise <file>; ruff format --check <file>
+
+## backend/services/export_import.py  -- HEAD (55cf236) vs working tree, findings per rule
+HEAD:
+      6 B904
+      1 F401
+      2 F841
+      2 I001
+      2 RUF010
+     63 W293
+working tree:
+      6 B904
+      1 F401
+      2 F841
+      2 I001
+      2 RUF010
+     63 W293
+diff (HEAD -> working tree):
+(no difference in per-rule counts)
+
+format --check HEAD:
+504 |     except zipfile.BadZipFile:
+1 file would be reformatted
+format --check working tree (file was already unformatted at HEAD; not reformatted to keep the diff reviewable):
+1 file would be reformatted
+
+note: ruff format --diff on export_import.py shows no hunks inside the new _validated_engine_fields or the added manifest/import lines; all pending hunks are pre-existing.
+
+## backend/tests/test_review_s5.py (new file; formatted with ruff format)
+All checks passed!
+1 file already formatted

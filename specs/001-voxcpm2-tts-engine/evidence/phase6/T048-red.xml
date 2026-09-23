@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="16" skipped="0" tests="117" time="9.724" timestamp="2026-09-23T18:14:01.944259+03:00" hostname="DevelopmentPC"><testcase classname="tests.test_voxcpm_backend" name="test_load_model_is_idempotent" time="1.936" /><testcase classname="tests.test_voxcpm_backend" name="test_load_model_disables_the_modelscope_denoiser" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_load_model_passes_an_explicit_device_from_our_policy" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_cached_model_loads_with_local_files_only" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_uncached_model_may_download" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_load_runs_inside_model_load_progress[True]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_load_runs_inside_model_load_progress[False]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_returns_the_array_and_the_model_runtime_sample_rate" time="0.008" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_keeps_upstream_normalization_off" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_seed_is_applied_before_the_vendor_call_and_never_forwarded" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_no_seed_means_no_manual_seed" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_passes_the_prompt_pair_together" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_without_reference_passes_neither_prompt_key[None]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_without_reference_passes_neither_prompt_key[voice_prompt1]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_rejects_half_a_prompt_pair[voice_prompt0]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_rejects_half_a_prompt_pair[voice_prompt1]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_rejects_half_a_prompt_pair[voice_prompt2]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_uses_declared_defaults_without_options" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_maps_advanced_options" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_partial_options_fall_back_per_setting" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_description_becomes_the_ascii_paren_prefix_without_reference" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_description_is_inactive_when_reference_audio_is_present" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_blank_voice_description_adds_no_prefix[None]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_blank_voice_description_adds_no_prefix[]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_blank_voice_description_adds_no_prefix[   ]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_unload_empties_the_device_cache_and_reports_unloaded" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_unload_when_not_loaded_is_a_no_op" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_reload_after_unload_loads_again" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_model_path_is_the_hf_repo" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_is_model_cached_recognises_pth_weights" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_is_model_cached_recognises_safetensors_weights" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_is_model_cached_rejects_incomplete_downloads" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_prompt_carries_the_audio_path_and_transcript" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_prompt_is_served_from_the_engine_scoped_cache" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_prompt_without_cache_writes_nothing" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_prompt_requires_a_transcript" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_combine_voice_prompts_delegates_to_the_shared_helper" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_voice_prompt_key_is_the_prefixed_shared_cache_key" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_real_cache_returns_the_pair_and_reports_cached_on_the_second_call" time="0.011" /><testcase classname="tests.test_voxcpm_backend" name="test_real_cache_does_not_serve_another_engines_entry" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[None]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt1]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt2]" time="0.002" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt3]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt4]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt5]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt6]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt7]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_a_created_prompt_reaches_the_vendor_as_a_complete_pair" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_combine_rate_is_the_profiles_save_rate" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_combine_passes_the_named_constant_not_a_literal" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_combine_delegate_is_the_shared_base_helper" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_multi_clip_prompt_is_combined_and_then_used_by_generate" time="1.219" /><testcase classname="tests.test_voxcpm_backend" name="test_same_seed_gives_identical_output" time="0.007" /><testcase classname="tests.test_voxcpm_backend" name="test_different_seed_gives_different_output" time="0.006" /><testcase classname="tests.test_voxcpm_backend" name="test_voxcpm_is_a_cloning_engine" time="0.270" /><testcase classname="tests.test_voxcpm_backend" name="test_cloned_profile_with_voxcpm_passes_profile_validation" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_module_has_no_top_level_heavy_import" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_vendor_import_is_marked_lazy" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_importing_and_constructing_the_backend_does_not_import_the_vendor" time="2.436" /><testcase classname="tests.test_voxcpm_backend" name="test_engine_is_registered_by_name" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_model_config_declares_the_data_model_values" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_model_config_declares_the_two_advanced_settings" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_backend_defaults_match_the_declared_settings" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_default_model_size_is_default" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_dispatch_returns_the_voxcpm_backend" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_dispatch_does_not_import_the_vendor" time="2.482" /><testcase classname="tests.test_voxcpm_backend" name="test_all_four_engine_patterns_accept_voxcpm" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_generation_request_accepts_the_declared_advanced_settings" time="0.000" /><testcase classname="tests.test_voxcpm_backend" name="test_cached_load_succeeds_with_the_network_blocked" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_cached_load_runs_inside_force_offline_if_cached" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_cached_load_passes_local_files_only_and_no_denoiser" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_offline_mode_is_restored_after_the_cached_load" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_uncached_load_is_not_forced_offline" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_pronunciation_processed_arabic_reaches_the_vendor_byte_for_byte" time="0.007" /><testcase classname="tests.test_voxcpm_backend" name="test_service_description_only_becomes_the_voxcpm_prefix" time="0.557" /><testcase classname="tests.test_voxcpm_backend" name="test_service_delivery_instruct_never_reaches_voxcpm" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_service_description_wins_over_delivery_instruct_for_voxcpm" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_service_neither_gives_plain_text_for_voxcpm" time="0.004" /><testcase classname="tests.test_voxcpm_backend" name="test_service_existing_engines_keep_instruct_and_drop_the_description[qwen_custom_voice]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_service_existing_engines_keep_instruct_and_drop_the_description[qwen]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_service_existing_engines_keep_instruct_and_drop_the_description[kokoro]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_service_cloned_profile_ignores_the_description" time="0.006" /><testcase classname="tests.test_voxcpm_backend" name="test_service_english_description_with_arabic_text_is_encoded_byte_for_byte" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[voxcpm-None-An old man, deep, slow and raspy voice-An old man, deep, slow and raspy voice]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[voxcpm-whisper-None-None]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[voxcpm-whisper-   -None]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[voxcpm-whisper-An old man, deep, slow and raspy voice-An old man, deep, slow and raspy voice]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[voxcpm-None-None-None]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[qwen_custom_voice-whisper-An old man, deep, slow and raspy voice-whisper]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[qwen_custom_voice-None-An old man, deep, slow and raspy voice-None]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[qwen-whisper-None-whisper]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_table[not-an-engine-whisper-An old man, deep, slow and raspy voice-whisper]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_reads_capability_data_not_engine_names" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_audio_sync_applies_the_same_mapping" time="0.005" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_route_forwards_voice_description_to_the_service" time="0.031" /><testcase classname="tests.test_voxcpm_backend" name="test_stream_route_encodes_the_description_and_drops_delivery_for_voxcpm" time="0.005" /><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt[voxcpm-None-None-A young woman, gentle and sweet voice-A young woman, gentle and sweet voice]" time="0.001"><failure message="TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'">engine = 'voxcpm', instruct = None, description = None
+design_prompt = 'A young woman, gentle and sweet voice'
+expected = 'A young woman, gentle and sweet voice'
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "design_prompt", "expected"),
+        [
+            ("voxcpm", None, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", DELIVERY, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", None, "   ", f"  {DESIGN_PROMPT}  ", DESIGN_PROMPT),
+            ("voxcpm", None, DESCRIPTION, DESIGN_PROMPT, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, "   ", None),
+            ("qwen_custom_voice", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+            ("qwen_custom_voice", None, None, DESIGN_PROMPT, None),
+            ("not-an-engine", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt(
+        engine, instruct, description, design_prompt, expected
+    ) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       resolved = generation_service.resolve_backend_instruct(
+            engine, instruct, description, profile_design_prompt=design_prompt
+        )
+E       TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'
+
+backend\tests\test_voxcpm_backend.py:1589: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt[voxcpm-whisper-None-A young woman, gentle and sweet voice-A young woman, gentle and sweet voice]" time="0.001"><failure message="TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'">engine = 'voxcpm', instruct = 'whisper', description = None
+design_prompt = 'A young woman, gentle and sweet voice'
+expected = 'A young woman, gentle and sweet voice'
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "design_prompt", "expected"),
+        [
+            ("voxcpm", None, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", DELIVERY, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", None, "   ", f"  {DESIGN_PROMPT}  ", DESIGN_PROMPT),
+            ("voxcpm", None, DESCRIPTION, DESIGN_PROMPT, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, "   ", None),
+            ("qwen_custom_voice", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+            ("qwen_custom_voice", None, None, DESIGN_PROMPT, None),
+            ("not-an-engine", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt(
+        engine, instruct, description, design_prompt, expected
+    ) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       resolved = generation_service.resolve_backend_instruct(
+            engine, instruct, description, profile_design_prompt=design_prompt
+        )
+E       TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'
+
+backend\tests\test_voxcpm_backend.py:1589: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt[voxcpm-None-   -  A young woman, gentle and sweet voice  -A young woman, gentle and sweet voice]" time="0.001"><failure message="TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'">engine = 'voxcpm', instruct = None, description = '   '
+design_prompt = '  A young woman, gentle and sweet voice  '
+expected = 'A young woman, gentle and sweet voice'
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "design_prompt", "expected"),
+        [
+            ("voxcpm", None, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", DELIVERY, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", None, "   ", f"  {DESIGN_PROMPT}  ", DESIGN_PROMPT),
+            ("voxcpm", None, DESCRIPTION, DESIGN_PROMPT, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, "   ", None),
+            ("qwen_custom_voice", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+            ("qwen_custom_voice", None, None, DESIGN_PROMPT, None),
+            ("not-an-engine", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt(
+        engine, instruct, description, design_prompt, expected
+    ) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       resolved = generation_service.resolve_backend_instruct(
+            engine, instruct, description, profile_design_prompt=design_prompt
+        )
+E       TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'
+
+backend\tests\test_voxcpm_backend.py:1589: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt[voxcpm-None-An old man, deep, slow and raspy voice-A young woman, gentle and sweet voice-An old man, deep, slow and raspy voice]" time="0.001"><failure message="TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'">engine = 'voxcpm', instruct = None
+description = 'An old man, deep, slow and raspy voice'
+design_prompt = 'A young woman, gentle and sweet voice'
+expected = 'An old man, deep, slow and raspy voice'
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "design_prompt", "expected"),
+        [
+            ("voxcpm", None, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", DELIVERY, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", None, "   ", f"  {DESIGN_PROMPT}  ", DESIGN_PROMPT),
+            ("voxcpm", None, DESCRIPTION, DESIGN_PROMPT, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, "   ", None),
+            ("qwen_custom_voice", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+            ("qwen_custom_voice", None, None, DESIGN_PROMPT, None),
+            ("not-an-engine", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt(
+        engine, instruct, description, design_prompt, expected
+    ) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       resolved = generation_service.resolve_backend_instruct(
+            engine, instruct, description, profile_design_prompt=design_prompt
+        )
+E       TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'
+
+backend\tests\test_voxcpm_backend.py:1589: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt[voxcpm-whisper-None-   -None]" time="0.001"><failure message="TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'">engine = 'voxcpm', instruct = 'whisper', description = None
+design_prompt = '   ', expected = None
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "design_prompt", "expected"),
+        [
+            ("voxcpm", None, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", DELIVERY, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", None, "   ", f"  {DESIGN_PROMPT}  ", DESIGN_PROMPT),
+            ("voxcpm", None, DESCRIPTION, DESIGN_PROMPT, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, "   ", None),
+            ("qwen_custom_voice", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+            ("qwen_custom_voice", None, None, DESIGN_PROMPT, None),
+            ("not-an-engine", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt(
+        engine, instruct, description, design_prompt, expected
+    ) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       resolved = generation_service.resolve_backend_instruct(
+            engine, instruct, description, profile_design_prompt=design_prompt
+        )
+E       TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'
+
+backend\tests\test_voxcpm_backend.py:1589: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt[qwen_custom_voice-whisper-None-A young woman, gentle and sweet voice-whisper]" time="0.001"><failure message="TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'">engine = 'qwen_custom_voice', instruct = 'whisper', description = None
+design_prompt = 'A young woman, gentle and sweet voice', expected = 'whisper'
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "design_prompt", "expected"),
+        [
+            ("voxcpm", None, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", DELIVERY, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", None, "   ", f"  {DESIGN_PROMPT}  ", DESIGN_PROMPT),
+            ("voxcpm", None, DESCRIPTION, DESIGN_PROMPT, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, "   ", None),
+            ("qwen_custom_voice", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+            ("qwen_custom_voice", None, None, DESIGN_PROMPT, None),
+            ("not-an-engine", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt(
+        engine, instruct, description, design_prompt, expected
+    ) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       resolved = generation_service.resolve_backend_instruct(
+            engine, instruct, description, profile_design_prompt=design_prompt
+        )
+E       TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'
+
+backend\tests\test_voxcpm_backend.py:1589: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt[qwen_custom_voice-None-None-A young woman, gentle and sweet voice-None]" time="0.001"><failure message="TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'">engine = 'qwen_custom_voice', instruct = None, description = None
+design_prompt = 'A young woman, gentle and sweet voice', expected = None
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "design_prompt", "expected"),
+        [
+            ("voxcpm", None, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", DELIVERY, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", None, "   ", f"  {DESIGN_PROMPT}  ", DESIGN_PROMPT),
+            ("voxcpm", None, DESCRIPTION, DESIGN_PROMPT, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, "   ", None),
+            ("qwen_custom_voice", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+            ("qwen_custom_voice", None, None, DESIGN_PROMPT, None),
+            ("not-an-engine", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt(
+        engine, instruct, description, design_prompt, expected
+    ) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       resolved = generation_service.resolve_backend_instruct(
+            engine, instruct, description, profile_design_prompt=design_prompt
+        )
+E       TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'
+
+backend\tests\test_voxcpm_backend.py:1589: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt[not-an-engine-whisper-None-A young woman, gentle and sweet voice-whisper]" time="0.001"><failure message="TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'">engine = 'not-an-engine', instruct = 'whisper', description = None
+design_prompt = 'A young woman, gentle and sweet voice', expected = 'whisper'
+
+    @pytest.mark.parametrize(
+        ("engine", "instruct", "description", "design_prompt", "expected"),
+        [
+            ("voxcpm", None, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", DELIVERY, None, DESIGN_PROMPT, DESIGN_PROMPT),
+            ("voxcpm", None, "   ", f"  {DESIGN_PROMPT}  ", DESIGN_PROMPT),
+            ("voxcpm", None, DESCRIPTION, DESIGN_PROMPT, DESCRIPTION),
+            ("voxcpm", DELIVERY, None, "   ", None),
+            ("qwen_custom_voice", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+            ("qwen_custom_voice", None, None, DESIGN_PROMPT, None),
+            ("not-an-engine", DELIVERY, None, DESIGN_PROMPT, DELIVERY),
+        ],
+    )
+    def test_resolve_backend_instruct_falls_back_to_the_profile_design_prompt(
+        engine, instruct, description, design_prompt, expected
+    ) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       resolved = generation_service.resolve_backend_instruct(
+            engine, instruct, description, profile_design_prompt=design_prompt
+        )
+E       TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'
+
+backend\tests\test_voxcpm_backend.py:1589: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_design_prompt_fallback_reads_capability_data_not_engine_names" time="0.001"><failure message="TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001FB8F9FB5C0&gt;
+
+    def test_design_prompt_fallback_reads_capability_data_not_engine_names(monkeypatch: pytest.MonkeyPatch) -&gt; None:
+        import backend.backends as backends_pkg
+        from backend.backends import ModelConfig
+        from backend.services import generation as generation_service
+    
+        real_configs = backends_pkg.get_tts_model_configs()
+        designer = ModelConfig(
+            model_name="fake-designer",
+            display_name="Fake Designer",
+            engine="fake_designer",
+            hf_repo_id="example/fake-designer",
+            supports_voice_design=True,
+        )
+        plain_voxcpm = ModelConfig(model_name="voxcpm2", display_name="VoxCPM2", engine="voxcpm", hf_repo_id="openbmb/VoxCPM2")
+        configs = [c for c in real_configs if c.engine != "voxcpm"] + [designer, plain_voxcpm]
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", lambda: configs)
+    
+        resolve = generation_service.resolve_backend_instruct
+&gt;       assert resolve("fake_designer", DELIVERY, None, profile_design_prompt=DESIGN_PROMPT) == DESIGN_PROMPT
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: resolve_backend_instruct() got an unexpected keyword argument 'profile_design_prompt'
+
+backend\tests\test_voxcpm_backend.py:1613: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_profile_design_prompt_is_read_only_from_designed_voice_prompts" time="0.003"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'profile_design_prompt'">reference_file = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-44/test_profile_design_prompt_is_0/reference.wav')
+
+    def test_profile_design_prompt_is_read_only_from_designed_voice_prompts(reference_file: Path) -&gt; None:
+        from backend.services import generation as generation_service
+    
+&gt;       extract = generation_service.profile_design_prompt
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'profile_design_prompt'
+
+backend\tests\test_voxcpm_backend.py:1620: AttributeError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_designed_profile_without_request_description_uses_its_design_prompt" time="0.005"><failure message="AssertionError: assert 'Hello there.' == '(A young wom...)Hello there.'&#10;  &#10;  - (A young woman, gentle and sweet voice)Hello there.&#10;  + Hello there.">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001FB8FA50C80&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x000001FB8F9FAAB0&gt;
+design_service = namespace(backend=&lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001FB8FA50C80&gt;, voice_prompt={'voice_t...A young woman, gentle and sweet voice'}, statuses=[('loading_model', None), ('generating', None), ('completed', None)])
+
+    @pytest.mark.asyncio
+    async def test_service_designed_profile_without_request_description_uses_its_design_prompt(
+        backend, recorder: _Recorder, design_service
+    ) -&gt; None:
+        design_service.backend = backend
+        design_service.voice_prompt = _designed_prompt()
+    
+        await _run_design("voxcpm", instruct=DELIVERY)
+    
+        assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+        (kwargs,) = recorder.generate_calls
+&gt;       assert kwargs["text"] == f"({DESIGN_PROMPT})Hello there."
+E       AssertionError: assert 'Hello there.' == '(A young wom...)Hello there.'
+E         
+E         - (A young woman, gentle and sweet voice)Hello there.
+E         + Hello there.
+
+backend\tests\test_voxcpm_backend.py:1640: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_request_description_beats_the_profile_design_prompt" time="0.003" /><testcase classname="tests.test_voxcpm_backend" name="test_service_whitespace_request_description_falls_back_to_the_design_prompt" time="0.003"><failure message="AssertionError: assert 'Hello there.' == '(A young wom...)Hello there.'&#10;  &#10;  - (A young woman, gentle and sweet voice)Hello there.&#10;  + Hello there.">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001FB88D3AE70&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x000001FB88D3BAA0&gt;
+design_service = namespace(backend=&lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001FB88D3AE70&gt;, voice_prompt={'voice_t...A young woman, gentle and sweet voice'}, statuses=[('loading_model', None), ('generating', None), ('completed', None)])
+
+    @pytest.mark.asyncio
+    async def test_service_whitespace_request_description_falls_back_to_the_design_prompt(
+        backend, recorder: _Recorder, design_service
+    ) -&gt; None:
+        design_service.backend = backend
+        design_service.voice_prompt = _designed_prompt()
+    
+        await _run_design("voxcpm", voice_description="   ")
+    
+        assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+&gt;       assert recorder.generate_calls[0]["text"] == f"({DESIGN_PROMPT})Hello there."
+E       AssertionError: assert 'Hello there.' == '(A young wom...)Hello there.'
+E         
+E         - (A young woman, gentle and sweet voice)Hello there.
+E         + Hello there.
+
+backend\tests\test_voxcpm_backend.py:1669: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_retry_and_regenerate_reproduce_the_designed_voice[retry]" time="0.005"><failure message="AssertionError: assert 'Hello there.' == '(A young wom...)Hello there.'&#10;  &#10;  - (A young woman, gentle and sweet voice)Hello there.&#10;  + Hello there.">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001FB88D3B8F0&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x000001FB88D3A690&gt;
+design_service = namespace(backend=&lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001FB88D3B8F0&gt;, voice_prompt={'voice_t...A young woman, gentle and sweet voice'}, statuses=[('loading_model', None), ('generating', None), ('completed', None)])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001FB88D3A810&gt;
+mode = 'retry'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("mode", ["retry", "regenerate"])
+    async def test_service_retry_and_regenerate_reproduce_the_designed_voice(
+        backend, recorder: _Recorder, design_service, monkeypatch: pytest.MonkeyPatch, mode
+    ) -&gt; None:
+        from backend.services import generation as generation_service
+    
+        monkeypatch.setattr(generation_service, "_save_retry", lambda **_k: "generations/fake.wav")
+        monkeypatch.setattr(generation_service, "_save_regenerate", lambda **_k: "generations/fake.wav")
+        design_service.backend = backend
+        design_service.voice_prompt = _designed_prompt()
+    
+        await generation_service.run_generation(
+            generation_id="gen-design",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine="voxcpm",
+            model_size="default",
+            seed=3,
+            mode=mode,
+        )
+    
+        assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+&gt;       assert recorder.generate_calls[0]["text"] == f"({DESIGN_PROMPT})Hello there."
+E       AssertionError: assert 'Hello there.' == '(A young wom...)Hello there.'
+E         
+E         - (A young woman, gentle and sweet voice)Hello there.
+E         + Hello there.
+
+backend\tests\test_voxcpm_backend.py:1696: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_retry_and_regenerate_reproduce_the_designed_voice[regenerate]" time="0.005"><failure message="AssertionError: assert 'Hello there.' == '(A young wom...)Hello there.'&#10;  &#10;  - (A young woman, gentle and sweet voice)Hello there.&#10;  + Hello there.">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001FB88D3BB90&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x000001FB88D3ACF0&gt;
+design_service = namespace(backend=&lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001FB88D3BB90&gt;, voice_prompt={'voice_t...A young woman, gentle and sweet voice'}, statuses=[('loading_model', None), ('generating', None), ('completed', None)])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001FB88D39820&gt;
+mode = 'regenerate'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("mode", ["retry", "regenerate"])
+    async def test_service_retry_and_regenerate_reproduce_the_designed_voice(
+        backend, recorder: _Recorder, design_service, monkeypatch: pytest.MonkeyPatch, mode
+    ) -&gt; None:
+        from backend.services import generation as generation_service
+    
+        monkeypatch.setattr(generation_service, "_save_retry", lambda **_k: "generations/fake.wav")
+        monkeypatch.setattr(generation_service, "_save_regenerate", lambda **_k: "generations/fake.wav")
+        design_service.backend = backend
+        design_service.voice_prompt = _designed_prompt()
+    
+        await generation_service.run_generation(
+            generation_id="gen-design",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine="voxcpm",
+            model_size="default",
+            seed=3,
+            mode=mode,
+        )
+    
+        assert design_service.statuses[-1] == ("completed", None), design_service.statuses
+&gt;       assert recorder.generate_calls[0]["text"] == f"({DESIGN_PROMPT})Hello there."
+E       AssertionError: assert 'Hello there.' == '(A young wom...)Hello there.'
+E         
+E         - (A young woman, gentle and sweet voice)Hello there.
+E         + Hello there.
+
+backend\tests\test_voxcpm_backend.py:1696: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_service_cloned_profile_with_description_still_has_no_prefix" time="0.005" /><testcase classname="tests.test_voxcpm_backend" name="test_service_designed_profile_on_other_engines_keeps_instruct[qwen_custom_voice]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_service_designed_profile_on_other_engines_keeps_instruct[qwen]" time="0.001" /><testcase classname="tests.test_voxcpm_backend" name="test_generate_audio_sync_uses_the_designed_profile_prompt" time="0.003"><failure message="AssertionError: assert 'Hello there.' == '(A young wom...)Hello there.'&#10;  &#10;  - (A young woman, gentle and sweet voice)Hello there.&#10;  + Hello there.">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001FB8F9FAFF0&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x000001FB8F9FBAA0&gt;
+design_service = namespace(backend=&lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001FB8F9FAFF0&gt;, voice_prompt={'voice_type': 'designed', 'design_prompt': 'A young woman, gentle and sweet voice'}, statuses=[])
+
+    @pytest.mark.asyncio
+    async def test_generate_audio_sync_uses_the_designed_profile_prompt(
+        backend, recorder: _Recorder, design_service
+    ) -&gt; None:
+        from backend.services import generation as generation_service
+    
+        design_service.backend = backend
+        design_service.voice_prompt = _designed_prompt()
+    
+        await generation_service.generate_audio_sync(
+            profile_id="p1", text="Hello there.", language="en", engine="voxcpm", model_size="default", instruct=DELIVERY
+        )
+    
+&gt;       assert recorder.generate_calls[0]["text"] == f"({DESIGN_PROMPT})Hello there."
+E       AssertionError: assert 'Hello there.' == '(A young wom...)Hello there.'
+E         
+E         - (A young woman, gentle and sweet voice)Hello there.
+E         + Hello there.
+
+backend\tests\test_voxcpm_backend.py:1740: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_stream_route_uses_the_designed_profile_prompt" time="0.004"><failure message="AssertionError: assert ['Hello.', '(...voice)Hello.'] == ['(A young wo...voice)Hello.']&#10;  &#10;  At index 0 diff: 'Hello.' != '(A young woman, gentle and sweet voice)Hello.'&#10;  &#10;  Full diff:&#10;    [&#10;  -     '(A young woman, gentle and sweet voice)Hello.',&#10;  +     'Hello.',&#10;        '(An old man, deep, slow and raspy voice)Hello.',&#10;    ]">backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001FB8F9F8DA0&gt;
+recorder = &lt;backend.tests.test_voxcpm_backend._Recorder object at 0x000001FB8F9F9220&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001FB8F9FB0E0&gt;
+
+    @pytest.mark.asyncio
+    async def test_stream_route_uses_the_designed_profile_prompt(
+        backend, recorder: _Recorder, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        from types import SimpleNamespace
+    
+        import backend.backends as backends_pkg
+        from backend import models
+        from backend.routes import generations as routes_mod
+    
+        async def fake_get_profile(*_a, **_k):
+            return SimpleNamespace(default_engine=None, preset_engine=None, personality=None, effects_chain=None)
+    
+        async def noop(*_a, **_k):
+            return None
+    
+        async def fake_voice_prompt(*_a, **_k):
+            return _designed_prompt()
+    
+        monkeypatch.setattr(routes_mod.profiles, "get_profile", fake_get_profile)
+        monkeypatch.setattr(routes_mod.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+        monkeypatch.setattr(routes_mod.profiles, "create_voice_prompt_for_profile", fake_voice_prompt)
+        monkeypatch.setattr(routes_mod.pronunciation, "apply_pronunciations", lambda text, *_a, **_k: (text, []))
+        monkeypatch.setattr(routes_mod, "_require_available_engine", lambda _engine: None)
+        monkeypatch.setattr(backends_pkg, "get_tts_backend_for_engine", lambda _engine: backend)
+        monkeypatch.setattr(backends_pkg, "ensure_model_cached_or_raise", noop)
+        monkeypatch.setattr(backends_pkg, "load_engine_model", noop)
+    
+        await routes_mod.stream_speech(
+            models.GenerationRequest(profile_id="p1", text="Hello.", engine="voxcpm", instruct=DELIVERY), db=None
+        )
+        await routes_mod.stream_speech(
+            models.GenerationRequest(profile_id="p1", text="Hello.", engine="voxcpm", voice_description=DESCRIPTION),
+            db=None,
+        )
+    
+&gt;       assert [c["text"] for c in recorder.generate_calls] == [f"({DESIGN_PROMPT})Hello.", f"({DESCRIPTION})Hello."]
+E       AssertionError: assert ['Hello.', '(...voice)Hello.'] == ['(A young wo...voice)Hello.']
+E         
+E         At index 0 diff: 'Hello.' != '(A young woman, gentle and sweet voice)Hello.'
+E         
+E         Full diff:
+E           [
+E         -     '(A young woman, gentle and sweet voice)Hello.',
+E         +     'Hello.',
+E               '(An old man, deep, slow and raspy voice)Hello.',
+E           ]
+
+backend\tests\test_voxcpm_backend.py:1779: AssertionError</failure></testcase></testsuite></testsuites>

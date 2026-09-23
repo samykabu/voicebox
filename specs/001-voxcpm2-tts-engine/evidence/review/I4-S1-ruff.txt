@@ -1,0 +1,18 @@
+$ ruff check / ruff format --check on the I4/S1 touched files, HEAD (git show HEAD:<f> | ruff --stdin-filename <f> -) vs working tree
+2026-09-23T21:12:20+03:00
+ruff 0.16.8
+backend/routes/generations.py: check findings HEAD=6 now=6 new-by-rule-message=0; format HEAD=unformatted now=unformatted
+backend/services/generation.py: check findings HEAD=16 now=16 new-by-rule-message=0; format HEAD=unformatted now=unformatted
+backend/services/history.py: check findings HEAD=49 now=49 new-by-rule-message=0; format HEAD=unformatted now=unformatted
+backend/database/models.py: check findings HEAD=0 now=0 new-by-rule-message=0; format HEAD=unformatted now=unformatted
+backend/database/migrations.py: check findings HEAD=2 now=2 new-by-rule-message=0; format HEAD=unformatted now=unformatted
+backend/models.py: check findings HEAD=187 now=187 new-by-rule-message=0; format HEAD=unformatted now=unformatted
+backend/tests/test_engine_capabilities.py: check findings HEAD=0 now=0 new-by-rule-message=0; format HEAD=formatted now=formatted
+(files unformatted at HEAD were left unformatted, to keep the diff reviewable)
+--- new file backend/tests/test_review_generation_description.py
+All checks passed!
+1 file already formatted
+--- new file backend/tests/test_review_advanced_settings_engine.py
+All checks passed!
+1 file already formatted
+Result: no new ruff check findings and no format regressions vs HEAD.

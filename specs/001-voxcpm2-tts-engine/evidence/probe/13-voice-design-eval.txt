@@ -1,0 +1,30 @@
+# timestamp start: 2026-09-23T02:15:45+03:00
+# venv nodeps312, CUDA. Evaluator ASR = openai/whisper-base.en (downloaded to default HF cache for this check only; not a voxcpm dependency)
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+The class this function is called from is 'LlamaTokenizerFast'.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cuda, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Loaded VoxCPM2Model
+Device set to use cuda:0
+form | run | audio_s | median_F0_Hz | transcript
+`return_token_timestamps` is deprecated for WhisperFeatureExtractor and will be removed in Transformers v5. Use `return_attention_mask` instead, as the number of frames can be inferred from it.
+Using custom `forced_decoder_ids` from the (generation) config. This is deprecated in favor of the `task` and `language` flags/config options.
+none | 1 | 3.20 | 188 | Hello, welcome to the voice design test.
+none | 2 | 3.04 | 131 | Hello, welcome to the voice design test.
+ascii_female | 1 | 3.20 | 304 | Hello, welcome to the Voice Design Test.
+ascii_female | 2 | 3.20 | 392 | Hello, welcome to the Voice Design Test.
+ascii_male | 1 | 3.20 | 381 | Hello, welcome to the voice design test.
+ascii_male | 2 | 3.20 | 159 | Hello, welcome to the Voice Design Test.
+fullwidth_female | 1 | 6.56 | 164 | a young woman, gentle and sweet voice. Hello, welcome to the voice design test.
+fullwidth_female | 2 | 8.32 | 113 | a young woman, gentle and sweet voice. Hello, welcome to the Voice Design Test.
+square_female | 1 | 3.20 | 229 | Hello. Welcome to the Voice Design Test.
+square_female | 2 | 3.20 | 235 | Hello, welcome to the Voice Design Test.
+You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset
+ascii_space_female | 1 | 2.24 | 376 | Hello, welcome to the Voice Design Test.
+ascii_space_female | 2 | 2.72 | 274 | Hello. Welcome to the Voice Design Test.
+exit=0 dur=81s
+# timestamp end: 2026-09-23T02:17:06+03:00

@@ -1,0 +1,55 @@
+# 2026-09-23T18:29:17+03:00
+# ruff: ruff 0.16.8; HEAD copy checked via stdin with --stdin-filename (same config), no git stash
+
+=== backend/utils/audio.py : HEAD ===
+backend\utils\audio.py:5:1: I001 [*] Import block is un-sorted or un-formatted
+backend\utils\audio.py:8:1: UP035 `typing.Tuple` is deprecated, use `tuple` instead
+backend\utils\audio.py:18:1: W293 Blank line contains whitespace
+backend\utils\audio.py:23:1: W293 Blank line contains whitespace
+backend\utils\audio.py:29:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:32:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:35:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:40:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:43:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:51:6: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backend\utils\audio.py:54:1: W293 Blank line contains whitespace
+backend\utils\audio.py:59:1: W293 Blank line contains whitespace
+backend\utils\audio.py:87:5: I001 [*] Import block is un-sorted or un-formatted
+backend\utils\audio.py:304:6: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backend\utils\audio.py:304:18: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:328:6: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backend\utils\audio.py:328:18: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:328:33: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:328:55: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:355:50: RUF010 [*] Use explicit conversion flag
+Found 20 errors.
+[*] 15 fixable with the `--fix` option (4 hidden fixes can be enabled with the `--unsafe-fixes` option).
+=== backend/utils/audio.py : working tree ===
+backend\utils\audio.py:5:1: I001 [*] Import block is un-sorted or un-formatted
+backend\utils\audio.py:8:1: UP035 `typing.Tuple` is deprecated, use `tuple` instead
+backend\utils\audio.py:21:1: W293 Blank line contains whitespace
+backend\utils\audio.py:26:1: W293 Blank line contains whitespace
+backend\utils\audio.py:32:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:35:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:38:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:43:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:46:1: W293 [*] Blank line contains whitespace
+backend\utils\audio.py:54:6: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backend\utils\audio.py:57:1: W293 Blank line contains whitespace
+backend\utils\audio.py:62:1: W293 Blank line contains whitespace
+backend\utils\audio.py:91:5: I001 [*] Import block is un-sorted or un-formatted
+backend\utils\audio.py:315:6: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backend\utils\audio.py:315:18: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:339:6: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backend\utils\audio.py:339:18: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:339:33: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:339:55: UP045 [*] Use `X | None` for type annotations
+backend\utils\audio.py:366:50: RUF010 [*] Use explicit conversion flag
+Found 20 errors.
+[*] 15 fixable with the `--fix` option (4 hidden fixes can be enabled with the `--unsafe-fixes` option).
+--- HEAD rules:       2 : I001       1 : RUF010       3 : UP006       1 : UP035       4 : UP045       9 : W293 | working tree rules:       2 : I001       1 : RUF010       3 : UP006       1 : UP035       4 : UP045       9 : W293 
+
+=== backend/tests/test_audio_disclosure.py (new file) ===
+All checks passed!
+
+# Verdict: no new findings (identical rule counts vs HEAD, line numbers shifted only); new test file clean.

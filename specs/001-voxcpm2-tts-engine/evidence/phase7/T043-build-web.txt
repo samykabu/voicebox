@@ -1,0 +1,20 @@
+$ bun run build:web
+# 2026-09-23T19:12:23.3923030+03:00
+$ cd web && bun run build
+$ tsc && vite build
+vite v5.4.21 building for production...
+transforming...
+✓ 3638 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                             0.47 kB │ gzip:   0.30 kB
+dist/assets/voicebox-logo-DQ1k8iIe.png  4,245.54 kB
+dist/assets/index-CY8RT3zR.css            107.99 kB │ gzip:  16.61 kB
+dist/assets/index-BiLuqM0c.js           1,772.65 kB │ gzip: 564.61 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 4.59s
+exit 0

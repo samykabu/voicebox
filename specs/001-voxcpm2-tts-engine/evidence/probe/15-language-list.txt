@@ -1,0 +1,53 @@
+# timestamp: 2026-09-23T02:29:28+03:00
+## Source 1: model card front-matter (HF cache README.md, snapshot 32279effe8c19989596f05d353d1447f51d9e915)
+$ sed -n '/^language:/,/^license/p' README.md
+language:
+- zh
+- en
+- ar
+- my
+- da
+- nl
+- fi
+- fr
+- de
+- el
+- he
+- hi
+- id
+- it
+- ja
+- km
+- ko
+- lo
+- ms
+- no
+- pl
+- pt
+- ru
+- es
+- sw
+- sv
+- tl
+- th
+- tr
+- vi
+license: apache-2.0
+count of codes: 30
+
+## Source 2: model card prose
+71:Arabic, Burmese, Chinese, Danish, Dutch, English, Finnish, French, German, Greek, Hebrew, Hindi, Indonesian, Italian, Japanese, Khmer, Korean, Lao, Malay, Norwegian, Polish, Portuguese, Russian, Spanish, Swahili, Swedish, Tagalog, Thai, Turkish, Vietnamese
+
+## Source 3: packaged PyPI README (voxcpm-2.0.3.dist-info/METADATA)
+107:Arabic, Burmese, Chinese, Danish, Dutch, English, Finnish, French, German, Greek, Hebrew, Hindi, Indonesian, Italian, Japanese, Khmer, Korean, Lao, Malay, Norwegian, Polish, Portuguese, Russian, Spanish, Swahili, Swedish, Tagalog, Thai, Turkish, Vietnamese
+
+## Package code: any language list / language parameter?
+$ grep -rn -i 'language\|lang_code\|"ar"' voxcpm/ --include=*.py
+/c/Users/sabus/voxcpm-probe/Lib/site-packages/voxcpm/model/voxcpm.py:17:See the License for the specific language governing permissions and
+/c/Users/sabus/voxcpm-probe/Lib/site-packages/voxcpm/model/voxcpm.py:749:        using the language model and diffusion transformer.
+/c/Users/sabus/voxcpm-probe/Lib/site-packages/voxcpm/model/voxcpm2.py:17:See the License for the specific language governing permissions and
+/c/Users/sabus/voxcpm-probe/Lib/site-packages/voxcpm/model/voxcpm2.py:991:        using the language model and diffusion transformer.
+(only license-header hits => no language list or language argument in code; text is fed directly, 'no language tag needed')
+
+## config.json keys
+['architecture', 'lm_config', 'patch_size', 'feat_dim', 'scalar_quantization_latent_dim', 'scalar_quantization_scale', 'residual_lm_num_layers', 'residual_lm_no_rope', 'encoder_config', 'dit_config', 'audio_vae_config', 'max_length', 'device', 'dtype']

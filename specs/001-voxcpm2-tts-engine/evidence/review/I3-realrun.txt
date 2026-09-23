@@ -1,0 +1,118 @@
+I3 real run: voice design, long English text, real VoxCPMBackend through utils.chunked_tts.generate_chunked
+Run: HF_HUB_OFFLINE=1 backend/venv/Scripts/python.exe <scratchpad>/review/i3_realrun.py <wav>  (2026-09-23T21:15:32+03:00)
+Script: C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/review/i3_realrun.py (outside the repo). The script wraps model.generate with a recording spy; nothing else is faked.
+Each chunk's audio_seconds is about the length of its own sentence, not prompt+sentence, so the vendor returns only the new speech.
+
+torch 2.11.0+cu128, cuda available True
+HF_HUB_OFFLINE=1
+nvidia-smi before load:
+0, NVIDIA GeForce RTX 5070, 1691 MiB, 10253 MiB
+1, NVIDIA GeForce RTX 5060 Ti, 3032 MiB, 13019 MiB
+description: 'A middle-aged man with a deep, calm, warm baritone voice, speaking slowly'
+text: 670 chars, max_chunk_chars=200, seed=42
+expected chunks: 6 -> [111, 112, 109, 111, 111, 111] chars
+device: cuda; load 13.2 s
+nvidia-smi after load:
+0, NVIDIA GeForce RTX 5070, 7376 MiB, 4568 MiB
+1, NVIDIA GeForce RTX 5060 Ti, 3029 MiB, 13022 MiB
+
+chunk count (vendor calls): 6
+
+--- chunk 0 ---
+{
+  "text": "(A middle-aged man with a deep, calm, warm baritone voice, speaking slowly)The old lighthouse stood at the edge of the cliff for more than a century, guiding ships through fog and storm.",
+  "prompt_keys_set": [],
+  "prompt_wav_path": null,
+  "prompt_wav_exists": false,
+  "prompt_wav_seconds": null,
+  "prompt_text": null,
+  "seconds_to_generate": 9.02,
+  "audio_seconds": 8.8
+}
+
+--- chunk 1 ---
+{
+  "text": "Every evening the keeper climbed its spiral stairs, polished the great glass lens, and lit the lamp before dark.",
+  "prompt_keys_set": [
+    "prompt_text",
+    "prompt_wav_path"
+  ],
+  "prompt_wav_path": "C:\\Users\\sabus\\AppData\\Local\\Temp\\voxcpm_continuation_w6w20y3i.wav",
+  "prompt_wav_exists": true,
+  "prompt_wav_seconds": 8.8,
+  "prompt_text": "The old lighthouse stood at the edge of the cliff for more than a century, guiding ships through fog and storm.",
+  "seconds_to_generate": 9.87,
+  "audio_seconds": 8.64
+}
+
+--- chunk 2 ---
+{
+  "text": "Sailors far out at sea would watch for the steady sweep of light and know that the harbour was close at hand.",
+  "prompt_keys_set": [
+    "prompt_text",
+    "prompt_wav_path"
+  ],
+  "prompt_wav_path": "C:\\Users\\sabus\\AppData\\Local\\Temp\\voxcpm_continuation_w6w20y3i.wav",
+  "prompt_wav_exists": true,
+  "prompt_wav_seconds": 8.8,
+  "prompt_text": "The old lighthouse stood at the edge of the cliff for more than a century, guiding ships through fog and storm.",
+  "seconds_to_generate": 8.18,
+  "audio_seconds": 8.16
+}
+
+--- chunk 3 ---
+{
+  "text": "When the automatic beacon finally arrived, the keeper packed his few belongings and walked down the hill alone.",
+  "prompt_keys_set": [
+    "prompt_text",
+    "prompt_wav_path"
+  ],
+  "prompt_wav_path": "C:\\Users\\sabus\\AppData\\Local\\Temp\\voxcpm_continuation_w6w20y3i.wav",
+  "prompt_wav_exists": true,
+  "prompt_wav_seconds": 8.8,
+  "prompt_text": "The old lighthouse stood at the edge of the cliff for more than a century, guiding ships through fog and storm.",
+  "seconds_to_generate": 7.63,
+  "audio_seconds": 7.68
+}
+
+--- chunk 4 ---
+{
+  "text": "He still returns each autumn to sit on the rocks below, listening to the waves and remembering the long nights.",
+  "prompt_keys_set": [
+    "prompt_text",
+    "prompt_wav_path"
+  ],
+  "prompt_wav_path": "C:\\Users\\sabus\\AppData\\Local\\Temp\\voxcpm_continuation_w6w20y3i.wav",
+  "prompt_wav_exists": true,
+  "prompt_wav_seconds": 8.8,
+  "prompt_text": "The old lighthouse stood at the edge of the cliff for more than a century, guiding ships through fog and storm.",
+  "seconds_to_generate": 7.67,
+  "audio_seconds": 7.84
+}
+
+--- chunk 5 ---
+{
+  "text": "Some say the light burns a little brighter on those evenings, as if the tower remembers him as well as he does.",
+  "prompt_keys_set": [
+    "prompt_text",
+    "prompt_wav_path"
+  ],
+  "prompt_wav_path": "C:\\Users\\sabus\\AppData\\Local\\Temp\\voxcpm_continuation_w6w20y3i.wav",
+  "prompt_wav_exists": true,
+  "prompt_wav_seconds": 8.8,
+  "prompt_text": "The old lighthouse stood at the edge of the cliff for more than a century, guiding ships through fog and storm.",
+  "seconds_to_generate": 7.88,
+  "audio_seconds": 7.84
+}
+
+continuation WAV removed after generation: True
+
+output: C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/review/i3_design_long.wav
+output sample rate 48000 Hz, duration 48.71 s
+generation wall time 50.3 s (RTF 1.03)
+torch peak allocated 5778 MiB, peak reserved 6110 MiB on cuda
+nvidia-smi after generation:
+0, NVIDIA GeForce RTX 5070, 7996 MiB, 3948 MiB
+1, NVIDIA GeForce RTX 5060 Ti, 3036 MiB, 13015 MiB
+
+HUMAN CHECK NEEDED: listen to the WAV and confirm one consistent speaker across all chunks.

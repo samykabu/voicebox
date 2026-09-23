@@ -1,0 +1,246 @@
+# T017 evidence — backend/build_binary.py (VoxCPM2 hidden imports / data / excludes)
+# timestamp: 2026-09-23T16:15:46+03:00
+# NOTE: the PyInstaller build was NOT run (per brief; verified later in quickstart Step 8).
+
+$ backend/venv/Scripts/python.exe -m py_compile backend/build_binary.py
+exit=0
+
+$ env -u VOICEBOX_TEST_ROCM_INSTALL PYTHONPATH=backend backend/venv/Scripts/python.exe -m pytest backend/tests/test_rocm_build.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase3/T017-build-binary.xml
+# VOICEBOX_TEST_ROCM_INSTALL before unset: <unset>
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 8 items
+
+backend\tests\test_rocm_build.py::TestRocmBuildArgs::test_binary_name PASSED [ 12%]
+backend\tests\test_rocm_build.py::TestRocmBuildArgs::test_pack_mode_is_onedir PASSED [ 25%]
+backend\tests\test_rocm_build.py::TestRocmBuildArgs::test_hidden_imports_cuda PASSED [ 37%]
+backend\tests\test_rocm_build.py::TestRocmBuildArgs::test_no_cudnn_hidden_import_for_rocm PASSED [ 50%]
+backend\tests\test_rocm_build.py::TestRocmBuildArgs::test_nvidia_excludes_present PASSED [ 62%]
+backend\tests\test_rocm_build.py::TestRocmBuildCli::test_rocm_flag_parses PASSED [ 75%]
+backend\tests\test_rocm_build.py::TestRocmBuildCli::test_cannot_combine_cuda_and_rocm PASSED [ 87%]
+backend\tests\test_rocm_build.py::TestRocmBuildE2E::test_rocm_binary_compiles_and_runs SKIPPED [100%]
+
+============================== warnings summary ===============================
+backend\tests\test_rocm_build.py:82
+  D:\Projects\Personal\voicebox\backend\tests\test_rocm_build.py:82: PytestUnknownMarkWarning: Unknown pytest.mark.slow - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.slow()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase3\T017-build-binary.xml -
+=========================== short test summary info ===========================
+SKIPPED [1] backend\tests\test_rocm_build.py:95: Set VOICEBOX_TEST_ROCM_INSTALL=1 to run the heavy ROCm build (reinstalls torch in the venv)
+=================== 7 passed, 1 skipped, 1 warning in 0.28s ===================
+exit=0
+
+## Captured PyInstaller args (build_server with PyInstaller.run mocked; no build)
+$ backend/venv/Scripts/python.exe <scratchpad>/t017_args.py
+    | # Capture the PyInstaller args build_server() would pass (PyInstaller.run mocked, no build).
+    | import sys
+    | from unittest.mock import patch
+    | sys.path.insert(0, "backend")
+    | import build_binary
+    | for label, kw in [("cpu", {}), ("cuda", {"cuda": True})]:
+    |     with patch("build_binary.PyInstaller.__main__.run") as run, patch("build_binary.os.chdir"), \
+    |          patch("build_binary.platform.system", return_value="Windows"):
+    |         build_binary.build_server(**kw)
+    |     a = run.call_args[0][0]
+    |     pairs = [(a[i], a[i + 1]) for i in range(len(a) - 1) if a[i].startswith("--")]
+    |     hits = [p for p in pairs if "voxcpm" in p[1] or p[1] in ("modelscope", "funasr", "spaces", "argbind", "wetext", "torchcodec", "gradio", "datasets")]
+    |     print(label, hits)
+    | with patch("build_binary.PyInstaller.__main__.run") as run, patch("build_binary.os.chdir"):
+    |     build_binary.build_mcp_shim() if hasattr(build_binary, "build_mcp_shim") else None
+    |     if run.called:
+    |         a = run.call_args[0][0]
+    |         print("shim excludes voxcpm:", ("--exclude-module", "voxcpm") in list(zip(a, a[1:])))
+152 INFO: Building for non-Apple Silicon platform - PyTorch only
+3123 INFO: CUDA torch detected � installing CPU torch for CPU build...
+28844 INFO: Restoring CUDA torch...
+67509 INFO: Binary built in D:\Projects\Personal\voicebox\backend\dist\voicebox-server
+67510 INFO: Building with CUDA support
+67510 INFO: Binary built in D:\Projects\Personal\voicebox\backend\dist\voicebox-server-cuda
+cpu [('--hidden-import', 'backend.backends.voxcpm_backend'), ('--collect-all', 'voxcpm'), ('--exclude-module', 'voxcpm.training'), ('--exclude-module', 'modelscope'), ('--exclude-module', 'funasr'), ('--exclude-module', 'spaces'), ('--exclude-module', 'argbind'), ('--exclude-module', 'wetext'), ('--exclude-module', 'torchcodec')]
+cuda [('--hidden-import', 'backend.backends.voxcpm_backend'), ('--collect-all', 'voxcpm'), ('--exclude-module', 'voxcpm.training'), ('--exclude-module', 'modelscope'), ('--exclude-module', 'funasr'), ('--exclude-module', 'spaces'), ('--exclude-module', 'argbind'), ('--exclude-module', 'wetext'), ('--exclude-module', 'torchcodec')]
+exit=0
+
+## INCIDENT (recorded, not hidden): the CPU-mode arg capture above triggered a real torch swap
+# build_server() (non-cuda, platform.system()=='Windows') detects CUDA torch and runs
+#   pip install torch torchvision torchaudio --index-url .../whl/cpu --force-reinstall --no-deps
+# before PyInstaller.run (which WAS mocked), then in 'finally' restores with the cu128 index.
+# I mocked platform.system to 'Windows' and did not mock subprocess.run, so both pip runs executed.
+# Post-check at 2026-09-23T16:17:55+03:00:
+$ backend/venv/Scripts/python.exe -c "import torch,torchaudio,torchvision; print(...)"
+2.11.0+cu128 2.11.0+cu128 0.26.0+cu128 cuda 12.8 available True
+$ ls -la --time-style=full-iso backend/venv/Lib/site-packages | grep "torch.*dist-info"
+drwxr-xr-x 1 sabus 197609       0 2026-09-23 15:41:14.161833700 +0300 ema_pytorch-0.8.3.dist-info
+drwxr-xr-x 1 sabus 197609       0 2026-09-23 16:17:03.095436100 +0300 torch-2.11.0+cu128.dist-info
+drwxr-xr-x 1 sabus 197609       0 2026-09-23 15:41:03.411304300 +0300 torch_einops_utils-0.1.29.dist-info
+drwxr-xr-x 1 sabus 197609       0 2026-09-23 16:16:30.954190200 +0300 torchaudio-2.11.0+cu128.dist-info
+drwxr-xr-x 1 sabus 197609       0 2026-09-23 15:41:03.383712400 +0300 torchdiffeq-0.2.5.dist-info
+drwxr-xr-x 1 sabus 197609       0 2026-09-23 16:16:31.598769700 +0300 torchvision-0.26.0+cu128.dist-info
+# Result: same versions as before (2.11.0+cu128 / 2.11.0+cu128 / 0.26.0+cu128), --no-deps so no other
+# package changed; torch was in flux ~16:16:00-16:17:03 +03:00. No further build_server() calls were made.
+
+## collect_all('voxcpm') — what --collect-all voxcpm resolves to (read-only; no build)
+$ cd backend && venv/Scripts/python.exe -c "from PyInstaller.utils.hooks import collect_all; ..."
+2319 WARNING: Failed to collect submodules for 'voxcpm.training' because importing 'voxcpm.training' raised: ModuleNotFoundError: No module named 'argbind'
+hiddenimports: ['voxcpm', 'voxcpm.cli', 'voxcpm.core', 'voxcpm.model', 'voxcpm.model.utils', 'voxcpm.model.voxcpm', 'voxcpm.model.voxcpm2', 'voxcpm.modules', 'voxcpm.modules.audiovae', 'voxcpm.modules.audiovae.audio_vae', 'voxcpm.modules.audiovae.audio_vae_v2', 'voxcpm.modules.layers', 'voxcpm.modules.layers.lora', 'voxcpm.modules.layers.scalar_quantization_layer', 'voxcpm.modules.locdit', 'voxcpm.modules.locdit.local_dit', 'voxcpm.modules.locdit.local_dit_v2', 'voxcpm.modules.locdit.unified_cfm', 'voxcpm.modules.locenc', 'voxcpm.modules.locenc.local_encoder', 'voxcpm.modules.minicpm4', 'voxcpm.modules.minicpm4.cache', 'voxcpm.modules.minicpm4.config', 'voxcpm.modules.minicpm4.model', 'voxcpm.zipenhancer']
+binaries: []
+non-.py datas: [('D:\\Projects\\Personal\\voicebox\\backend\\venv\\Lib\\site-packages\\voxcpm-2.0.3.dist-info', 'voxcpm-2.0.3.dist-info')]
+py source datas: 34
+exit=0
+$ find backend/venv/Lib/site-packages/voxcpm -type f ! -name "*.py" ! -path "*__pycache__*"
+(end; empty = no non-.py data)
+$ grep -rn "torch.jit.script" backend/venv/Lib/site-packages/voxcpm
+venv/Lib/site-packages/voxcpm/modules/audiovae/audio_vae.py:49:@torch.jit.script
+venv/Lib/site-packages/voxcpm/modules/audiovae/audio_vae_v2.py:50:@torch.jit.script
+$ find_spec for voxcpm optional deps
+{'torchcodec': False, 'modelscope': False, 'wetext': False, 'funasr': False, 'spaces': False, 'argbind': False, 'gradio': True, 'datasets': True, 'triton': False}
+
+## ruff (config backend/pyproject.toml, run from backend/) — 2026-09-23T16:18:10+03:00
+$ venv/Scripts/ruff.exe check build_binary.py
+I001 [*] Import block is un-sorted or un-formatted
+  --> build_binary.py:9:1
+   |
+ 7 |   """
+ 8 |
+ 9 | / import PyInstaller.__main__
+10 | | import argparse
+11 | | import logging
+12 | | import os
+13 | | import platform
+14 | | import sys
+15 | | from pathlib import Path
+   | |________________________^
+16 |
+17 |   logger = logging.getLogger(__name__)
+   |
+help: Organize imports
+   |
+8  |
+   - import PyInstaller.__main__
+9  | import argparse
+--------------------------------------------------------------------------------
+15 |
+16 + import PyInstaller.__main__
+17 +
+18 | logger = logging.getLogger(__name__)
+   |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.
+exit=1
+$ git show HEAD:backend/build_binary.py | venv/Scripts/ruff.exe check --stdin-filename build_binary.py -
+I001 [*] Import block is un-sorted or un-formatted
+  --> build_binary.py:9:1
+   |
+ 7 |   """
+ 8 |
+ 9 | / import PyInstaller.__main__
+10 | | import argparse
+11 | | import logging
+12 | | import os
+13 | | import platform
+14 | | import sys
+15 | | from pathlib import Path
+   | |________________________^
+16 |
+17 |   logger = logging.getLogger(__name__)
+   |
+help: Organize imports
+   |
+8  |
+   - import PyInstaller.__main__
+9  | import argparse
+--------------------------------------------------------------------------------
+15 |
+16 + import PyInstaller.__main__
+17 +
+18 | logger = logging.getLogger(__name__)
+   |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.
+exit=1
+$ venv/Scripts/ruff.exe format --check build_binary.py
+unformatted: File would be reformatted
+   --> build_binary.py:729:1
+    |
+728 |
+    -
+729 |     logger.info("Binary built in %s", backend_dir / "dist" / binary_name)
+--------------------------------------------------------------------------------
+845 |         build_server(cuda=cli_args.cuda, rocm=cli_args.rocm)
+    -
+    |
+
+1 file would be reformatted
+exit=1
+$ git show HEAD:backend/build_binary.py | venv/Scripts/ruff.exe format --check --stdin-filename build_binary.py -
+exit=1
+
+## git diff -- backend/build_binary.py
+diff --git a/backend/build_binary.py b/backend/build_binary.py
+index 2787eb8..258b936 100644
+--- a/backend/build_binary.py
++++ b/backend/build_binary.py
+@@ -322,6 +322,47 @@ def build_server(cuda=False, rocm=False):
+             "pypinyin",
+             "--hidden-import",
+             "loguru",
++            # VoxCPM2 — tokenizer-free multilingual TTS (openbmb/VoxCPM2).
++            # The backend module is lazily imported by the engine dispatcher,
++            # so PyInstaller cannot see it without a hidden import.
++            "--hidden-import",
++            "backend.backends.voxcpm_backend",
++            # collect-all (not hidden-import) because voxcpm's audio VAE
++            # modules decorate `snake` with @torch.jit.script at import time,
++            # and TorchScript calls inspect.getsource(), which needs the .py
++            # source files in the bundle (same failure as the DAC shim note).
++            # The package ships no non-.py data; the model config and
++            # tokenizer come from the HF snapshot at runtime.
++            "--collect-all",
++            "voxcpm",
++            # collect-all also lists voxcpm.training, which imports argbind
++            # and datasets (training only). Voicebox only runs inference.
++            "--exclude-module",
++            "voxcpm.training",
++            # Runtime-unneeded voxcpm deps (dependency probe Q11): the
++            # ModelScope denoiser (Voicebox loads with load_denoiser=False),
++            # FunASR, HF Spaces, argbind and wetext (normalize=True only).
++            # None is installed with the --no-deps setup; excluding them
++            # keeps a venv that has them from dragging them in. gradio and
++            # datasets are left alone because other engines' packages pull
++            # them in.
++            "--exclude-module",
++            "modelscope",
++            "--exclude-module",
++            "funasr",
++            "--exclude-module",
++            "spaces",
++            "--exclude-module",
++            "argbind",
++            "--exclude-module",
++            "wetext",
++            # torchcodec: VoxCPM2 never calls it (reference audio loads via
++            # librosa), the other engines already bypass torchaudio.load, and
++            # it needs FFmpeg "full-shared" DLLs that the app does not ship.
++            # Exclude it so a build venv that has it cannot bundle a codec
++            # that fails to load at runtime.
++            "--exclude-module",
++            "torchcodec",
+             # MCP server — Streamable-HTTP endpoint and the 4 voicebox.* tools.
+             # FastMCP pulls in a chain of deps (mcp, cyclopts, openapi-pydantic,
+             # etc.) that don't auto-discover cleanly under PyInstaller, so we
+@@ -738,6 +779,8 @@ def build_shim():
+         "--exclude-module",
+         "kokoro",
+         "--exclude-module",
++        "voxcpm",
++        "--exclude-module",
+         "misaki",
+         "--exclude-module",
+         "spacy",

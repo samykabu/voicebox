@@ -1,0 +1,1349 @@
+$ just check-js (bun run check)
+# 2026-09-23T19:11:21.0516426+03:00
+bun run check
+$ biome check .
+.mcp.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - {␍
+     2    │ - ··"mcpServers":·{␍
+     3    │ - ····"voicebox":·{␍
+     4    │ - ······"type":·"http",␍
+     5    │ - ······"url":·"http://127.0.0.1:17493/mcp",␍
+     6    │ - ······"headers":·{␍
+     7    │ - ········"X-Voicebox-Client-Id":·"claude-code"␍
+     8    │ - ······}␍
+     9    │ - ····}␍
+    10    │ - ··}␍
+    11    │ - }
+        1 │ + {
+        2 │ + ··"mcpServers":·{
+        3 │ + ····"voicebox":·{
+        4 │ + ······"type":·"http",
+        5 │ + ······"url":·"http://127.0.0.1:17493/mcp",
+        6 │ + ······"headers":·{
+        7 │ + ········"X-Voicebox-Client-Id":·"claude-code"
+        8 │ + ······}
+        9 │ + ····}
+       10 │ + ··}
+       11 │ + }
+       12 │ + 
+  
+
+.specify\extensions\.cache\catalog-77341f02b0d26368-metadata.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+    1   │ - {␍
+    2   │ - ··"cached_at":·"2026-09-22T22:29:30.576653+00:00",␍
+    3   │ - ··"catalog_url":·"https://raw.githubusercontent.com/samykabu/sanduq/main/catalog.json"␍
+    4   │ - }
+      1 │ + {
+      2 │ + ··"cached_at":·"2026-09-22T22:29:30.576653+00:00",
+      3 │ + ··"catalog_url":·"https://raw.githubusercontent.com/samykabu/sanduq/main/catalog.json"
+      4 │ + }
+      5 │ + 
+  
+
+.specify\extensions\.cache\catalog-77341f02b0d26368.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+      1     │ - {␍
+      2     │ - ··"schema_version":·"1.0",␍
+      3     │ - ··"updated_at":·"2026-09-22T22:24:56.069175+00:00",␍
+      4     │ - ··"catalog_url":·"https://raw.githubusercontent.com/samykabu/sanduq/main/catalog.json",␍
+      5     │ - ··"extensions":·{␍
+      6     │ - ····"project":·{␍
+      7     │ - ······"name":·"GitHub·Project·Lifecycle·Sync",␍
+      8     │ - ······"id":·"project",␍
+      9     │ - ······"description":·"Mirror·each·Spec·Kit·feature·onto·a·GitHub·Project·(v2):·create·a·parent·feature·issue,·advance·its·Status·column·through·the·Spec·Kit·lifecycle·(open·->·analysis·->·engineer-review·->·ready·->·in-progress·->·in-review·->·done),·create·one·native·sub-issue·per·task,·and·close·sub-issues·as·their·tasks·are·checked·off.·Board-agnostic·initialization·lets·each·repo·choose·required/automatic·or·optional/manual·sync·hooks.·Idempotent·and·no-regress.",␍
+     10     │ - ······"author":·"Samy·K.·Abushanab",␍
+     11     │ - ······"version":·"2.1.0",␍
+     12     │ - ······"download_url":·"https://github.com/samykabu/sanduq/releases/download/project-v2.1.0/project.zip",␍
+     13     │ - ······"repository":·"https://github.com/samykabu/sanduq",␍
+     14     │ - ······"homepage":·"https://github.com/samykabu/sanduq/tree/main/extensions/project",␍
+     15     │ - ······"documentation":·"https://github.com/samykabu/sanduq/blob/main/extensions/project/README.md",␍
+     16     │ - ······"changelog":·"https://github.com/samykabu/sanduq/blob/main/extensions/project/CHANGELOG.md",␍
+     17     │ - ······"license":·"PolyForm-Noncommercial-1.0.0",␍
+     18     │ - ······"category":·"process",␍
+     19     │ - ······"effect":·"read-write",␍
+     20     │ - ······"requires":·{␍
+     21     │ - ········"speckit_version":·">=0.2.0",␍
+     22     │ - ········"tools":·[␍
+     23     │ - ··········{␍
+     24     │ - ············"name":·"git",␍
+     25     │ - ············"required":·false␍
+     26     │ - ··········},␍
+     27     │ - ··········{␍
+     28     │ - ············"name":·"gh",␍
+     29     │ - ············"required":·false␍
+     30     │ - ··········}␍
+     31     │ - ········]␍
+     32     │ - ······},␍
+     33     │ - ······"provides":·{␍
+     34     │ - ········"commands":·2,␍
+     35     │ - ········"hooks":·6␍
+     36     │ - ······},␍
+     37     │ - ······"tags":·[␍
+     38     │ - ········"project",␍
+     39     │ - ········"github",␍
+     40     │ - ········"issues",␍
+     41     │ - ········"sub-issues",␍
+     42     │ - ········"lifecycle",␍
+     43     │ - ········"workflow"␍
+     44     │ - ······],␍
+     45     │ - ······"verified":·false,␍
+     46     │ - ······"downloads":·0,␍
+     47     │ - ······"stars":·0,␍
+     48     │ - ······"created_at":·"2026-07-09T00:00:00Z",␍
+     49     │ - ······"updated_at":·"2026-09-19T22:24:12.265584+00:00",␍
+     50     │ - ······"sha256":·"7ec7eb280b9cfb4408303d5c8ce23df875b73ae1b9b8caf864dd9e2968ef283e"␍
+     51     │ - ····},␍
+     52     │ - ····"pr":·{␍
+     53     │ - ······"name":·"Pull·Request·Workflow",␍
+     54     │ - ······"id":·"pr",␍
+     55     │ - ······"version":·"4.1.0",␍
+     56     │ - ······"description":·"Generate·or·update·pull·requests·from·Spec·Kit·artifacts,·enforce·installed·QA·and·User·Manual·freshness·policies,·then·process·review·feedback·through·an·approval-gated·fix·and·reply·workflow.",␍
+     57     │ - ······"author":·"Samy·K.·Abushanab",␍
+     58     │ - ······"repository":·"https://github.com/samykabu/sanduq",␍
+     59     │ - ······"homepage":·"https://github.com/samykabu/sanduq/tree/main/extensions/pr",␍
+     60     │ - ······"documentation":·"https://github.com/samykabu/sanduq/blob/main/extensions/pr/README.md",␍
+     61     │ - ······"changelog":·"https://github.com/samykabu/sanduq/blob/main/extensions/pr/CHANGELOG.md",␍
+     62     │ - ······"download_url":·"https://github.com/samykabu/sanduq/releases/download/pr-v4.1.0/pr.zip",␍
+     63     │ - ······"license":·"PolyForm-Noncommercial-1.0.0",␍
+     64     │ - ······"category":·"process",␍
+     65     │ - ······"effect":·"read-write",␍
+     66     │ - ······"requires":·{␍
+     67     │ - ········"speckit_version":·">=0.2.0",␍
+     68     │ - ········"extensions":·[␍
+     69     │ - ··········{␍
+     70     │ - ············"id":·"illustrate",␍
+     71     │ - ············"version":·">=2.0.0,<3.0.0",␍
+     72     │ - ············"required":·true␍
+     73     │ - ··········},␍
+     74     │ - ··········{␍
+     75     │ - ············"id":·"assure",␍
+     76     │ - ············"version":·">=2.0.0,<3.0.0",␍
+     77     │ - ············"required":·false␍
+     78     │ - ··········},␍
+     79     │ - ··········{␍
+     80     │ - ············"id":·"user-manual",␍
+     81     │ - ············"version":·">=1.0.0,<2.0.0",␍
+     82     │ - ············"required":·false␍
+     83     │ - ··········}␍
+     84     │ - ········],␍
+     85     │ - ········"tools":·[␍
+     86     │ - ··········{␍
+     87     │ - ············"name":·"git",␍
+     88     │ - ············"required":·false␍
+     89     │ - ··········},␍
+     90     │ - ··········{␍
+     91     │ - ············"name":·"gh",␍
+     92     │ - ············"required":·false␍
+     93     │ - ··········}␍
+     94     │ - ········]␍
+     95     │ - ······},␍
+     96     │ - ······"provides":·{␍
+     97     │ - ········"commands":·2,␍
+     98     │ - ········"hooks":·1␍
+     99     │ - ······},␍
+    100     │ - ······"tags":·[␍
+    101     │ - ········"pr",␍
+    102     │ - ········"changelog",␍
+    103     │ - ········"documentation",␍
+    104     │ - ········"diagram",␍
+    105     │ - ········"sequence",␍
+    106     │ - ········"flowchart",␍
+    107     │ - ········"state-machine",␍
+    108     │ - ········"data-model",␍
+    109     │ - ········"review",␍
+    110     │ - ········"feedback",␍
+    111     │ - ········"code-review",␍
+    112     │ - ········"workflow"␍
+    113     │ - ······],␍
+    114     │ - ······"verified":·false,␍
+    115     │ - ······"created_at":·"2026-07-09T20:26:15Z",␍
+    116     │ - ······"updated_at":·"2026-09-19T22:24:12.258379+00:00",␍
+    117     │ - ······"sha256":·"c567ed63fa745f92b523f07e2270f5ecaba2f486fd9c1bccf69e5cba42215660"␍
+    118     │ - ····},␍
+    119     │ - ····"illustrate":·{␍
+    120     │ - ······"name":·"Illustrate",␍
+    121     │ - ······"id":·"illustrate",␍
+    122     │ - ······"version":·"2.1.2",␍
+    123     │ - ······"description":·"Generate·and·export·twenty-seven·technical,·product,·architecture,·and·process·illustration·types·with·tracked·project-level·light/dark·color·and·font·themes.",␍
+    124     │ - ······"author":·"Samy·K.·Abushanab",␍
+    125     │ - ······"repository":·"https://github.com/samykabu/sanduq",␍
+    126     │ - ······"homepage":·"https://github.com/samykabu/sanduq/tree/main/extensions/illustrate",␍
+    127     │ - ······"documentation":·"https://github.com/samykabu/sanduq/blob/main/extensions/illustrate/README.md",␍
+    128     │ - ······"changelog":·"https://github.com/samykabu/sanduq/blob/main/extensions/illustrate/CHANGELOG.md",␍
+    129     │ - ······"download_url":·"https://github.com/samykabu/sanduq/releases/download/illustrate-v2.1.2/illustrate.zip",␍
+    130     │ - ······"license":·"PolyForm-Noncommercial-1.0.0",␍
+    131     │ - ······"category":·"documentation",␍
+    132     │ - ······"effect":·"read-write",␍
+    133     │ - ······"requires":·{␍
+    134     │ - ········"speckit_version":·">=0.2.0",␍
+    135     │ - ········"tools":·[␍
+    136     │ - ··········{␍
+    137     │ - ············"name":·"git",␍
+    138     │ - ············"required":·false␍
+    139     │ - ··········}␍
+    140     │ - ········]␍
+    141     │ - ······},␍
+    142     │ - ······"provides":·{␍
+    143     │ - ········"commands":·3,␍
+    144     │ - ········"hooks":·0␍
+    145     │ - ······},␍
+    146     │ - ······"tags":·[␍
+    147     │ - ········"diagram",␍
+    148     │ - ········"architecture",␍
+    149     │ - ········"process-flow",␍
+    150     │ - ········"technical-color",␍
+  600 more lines truncated
+  
+
+.specify\extensions\.cache\catalog-ebf165086500aab1-metadata.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+    1   │ - {␍
+    2   │ - ··"cached_at":·"2026-09-22T22:29:31.266390+00:00",␍
+    3   │ - ··"catalog_url":·"https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.community.json"␍
+    4   │ - }
+      1 │ + {
+      2 │ + ··"cached_at":·"2026-09-22T22:29:31.266390+00:00",
+      3 │ + ··"catalog_url":·"https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.community.json"
+      4 │ + }
+      5 │ + 
+  
+
+.specify\extensions\.cache\catalog-ebf165086500aab1.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+       1      │ - {␍
+       2      │ - ··"schema_version":·"1.0",␍
+       3      │ - ··"updated_at":·"2026-09-18T00:00:00Z",␍
+       4      │ - ··"catalog_url":·"https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.community.json",␍
+       5      │ - ··"extensions":·{␍
+       6      │ - ····"adrkit":·{␍
+       7      │ - ······"name":·"adrkit·\u2014·decision·memory·for·spec-driven·development",␍
+       8      │ - ······"id":·"adrkit",␍
+       9      │ - ······"description":·"Pulls·the·decisions·governing·this·work·into·agent·context,·checks·produced·plans·against·them,·and·drafts·an·ADR·from·a·plan·artifact.",␍
+      10      │ - ······"author":·"Mark·Beacom·(@mbeacom)",␍
+      11      │ - ······"version":·"0.1.4",␍
+      12      │ - ······"download_url":·"https://github.com/mbeacom/adrkit/releases/download/spec-kit-v0.1.4/adrkit.zip",␍
+      13      │ - ······"repository":·"https://github.com/mbeacom/adrkit",␍
+      14      │ - ······"homepage":·"https://adrkit.dev",␍
+      15      │ - ······"documentation":·"https://github.com/mbeacom/adrkit/blob/main/packages/adapters/spec-kit/README.md",␍
+      16      │ - ······"changelog":·"https://github.com/mbeacom/adrkit/blob/main/CHANGELOG.md",␍
+      17      │ - ······"license":·"Apache-2.0",␍
+      18      │ - ······"category":·"process",␍
+      19      │ - ······"effect":·"read-write",␍
+      20      │ - ······"requires":·{␍
+      21      │ - ········"speckit_version":·">=0.13.0,<1.1.0",␍
+      22      │ - ········"tools":·[␍
+      23      │ - ··········{␍
+      24      │ - ············"name":·"adr",␍
+      25      │ - ············"version":·">=0.3.0",␍
+      26      │ - ············"required":·true␍
+      27      │ - ··········}␍
+      28      │ - ········]␍
+      29      │ - ······},␍
+      30      │ - ······"provides":·{␍
+      31      │ - ········"commands":·3,␍
+      32      │ - ········"hooks":·1␍
+      33      │ - ······},␍
+      34      │ - ······"tags":·[␍
+      35      │ - ········"adr",␍
+      36      │ - ········"governance",␍
+      37      │ - ········"decision-records",␍
+      38      │ - ········"architecture",␍
+      39      │ - ········"compliance"␍
+      40      │ - ······],␍
+      41      │ - ······"verified":·false,␍
+      42      │ - ······"downloads":·0,␍
+      43      │ - ······"stars":·0,␍
+      44      │ - ······"created_at":·"2026-08-03T00:00:00Z",␍
+      45      │ - ······"updated_at":·"2026-09-15T00:00:00Z"␍
+      46      │ - ····},␍
+      47      │ - ····"aee":·{␍
+      48      │ - ······"name":·"Applied·Epistemic·Engineering",␍
+      49      │ - ······"id":·"aee",␍
+      50      │ - ······"description":·"Challenges·claims,·traces·evidence,·propagates·uncertainty,·and·routes·epistemic·failures·between·Spec·Kit·phases.",␍
+      51      │ - ······"author":·"ElectroHire",␍
+      52      │ - ······"version":·"1.0.0",␍
+      53      │ - ······"download_url":·"https://github.com/electrohire/spec-kit-aee/archive/refs/tags/v1.0.0.zip",␍
+      54      │ - ······"repository":·"https://github.com/electrohire/spec-kit-aee",␍
+      55      │ - ······"homepage":·"https://github.com/electrohire/spec-kit-aee",␍
+      56      │ - ······"documentation":·"https://github.com/electrohire/spec-kit-aee#readme",␍
+      57      │ - ······"changelog":·"https://github.com/electrohire/spec-kit-aee/blob/main/CHANGELOG.md",␍
+      58      │ - ······"license":·"MIT",␍
+      59      │ - ······"category":·"process",␍
+      60      │ - ······"effect":·"read-write",␍
+      61      │ - ······"requires":·{␍
+      62      │ - ········"speckit_version":·">=1.0.0",␍
+      63      │ - ········"tools":·[␍
+      64      │ - ··········{␍
+      65      │ - ············"name":·"aee",␍
+      66      │ - ············"version":·">=1.0.0",␍
+      67      │ - ············"required":·true␍
+      68      │ - ··········}␍
+      69      │ - ········]␍
+      70      │ - ······},␍
+      71      │ - ······"provides":·{␍
+      72      │ - ········"commands":·6,␍
+      73      │ - ········"hooks":·5␍
+      74      │ - ······},␍
+      75      │ - ······"tags":·[␍
+      76      │ - ········"epistemics",␍
+      77      │ - ········"evidence",␍
+      78      │ - ········"provenance",␍
+      79      │ - ········"uncertainty",␍
+      80      │ - ········"governance"␍
+      81      │ - ······],␍
+      82      │ - ······"verified":·false,␍
+      83      │ - ······"downloads":·0,␍
+      84      │ - ······"stars":·0,␍
+      85      │ - ······"created_at":·"2026-09-15T00:00:00Z",␍
+      86      │ - ······"updated_at":·"2026-09-15T00:00:00Z"␍
+      87      │ - ····},␍
+      88      │ - ····"aide":·{␍
+      89      │ - ······"name":·"AI-Driven·Engineering·(AIDE)",␍
+      90      │ - ······"id":·"aide",␍
+      91      │ - ······"description":·"A·structured·7-step·workflow·for·building·new·projects·from·scratch·with·AI·assistants·\u2014·from·vision·through·implementation.",␍
+      92      │ - ······"author":·"mnriem",␍
+      93      │ - ······"version":·"1.0.0",␍
+      94      │ - ······"download_url":·"https://github.com/mnriem/spec-kit-extensions/releases/download/aide-v1.0.0/aide.zip",␍
+      95      │ - ······"repository":·"https://github.com/mnriem/spec-kit-extensions",␍
+      96      │ - ······"homepage":·"https://github.com/mnriem/spec-kit-extensions",␍
+      97      │ - ······"documentation":·"https://github.com/mnriem/spec-kit-extensions/blob/main/aide/README.md",␍
+      98      │ - ······"changelog":·"https://github.com/mnriem/spec-kit-extensions/blob/main/aide/CHANGELOG.md",␍
+      99      │ - ······"license":·"MIT",␍
+     100      │ - ······"category":·"process",␍
+     101      │ - ······"effect":·"read-write",␍
+     102      │ - ······"requires":·{␍
+     103      │ - ········"speckit_version":·">=0.2.0"␍
+     104      │ - ······},␍
+     105      │ - ······"provides":·{␍
+     106      │ - ········"commands":·7,␍
+     107      │ - ········"hooks":·0␍
+     108      │ - ······},␍
+     109      │ - ······"tags":·[␍
+     110      │ - ········"workflow",␍
+     111      │ - ········"project-management",␍
+     112      │ - ········"ai-driven",␍
+     113      │ - ········"new-project",␍
+     114      │ - ········"planning",␍
+     115      │ - ········"experimental"␍
+     116      │ - ······],␍
+     117      │ - ······"verified":·false,␍
+     118      │ - ······"downloads":·0,␍
+     119      │ - ······"stars":·0,␍
+     120      │ - ······"created_at":·"2026-03-18T00:00:00Z",␍
+     121      │ - ······"updated_at":·"2026-03-18T00:00:00Z"␍
+     122      │ - ····},␍
+     123      │ - ····"agent-assign":·{␍
+     124      │ - ······"name":·"Agent·Assign",␍
+     125      │ - ······"id":·"agent-assign",␍
+     126      │ - ······"description":·"Assign·specialized·Claude·Code·agents·to·spec-kit·tasks·for·targeted·execution",␍
+     127      │ - ······"author":·"xuyang",␍
+     128      │ - ······"version":·"1.0.0",␍
+     129      │ - ······"download_url":·"https://github.com/xymelon/spec-kit-agent-assign/archive/refs/tags/v1.0.0.zip",␍
+     130      │ - ······"repository":·"https://github.com/xymelon/spec-kit-agent-assign",␍
+     131      │ - ······"homepage":·"https://github.com/xymelon/spec-kit-agent-assign",␍
+     132      │ - ······"documentation":·"https://github.com/xymelon/spec-kit-agent-assign/blob/main/README.md",␍
+     133      │ - ······"changelog":·"https://github.com/xymelon/spec-kit-agent-assign/blob/main/CHANGELOG.md",␍
+     134      │ - ······"license":·"MIT",␍
+     135      │ - ······"category":·"process",␍
+     136      │ - ······"effect":·"read-write",␍
+     137      │ - ······"requires":·{␍
+     138      │ - ········"speckit_version":·">=0.3.0"␍
+     139      │ - ······},␍
+     140      │ - ······"provides":·{␍
+     141      │ - ········"commands":·3,␍
+     142      │ - ········"hooks":·1␍
+     143      │ - ······},␍
+     144      │ - ······"tags":·[␍
+     145      │ - ········"agent",␍
+     146      │ - ········"automation",␍
+     147      │ - ········"implementation",␍
+     148      │ - ········"multi-agent",␍
+     149      │ - ········"task-routing"␍
+     150      │ - ······],␍
+  11866 more lines truncated
+  
+
+.specify\extensions\.cache\catalog-metadata.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+    1   │ - {␍
+    2   │ - ··"cached_at":·"2026-09-22T16:51:25.491483+00:00",␍
+    3   │ - ··"catalog_url":·"https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.json"␍
+    4   │ - }
+      1 │ + {
+      2 │ + ··"cached_at":·"2026-09-22T16:51:25.491483+00:00",
+      3 │ + ··"catalog_url":·"https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.json"
+      4 │ + }
+      5 │ + 
+  
+
+.specify\extensions\.cache\catalog.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - {␍
+     2    │ - ··"schema_version":·"1.0",␍
+     3    │ - ··"updated_at":·"2026-07-17T00:00:00Z",␍
+     4    │ - ··"catalog_url":·"https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.json",␍
+     5    │ - ··"extensions":·{␍
+     6    │ - ····"agent-context":·{␍
+     7    │ - ······"name":·"Coding·Agent·Context",␍
+     8    │ - ······"id":·"agent-context",␍
+     9    │ - ······"version":·"1.0.0",␍
+    10    │ - ······"description":·"Manages·coding·agent·context/instruction·files·(e.g.,·CLAUDE.md,·copilot-instructions.md)·with·project-specific·plan·references·and·configurable·markers",␍
+    11    │ - ······"author":·"spec-kit-core",␍
+    12    │ - ······"repository":·"https://github.com/github/spec-kit",␍
+    13    │ - ······"bundled":·true,␍
+    14    │ - ······"tags":·[␍
+    15    │ - ········"agent",␍
+    16    │ - ········"context",␍
+    17    │ - ········"core"␍
+    18    │ - ······]␍
+    19    │ - ····},␍
+    20    │ - ····"assess":·{␍
+    21    │ - ······"name":·"Idea·Assessment·Pipeline",␍
+    22    │ - ······"id":·"assess",␍
+    23    │ - ······"version":·"1.0.0",␍
+    24    │ - ······"description":·"Assess·an·idea·before·Spec-Driven·Development·via·intake,·research,·define,·shape,·and·decide.·A·go·verdict·hands·off·to·/speckit.specify;·a·kill·closes·it.·Lives·under·.specify/assessments/<slug>/",␍
+    25    │ - ······"author":·"spec-kit-core",␍
+    26    │ - ······"repository":·"https://github.com/github/spec-kit",␍
+    27    │ - ······"bundled":·true,␍
+    28    │ - ······"tags":·[␍
+    29    │ - ········"assessment",␍
+    30    │ - ········"discovery",␍
+    31    │ - ········"triage",␍
+    32    │ - ········"product",␍
+    33    │ - ········"workflow"␍
+    34    │ - ······]␍
+    35    │ - ····},␍
+    36    │ - ····"bug":·{␍
+    37    │ - ······"name":·"Bug·Triage·Workflow",␍
+    38    │ - ······"id":·"bug",␍
+    39    │ - ······"version":·"1.0.0",␍
+    40    │ - ······"description":·"Assess,·fix,·and·validate·bug·reports·against·the·codebase·with·per-bug·reports·stored·under·.specify/bugs/<slug>/",␍
+    41    │ - ······"author":·"spec-kit-core",␍
+    42    │ - ······"repository":·"https://github.com/github/spec-kit",␍
+    43    │ - ······"bundled":·true,␍
+    44    │ - ······"tags":·[␍
+    45    │ - ········"bug",␍
+    46    │ - ········"triage",␍
+    47    │ - ········"workflow",␍
+    48    │ - ········"qa"␍
+    49    │ - ······]␍
+    50    │ - ····},␍
+    51    │ - ····"git":·{␍
+    52    │ - ······"name":·"Git·Branching·Workflow",␍
+    53    │ - ······"id":·"git",␍
+    54    │ - ······"version":·"1.0.0",␍
+    55    │ - ······"description":·"Feature·branch·creation,·numbering·(sequential/timestamp),·validation,·and·Git·remote·detection",␍
+    56    │ - ······"author":·"spec-kit-core",␍
+    57    │ - ······"repository":·"https://github.com/github/spec-kit",␍
+    58    │ - ······"bundled":·true,␍
+    59    │ - ······"tags":·[␍
+    60    │ - ········"git",␍
+    61    │ - ········"branching",␍
+    62    │ - ········"workflow",␍
+    63    │ - ········"core"␍
+    64    │ - ······]␍
+    65    │ - ····}␍
+    66    │ - ··}␍
+    67    │ - }
+        1 │ + {
+        2 │ + ··"schema_version":·"1.0",
+        3 │ + ··"updated_at":·"2026-07-17T00:00:00Z",
+        4 │ + ··"catalog_url":·"https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.json",
+        5 │ + ··"extensions":·{
+        6 │ + ····"agent-context":·{
+        7 │ + ······"name":·"Coding·Agent·Context",
+        8 │ + ······"id":·"agent-context",
+        9 │ + ······"version":·"1.0.0",
+       10 │ + ······"description":·"Manages·coding·agent·context/instruction·files·(e.g.,·CLAUDE.md,·copilot-instructions.md)·with·project-specific·plan·references·and·configurable·markers",
+       11 │ + ······"author":·"spec-kit-core",
+       12 │ + ······"repository":·"https://github.com/github/spec-kit",
+       13 │ + ······"bundled":·true,
+       14 │ + ······"tags":·["agent",·"context",·"core"]
+       15 │ + ····},
+       16 │ + ····"assess":·{
+       17 │ + ······"name":·"Idea·Assessment·Pipeline",
+       18 │ + ······"id":·"assess",
+       19 │ + ······"version":·"1.0.0",
+       20 │ + ······"description":·"Assess·an·idea·before·Spec-Driven·Development·via·intake,·research,·define,·shape,·and·decide.·A·go·verdict·hands·off·to·/speckit.specify;·a·kill·closes·it.·Lives·under·.specify/assessments/<slug>/",
+       21 │ + ······"author":·"spec-kit-core",
+       22 │ + ······"repository":·"https://github.com/github/spec-kit",
+       23 │ + ······"bundled":·true,
+       24 │ + ······"tags":·["assessment",·"discovery",·"triage",·"product",·"workflow"]
+       25 │ + ····},
+       26 │ + ····"bug":·{
+       27 │ + ······"name":·"Bug·Triage·Workflow",
+       28 │ + ······"id":·"bug",
+       29 │ + ······"version":·"1.0.0",
+       30 │ + ······"description":·"Assess,·fix,·and·validate·bug·reports·against·the·codebase·with·per-bug·reports·stored·under·.specify/bugs/<slug>/",
+       31 │ + ······"author":·"spec-kit-core",
+       32 │ + ······"repository":·"https://github.com/github/spec-kit",
+       33 │ + ······"bundled":·true,
+       34 │ + ······"tags":·["bug",·"triage",·"workflow",·"qa"]
+       35 │ + ····},
+       36 │ + ····"git":·{
+       37 │ + ······"name":·"Git·Branching·Workflow",
+       38 │ + ······"id":·"git",
+       39 │ + ······"version":·"1.0.0",
+       40 │ + ······"description":·"Feature·branch·creation,·numbering·(sequential/timestamp),·validation,·and·Git·remote·detection",
+       41 │ + ······"author":·"spec-kit-core",
+       42 │ + ······"repository":·"https://github.com/github/spec-kit",
+       43 │ + ······"bundled":·true,
+       44 │ + ······"tags":·["git",·"branching",·"workflow",·"core"]
+       45 │ + ····}
+       46 │ + ··}
+       47 │ + }
+       48 │ + 
+  
+
+app\tsconfig.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - {␍
+     2    │ - ··"compilerOptions":·{␍
+     3    │ - ····"target":·"ES2020",␍
+     4    │ - ····"useDefineForClassFields":·true,␍
+     5    │ - ····"lib":·["ES2020",·"DOM",·"DOM.Iterable"],␍
+     6    │ - ····"module":·"ESNext",␍
+     7    │ - ····"skipLibCheck":·true,␍
+     8    │ - ␍
+     9    │ - ····/*·Bundler·mode·*/␍
+    10    │ - ····"moduleResolution":·"bundler",␍
+    11    │ - ····"allowImportingTsExtensions":·true,␍
+    12    │ - ····"resolveJsonModule":·true,␍
+    13    │ - ····"isolatedModules":·true,␍
+    14    │ - ····"noEmit":·true,␍
+    15    │ - ····"jsx":·"react-jsx",␍
+    16    │ - ␍
+    17    │ - ····/*·Linting·*/␍
+    18    │ - ····"strict":·true,␍
+    19    │ - ····"noUnusedLocals":·true,␍
+    20    │ - ····"noUnusedParameters":·true,␍
+    21    │ - ····"noFallthroughCasesInSwitch":·true,␍
+    22    │ - ␍
+    23    │ - ····/*·Path·aliases·*/␍
+    24    │ - ····"baseUrl":·".",␍
+    25    │ - ····"paths":·{␍
+    26    │ - ······"@/*":·["./src/*"]␍
+    27    │ - ····},␍
+    28    │ - ····"types":·["vite/client"]␍
+    29    │ - ··},␍
+    30    │ - ··"include":·["src"],␍
+    31    │ - ··"references":·[{·"path":·"./tsconfig.node.json"·}]␍
+    32    │ - }␍
+        1 │ + {
+        2 │ + ··"compilerOptions":·{
+        3 │ + ····"target":·"ES2020",
+        4 │ + ····"useDefineForClassFields":·true,
+        5 │ + ····"lib":·["ES2020",·"DOM",·"DOM.Iterable"],
+        6 │ + ····"module":·"ESNext",
+        7 │ + ····"skipLibCheck":·true,
+        8 │ + 
+        9 │ + ····/*·Bundler·mode·*/
+       10 │ + ····"moduleResolution":·"bundler",
+       11 │ + ····"allowImportingTsExtensions":·true,
+       12 │ + ····"resolveJsonModule":·true,
+       13 │ + ····"isolatedModules":·true,
+       14 │ + ····"noEmit":·true,
+       15 │ + ····"jsx":·"react-jsx",
+       16 │ + 
+       17 │ + ····/*·Linting·*/
+       18 │ + ····"strict":·true,
+       19 │ + ····"noUnusedLocals":·true,
+       20 │ + ····"noUnusedParameters":·true,
+       21 │ + ····"noFallthroughCasesInSwitch":·true,
+       22 │ + 
+       23 │ + ····/*·Path·aliases·*/
+       24 │ + ····"baseUrl":·".",
+       25 │ + ····"paths":·{
+       26 │ + ······"@/*":·["./src/*"]
+       27 │ + ····},
+       28 │ + ····"types":·["vite/client"]
+       29 │ + ··},
+       30 │ + ··"include":·["src"],
+       31 │ + ··"references":·[{·"path":·"./tsconfig.node.json"·}]
+       32 │ + }
+    33 33 │   
+  
+
+biome.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - {␍
+     2    │ - ··"$schema":·"https://biomejs.dev/schemas/2.3.12/schema.json",␍
+     3    │ - ··"vcs":·{␍
+     4    │ - ····"enabled":·true,␍
+     5    │ - ····"clientKind":·"git",␍
+     6    │ - ····"useIgnoreFile":·true␍
+     7    │ - ··},␍
+     8    │ - ··"files":·{␍
+     9    │ - ····"includes":·[␍
+    10    │ - ······"**",␍
+    11    │ - ······"!app/src/lib/api/core",␍
+    12    │ - ······"!app/src/lib/api/models",␍
+    13    │ - ······"!app/src/lib/api/schemas",␍
+    14    │ - ······"!app/src/lib/api/services",␍
+    15    │ - ······"!app/src/lib/api/index.ts"␍
+    16    │ - ····]␍
+    17    │ - ··},␍
+    18    │ - ··"formatter":·{␍
+    19    │ - ····"enabled":·true,␍
+    20    │ - ····"indentStyle":·"space",␍
+    21    │ - ····"indentWidth":·2,␍
+    22    │ - ····"lineWidth":·100␍
+    23    │ - ··},␍
+    24    │ - ··"linter":·{␍
+    25    │ - ····"enabled":·true,␍
+    26    │ - ····"rules":·{␍
+    27    │ - ······"recommended":·true,␍
+    28    │ - ······"a11y":·{␍
+    29    │ - ········"useButtonType":·"warn"␍
+    30    │ - ······},␍
+    31    │ - ······"correctness":·{␍
+    32    │ - ········"noUnusedVariables":·"warn",␍
+    33    │ - ········"noUnusedImports":·"error",␍
+    34    │ - ········"useExhaustiveDependencies":·"warn",␍
+    35    │ - ········"useHookAtTopLevel":·"error"␍
+    36    │ - ······},␍
+    37    │ - ······"suspicious":·{␍
+    38    │ - ········"noDoubleEquals":·"error",␍
+    39    │ - ········"noExplicitAny":·"warn",␍
+    40    │ - ········"noUnknownAtRules":·"off"␍
+    41    │ - ······},␍
+    42    │ - ······"style":·{␍
+    43    │ - ········"useFilenamingConvention":·"off",␍
+    44    │ - ········"noNonNullAssertion":·"off"␍
+    45    │ - ······}␍
+    46    │ - ····}␍
+    47    │ - ··},␍
+    48    │ - ··"javascript":·{␍
+    49    │ - ····"formatter":·{␍
+    50    │ - ······"quoteStyle":·"single",␍
+    51    │ - ······"jsxQuoteStyle":·"double",␍
+    52    │ - ······"trailingCommas":·"all",␍
+    53    │ - ······"semicolons":·"always",␍
+    54    │ - ······"arrowParentheses":·"always"␍
+    55    │ - ····}␍
+    56    │ - ··},␍
+    57    │ - ··"json":·{␍
+    58    │ - ····"formatter":·{␍
+    59    │ - ······"trailingCommas":·"none"␍
+    60    │ - ····}␍
+    61    │ - ··},␍
+    62    │ - ··"css":·{␍
+    63    │ - ····"parser":·{␍
+    64    │ - ······"cssModules":·false,␍
+    65    │ - ······"allowWrongLineComments":·false,␍
+    66    │ - ······"tailwindDirectives":·true␍
+    67    │ - ····},␍
+    68    │ - ····"linter":·{␍
+    69    │ - ······"enabled":·true␍
+    70    │ - ····}␍
+    71    │ - ··}␍
+    72    │ - }␍
+        1 │ + {
+        2 │ + ··"$schema":·"https://biomejs.dev/schemas/2.3.12/schema.json",
+        3 │ + ··"vcs":·{
+        4 │ + ····"enabled":·true,
+        5 │ + ····"clientKind":·"git",
+        6 │ + ····"useIgnoreFile":·true
+        7 │ + ··},
+        8 │ + ··"files":·{
+        9 │ + ····"includes":·[
+       10 │ + ······"**",
+       11 │ + ······"!app/src/lib/api/core",
+       12 │ + ······"!app/src/lib/api/models",
+       13 │ + ······"!app/src/lib/api/schemas",
+       14 │ + ······"!app/src/lib/api/services",
+       15 │ + ······"!app/src/lib/api/index.ts"
+       16 │ + ····]
+       17 │ + ··},
+       18 │ + ··"formatter":·{
+       19 │ + ····"enabled":·true,
+       20 │ + ····"indentStyle":·"space",
+       21 │ + ····"indentWidth":·2,
+       22 │ + ····"lineWidth":·100
+       23 │ + ··},
+       24 │ + ··"linter":·{
+       25 │ + ····"enabled":·true,
+       26 │ + ····"rules":·{
+       27 │ + ······"recommended":·true,
+       28 │ + ······"a11y":·{
+       29 │ + ········"useButtonType":·"warn"
+       30 │ + ······},
+       31 │ + ······"correctness":·{
+       32 │ + ········"noUnusedVariables":·"warn",
+       33 │ + ········"noUnusedImports":·"error",
+       34 │ + ········"useExhaustiveDependencies":·"warn",
+       35 │ + ········"useHookAtTopLevel":·"error"
+       36 │ + ······},
+       37 │ + ······"suspicious":·{
+       38 │ + ········"noDoubleEquals":·"error",
+       39 │ + ········"noExplicitAny":·"warn",
+       40 │ + ········"noUnknownAtRules":·"off"
+       41 │ + ······},
+       42 │ + ······"style":·{
+       43 │ + ········"useFilenamingConvention":·"off",
+       44 │ + ········"noNonNullAssertion":·"off"
+       45 │ + ······}
+       46 │ + ····}
+       47 │ + ··},
+       48 │ + ··"javascript":·{
+       49 │ + ····"formatter":·{
+       50 │ + ······"quoteStyle":·"single",
+       51 │ + ······"jsxQuoteStyle":·"double",
+       52 │ + ······"trailingCommas":·"all",
+       53 │ + ······"semicolons":·"always",
+       54 │ + ······"arrowParentheses":·"always"
+       55 │ + ····}
+       56 │ + ··},
+       57 │ + ··"json":·{
+       58 │ + ····"formatter":·{
+       59 │ + ······"trailingCommas":·"none"
+       60 │ + ····}
+       61 │ + ··},
+       62 │ + ··"css":·{
+       63 │ + ····"parser":·{
+       64 │ + ······"cssModules":·false,
+       65 │ + ······"allowWrongLineComments":·false,
+       66 │ + ······"tailwindDirectives":·true
+       67 │ + ····},
+       68 │ + ····"linter":·{
+       69 │ + ······"enabled":·true
+       70 │ + ····}
+       71 │ + ··}
+       72 │ + }
+    73 73 │   
+  
+
+docs\tsconfig.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - {␍
+     2    │ - ··"compilerOptions":·{␍
+     3    │ - ····"baseUrl":·".",␍
+     4    │ - ····"target":·"ESNext",␍
+     5    │ - ····"lib":·["dom",·"dom.iterable",·"esnext"],␍
+     6    │ - ····"allowJs":·true,␍
+     7    │ - ····"skipLibCheck":·true,␍
+     8    │ - ····"strict":·true,␍
+     9    │ - ····"forceConsistentCasingInFileNames":·true,␍
+    10    │ - ····"noEmit":·true,␍
+    11    │ - ····"esModuleInterop":·true,␍
+    12    │ - ····"module":·"esnext",␍
+    13    │ - ····"moduleResolution":·"bundler",␍
+    14    │ - ····"resolveJsonModule":·true,␍
+    15    │ - ····"isolatedModules":·true,␍
+    16    │ - ····"jsx":·"react-jsx",␍
+    17    │ - ····"incremental":·true,␍
+    18    │ - ····"paths":·{␍
+    19    │ - ······"@/*":·["./*"],␍
+    20    │ - ······"@/.source":·[".source"]␍
+    21    │ - ····},␍
+    22    │ - ····"plugins":·[␍
+    23    │ - ······{␍
+    24    │ - ········"name":·"next"␍
+    25    │ - ······}␍
+    26    │ - ····]␍
+    27    │ - ··},␍
+    28    │ - ··"include":·[␍
+    29    │ - ····"next-env.d.ts",␍
+    30    │ - ····"**/*.ts",␍
+    31    │ - ····"**/*.tsx",␍
+    32    │ - ····".next/types/**/*.ts",␍
+    33    │ - ····".next/dev/types/**/*.ts"␍
+    34    │ - ··],␍
+    35    │ - ··"exclude":·["node_modules"]␍
+    36    │ - }␍
+        1 │ + {
+        2 │ + ··"compilerOptions":·{
+        3 │ + ····"baseUrl":·".",
+        4 │ + ····"target":·"ESNext",
+        5 │ + ····"lib":·["dom",·"dom.iterable",·"esnext"],
+        6 │ + ····"allowJs":·true,
+        7 │ + ····"skipLibCheck":·true,
+        8 │ + ····"strict":·true,
+        9 │ + ····"forceConsistentCasingInFileNames":·true,
+       10 │ + ····"noEmit":·true,
+       11 │ + ····"esModuleInterop":·true,
+       12 │ + ····"module":·"esnext",
+       13 │ + ····"moduleResolution":·"bundler",
+       14 │ + ····"resolveJsonModule":·true,
+       15 │ + ····"isolatedModules":·true,
+       16 │ + ····"jsx":·"react-jsx",
+       17 │ + ····"incremental":·true,
+       18 │ + ····"paths":·{
+       19 │ + ······"@/*":·["./*"],
+       20 │ + ······"@/.source":·[".source"]
+       21 │ + ····},
+       22 │ + ····"plugins":·[
+       23 │ + ······{
+       24 │ + ········"name":·"next"
+       25 │ + ······}
+       26 │ + ····]
+       27 │ + ··},
+       28 │ + ··"include":·[
+       29 │ + ····"next-env.d.ts",
+       30 │ + ····"**/*.ts",
+       31 │ + ····"**/*.tsx",
+       32 │ + ····".next/types/**/*.ts",
+       33 │ + ····".next/dev/types/**/*.ts"
+       34 │ + ··],
+       35 │ + ··"exclude":·["node_modules"]
+       36 │ + }
+    37 37 │   
+  
+
+landing\tsconfig.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - {␍
+     2    │ - ··"compilerOptions":·{␍
+     3    │ - ····"target":·"ES2020",␍
+     4    │ - ····"lib":·["dom",·"dom.iterable",·"esnext"],␍
+     5    │ - ····"allowJs":·true,␍
+     6    │ - ····"skipLibCheck":·true,␍
+     7    │ - ····"strict":·true,␍
+     8    │ - ····"noEmit":·true,␍
+     9    │ - ····"esModuleInterop":·true,␍
+    10    │ - ····"module":·"esnext",␍
+    11    │ - ····"moduleResolution":·"bundler",␍
+    12    │ - ····"resolveJsonModule":·true,␍
+    13    │ - ····"isolatedModules":·true,␍
+    14    │ - ····"jsx":·"react-jsx",␍
+    15    │ - ····"incremental":·true,␍
+    16    │ - ····"plugins":·[␍
+    17    │ - ······{␍
+    18    │ - ········"name":·"next"␍
+    19    │ - ······}␍
+    20    │ - ····],␍
+    21    │ - ····"paths":·{␍
+    22    │ - ······"@/*":·["./src/*"]␍
+    23    │ - ····}␍
+    24    │ - ··},␍
+    25    │ - ··"include":·[␍
+    26    │ - ····"next-env.d.ts",␍
+    27    │ - ····"**/*.ts",␍
+    28    │ - ····"**/*.tsx",␍
+    29    │ - ····".next/types/**/*.ts",␍
+    30    │ - ····".next/dev/types/**/*.ts"␍
+    31    │ - ··],␍
+    32    │ - ··"exclude":·["node_modules"]␍
+    33    │ - }␍
+        1 │ + {
+        2 │ + ··"compilerOptions":·{
+        3 │ + ····"target":·"ES2020",
+        4 │ + ····"lib":·["dom",·"dom.iterable",·"esnext"],
+        5 │ + ····"allowJs":·true,
+        6 │ + ····"skipLibCheck":·true,
+        7 │ + ····"strict":·true,
+        8 │ + ····"noEmit":·true,
+        9 │ + ····"esModuleInterop":·true,
+       10 │ + ····"module":·"esnext",
+       11 │ + ····"moduleResolution":·"bundler",
+       12 │ + ····"resolveJsonModule":·true,
+       13 │ + ····"isolatedModules":·true,
+       14 │ + ····"jsx":·"react-jsx",
+       15 │ + ····"incremental":·true,
+       16 │ + ····"plugins":·[
+       17 │ + ······{
+       18 │ + ········"name":·"next"
+       19 │ + ······}
+       20 │ + ····],
+       21 │ + ····"paths":·{
+       22 │ + ······"@/*":·["./src/*"]
+       23 │ + ····}
+       24 │ + ··},
+       25 │ + ··"include":·[
+       26 │ + ····"next-env.d.ts",
+       27 │ + ····"**/*.ts",
+       28 │ + ····"**/*.tsx",
+       29 │ + ····".next/types/**/*.ts",
+       30 │ + ····".next/dev/types/**/*.ts"
+       31 │ + ··],
+       32 │ + ··"exclude":·["node_modules"]
+       33 │ + }
+    34 34 │   
+  
+
+tauri\tsconfig.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - {␍
+     2    │ - ··"compilerOptions":·{␍
+     3    │ - ····"target":·"ES2020",␍
+     4    │ - ····"useDefineForClassFields":·true,␍
+     5    │ - ····"lib":·["ES2020",·"DOM",·"DOM.Iterable"],␍
+     6    │ - ····"module":·"ESNext",␍
+     7    │ - ····"skipLibCheck":·true,␍
+     8    │ - ····"moduleResolution":·"bundler",␍
+     9    │ - ····"allowImportingTsExtensions":·true,␍
+    10    │ - ····"resolveJsonModule":·true,␍
+    11    │ - ····"isolatedModules":·true,␍
+    12    │ - ····"noEmit":·true,␍
+    13    │ - ····"jsx":·"react-jsx",␍
+    14    │ - ····"strict":·true,␍
+    15    │ - ····"noUnusedLocals":·true,␍
+    16    │ - ····"noUnusedParameters":·true,␍
+    17    │ - ····"noFallthroughCasesInSwitch":·true,␍
+    18    │ - ····"types":·["vite/client"],␍
+    19    │ - ····"baseUrl":·".",␍
+    20    │ - ····"paths":·{␍
+    21    │ - ······"@/*":·["../app/src/*"]␍
+    22    │ - ····}␍
+    23    │ - ··},␍
+    24    │ - ··"include":·["src"],␍
+    25    │ - ··"references":·[{·"path":·"./tsconfig.node.json"·}]␍
+    26    │ - }␍
+        1 │ + {
+        2 │ + ··"compilerOptions":·{
+        3 │ + ····"target":·"ES2020",
+        4 │ + ····"useDefineForClassFields":·true,
+        5 │ + ····"lib":·["ES2020",·"DOM",·"DOM.Iterable"],
+        6 │ + ····"module":·"ESNext",
+        7 │ + ····"skipLibCheck":·true,
+        8 │ + ····"moduleResolution":·"bundler",
+        9 │ + ····"allowImportingTsExtensions":·true,
+       10 │ + ····"resolveJsonModule":·true,
+       11 │ + ····"isolatedModules":·true,
+       12 │ + ····"noEmit":·true,
+       13 │ + ····"jsx":·"react-jsx",
+       14 │ + ····"strict":·true,
+       15 │ + ····"noUnusedLocals":·true,
+       16 │ + ····"noUnusedParameters":·true,
+       17 │ + ····"noFallthroughCasesInSwitch":·true,
+       18 │ + ····"types":·["vite/client"],
+       19 │ + ····"baseUrl":·".",
+       20 │ + ····"paths":·{
+       21 │ + ······"@/*":·["../app/src/*"]
+       22 │ + ····}
+       23 │ + ··},
+       24 │ + ··"include":·["src"],
+       25 │ + ··"references":·[{·"path":·"./tsconfig.node.json"·}]
+       26 │ + }
+    27 27 │   
+  
+
+web\src\platform\index.ts:1:1 assist/source/organizeImports  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × The imports and exports are not sorted.
+  
+  > 1 │ import type { Platform } from '@/platform/types';
+      │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    2 │ import { webFilesystem } from './filesystem';
+    3 │ import { webUpdater } from './updater';
+  
+  i Safe fix: Organize Imports (Biome)
+  
+     1  1 │   import type { Platform } from '@/platform/types';␍
+     2    │ - import·{·webFilesystem·}·from·'./filesystem';␍
+     3    │ - import·{·webUpdater·}·from·'./updater';␍
+     4    │ - import·{·webAudio·}·from·'./audio';␍
+     5    │ - import·{·webLifecycle·}·from·'./lifecycle';␍
+     6    │ - import·{·webMetadata·}·from·'./metadata';␍
+        2 │ + import·{·webAudio·}·from·'./audio';␍
+        3 │ + import·{·webFilesystem·}·from·'./filesystem';␍
+        4 │ + import·{·webLifecycle·}·from·'./lifecycle';␍
+        5 │ + import·{·webMetadata·}·from·'./metadata';␍
+        6 │ + import·{·webUpdater·}·from·'./updater';␍
+     7  7 │   ␍
+     8  8 │   export const webPlatform: Platform = {␍
+  
+
+web\src\platform\index.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·type·{·Platform·}·from·'@/platform/types';␍
+     2    │ - import·{·webFilesystem·}·from·'./filesystem';␍
+     3    │ - import·{·webUpdater·}·from·'./updater';␍
+     4    │ - import·{·webAudio·}·from·'./audio';␍
+     5    │ - import·{·webLifecycle·}·from·'./lifecycle';␍
+     6    │ - import·{·webMetadata·}·from·'./metadata';␍
+     7    │ - ␍
+     8    │ - export·const·webPlatform:·Platform·=·{␍
+     9    │ - ··filesystem:·webFilesystem,␍
+    10    │ - ··updater:·webUpdater,␍
+    11    │ - ··audio:·webAudio,␍
+    12    │ - ··lifecycle:·webLifecycle,␍
+    13    │ - ··metadata:·webMetadata,␍
+    14    │ - };␍
+        1 │ + import·type·{·Platform·}·from·'@/platform/types';
+        2 │ + import·{·webFilesystem·}·from·'./filesystem';
+        3 │ + import·{·webUpdater·}·from·'./updater';
+        4 │ + import·{·webAudio·}·from·'./audio';
+        5 │ + import·{·webLifecycle·}·from·'./lifecycle';
+        6 │ + import·{·webMetadata·}·from·'./metadata';
+        7 │ + 
+        8 │ + export·const·webPlatform:·Platform·=·{
+        9 │ + ··filesystem:·webFilesystem,
+       10 │ + ··updater:·webUpdater,
+       11 │ + ··audio:·webAudio,
+       12 │ + ··lifecycle:·webLifecycle,
+       13 │ + ··metadata:·webMetadata,
+       14 │ + };
+    15 15 │   
+  
+
+web\src\platform\lifecycle.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·type·{·PlatformLifecycle,·ServerLogEntry·}·from·'@/platform/types';␍
+     2    │ - import·{·getDefaultServerUrl·}·from·'@/stores/serverStore';␍
+     3    │ - ␍
+     4    │ - class·WebLifecycle·implements·PlatformLifecycle·{␍
+     5    │ - ··onServerReady?:·()·=>·void;␍
+     6    │ - ␍
+     7    │ - ··async·startServer(_remote·=·false,·_modelsDir?:·string·|·null):·Promise<string>·{␍
+     8    │ - ····//·Web·assumes·server·is·running·externally␍
+     9    │ - ····const·serverUrl·=·import.meta.env.VITE_SERVER_URL·||·getDefaultServerUrl();␍
+    10    │ - ····this.onServerReady?.();␍
+    11    │ - ····return·serverUrl;␍
+    12    │ - ··}␍
+    13    │ - ␍
+    14    │ - ··async·stopServer():·Promise<void>·{␍
+    15    │ - ····//·No-op·for·web·-·server·is·managed·externally␍
+    16    │ - ··}␍
+    17    │ - ␍
+    18    │ - ··async·restartServer(_modelsDir?:·string·|·null):·Promise<string>·{␍
+    19    │ - ····//·No-op·for·web·-·server·is·managed·externally␍
+    20    │ - ····return·import.meta.env.VITE_SERVER_URL·||·getDefaultServerUrl();␍
+    21    │ - ··}␍
+    22    │ - ␍
+    23    │ - ··async·setKeepServerRunning(_keep:·boolean):·Promise<void>·{␍
+    24    │ - ····//·No-op·for·web␍
+    25    │ - ··}␍
+    26    │ - ␍
+    27    │ - ··async·setBackendOverride(_backend?:·string·|·null):·Promise<void>·{␍
+    28    │ - ····//·No-op·for·web·-·backend·variant·is·managed·externally␍
+    29    │ - ··}␍
+    30    │ - ␍
+    31    │ - ··async·setupWindowCloseHandler():·Promise<void>·{␍
+    32    │ - ····//·No-op·for·web·-·no·window·close·handling·needed␍
+    33    │ - ··}␍
+    34    │ - ␍
+    35    │ - ··subscribeToServerLogs(_callback:·(_entry:·ServerLogEntry)·=>·void):·()·=>·void·{␍
+    36    │ - ····//·No-op·for·web·-·server·logs·are·not·available␍
+    37    │ - ····return·()·=>·{};␍
+    38    │ - ··}␍
+    39    │ - }␍
+    40    │ - ␍
+    41    │ - export·const·webLifecycle·=·new·WebLifecycle();␍
+        1 │ + import·type·{·PlatformLifecycle,·ServerLogEntry·}·from·'@/platform/types';
+        2 │ + import·{·getDefaultServerUrl·}·from·'@/stores/serverStore';
+        3 │ + 
+        4 │ + class·WebLifecycle·implements·PlatformLifecycle·{
+        5 │ + ··onServerReady?:·()·=>·void;
+        6 │ + 
+        7 │ + ··async·startServer(_remote·=·false,·_modelsDir?:·string·|·null):·Promise<string>·{
+        8 │ + ····//·Web·assumes·server·is·running·externally
+        9 │ + ····const·serverUrl·=·import.meta.env.VITE_SERVER_URL·||·getDefaultServerUrl();
+       10 │ + ····this.onServerReady?.();
+       11 │ + ····return·serverUrl;
+       12 │ + ··}
+       13 │ + 
+       14 │ + ··async·stopServer():·Promise<void>·{
+       15 │ + ····//·No-op·for·web·-·server·is·managed·externally
+       16 │ + ··}
+       17 │ + 
+       18 │ + ··async·restartServer(_modelsDir?:·string·|·null):·Promise<string>·{
+       19 │ + ····//·No-op·for·web·-·server·is·managed·externally
+       20 │ + ····return·import.meta.env.VITE_SERVER_URL·||·getDefaultServerUrl();
+       21 │ + ··}
+       22 │ + 
+       23 │ + ··async·setKeepServerRunning(_keep:·boolean):·Promise<void>·{
+       24 │ + ····//·No-op·for·web
+       25 │ + ··}
+       26 │ + 
+       27 │ + ··async·setBackendOverride(_backend?:·string·|·null):·Promise<void>·{
+       28 │ + ····//·No-op·for·web·-·backend·variant·is·managed·externally
+       29 │ + ··}
+       30 │ + 
+       31 │ + ··async·setupWindowCloseHandler():·Promise<void>·{
+       32 │ + ····//·No-op·for·web·-·no·window·close·handling·needed
+       33 │ + ··}
+       34 │ + 
+       35 │ + ··subscribeToServerLogs(_callback:·(_entry:·ServerLogEntry)·=>·void):·()·=>·void·{
+       36 │ + ····//·No-op·for·web·-·server·logs·are·not·available
+       37 │ + ····return·()·=>·{};
+       38 │ + ··}
+       39 │ + }
+       40 │ + 
+       41 │ + export·const·webLifecycle·=·new·WebLifecycle();
+    42 42 │   
+  
+
+web\src\platform\metadata.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·type·{·PlatformMetadata·}·from·'@/platform/types';␍
+     2    │ - ␍
+     3    │ - export·const·webMetadata:·PlatformMetadata·=·{␍
+     4    │ - ··async·getVersion():·Promise<string>·{␍
+     5    │ - ····//·Return·version·from·env·var·or·package.json␍
+     6    │ - ····return·import.meta.env.VITE_APP_VERSION·||·'0.1.0';␍
+     7    │ - ··},␍
+     8    │ - ··isTauri:·false,␍
+     9    │ - };␍
+        1 │ + import·type·{·PlatformMetadata·}·from·'@/platform/types';
+        2 │ + 
+        3 │ + export·const·webMetadata:·PlatformMetadata·=·{
+        4 │ + ··async·getVersion():·Promise<string>·{
+        5 │ + ····//·Return·version·from·env·var·or·package.json
+        6 │ + ····return·import.meta.env.VITE_APP_VERSION·||·'0.1.0';
+        7 │ + ··},
+        8 │ + ··isTauri:·false,
+        9 │ + };
+    10 10 │   
+  
+
+web\src\platform\updater.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·type·{·PlatformUpdater,·UpdateStatus·}·from·'@/platform/types';␍
+     2    │ - ␍
+     3    │ - class·WebUpdater·implements·PlatformUpdater·{␍
+     4    │ - ··private·status:·UpdateStatus·=·{␍
+     5    │ - ····checking:·false,␍
+     6    │ - ····available:·false,␍
+     7    │ - ····downloading:·false,␍
+     8    │ - ····installing:·false,␍
+     9    │ - ····readyToInstall:·false,␍
+    10    │ - ··};␍
+    11    │ - ␍
+    12    │ - ··private·subscribers:·Set<(status:·UpdateStatus)·=>·void>·=·new·Set();␍
+    13    │ - ␍
+    14    │ - ··subscribe(callback:·(status:·UpdateStatus)·=>·void):·()·=>·void·{␍
+    15    │ - ····this.subscribers.add(callback);␍
+    16    │ - ····callback(this.status);␍
+    17    │ - ····return·()·=>·{␍
+    18    │ - ······this.subscribers.delete(callback);␍
+    19    │ - ····};␍
+    20    │ - ··}␍
+    21    │ - ␍
+    22    │ - ··getStatus():·UpdateStatus·{␍
+    23    │ - ····return·{·...this.status·};␍
+    24    │ - ··}␍
+    25    │ - ␍
+    26    │ - ··async·checkForUpdates():·Promise<void>·{␍
+    27    │ - ····//·Web·apps·don't·need·client-side·updates␍
+    28    │ - ····//·Updates·are·handled·by·redeploying·the·web·app␍
+    29    │ - ··}␍
+    30    │ - ␍
+    31    │ - ··async·downloadAndInstall():·Promise<void>·{␍
+    32    │ - ····//·No-op·for·web␍
+    33    │ - ··}␍
+    34    │ - ␍
+    35    │ - ··async·restartAndInstall():·Promise<void>·{␍
+    36    │ - ····//·No-op·for·web␍
+    37    │ - ··}␍
+    38    │ - }␍
+    39    │ - ␍
+    40    │ - export·const·webUpdater·=·new·WebUpdater();␍
+        1 │ + import·type·{·PlatformUpdater,·UpdateStatus·}·from·'@/platform/types';
+        2 │ + 
+        3 │ + class·WebUpdater·implements·PlatformUpdater·{
+        4 │ + ··private·status:·UpdateStatus·=·{
+        5 │ + ····checking:·false,
+        6 │ + ····available:·false,
+        7 │ + ····downloading:·false,
+        8 │ + ····installing:·false,
+        9 │ + ····readyToInstall:·false,
+       10 │ + ··};
+       11 │ + 
+       12 │ + ··private·subscribers:·Set<(status:·UpdateStatus)·=>·void>·=·new·Set();
+       13 │ + 
+       14 │ + ··subscribe(callback:·(status:·UpdateStatus)·=>·void):·()·=>·void·{
+       15 │ + ····this.subscribers.add(callback);
+       16 │ + ····callback(this.status);
+       17 │ + ····return·()·=>·{
+       18 │ + ······this.subscribers.delete(callback);
+       19 │ + ····};
+       20 │ + ··}
+       21 │ + 
+       22 │ + ··getStatus():·UpdateStatus·{
+       23 │ + ····return·{·...this.status·};
+       24 │ + ··}
+       25 │ + 
+       26 │ + ··async·checkForUpdates():·Promise<void>·{
+       27 │ + ····//·Web·apps·don't·need·client-side·updates
+       28 │ + ····//·Updates·are·handled·by·redeploying·the·web·app
+       29 │ + ··}
+       30 │ + 
+       31 │ + ··async·downloadAndInstall():·Promise<void>·{
+       32 │ + ····//·No-op·for·web
+       33 │ + ··}
+       34 │ + 
+       35 │ + ··async·restartAndInstall():·Promise<void>·{
+       36 │ + ····//·No-op·for·web
+       37 │ + ··}
+       38 │ + }
+       39 │ + 
+       40 │ + export·const·webUpdater·=·new·WebUpdater();
+    41 41 │   
+  
+
+web\tsconfig.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - {␍
+     2    │ - ··"compilerOptions":·{␍
+     3    │ - ····"target":·"ES2020",␍
+     4    │ - ····"useDefineForClassFields":·true,␍
+     5    │ - ····"lib":·["ES2020",·"DOM",·"DOM.Iterable"],␍
+     6    │ - ····"module":·"ESNext",␍
+     7    │ - ····"skipLibCheck":·true,␍
+     8    │ - ····"moduleResolution":·"bundler",␍
+     9    │ - ····"allowImportingTsExtensions":·true,␍
+    10    │ - ····"resolveJsonModule":·true,␍
+    11    │ - ····"isolatedModules":·true,␍
+    12    │ - ····"noEmit":·true,␍
+    13    │ - ····"jsx":·"react-jsx",␍
+    14    │ - ····"strict":·true,␍
+    15    │ - ····"noUnusedLocals":·true,␍
+    16    │ - ····"noUnusedParameters":·true,␍
+    17    │ - ····"noFallthroughCasesInSwitch":·true,␍
+    18    │ - ····"baseUrl":·".",␍
+    19    │ - ····"paths":·{␍
+    20    │ - ······"@/*":·["../app/src/*"]␍
+    21    │ - ····},␍
+    22    │ - ····"types":·["vite/client"]␍
+    23    │ - ··},␍
+    24    │ - ··"include":·["src",·"../app/src/global.d.ts"],␍
+    25    │ - ··"references":·[{·"path":·"./tsconfig.node.json"·}]␍
+    26    │ - }␍
+        1 │ + {
+        2 │ + ··"compilerOptions":·{
+        3 │ + ····"target":·"ES2020",
+        4 │ + ····"useDefineForClassFields":·true,
+        5 │ + ····"lib":·["ES2020",·"DOM",·"DOM.Iterable"],
+        6 │ + ····"module":·"ESNext",
+        7 │ + ····"skipLibCheck":·true,
+        8 │ + ····"moduleResolution":·"bundler",
+        9 │ + ····"allowImportingTsExtensions":·true,
+       10 │ + ····"resolveJsonModule":·true,
+       11 │ + ····"isolatedModules":·true,
+       12 │ + ····"noEmit":·true,
+       13 │ + ····"jsx":·"react-jsx",
+       14 │ + ····"strict":·true,
+       15 │ + ····"noUnusedLocals":·true,
+       16 │ + ····"noUnusedParameters":·true,
+       17 │ + ····"noFallthroughCasesInSwitch":·true,
+       18 │ + ····"baseUrl":·".",
+       19 │ + ····"paths":·{
+       20 │ + ······"@/*":·["../app/src/*"]
+       21 │ + ····},
+       22 │ + ····"types":·["vite/client"]
+       23 │ + ··},
+       24 │ + ··"include":·["src",·"../app/src/global.d.ts"],
+       25 │ + ··"references":·[{·"path":·"./tsconfig.node.json"·}]
+       26 │ + }
+    27 27 │   
+  
+
+web\tsconfig.node.json format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - {␍
+     2    │ - ··"compilerOptions":·{␍
+     3    │ - ····"composite":·true,␍
+     4    │ - ····"skipLibCheck":·true,␍
+     5    │ - ····"module":·"ESNext",␍
+     6    │ - ····"moduleResolution":·"bundler",␍
+     7    │ - ····"allowSyntheticDefaultImports":·true␍
+     8    │ - ··},␍
+     9    │ - ··"include":·["vite.config.ts"]␍
+    10    │ - }␍
+        1 │ + {
+        2 │ + ··"compilerOptions":·{
+        3 │ + ····"composite":·true,
+        4 │ + ····"skipLibCheck":·true,
+        5 │ + ····"module":·"ESNext",
+        6 │ + ····"moduleResolution":·"bundler",
+        7 │ + ····"allowSyntheticDefaultImports":·true
+        8 │ + ··},
+        9 │ + ··"include":·["vite.config.ts"]
+       10 │ + }
+    11 11 │   
+  
+
+web\vite.config.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     1    │ - import·path·from·'node:path';␍
+     2    │ - import·tailwindcss·from·'@tailwindcss/vite';␍
+     3    │ - import·react·from·'@vitejs/plugin-react';␍
+     4    │ - import·{·defineConfig·}·from·'vite';␍
+     5    │ - import·{·changelogPlugin·}·from·'../app/plugins/changelog';␍
+     6    │ - ␍
+     7    │ - export·default·defineConfig({␍
+     8    │ - ··plugins:·[react(),·tailwindcss(),·changelogPlugin(path.resolve(__dirname,·'..'))],␍
+     9    │ - ··resolve:·{␍
+    10    │ - ····alias:·{␍
+    11    │ - ······'@':·path.resolve(__dirname,·'../app/src'),␍
+    12    │ - ····},␍
+    13    │ - ··},␍
+    14    │ - ··build:·{␍
+    15    │ - ····outDir:·'dist',␍
+    16    │ - ··},␍
+    17    │ - });␍
+        1 │ + import·path·from·'node:path';
+        2 │ + import·tailwindcss·from·'@tailwindcss/vite';
+        3 │ + import·react·from·'@vitejs/plugin-react';
+        4 │ + import·{·defineConfig·}·from·'vite';
+        5 │ + import·{·changelogPlugin·}·from·'../app/plugins/changelog';
+        6 │ + 
+        7 │ + export·default·defineConfig({
+        8 │ + ··plugins:·[react(),·tailwindcss(),·changelogPlugin(path.resolve(__dirname,·'..'))],
+        9 │ + ··resolve:·{
+       10 │ + ····alias:·{
+       11 │ + ······'@':·path.resolve(__dirname,·'../app/src'),
+       12 │ + ····},
+       13 │ + ··},
+       14 │ + ··build:·{
+       15 │ + ····outDir:·'dist',
+       16 │ + ··},
+       17 │ + });
+    18 18 │   
+  
+
+The number of diagnostics exceeds the limit allowed. Use --max-diagnostics to increase it.
+Diagnostics not shown: 729.
+Checked 525 files in 210ms. No fixes applied.
+Found 491 errors.
+Found 253 warnings.
+Found 5 infos.
+check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.
+  
+
+error: script "check" exited with code 1
+error: recipe `check-js` failed on line 297 with exit code 1
+exit 1

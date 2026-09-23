@@ -1,0 +1,126 @@
+## Environment (recorded 2026-09-23T12:44:16Z, before any test run)
+$ backend/venv/Scripts/python.exe --version
+Python 3.12.14
+$ backend/venv/Scripts/python.exe -m pip list | grep -iE "^(torch|numpy|transformers|voxcpm|fastapi|pydantic|pytest)"
+fastapi                                  0.141.1
+numpy                                    1.26.4
+pydantic                                 2.13.5
+pydantic_core                            2.46.5
+pydantic-settings                        2.15.0
+pytest                                   9.1.1
+pytest-asyncio                           1.4.0
+torch                                    2.11.0+cu128
+torch-einops-utils                       0.1.29
+torchaudio                               2.11.0+cu128
+torchdiffeq                              0.2.5
+torchvision                              0.26.0+cu128
+transformers                             4.57.3
+transformers-stream-generator            0.0.5
+voxcpm                                   2.0.3
+(pytest-timeout is NOT installed; plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0)
+Working directory for every command: D:/Projects/Personal/voicebox (repo root); rootdir resolved to backend/ via backend/pyproject.toml.
+
+!!! INCIDENT - READ FIRST !!!
+The full suite (what `just test` runs) contains backend/tests/test_rocm_build.py::TestRocmBuildE2E::test_rocm_binary_compiles_and_runs,
+which is NOT gated (no skipif / env var). It runs `python backend/build_binary.py --rocm` with sys.executable = the real venv python.
+On Windows, build_binary.py (lines ~561-610) sees no ROCm torch and runs
+`pip install --force-reinstall --no-deps` of ROCm 7.2.1 SDK wheels + torch-2.9.1+rocm7.2.1 / torchaudio-2.9.1 / torchvision-0.24.1
+INTO THE RUNNING VENV, and only restores the original torch in a `finally` after PyInstaller finishes.
+The run was stopped (TaskStop, ~12:47Z) as soon as this was identified, but the pip installs had already completed (15:46 local),
+and stopping the run prevented the `finally` restore. Current venv state (verified after stop):
+  torch 2.9.1+rocm7.2.1, torchaudio 2.9.1+rocm7.2.1, torchvision 0.24.1+rocm7.2.1, rocm 7.2.1 (+ rocm_sdk_core/devel/libraries_custom)
+  torch.version.cuda=None, torch.version.hip=7.2.53211-158bd99533, torch.cuda.is_available()=False
+It also created backend/build/voicebox-server-rocm/ and an empty backend/dist/ (both git-ignored; left in place).
+The backend server already running on :17493 keeps its in-memory CUDA torch, but will get ROCm torch on restart.
+Remedy (NOT performed - installs forbidden for this worker): reinstall CUDA torch into backend/venv, e.g.
+  backend/venv/Scripts/python.exe -m pip install --force-reinstall --no-deps torch==2.11.0+cu128 torchaudio==2.11.0+cu128 torchvision==0.26.0+cu128 --index-url https://download.pytorch.org/whl/cu128
+  and pip uninstall rocm rocm-sdk-core rocm-sdk-devel rocm-sdk-libraries-custom.
+Recommendation: gate TestRocmBuildE2E behind an env var (like test_rocm_requirements.py does with VOICEBOX_TEST_ROCM_INSTALL).
+This is pre-existing test/build code, unrelated to Phase 2.
+
+## Run 1 - exact `just test` command + junitxml (started 2026-09-23T12:44:33Z)
+$ backend/venv/Scripts/python.exe -m pytest backend/tests -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase2/realenv-suite.xml
+exit code: 2 (Interrupted: 1 error during collection)   wall: ~5s (pytest 3.52s)
+collected 538 items / 1 error ; no test executed.
+realenv-suite.xml (this file's companion) is THIS run's XML:
+  testsuite tests=1 failures=0 errors=1 skipped=0 time=3.523 timestamp=2026-09-23T15:44:33.552629+03:00
+  ERROR tests.test_profile_duplicate_names | collection failure
+    backend/tests/test_profile_duplicate_names.py:19 `from database import Base, ...` -> backend/database/models.py:21
+    `from ..utils.capture_chords import (...)` -> ImportError: attempted relative import beyond top-level package
+  Classification: (c) pre-existing. Test imports `database` as a top-level package (sys.path hack); neither file is in the
+  Phase 2 change set; it was also a collection ERROR in the scratch baseline. Consequence: `just test` as written aborts on
+  every run in this repo until that test is fixed or --continue-on-collection-errors is used.
+
+## Run 2 - same command + --continue-on-collection-errors (as the scratch baseline did) (started 2026-09-23T12:45:05Z)
+$ backend/venv/Scripts/python.exe -m pytest backend/tests -v -p no:cacheprovider --continue-on-collection-errors --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase2/realenv-suite.xml
+STOPPED by this worker at ~12:47Z while executing test_rocm_build.py::TestRocmBuildE2E (see INCIDENT). Wall ~2.5 min.
+No XML was written for run 2 (pytest writes junitxml at session end), so realenv-suite.xml still holds run 1.
+Nothing was deselected or skipped by the worker. Counts from the -v console log (not XML):
+  collected 538 items / 1 collection error (test_profile_duplicate_names.py)
+  PASSED 516, FAILED 1, SKIPPED 6, killed-in-progress 1 (TestRocmBuildE2E), not reached 14
+  (not reached = the 14 items in files sorting after test_rocm_build.py: test_rocm_download.py, test_rocm_requirements.py,
+   test_tada_language_alignment.py, test_task_queue_cancellation.py, test_whisper_download.py)
+  Skips: test_audioop_python313 TestAudioopRuntime x2, test_mlx_smoke x4 (MLX not available on Windows).
+  All 307 Phase 2 tests (test_engine_capabilities.py, test_engine_patterns.py) PASSED in run 2.
+
+### Failing / erroring test ids and classification
+1. ERROR  backend/tests/test_profile_duplicate_names.py (collection)
+   ImportError: attempted relative import beyond top-level package   -> (c) pre-existing (see run 1).
+2. FAILED backend/tests/test_progress.py::test_hf_progress_tracker
+   Message: not captured - run 2 was killed before pytest printed the failure section. A single-file rerun afterwards
+   (in the already ROCm-modified venv, so NOT real-env evidence) failed earlier at collection:
+   `from utils.progress import ...` -> ModuleNotFoundError: No module named 'utils' (the test relies on another test module
+   having put backend/ on sys.path). -> (c) pre-existing/environmental by traceback reasoning only: the test exercises
+   backend.utils.hf_progress tqdm patching; none of the Phase 2 files (backend/models.py, backends/__init__.py, backends/base.py,
+   routes/models.py, requirements.txt) is on its path. It PASSED in the scratch baseline (no transformers there); in the real env
+   transformers/huggingface_hub already hold their own tqdm references (imported via backends/__init__ -> hf_offline_patch, which
+   is pre-existing on main), the most plausible cause. Not verified (no stash/worktree allowed; env now altered).
+3. (killed, no verdict) backend/tests/test_rocm_build.py::TestRocmBuildE2E::test_rocm_binary_compiles_and_runs -> (c) environmental
+   and destructive (see INCIDENT).
+No failure is in category (a) or (b).
+
+## test_all_models_e2e.py
+Pytest collects 0 items from it (it defines no test_* functions; it is a script with helpers like find_binary/build_binary/
+run_one_generation driven by __main__). It appears nowhere in the run-2 log. Nothing ran; no binary built by it.
+
+## Comparison with scratch baseline (00-baseline-pytest.txt: 15 failed, 10 collection errors = 25)
+  FAILED backend\tests\test_amd_gpu_detect.py::TestAmdGpuWindows::test_fallback_to_torch_radeon -> PASSED
+  FAILED backend\tests\test_amd_gpu_detect.py::TestAmdGpuWindows::test_fallback_to_torch_nvidia -> PASSED
+  FAILED backend\tests\test_amd_gpu_detect.py::TestAmdGpuWindows::test_no_torch_cuda -> PASSED
+  FAILED backend\tests\test_f5tts_backend.py::test_cache_requires_nested_files_from_the_same_snapshot -> PASSED
+  FAILED backend\tests\test_f5tts_backend.py::test_safe_audio_loader_falls_back_to_pydub -> PASSED
+  FAILED backend\tests\test_offline_guard.py::test_mutates_cached_huggingface_hub_constant -> PASSED
+  FAILED backend\tests\test_offline_guard.py::test_mutates_cached_transformers_constant -> PASSED
+  FAILED backend\tests\test_offline_guard.py::test_noop_when_not_cached -> PASSED
+  FAILED backend\tests\test_offline_guard.py::test_nested_contexts_respect_refcount -> PASSED
+  FAILED backend\tests\test_offline_guard.py::test_concurrent_threads_share_offline_window -> PASSED
+  FAILED backend\tests\test_progress.py::test_full_integration -> PASSED
+  FAILED backend\tests\test_rocm_backends.py::TestCheckCudaCompatibility::test_no_gpu_returns_compatible -> PASSED
+  FAILED backend\tests\test_rocm_backends.py::TestCheckCudaCompatibility::test_rocm_skips_compute_check -> PASSED
+  FAILED backend\tests\test_rocm_backends.py::TestCheckCudaCompatibility::test_cuda_compatible_arch -> PASSED
+  FAILED backend\tests\test_rocm_backends.py::TestCheckCudaCompatibility::test_cuda_incompatible_arch -> PASSED
+  ERROR backend\tests\test_audioop_python313.py -> collection_error=False results={'PASSED': 3, 'SKIPPED': 2}
+  ERROR backend\tests\test_client_id_middleware.py -> collection_error=False results={'PASSED': 17}
+  ERROR backend\tests\test_hf_symlink_probe.py -> collection_error=False results={'PASSED': 2}
+  ERROR backend\tests\test_hume_encode_inference_mode.py -> collection_error=False results={'PASSED': 1}
+  ERROR backend\tests\test_mcp_speak.py -> collection_error=False results={'PASSED': 3}
+  ERROR backend\tests\test_offline_patch.py -> collection_error=False results={'PASSED': 5}
+  ERROR backend\tests\test_profile_duplicate_names.py -> collection_error=False results={}
+  ERROR backend\tests\test_pronunciation.py -> collection_error=False results={'PASSED': 45}
+  ERROR backend\tests\test_rocm_build.py -> collection_error=False results={'PASSED': 7}
+  ERROR backend\tests\test_tada_language_alignment.py -> collection_error=False results={}
+  Summary: all 15 baseline FAILED tests now PASS. Of the 10 baseline collection ERRORs, 8 now collect and all their tests pass
+  (test_audioop_python313: 3 passed + 2 skipped); test_profile_duplicate_names.py still fails collection (real code issue, see above);
+  test_tada_language_alignment.py collected but was not reached before the run was stopped (verdict unknown).
+  New vs baseline: test_progress.py::test_hf_progress_tracker FAILED here (passed in scratch env).
+
+## Run-2 console excerpt (non-PASSED lines)
+collecting ... collected 538 items / 1 error
+backend\tests\test_audioop_python313.py::TestAudioopRuntime::test_audioop_importable SKIPPED [  4%]
+backend\tests\test_audioop_python313.py::TestAudioopRuntime::test_validate_reference_wav_does_not_fail_on_missing_audioop SKIPPED [  5%]
+backend\tests\test_mlx_smoke.py::test_mlx_core_runs SKIPPED (MLX pac...) [ 74%]
+backend\tests\test_mlx_smoke.py::test_mlx_audio_tts_entry_point SKIPPED  [ 75%]
+backend\tests\test_mlx_smoke.py::test_mlx_audio_stt_entry_point SKIPPED  [ 75%]
+backend\tests\test_mlx_smoke.py::test_mlx_lm_entry_points SKIPPED (M...) [ 75%]
+backend\tests\test_progress.py::test_hf_progress_tracker FAILED          [ 81%]
+backend\tests\test_rocm_build.py::TestRocmBuildE2E::test_rocm_binary_compiles_and_runs 

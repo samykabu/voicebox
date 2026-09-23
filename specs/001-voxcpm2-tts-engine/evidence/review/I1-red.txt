@@ -1,0 +1,7 @@
+RED run before the fix, extracted from I-red.xml (whole run: {'name': 'pytest', 'errors': '0', 'failures': '14', 'skipped': '0', 'tests': '19', 'time': '3.362', 'timestamp': '2026-09-23T21:10:38.687740+03:00', 'hostname': 'DevelopmentPC'}).
+I1: tests=4 failures=4 passed=0
+
+FAILED  tests.test_voxcpm_review.TestNoVoiceboxRunawayRetry::test_voxcpm_does_not_declare_voicebox_runaway_retry  AssertionError: assert True is False
+FAILED  tests.test_voxcpm_review.TestNoVoiceboxRunawayRetry::test_chunked_path_never_calls_the_detector_or_resplits  RuntimeError: TTS output remained unstable after retrying smaller text chunks
+FAILED  tests.test_voxcpm_review.TestNoVoiceboxRunawayRetry::test_service_path_never_calls_the_detector_for_voxcpm  RuntimeError: TTS output remained unstable after retrying smaller text chunks
+FAILED  tests.test_voxcpm_backend::test_model_config_declares_the_data_model_values  AssertionError: assert True is False

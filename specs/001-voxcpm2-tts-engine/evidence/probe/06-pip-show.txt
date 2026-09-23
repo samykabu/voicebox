@@ -1,0 +1,112 @@
+# timestamp: 2026-09-23T01:48:20+03:00
+$ pip show voxcpm
+Name: voxcpm
+Version: 2.0.3
+Summary: VoxCPM: Tokenizer-Free TTS for Context-Aware Speech Generation and True-to-Life Voice Cloning
+Home-page: https://github.com/OpenBMB/VoxCPM
+Author: 
+Author-email: OpenBMB <openbmb@gmail.com>
+License-Expression: Apache-2.0
+Location: C:\Users\sabus\voxcpm-probe\Lib\site-packages
+Requires: addict, argbind, datasets, einops, funasr, gradio, huggingface-hub, inflect, librosa, matplotlib, modelscope, pydantic, safetensors, simplejson, sortedcontainers, soundfile, spaces, torch, torchaudio, torchcodec, tqdm, transformers, wetext
+Required-by: 
+
+$ pip show numpy
+Name: numpy
+Version: 2.5.3
+Summary: Fundamental package for array computing in Python
+Home-page: https://numpy.org
+Author: Travis E. Oliphant et al.
+Author-email: 
+License-Expression: BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0
+Location: C:\Users\sabus\voxcpm-probe\Lib\site-packages
+Requires: 
+Required-by: contourpy, datasets, funasr, gradio, kaldiio, librosa, matplotlib, numba, pandas, scikit-learn, scipy, soundfile, soxr, tensorboardX, torch-complex, transformers, umap-learn
+
+$ pip show torch
+Name: torch
+Version: 2.14.0
+Summary: Tensors and Dynamic neural networks in Python with strong GPU acceleration
+Home-page: https://pytorch.org
+Author: 
+Author-email: PyTorch Team <packages@pytorch.org>
+License-Expression: Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND BSD-2-Clause AND BSD-3-Clause AND BSL-1.0 AND MIT
+Location: C:\Users\sabus\voxcpm-probe\Lib\site-packages
+Requires: filelock, fsspec, jinja2, networkx, setuptools, sympy, typing-extensions
+Required-by: voxcpm
+
+$ pip show torchaudio
+Name: torchaudio
+Version: 2.11.0
+Summary: An audio package for PyTorch
+Home-page: https://github.com/pytorch/audio
+Author: Soumith Chintala, David Pollack, Sean Naren, Peter Goldsborough, Moto Hira, Caroline Chen, Jeff Hwang, Zhaoheng Ni, Xiaohui Zhang
+Author-email: soumith@pytorch.org
+License: 
+Location: C:\Users\sabus\voxcpm-probe\Lib\site-packages
+Requires: 
+Required-by: voxcpm
+
+$ pip show torchcodec
+Name: torchcodec
+Version: 0.16.0
+Summary: A video decoder for PyTorch
+Home-page: 
+Author: 
+Author-email: PyTorch Team <packages@pytorch.org>
+License: 
+Location: C:\Users\sabus\voxcpm-probe\Lib\site-packages
+Requires: 
+Required-by: voxcpm
+
+$ pip show transformers
+Name: transformers
+Version: 5.17.0
+Summary: Transformers: the model-definition framework for state-of-the-art machine learning models in text, vision, audio, and multimodal models, for both inference and training.
+Home-page: https://github.com/huggingface/transformers
+Author: The Hugging Face team (past and future) with the help of all our contributors (https://github.com/huggingface/transformers/graphs/contributors)
+Author-email: transformers@huggingface.co
+License: Apache 2.0 License
+Location: C:\Users\sabus\voxcpm-probe\Lib\site-packages
+Requires: huggingface-hub, numpy, packaging, pyyaml, regex, safetensors, tokenizers, tqdm, typer
+Required-by: funasr, voxcpm
+
+$ pip check
+No broken requirements found.
+$ torch build
+torch 2.14.0+cpu cuda build None cuda avail False
+$ torchaudio/torchcodec import
+torchaudio 2.11.0+cpu
+torchcodec 0.16.0+cpu
+$ PyPI metadata Requires-Python
+Requires-Python: >=3.10
+torch>=2.5.0
+torchaudio>=2.5.0
+torchcodec
+transformers>=4.36.2
+einops
+gradio<7,>=6
+inflect
+addict
+wetext
+modelscope>=1.22.0
+datasets<4,>=3
+huggingface-hub
+pydantic
+tqdm
+simplejson
+sortedcontainers
+soundfile
+librosa
+matplotlib
+funasr
+spaces
+argbind
+safetensors
+pytest>=6.0; extra == "dev"
+pytest-cov>=2.0; extra == "dev"
+black>=21.0; extra == "dev"
+flake8>=3.8; extra == "dev"
+pre-commit>=2.0; extra == "dev"
+$ venv size
+1.8G	/c/Users/sabus/voxcpm-probe

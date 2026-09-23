@@ -132,6 +132,7 @@ jobs:
           pip install --no-deps hume-tada
           pip install --no-deps 'f5-tts==1.1.21'
           pip install --no-deps 'habibi-tts==0.1.1'
+          pip install --no-deps 'voxcpm==2.0.3'
 
       - name: Install MLX dependencies (Apple Silicon only)
         if: matrix.backend == 'mlx'
@@ -340,6 +341,7 @@ jobs:
           pip install --no-deps hume-tada
           pip install --no-deps 'f5-tts==1.1.21'
           pip install --no-deps 'habibi-tts==0.1.1'
+          pip install --no-deps 'voxcpm==2.0.3'
 
       - name: Install PyTorch with CUDA 12.8
         run: |
@@ -416,6 +418,7 @@ jobs:
           pip install --no-deps hume-tada
           pip install --no-deps 'f5-tts==1.1.21'
           pip install --no-deps 'habibi-tts==0.1.1'
+          pip install --no-deps 'voxcpm==2.0.3'
 
       - name: Build ROCm server binary (onedir)
         shell: bash

@@ -1,0 +1,169 @@
+# T019-T023 frontend checks. Generated 2026-09-23T16:36:28+03:00
+
+## 1. Typecheck and biome on the working tree
+timestamp 2026-09-23T16:34:51.8329013+03:00
+$ bun run typecheck
+$ bunx tsc -p app/tsconfig.json --noEmit && cd web && bunx tsc --noEmit
+
+exit=0
+$ bunx biome check app/src/components/History/HistoryTable.tsx   (untouched file, to show the working-tree CRLF finding is repo-wide)
+app\src\components\History\HistoryTable.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  × Formatter would have printed the following content:
+      59      │ - import·{·formatDate,·formatDuration,·formatEngineName·}·from·'@/lib/utils/format';␍
+Checked 1 file in 17ms. No fixes applied.
+Found 6 errors.
+Found 1 warning.
+
+exit=1
+$ bunx biome check app/src/components/Generation/EngineModelSelector.tsx app/src/lib/constants/languages.ts app/src/lib/hooks/useGenerationForm.ts app/src/components/Generation/FloatingGenerateBox.tsx app/src/lib/utils/format.ts app/src/components/ServerSettings/ModelManagement.tsx app/src/lib/api/types.ts app/src/lib/hooks/engineCapabilityRules.ts app/src/components/Generation/DownloadConfirmDialog.tsx app/src/components/Generation/AdvancedSettingsControls.tsx   (working tree, CRLF)
+app\src\components\ServerSettings\ModelManagement.tsx:633:49 lint/complexity/useOptionalChain  FIXABLE  ━━━━━━━━━━
+app\src\components\ServerSettings\ModelManagement.tsx:939:47 lint/complexity/useOptionalChain  FIXABLE  ━━━━━━━━━━
+app\src\components\Generation\EngineModelSelector.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app\src\components\Generation\FloatingGenerateBox.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app\src\components\ServerSettings\ModelManagement.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app\src\lib\api\types.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app\src\lib\constants\languages.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app\src\lib\hooks\useGenerationForm.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app\src\lib\utils\format.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Checked 10 files in 18ms. No fixes applied.
+Found 7 errors.
+Found 2 warnings.
+
+exit=1
+
+## 2. Biome, HEAD vs working copy, both LF-normalised (script: <scratchpad>/biome-compare.sh)
+The working tree is CRLF (core.autocrlf=true); biome flags CRLF on every tracked file, including untouched ones (HistoryTable.tsx above).
+Both sides are checked as LF, which is what git stores, with a copy of the repo biome.json whose only change is vcs.enabled=false (the scratch dir is not a git repo).
+$ bash <scratchpad>/biome-compare.sh
+(new file, no HEAD version: app/src/lib/hooks/engineCapabilityRules.ts)
+(new file, no HEAD version: app/src/components/Generation/DownloadConfirmDialog.tsx)
+(new file, no HEAD version: app/src/components/Generation/AdvancedSettingsControls.tsx)
+##### biome check, head side (2026-09-23T16:34:39+03:00)
+exit=1
+app\src\components\ServerSettings\ModelManagement.tsx:590:49 lint/complexity/useOptionalChain  FIXABLE  ━━━━━━━━━━
+app\src\components\ServerSettings\ModelManagement.tsx:883:47 lint/complexity/useOptionalChain  FIXABLE  ━━━━━━━━━━
+app\src\components\Generation\EngineModelSelector.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app\src\components\Generation\FloatingGenerateBox.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app\src\components\ServerSettings\ModelManagement.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Checked 7 files in 26ms. No fixes applied.
+Found 3 errors.
+Found 2 warnings.
+##### biome check, work side (2026-09-23T16:34:39+03:00)
+exit=1
+app\src\components\ServerSettings\ModelManagement.tsx:633:49 lint/complexity/useOptionalChain  FIXABLE  ━━━━━━━━━━
+app\src\components\ServerSettings\ModelManagement.tsx:939:47 lint/complexity/useOptionalChain  FIXABLE  ━━━━━━━━━━
+app\src\components\Generation\EngineModelSelector.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app\src\components\Generation\FloatingGenerateBox.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app\src\components\ServerSettings\ModelManagement.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Checked 10 files in 18ms. No fixes applied.
+Found 3 errors.
+Found 2 warnings.
+##### what biome --write would change (formatter + import sorting), per file: HEAD vs working
+=== app/src/components/Generation/EngineModelSelector.tsx
+--- HEAD:
+58c58,65
+< const CLONING_ENGINES = new Set(['qwen', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'f5_tts']);
+---
+> const CLONING_ENGINES = new Set([
+>   'qwen',
+>   'luxtts',
+>   'chatterbox',
+>   'chatterbox_turbo',
+>   'tada',
+>   'f5_tts',
+> ]);
+--- working:
+64c64,71
+< const CLONING_ENGINES = new Set(['qwen', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'f5_tts']);
+---
+> const CLONING_ENGINES = new Set([
+>   'qwen',
+>   'luxtts',
+>   'chatterbox',
+>   'chatterbox_turbo',
+>   'tada',
+>   'f5_tts',
+> ]);
+=== app/src/lib/constants/languages.ts
+--- HEAD:
+--- working:
+=== app/src/lib/hooks/useGenerationForm.ts
+--- HEAD:
+--- working:
+=== app/src/components/Generation/FloatingGenerateBox.tsx
+--- HEAD:
+431c431,435
+<                                     aria-label={active ? t('generation.persona.ariaLabelActive') : t('generation.persona.ariaLabelInactive')}
+---
+>                                     aria-label={
+>                                       active
+>                                         ? t('generation.persona.ariaLabelActive')
+>                                         : t('generation.persona.ariaLabelInactive')
+>                                     }
+437c441,443
+<                                     {active ? t('generation.persona.tooltipActive') : t('generation.persona.tooltipInactive')}
+---
+>                                     {active
+>                                       ? t('generation.persona.tooltipActive')
+>                                       : t('generation.persona.tooltipInactive')}
+578d583
+< 
+--- working:
+441c441,445
+<                                     aria-label={active ? t('generation.persona.ariaLabelActive') : t('generation.persona.ariaLabelInactive')}
+---
+>                                     aria-label={
+>                                       active
+>                                         ? t('generation.persona.ariaLabelActive')
+>                                         : t('generation.persona.ariaLabelInactive')
+>                                     }
+447c451,453
+<                                     {active ? t('generation.persona.tooltipActive') : t('generation.persona.tooltipInactive')}
+---
+>                                     {active
+>                                       ? t('generation.persona.tooltipActive')
+>                                       : t('generation.persona.tooltipInactive')}
+637d642
+< 
+=== app/src/lib/utils/format.ts
+--- HEAD:
+--- working:
+=== app/src/components/ServerSettings/ModelManagement.tsx
+--- HEAD:
+45,49c45
+< import {
+<   getHabibiModel,
+<   HABIBI_MODELS,
+<   isHabibiModelId,
+< } from '@/lib/constants/habibiModels';
+---
+> import { getHabibiModel, HABIBI_MODELS, isHabibiModelId } from '@/lib/constants/habibiModels';
+--- working:
+46,50c46
+< import {
+<   getHabibiModel,
+<   HABIBI_MODELS,
+<   isHabibiModelId,
+< } from '@/lib/constants/habibiModels';
+---
+> import { getHabibiModel, HABIBI_MODELS, isHabibiModelId } from '@/lib/constants/habibiModels';
+=== app/src/lib/api/types.ts
+--- HEAD:
+--- working:
+=== app/src/lib/hooks/engineCapabilityRules.ts
+--- working:
+=== app/src/components/Generation/DownloadConfirmDialog.tsx
+--- working:
+=== app/src/components/Generation/AdvancedSettingsControls.tsx
+--- working:
+
+Result: working side has exactly the HEAD findings (useOptionalChain x2 in ModelManagement at shifted lines; pre-existing format issues in EngineModelSelector CLONING_ENGINES line, FloatingGenerateBox persona lines + blank line, ModelManagement habibi import). The 3 new files and every changed line are clean.
+
+## 3. Optional web build
+$ bun run build:web   (timestamp 2026-09-23T16:35:19.2795452+03:00)
+exit=0; vite v5.4.21: 3638 modules transformed; built in 4.32s (only the pre-existing >500 kB chunk-size warning). web/dist is gitignored.
+
+## 4. Frontend test runner
+No frontend test runner or test files exist in the repo (no vitest, no bunfig, no *.test.ts(x), no bun types in app/tsconfig). Nothing installed.
+The capability-logic tests run with bun's built-in runner from the scratchpad; source, RED and GREEN runs and the JUnit XML are in T019-T023-frontend.txt section 3.
+GREEN JUnit: tests=16 failures=0 skipped=0 assertions=85 (testsuites attributes).

@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
-import { Edit2, Mic, Monitor, Music, Upload, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { Edit2, Mic, Monitor, Music, ShieldCheck, Upload, UserRoundPen, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { EffectsChainEditor } from '@/components/Effects/EffectsChainEditor';
 import { Badge } from '@/components/ui/badge';
@@ -38,8 +38,17 @@ import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api/client';
 import type { EffectConfig, PresetVoice, VoiceType } from '@/lib/api/types';
 import { LANGUAGE_CODES, LANGUAGE_OPTIONS, type LanguageCode } from '@/lib/constants/languages';
+import {
+  declaredCloningEngineOptions,
+  designPromptError,
+  engineNotice,
+  MAX_DESIGN_PROMPT_CHARS,
+  pickVoiceDesignEngine,
+  voiceDesignEngineOptions,
+} from '@/lib/hooks/engineCapabilityRules';
 import { useAudioPlayer } from '@/lib/hooks/useAudioPlayer';
 import { useAudioRecording } from '@/lib/hooks/useAudioRecording';
+import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
 import {
   useAddSample,
   useCreateProfile,
@@ -52,6 +61,7 @@ import {
 import { useSystemAudioCapture } from '@/lib/hooks/useSystemAudioCapture';
 import { useTranscription } from '@/lib/hooks/useTranscription';
 import { convertToWav, formatAudioDuration, getAudioDuration } from '@/lib/utils/audio';
+import { cn } from '@/lib/utils/cn';
 import { usePlatform } from '@/platform/PlatformContext';
 import { useServerStore } from '@/stores/serverStore';
 import { type ProfileFormDraft, useUIStore } from '@/stores/uiStore';
@@ -61,6 +71,8 @@ import { AudioSampleUpload } from './AudioSampleUpload';
 import { SampleList } from './SampleList';
 
 const MAX_AUDIO_DURATION_SECONDS = 30;
+/** Responsible Use guidance (FR-025), on the same GitHub repo the About page links. */
+const RESPONSIBLE_USE_URL = 'https://github.com/samykabu/voicebox/blob/main/RESPONSIBLE_USE.md';
 const PRESET_ONLY_ENGINES = new Set(['kokoro', 'qwen_custom_voice']);
 const DEFAULT_ENGINE_OPTIONS = [
   { value: 'qwen', label: 'Qwen3-TTS' },
@@ -72,6 +84,9 @@ const DEFAULT_ENGINE_OPTIONS = [
   { value: 'kokoro', label: 'Kokoro 82M' },
   { value: 'f5_tts', label: 'Arabic F5 / Habibi' },
 ] as const;
+const LISTED_DEFAULT_ENGINES: ReadonlySet<string> = new Set(
+  DEFAULT_ENGINE_OPTIONS.map((option) => option.value),
+);
 
 function makeProfileSchema(t: (key: string) => string) {
   const baseProfileSchema = z.object({
@@ -82,6 +97,8 @@ function makeProfileSchema(t: (key: string) => string) {
     sampleFile: z.instanceof(File).optional(),
     referenceText: z.string().max(1000).optional(),
     avatarFile: z.instanceof(File).optional(),
+    /** The written description a designed profile is created from (FR-015a). */
+    designPrompt: z.string().max(MAX_DESIGN_PROMPT_CHARS).optional(),
   });
 
   return baseProfileSchema.refine(
@@ -106,6 +123,7 @@ type ProfileFormValues = {
   sampleFile?: File;
   referenceText?: string;
   avatarFile?: File;
+  designPrompt?: string;
 };
 
 // Helper to convert File to base64
@@ -148,7 +166,7 @@ export function ProfileForm() {
   const deleteAvatar = useDeleteAvatar();
   const transcribe = useTranscription();
   const { toast } = useToast();
-  const [voiceSource, setVoiceSource] = useState<'clone' | 'builtin'>('clone');
+  const [voiceSource, setVoiceSource] = useState<'clone' | 'builtin' | 'design'>('clone');
   const [sampleMode, setSampleMode] = useState<'upload' | 'record' | 'system'>('record');
   const [audioDuration, setAudioDuration] = useState<number | null>(null);
   const [isValidatingAudio, setIsValidatingAudio] = useState(false);
@@ -173,6 +191,7 @@ export function ProfileForm() {
       sampleFile: undefined,
       referenceText: '',
       avatarFile: undefined,
+      designPrompt: '',
     },
   });
 
@@ -290,9 +309,53 @@ export function ProfileForm() {
   const isSampleBasedProfile = isCreating
     ? voiceSource === 'clone'
     : editingProfile?.voice_type !== 'preset';
-  const availableDefaultEngines = DEFAULT_ENGINE_OPTIONS.filter(
-    (option) => !isSampleBasedProfile || !PRESET_ONLY_ENGINES.has(option.value),
+  const { data: engineCapabilities, isSuccess: engineCapabilitiesLoaded } = useEngineCapabilities();
+  // FR-015a: engines whose capability declares voice design. The "Describe a voice" source is
+  // offered only when there is at least one.
+  const designEngineOptions = useMemo(
+    () => voiceDesignEngineOptions(engineCapabilities),
+    [engineCapabilities],
   );
+  const canDesignVoice = designEngineOptions.length > 0;
+  const isDesignedProfile = isCreating
+    ? voiceSource === 'design'
+    : editingProfile?.voice_type === 'designed';
+  // Engines not listed above are offered when the backend declares `supports_cloning`
+  // (FR-011, FR-014), labelled with the declared display name. A designed profile is offered
+  // only the engines that declare voice design.
+  const availableDefaultEngines = useMemo<{ value: string; label: string }[]>(
+    () =>
+      isDesignedProfile
+        ? designEngineOptions.map(({ value, label }) => ({ value, label }))
+        : [
+            ...DEFAULT_ENGINE_OPTIONS.filter(
+              (option) => !isSampleBasedProfile || !PRESET_ONLY_ENGINES.has(option.value),
+            ),
+            ...declaredCloningEngineOptions(engineCapabilities, LISTED_DEFAULT_ENGINES),
+          ],
+    [isDesignedProfile, designEngineOptions, isSampleBasedProfile, engineCapabilities],
+  );
+  // The engine a new designed profile is created for: the chosen default engine when it
+  // declares voice design, otherwise the first available one that does.
+  const designEngine = pickVoiceDesignEngine(designEngineOptions, defaultEngine);
+  const designEngineNotice = engineNotice(
+    findEngineCapability(engineCapabilities, designEngine),
+    t,
+  )?.text;
+
+  // Leave the "Describe a voice" source if no engine declares voice design any more.
+  useEffect(() => {
+    if (voiceSource === 'design' && engineCapabilitiesLoaded && !canDesignVoice) {
+      setVoiceSource('clone');
+    }
+  }, [voiceSource, engineCapabilitiesLoaded, canDesignVoice]);
+
+  // Keep the default engine on a voice-design engine while creating a designed profile.
+  useEffect(() => {
+    if (isCreating && voiceSource === 'design' && designEngine && designEngine !== defaultEngine) {
+      setDefaultEngine(designEngine);
+    }
+  }, [isCreating, voiceSource, designEngine, defaultEngine]);
 
   // Show recording errors
   useEffect(() => {
@@ -339,6 +402,7 @@ export function ProfileForm() {
         sampleFile: undefined,
         referenceText: undefined,
         avatarFile: undefined,
+        designPrompt: '',
       });
       setProfileEffectsChain(editingProfile.effects_chain ?? []);
       setEffectsDirty(false);
@@ -353,8 +417,10 @@ export function ProfileForm() {
         referenceText: profileFormDraft.referenceText,
         sampleFile: undefined,
         avatarFile: undefined,
+        designPrompt: profileFormDraft.designPrompt ?? '',
       });
       setSampleMode(profileFormDraft.sampleMode);
+      setVoiceSource(profileFormDraft.voiceSource ?? 'clone');
       // Restore the file if we have it saved
       if (
         profileFormDraft.sampleFileData &&
@@ -378,6 +444,7 @@ export function ProfileForm() {
         sampleFile: undefined,
         referenceText: undefined,
         avatarFile: undefined,
+        designPrompt: '',
       });
       setSampleMode('record');
       setAvatarPreview(null);
@@ -387,11 +454,13 @@ export function ProfileForm() {
   useEffect(() => {
     if (
       defaultEngine &&
-      !availableDefaultEngines.some((option) => option.value === defaultEngine)
+      !availableDefaultEngines.some((option) => option.value === defaultEngine) &&
+      // A saved engine that only the capability list names is unknown until it loads.
+      (LISTED_DEFAULT_ENGINES.has(defaultEngine) || engineCapabilitiesLoaded)
     ) {
       setDefaultEngine('');
     }
-  }, [availableDefaultEngines, defaultEngine]);
+  }, [availableDefaultEngines, defaultEngine, engineCapabilitiesLoaded]);
 
   useEffect(() => {
     if (!selectedPresetVoiceId) {
@@ -546,6 +615,55 @@ export function ProfileForm() {
         toast({
           title: t('profileForm.toast.voiceUpdated'),
           description: t('profileForm.toast.voiceUpdatedDescription', { name: data.name }),
+        });
+      } else if (voiceSource === 'design') {
+        // Creating a designed profile from a written description (FR-015a)
+        const designPrompt = form.getValues('designPrompt');
+        const promptError = designPromptError(designPrompt);
+        if (promptError) {
+          form.setError('designPrompt', {
+            type: 'manual',
+            message:
+              promptError === 'required'
+                ? t('profileForm.validation.designPromptRequired')
+                : t('profileForm.validation.designPromptTooLong', {
+                    max: MAX_DESIGN_PROMPT_CHARS,
+                  }),
+          });
+          return;
+        }
+
+        const profile = await createProfile.mutateAsync({
+          name: data.name,
+          description: data.description,
+          language: data.language,
+          voice_type: 'designed' as VoiceType,
+          design_prompt: designPrompt?.trim(),
+          default_engine: designEngine || undefined,
+          personality: data.personality?.trim() ? data.personality.trim() : undefined,
+        });
+
+        if (data.avatarFile) {
+          try {
+            await uploadAvatar.mutateAsync({
+              profileId: profile.id,
+              file: data.avatarFile,
+            });
+          } catch (avatarError) {
+            toast({
+              title: t('profileForm.toast.avatarUploadFailed'),
+              description:
+                avatarError instanceof Error
+                  ? avatarError.message
+                  : t('profileForm.toast.avatarUploadFailedFallback'),
+              variant: 'destructive',
+            });
+          }
+        }
+
+        toast({
+          title: t('profileForm.toast.profileCreated'),
+          description: t('profileForm.toast.profileCreatedDesigned', { name: data.name }),
         });
       } else if (voiceSource === 'builtin') {
         // Creating preset profile from built-in voice
@@ -759,7 +877,11 @@ export function ProfileForm() {
       // Save draft when closing the create modal
       const values = form.getValues();
       const hasContent =
-        values.name || values.description || values.referenceText || values.sampleFile;
+        values.name ||
+        values.description ||
+        values.referenceText ||
+        values.sampleFile ||
+        values.designPrompt;
 
       if (hasContent) {
         const draft: ProfileFormDraft = {
@@ -769,6 +891,8 @@ export function ProfileForm() {
           personality: values.personality || '',
           referenceText: values.referenceText || '',
           sampleMode,
+          voiceSource,
+          designPrompt: values.designPrompt || '',
         };
 
         // Save file as base64 if present
@@ -813,6 +937,26 @@ export function ProfileForm() {
                 ? t('profileForm.editDescription')
                 : t('profileForm.createDescription')}
             </DialogDescription>
+            {/* FR-025: responsible-use acknowledgement for every profile source */}
+            <p className="flex items-start gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-sm text-foreground">
+              <ShieldCheck className="h-4 w-4 mt-0.5 shrink-0 text-accent" aria-hidden="true" />
+              <span>
+                <Trans
+                  i18nKey="profileForm.responsibleUse"
+                  components={{
+                    link: (
+                      // biome-ignore lint/a11y/useAnchorContent: Trans fills content at runtime
+                      <a
+                        href={RESPONSIBLE_USE_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium underline underline-offset-2 hover:text-accent"
+                      />
+                    ),
+                  }}
+                />
+              </span>
+            </p>
             {isCreating && profileFormDraft && (
               <div className="flex items-center gap-2 pt-2">
                 <span className="text-xs text-muted-foreground">
@@ -833,6 +977,7 @@ export function ProfileForm() {
                       sampleFile: undefined,
                       referenceText: '',
                       avatarFile: undefined,
+                      designPrompt: '',
                     });
                     setSampleMode('record');
                   }}
@@ -878,10 +1023,103 @@ export function ProfileForm() {
                             <Music className="h-3.5 w-3.5" />
                             {t('profileForm.source.builtin')}
                           </button>
+                          {/* FR-015a: only when some engine's capability declares voice design */}
+                          {canDesignVoice && (
+                            <button
+                              type="button"
+                              onClick={() => setVoiceSource('design')}
+                              className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors ${
+                                voiceSource === 'design'
+                                  ? 'bg-accent text-accent-foreground shadow-sm'
+                                  : 'text-muted-foreground hover:text-foreground'
+                              }`}
+                            >
+                              <UserRoundPen className="h-3.5 w-3.5" />
+                              {t('profileForm.source.design')}
+                            </button>
+                          )}
                         </div>
                       </div>
 
-                      {voiceSource === 'builtin' ? (
+                      {voiceSource === 'design' ? (
+                        <div className="space-y-4">
+                          <FormDescription>{t('profileForm.design.hint')}</FormDescription>
+
+                          <FormItem>
+                            <FormLabel>{t('profileForm.fields.engine')}</FormLabel>
+                            <Select value={designEngine} onValueChange={setDefaultEngine}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {designEngineOptions.map((option) => {
+                                  // FR-003: an unavailable engine stays listed, greyed out,
+                                  // with why it cannot run (as in EngineModelSelector).
+                                  const notice = engineNotice(
+                                    findEngineCapability(engineCapabilities, option.value),
+                                    t,
+                                  );
+                                  return (
+                                    <SelectItem
+                                      key={option.value}
+                                      value={option.value}
+                                      // Only the label is greyed out, so the reason stays readable.
+                                      className="data-[disabled]:opacity-100"
+                                      disabled={!option.available}
+                                    >
+                                      <span className={option.available ? undefined : 'opacity-50'}>
+                                        {option.label}
+                                      </span>
+                                      {notice ? (
+                                        <span
+                                          className={cn(
+                                            'block text-[10px]',
+                                            notice.kind === 'reason'
+                                              ? 'text-muted-foreground'
+                                              : 'text-amber-600 dark:text-amber-400',
+                                          )}
+                                        >
+                                          {notice.text}
+                                        </span>
+                                      ) : null}
+                                    </SelectItem>
+                                  );
+                                })}
+                              </SelectContent>
+                            </Select>
+                            {designEngineNotice ? (
+                              <p className="text-xs text-amber-600 dark:text-amber-400">
+                                {designEngineNotice}
+                              </p>
+                            ) : null}
+                          </FormItem>
+
+                          <FormField
+                            control={form.control}
+                            name="designPrompt"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('profileForm.fields.designPrompt')}</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder={t('profileForm.fields.designPromptPlaceholder')}
+                                    className="min-h-[140px]"
+                                    maxLength={MAX_DESIGN_PROMPT_CHARS}
+                                    {...field}
+                                    value={field.value ?? ''}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  {t('profileForm.fields.designPromptHint')}
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      ) : voiceSource === 'builtin' ? (
                         <div className="space-y-4">
                           <FormDescription>{t('profileForm.builtin.hint')}</FormDescription>
 
@@ -1102,6 +1340,20 @@ export function ProfileForm() {
                           {t('profileForm.builtin.note')}
                         </p>
                       </div>
+                    ) : editingProfile.voice_type === 'designed' ? (
+                      <div className="space-y-4 pt-4">
+                        <div className="rounded-lg border border-border p-4 space-y-2">
+                          <div className="text-sm font-medium text-muted-foreground">
+                            {t('profileForm.design.badge')}
+                          </div>
+                          <p className="text-sm whitespace-pre-wrap">
+                            {editingProfile.design_prompt}
+                          </p>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {t('profileForm.design.note')}
+                        </p>
+                      </div>
                     ) : (
                       <div>
                         <SampleList profileId={editingProfileId} />
@@ -1249,7 +1501,9 @@ export function ProfileForm() {
                         setDefaultEngine(v === '_none' ? '' : v);
                       }}
                       disabled={
-                        voiceSource === 'builtin' || editingProfile?.voice_type === 'preset'
+                        voiceSource === 'builtin' ||
+                        (isCreating && voiceSource === 'design') ||
+                        editingProfile?.voice_type === 'preset'
                       }
                     >
                       <FormControl>

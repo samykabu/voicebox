@@ -1,0 +1,38 @@
+# timestamp: 2026-09-23T01:42:55+03:00
+$ py -0p
+ -V:3.14 *        C:\Python314\python.exe
+ -V:3.13          C:\Users\sabus\AppData\Local\Programs\Python\Python313\python.exe
+ -V:3.10          C:\Users\sabus\AppData\Local\Programs\Python\Python310\python.exe
+
+$ python --version
+Python 3.14.7
+$ where python py
+C:\Python314\python.exe
+C:\Users\sabus\AppData\Local\Programs\Python\Python313\python.exe
+C:\Users\sabus\AppData\Local\Programs\Python\Python310\python.exe
+C:\Users\sabus\AppData\Local\Microsoft\WindowsApps\python.exe
+C:\Windows\py.exe
+
+$ systeminfo (OS lines)
+OS Name:                       Microsoft Windows 11 Pro for Workstations
+OS Version:                    10.0.26200 N/A Build 26200
+Processor(s):                  1 Processor(s) Installed.
+Total Physical Memory:         130,318 MB
+/usr/bin/bash: line 2: wmic: command not found
+HF_HOME=<unset>
+HUGGINGFACE_HUB_CACHE=<unset>
+HF_HUB_CACHE=<unset>
+MODELSCOPE_CACHE=<unset>
+HF_TOKEN set? no
+total 33
+drwxr-xr-x 1 sabus 197609    0 Sep 20 13:43 .
+drwxr-xr-x 1 sabus 197609    0 Sep 20 11:47 ..
+-rw-r--r-- 1 sabus 197609 6007 Sep 20 13:42 .agent_harnesses.json
+-rw-r--r-- 1 sabus 197609    0 Sep  6 22:45 .check_for_skill_update_done
+-rw-r--r-- 1 sabus 197609    0 Sep  6 22:45 .check_for_update_done
+drwxr-xr-x 1 sabus 197609    0 Sep 22 11:17 hub
+-rw-r--r-- 1 sabus 197609  953 Sep  6 22:46 stored_tokens
+-rw-r--r-- 1 sabus 197609  825 Sep  6 22:46 token
+-rw-r--r-- 1 sabus 197609  199 Aug 30 20:04 unsloth_xet_health.DevelopmentPC.json
+/c/Users/sabus/.cache/huggingface/token
+CPU: Intel(R) Core(TM) Ultra 9 285K | cores 24 | threads 24

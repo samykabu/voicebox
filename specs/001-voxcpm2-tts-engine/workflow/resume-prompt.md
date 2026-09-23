@@ -1,0 +1,1 @@
+Continue the Sanduq workflow in D:\Projects\Personal\voicebox. Read specs/001-voxcpm2-tts-engine/workflow/checkpoint.json and handoff.md. Invoke speckit.workflow.continue for specs/001-voxcpm2-tts-engine; validate inputs and resolve any active claim before resuming. Preserve policy and unresolved approvals.

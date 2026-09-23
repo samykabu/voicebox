@@ -1,0 +1,109 @@
+# T004 (#20) + T005 (#21): voxcpm==2.0.3 --no-deps install in justfile setup-python recipes
+# Timestamp: 2026-09-23T00:23:10Z
+
+$ git diff justfile
+diff --git a/justfile b/justfile
+index 718068e..5e998a2 100644
+--- a/justfile
++++ b/justfile
+@@ -72,6 +72,8 @@ setup-python:
+     {{ pip }} install --no-deps 'f5-tts==1.1.21'
+     # Habibi supplies the Arabic-aware inference formatter and model utilities
+     {{ pip }} install --no-deps 'habibi-tts==0.1.1'
++    # VoxCPM2 declares gradio>=6, datasets>=3, modelscope, funasr and unpinned numpy/transformers; its runtime deps are in requirements.txt
++    {{ pip }} install --no-deps 'voxcpm==2.0.3'
+     # Apple Silicon: install MLX backend
+     if [ "$(uname -m)" = "arm64" ] && [ "$(uname)" = "Darwin" ]; then
+         echo "Detected Apple Silicon — installing MLX dependencies..."
+@@ -121,6 +123,7 @@ setup-python:
+     & "{{ pip }}" install --no-deps hume-tada
+     & "{{ pip }}" install --no-deps "f5-tts==1.1.21"
+     & "{{ pip }}" install --no-deps "habibi-tts==0.1.1"
++    & "{{ pip }}" install --no-deps "voxcpm==2.0.3"
+     & "{{ pip }}" install git+https://github.com/QwenLM/Qwen3-TTS.git
+     & "{{ pip }}" install pyinstaller ruff pytest pytest-asyncio -q
+     Write-Host "Python environment ready."
+
+$ git show HEAD:justfile | sed -n 21p
+system_python := if os() == "windows" { "python" } else { `command -v python3.12 2>/dev/null || command -v python3.13 2>/dev/null || echo python3` }
+$ sed -n 21p justfile
+system_python := if os() == "windows" { "python" } else { `command -v python3.12 2>/dev/null || command -v python3.13 2>/dev/null || echo python3` }
+$ cmp <(git show HEAD:justfile | sed -n 21p) <(sed -n 21p justfile) && echo "line 21 byte-identical"
+line 21 byte-identical
+
+$ nl -ba justfile | sed -n 30,34p
+    30	# Create venv and install Python dependencies
+    31	[unix]
+    32	setup-python:
+    33	    #!/usr/bin/env bash
+    34	    set -euo pipefail
+$ nl -ba justfile | sed -n 66,78p
+    66	    {{ pip }} install -r {{ backend_dir }}/requirements.txt
+    67	    # Chatterbox pins numpy<1.26 / torch==2.6 which break on Python 3.12+
+    68	    {{ pip }} install --no-deps chatterbox-tts
+    69	    # HumeAI TADA pins torch>=2.7,<2.8 which conflicts with our torch>=2.1
+    70	    {{ pip }} install --no-deps hume-tada
+    71	    # F5-TTS causes dependency resolution hell due to gradio/accelerate bounds
+    72	    {{ pip }} install --no-deps 'f5-tts==1.1.21'
+    73	    # Habibi supplies the Arabic-aware inference formatter and model utilities
+    74	    {{ pip }} install --no-deps 'habibi-tts==0.1.1'
+    75	    # VoxCPM2 declares gradio>=6, datasets>=3, modelscope, funasr and unpinned numpy/transformers; its runtime deps are in requirements.txt
+    76	    {{ pip }} install --no-deps 'voxcpm==2.0.3'
+    77	    # Apple Silicon: install MLX backend
+    78	    if [ "$(uname -m)" = "arm64" ] && [ "$(uname)" = "Darwin" ]; then
+$ nl -ba justfile | sed -n 90,92p
+    90	    echo "Python environment ready."
+    91	
+    92	[windows]
+$ nl -ba justfile | sed -n 119,128p
+   119	        Write-Host "  pip install intel-extension-for-pytorch --index-url https://download.pytorch.org/whl/xpu"; \
+   120	    }
+   121	    & "{{ pip }}" install -r {{ backend_dir }}/requirements.txt
+   122	    & "{{ pip }}" install --no-deps chatterbox-tts
+   123	    & "{{ pip }}" install --no-deps hume-tada
+   124	    & "{{ pip }}" install --no-deps "f5-tts==1.1.21"
+   125	    & "{{ pip }}" install --no-deps "habibi-tts==0.1.1"
+   126	    & "{{ pip }}" install --no-deps "voxcpm==2.0.3"
+   127	    & "{{ pip }}" install git+https://github.com/QwenLM/Qwen3-TTS.git
+   128	    & "{{ pip }}" install pyinstaller ruff pytest pytest-asyncio -q
+
+$ sed -n 66,128p justfile | grep -n voxcpm | cat -A   (indentation check: 4 leading spaces, no tabs; $ marks end of line; line numbers relative to 66)
+11:    {{ pip }} install --no-deps 'voxcpm==2.0.3'$
+61:    & "{{ pip }}" install --no-deps "voxcpm==2.0.3"$
+
+$ which just
+which: no just in (/c/Users/sabus/bin:/mingw64/bin:/usr/local/bin:/usr/bin:/bin:/mingw64/bin:/usr/bin:/c/Users/sabus/bin:/c/Program Files/SiYuan/resources/kernel:/c/Program Files/Microsoft SDKs/Azure/CLI2/wbin:/c/Program Files/Amazon Corretto/jdk21.0.12_9/bin:/c/Program Files/Eclipse Adoptium/jre-25.0.4.101-hotspot/bin:/c/Program Files (x86)/Common Files/Oracle/Java/java8path:/c/Program Files (x86)/Common Files/Oracle/Java/javapath:/c/Program Files/Eclipse Adoptium/jre-21.0.12.101-hotspot/bin:/c/Program Files/ImageMagick-7.1.2-Q16-HDRI:/c/Python314/Scripts:/c/Python314:/c/Program Files (x86)/oh-my-posh/bin:/c/WINDOWS/system32:/c/WINDOWS:/c/WINDOWS/System32/Wbem:/c/WINDOWS/System32/WindowsPowerShell/v1.0:/c/WINDOWS/System32/OpenSSH:/c/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR:/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/c/ProgramData/chocolatey/bin:/c/Program Files/PuTTY:/c/Program Files/OpenSSH-Win64:/c/Program Files/CMake/bin:/c/Program Files/OpenSSL-Win64/bin:/c/ProgramData/nvm:/c/nvm4w/nodejs:/c/Program Files/dotnet:/c/Program Files/pangolin-cli:/c/Program Files/OpenJDK/jdk-26/bin:/c/Program Files/OpenJDK/jdk-13.0.2/bin:/c/Program Files/Java/jdk1.8.0_211/bin:/c/Android/android-sdk/tools:/c/Android/android-sdk/platform-tools:/c/Android/android-sdk/tools/bin:/c/Program Files/Microsoft SQL Server/170/Tools/Binn:/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn:/c/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit:/c/Program Files (x86)/cloudflared:/c/Program Files/GitHub CLI:/c/Program Files/OpenJDK/jdk-26.0.2.1/bin:/cmd:/c/Program Files/gs/gs10.08.0/bin:/c/Program Files/Amazon/AWSCLIV2:/c/Program Files/WireGuard:/c/Program Files/Docker/Docker/resources/bin:/c/Users/sabus/.herdr/packages/standalone/releases/0.9.1-x86_64-pc-windows-msvc:/c/Users/sabus/.cargo/bin:/c/Users/sabus/AppData/Local/codegraph/current/bin:/c/Users/sabus/AppData/Local/hermes/bin:/c/Users/sabus/.unsloth/studio/bin:/c/Users/sabus/AppData/Local/Programs/Python/Python313/Scripts:/c/Users/sabus/AppData/Local/Programs/Python/Python313:/c/ProgramData/nvm:/c/nvm4w/nodejs:/c/Users/sabus/AppData/Roaming/npm:/c/Users/sabus/AppData/Local/Programs/Python/Python310/Scripts:/c/Users/sabus/AppData/Local/Programs/Python/Python310:/c/Users/sabus/.local/bin:/c/Users/sabus/AppData/Local/agy/bin:/c/Users/sabus/.proto/shims:/c/Users/sabus/.proto/bin:/c/Users/sabus/AppData/Local/Microsoft/WindowsApps:/c/Users/sabus/AppData/Local/Programs/Microsoft VS Code/bin:/c/Users/sabus/AppData/Local/Programs/Microsoft VS Code Insiders/bin:/c/Users/sabus/AppData/Local/Microsoft/WinGet/Links:/c/Users/sabus/.dotnet/tools:/c/tools/dart-sdk/bin:/c/Users/sabus/AppData/Local/Pub/Cache/bin:/c/Users/sabus/AppData/Local/Programs/Ollama:/c/Users/sabus/.lmstudio/bin:/c/Users/sabus/AppData/Local/Programs/Swift/Toolchains/6.3.3+Asserts/usr/bin:/c/Users/sabus/AppData/Local/Programs/Swift/Runtimes/6.3.3/usr/bin:/c/Users/sabus/AppData/Local/pi-node/current:/c/Users/sabus/AppData/Local/PowerToys/DSCModules:/c/Users/sabus/AppData/Local/Nvidia Corporation/Personal AI Router/bin:/c/flutter/bin:/c/Users/sabus/AppData/Local/Unity/bin:/c/Program Files/Lens/resources/cli/bin:/c/Users/sabus/.dotnet/tools:/c/Users/sabus/AppData/Local/Programs/Cua/cua-driver/bin:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/sabus/.claude/plugins/cache/37signals/basecamp/0.9.1/bin:/c/Users/sabus/.claude/plugins/cache/claude-plugins-official/figma/2.2.120/bin:/c/Users/sabus/.openviking/openviking-repo/examples/claude-code-memory-plugin/bin:/c/Users/sabus/.claude/plugins/cache/typesafe-ai/typesafe/0.5.7/bin:/c/Users/sabus/.claude/skills/humanizer/bin:/c/Users/sabus/.claude/plugins/synced/56fa0335-706b-48df-bb46-ea029d3077a7_0e432a7f-14ec-468d-9911-2221539968f9/illustration-tools~g3/bin:/c/Users/sabus/.claude/plugins/synced/56fa0335-706b-48df-bb46-ea029d3077a7_0e432a7f-14ec-468d-9911-2221539968f9/dev-tools~g3/bin:/c/Users/sabus/.claude/plugins/synced/56fa0335-706b-48df-bb46-ea029d3077a7_0e432a7f-14ec-468d-9911-2221539968f9/design~g2/bin:/c/Users/sabus/.claude/plugins/synced/56fa0335-706b-48df-bb46-ea029d3077a7_0e432a7f-14ec-468d-9911-2221539968f9/engineering/bin:/c/Users/sabus/.claude/plugins/synced/56fa0335-706b-48df-bb46-ea029d3077a7_0e432a7f-14ec-468d-9911-2221539968f9/legal~g2/bin:/c/Users/sabus/.claude/plugins/synced/56fa0335-706b-48df-bb46-ea029d3077a7_0e432a7f-14ec-468d-9911-2221539968f9/product-management~g2/bin:/c/Users/sabus/.claude/plugins/synced/56fa0335-706b-48df-bb46-ea029d3077a7_0e432a7f-14ec-468d-9911-2221539968f9/productivity~g2/bin:/c/Users/sabus/.claude/plugins/synced/56fa0335-706b-48df-bb46-ea029d3077a7_0e432a7f-14ec-468d-9911-2221539968f9/marketing~g2/bin:/c/Users/sabus/.claude/plugins/synced/56fa0335-706b-48df-bb46-ea029d3077a7_0e432a7f-14ec-468d-9911-2221539968f9/cowork-plugin-management~g3/bin)
+(exit 1) just not installed
+
+NOTES:
+- Recipes NOT executed: just is not installed on this machine (see which output above); per brief, not installed and setup recipes not run.
+- No pytest/ruff run: the change touches only justfile (no Python code).
+- Windows recipe: no '#' comment added. That recipe is a linewise (non-shebang) recipe; just passes a '#' line to the shell as its own
+  command line and echoes it (the justfile has no 'set ignore-comments'), spawning an extra powershell -Command invocation. PowerShell
+  would treat it as a comment so it would not fail, but it is noisy and diverges from the local style (existing Windows entries carry no comments).
+  The Unix recipe is a #!/usr/bin/env bash shebang recipe, where '#' lines are plain bash comments, matching the neighbouring entries.
+- Line 21 (system_python interpreter selection) unchanged, per research R1.
+
+## Follow-up: TADA comment torch floor (torch>=2.1 -> torch>=2.5.0)
+# Timestamp: 2026-09-23T12:44:24Z
+$ git log --oneline -1
+cd42d4c feat(tts): add the engine capability channel and VoxCPM2 install plumbing (phase 2)
+$ git diff justfile   (vs HEAD cd42d4c, which already contains the voxcpm lines)
+diff --git a/justfile b/justfile
+index 5e998a2..da11d4b 100644
+--- a/justfile
++++ b/justfile
+@@ -66,7 +66,7 @@ setup-python:
+     {{ pip }} install -r {{ backend_dir }}/requirements.txt
+     # Chatterbox pins numpy<1.26 / torch==2.6 which break on Python 3.12+
+     {{ pip }} install --no-deps chatterbox-tts
+-    # HumeAI TADA pins torch>=2.7,<2.8 which conflicts with our torch>=2.1
++    # HumeAI TADA pins torch>=2.7,<2.8 which conflicts with our torch>=2.5.0
+     {{ pip }} install --no-deps hume-tada
+     # F5-TTS causes dependency resolution hell due to gradio/accelerate bounds
+     {{ pip }} install --no-deps 'f5-tts==1.1.21'
+$ git diff --numstat justfile
+1	1	justfile
+$ cmp <(git show HEAD:justfile | sed -n 21p) <(sed -n 21p justfile) && echo "line 21 byte-identical"
+line 21 byte-identical
+- No recipes run (just not installed); no installs; no git writes.

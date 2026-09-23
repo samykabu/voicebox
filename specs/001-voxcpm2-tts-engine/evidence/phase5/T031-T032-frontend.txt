@@ -1,0 +1,299 @@
+# T031/T032 frontend. Generated 2026-09-23T17:41:31+03:00
+Base: HEAD 60cd4fe. Test file: copy of evidence/phase4/T028-capability-logic.test.ts in <scratchpad>/t031/, with T031/T032 cases added (final copy: T031-T032-capability-logic.test.ts).
+
+## 0. Audit of the Phase 3 behaviour against T031/T032 and quickstart Step 5 items 3-4
+- An unavailable engine stays listed and disabled (isEngineSelectable). Already done in Phase 3.
+- Gap: a disabled item's reason was not readable. The SelectItem's data-[disabled]:opacity-50 dimmed the 10px reason line to half opacity. Fix: the item overrides it with data-[disabled]:opacity-100, and only the label is dimmed (opacity-50), so the reason shows at full opacity.
+- Gap: an unavailable engine with no `reason` showed nothing in the list. Fix: engineNotice falls back to "<display_name> can't run on this machine."
+- Gap: the warning showed only under the selector for the selected engine, not in the list for an available engine. Fix: each list item shows engineNotice (the reason in muted text, a warning in amber). The selected-engine line under the selector uses the same helper.
+- A previously selected engine that becomes unavailable stays selected. It is not auto-switched, so the user sees why. The reason shows under the selector. handleSubmit in useGenerationForm (Phase 3) already refuses with a toast whose description is capability.reason.
+- Gap: when the selected engine did not fit the chosen profile, the auto-fallback picked availableOptions[0] even if that engine was unavailable. Fix: it prefers the first selectable option.
+- Backend 400 detail: the generate path already surfaces it, so no change was needed in FloatingGenerateBox or useGenerationForm.
+  - apiClient.request throws new Error(formatErrorDetail(error.detail, ...)), and a string detail is passed through as is (client.ts lines 58-59, 89-94).
+  - generateSpeech, retryGeneration and regenerateGeneration all use request().
+  - useGenerationForm's catch shows toast "Generation failed" with error.message.
+  - HistoryTable handleRetry and handleRegenerate show error.message.
+  - So the resolver's reason from the new 400 reaches the user verbatim.
+- T032, pre-download warning:
+  - DownloadConfirmationDetails now carries `warning`, and DownloadConfirmDialog shows it in amber. The Download button stays enabled (advisory, C1Q4).
+  - Because useGenerationForm builds the same details, the /generate-triggered confirmation also shows it, with no change to that file.
+  - The ModelManagement detail view shows engineNotice (the warning, or the reason) with an AlertTriangle, above the actions, before Download. It never disables anything.
+- T032 decision on the model list: no warning in the list rows.
+  - In ModelManagement a download can start only from the detail view's Download or Retry button. The list rows open the detail view and have no download action, verified by grep: handleDownload is called only at the two detail-view buttons.
+  - So an engine with a warning but no confirmation requirement still shows its warning in the detail view before its Download button. That satisfies "before the download starts" without cluttering the list.
+
+## 1. RED run 1 (no engineNotice export yet)
+timestamp 2026-09-23T17:38:49+03:00
+$ bun test <scratchpad>/t031/capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/t031/red.xml
+bun test v1.4.2 (744846f84)
+
+C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\t031\capability-logic.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'engineNotice' not found in module 'D:/Projects/Personal/voicebox/app/src/lib/hooks/engineCapabilityRules.ts'.
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [18.00ms]
+exit=1
+(Module load failed, so no test ran and bun wrote no XML. The failure is the missing export, as intended.)
+
+## 2. RED run 2 (engineNotice implemented; the warning not yet in downloadConfirmationDetails), timestamp 2026-09-23T17:39:03+03:00
+$ bun test <scratchpad>/t031/capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/t031/red2.xml
+error: expect(received).toBe(expected)
+Expected: "This machine has about 4 GB of graphics memory. Engine Under Test usually needs about 8 GB, so generation may fail."
+Received: undefined
+(fail) T032 downloadConfirmationDetails warning > the capability warning is included in the confirmation details [0.45ms]
+ 31 pass
+ 1 fail
+Ran 32 tests across 1 file. [23.00ms]
+exit=1
+### counts from red2.xml
+capability-logic.test.ts: tests=32 failures=1 skipped=0
+T020 getLanguageOptionsForEngine: tests=6 failures=0 skipped=0
+T019 isEngineSelectable: tests=2 failures=0 skipped=0
+T022 needsDownloadConfirmation: tests=3 failures=0 skipped=0
+T023 buildAdvancedSettingsPayload: tests=5 failures=0 skipped=0
+T023 advancedSettingStep: tests=1 failures=0 skipped=0
+T028 supportsCloning: tests=4 failures=0 skipped=0
+T028 declaredCloningEngineOptions: tests=3 failures=0 skipped=0
+T031 engineNotice: tests=5 failures=0 skipped=0
+T032 downloadConfirmationDetails warning: tests=3 failures=1 skipped=0
+
+## 3. GREEN run, timestamp 2026-09-23T17:39:17+03:00
+$ bun test <scratchpad>/t031/capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/t031/green.xml   (saved as T031-T032-fe.xml)
+bun test v1.4.2 (744846f84)
+
+ 32 pass
+ 0 fail
+ 138 expect() calls
+Ran 32 tests across 1 file. [23.00ms]
+exit=0
+### counts from T031-T032-fe.xml
+capability-logic.test.ts: tests=32 failures=0 skipped=0
+T020 getLanguageOptionsForEngine: tests=6 failures=0 skipped=0
+T019 isEngineSelectable: tests=2 failures=0 skipped=0
+T022 needsDownloadConfirmation: tests=3 failures=0 skipped=0
+T023 buildAdvancedSettingsPayload: tests=5 failures=0 skipped=0
+T023 advancedSettingStep: tests=1 failures=0 skipped=0
+T028 supportsCloning: tests=4 failures=0 skipped=0
+T028 declaredCloningEngineOptions: tests=3 failures=0 skipped=0
+T031 engineNotice: tests=5 failures=0 skipped=0
+T032 downloadConfirmationDetails warning: tests=3 failures=0 skipped=0
+
+## 4. Diff of the owned files
+diff --git a/app/src/components/Generation/DownloadConfirmDialog.tsx b/app/src/components/Generation/DownloadConfirmDialog.tsx
+index 4812aea..0a4edb5 100644
+--- a/app/src/components/Generation/DownloadConfirmDialog.tsx
++++ b/app/src/components/Generation/DownloadConfirmDialog.tsx
+@@ -23,7 +23,8 @@ interface DownloadConfirmDialogProps {
+ 
+ /**
+  * Asks before starting a model download for engines whose capability sets
+- * `requires_download_confirmation` (FR-018, C1Q7), showing the declared download size.
++ * `requires_download_confirmation` (FR-018, C1Q7), showing the declared download size and
++ * any capability warning, such as too little memory (C1Q4), without blocking the download.
+  */
+ export function DownloadConfirmDialog({
+   details,
+@@ -61,6 +62,10 @@ export function DownloadConfirmDialog({
+                 }`
+               : null}
+           </AlertDialogDescription>
++          {/* C1Q4: advisory only; Download stays enabled. */}
++          {details?.warning ? (
++            <p className="text-sm text-amber-600 dark:text-amber-400">{details.warning}</p>
++          ) : null}
+         </AlertDialogHeader>
+         <AlertDialogFooter>
+           <AlertDialogCancel>Cancel</AlertDialogCancel>
+diff --git a/app/src/components/Generation/EngineModelSelector.tsx b/app/src/components/Generation/EngineModelSelector.tsx
+index c5a7d83..bceeba5 100644
+--- a/app/src/components/Generation/EngineModelSelector.tsx
++++ b/app/src/components/Generation/EngineModelSelector.tsx
+@@ -18,9 +18,14 @@ import {
+   isHabibiModelId,
+ } from '@/lib/constants/habibiModels';
+ import { getLanguageOptionsForEngine } from '@/lib/constants/languages';
+-import { isEngineSelectable, supportsCloning } from '@/lib/hooks/engineCapabilityRules';
++import {
++  engineNotice,
++  isEngineSelectable,
++  supportsCloning,
++} from '@/lib/hooks/engineCapabilityRules';
+ import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
+ import type { GenerationFormValues } from '@/lib/hooks/useGenerationForm';
++import { cn } from '@/lib/utils/cn';
+ 
+ /**
+  * Engine/model options and their display metadata.
+@@ -167,12 +172,10 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
+   const selectedHabibiModel = engine === 'f5_tts' ? getHabibiModel(modelSize) : null;
+   const selectedCapability = findEngineCapability(capabilities, engine);
+   // FR-003 / C1Q3: an engine this machine cannot run stays listed, greyed out, with the
+-  // backend's reason. A warning is advisory only and never disables anything.
+-  const selectedNotice = selectedCapability
+-    ? !isEngineSelectable(selectedCapability)
+-      ? selectedCapability.reason
+-      : selectedCapability.warning
+-    : null;
++  // backend's reason. A warning is advisory only and never disables anything. An engine
++  // that was selected and has since become unavailable stays selected with its reason;
++  // generating with it is refused with that reason (useGenerationForm).
++  const selectedNotice = engineNotice(selectedCapability)?.text;
+ 
+   const currentEngineAvailable = availableOptions.some((opt) => opt.value === selectValue);
+ 
+@@ -189,7 +192,12 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
+ 
+   useEffect(() => {
+     if (!currentEngineAvailable && availableOptions.length > 0) {
+-      applyEngineSelection(form, availableOptions[0].value, capabilities);
++      // Prefer an engine this machine can run; the list order is otherwise kept.
++      const fallback =
++        availableOptions.find((opt) =>
++          isEngineSelectable(findEngineCapability(capabilities, opt.engine)),
++        ) ?? availableOptions[0];
++      applyEngineSelection(form, fallback.value, capabilities);
+     }
+   }, [availableOptions, currentEngineAvailable, form, capabilities]);
+ 
+@@ -213,17 +221,26 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
+           {availableOptions.map((opt) => {
+             const capability = findEngineCapability(capabilities, opt.engine);
+             const selectable = isEngineSelectable(capability);
++            const notice = engineNotice(capability);
+             return (
+               <SelectItem
+                 key={opt.value}
+                 value={opt.value}
+-                className={itemClass}
++                // Only the label is greyed out, so a disabled engine's reason stays readable.
++                className={cn(itemClass, 'data-[disabled]:opacity-100')}
+                 disabled={!selectable}
+               >
+-                {opt.label}
+-                {!selectable && capability?.reason ? (
+-                  <span className="block text-[10px] text-muted-foreground">
+-                    {capability.reason}
++                <span className={selectable ? undefined : 'opacity-50'}>{opt.label}</span>
++                {notice ? (
++                  <span
++                    className={cn(
++                      'block text-[10px]',
++                      notice.kind === 'reason'
++                        ? 'text-muted-foreground'
++                        : 'text-amber-600 dark:text-amber-400',
++                    )}
++                  >
++                    {notice.text}
+                   </span>
+                 ) : null}
+               </SelectItem>
+diff --git a/app/src/components/ServerSettings/ModelManagement.tsx b/app/src/components/ServerSettings/ModelManagement.tsx
+index f71714b..b153145 100644
+--- a/app/src/components/ServerSettings/ModelManagement.tsx
++++ b/app/src/components/ServerSettings/ModelManagement.tsx
+@@ -1,5 +1,6 @@
+ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+ import {
++  AlertTriangle,
+   ChevronDown,
+   ChevronRight,
+   ChevronUp,
+@@ -51,6 +52,7 @@ import {
+ import {
+   type DownloadConfirmationDetails,
+   downloadConfirmationDetails,
++  engineNotice,
+   needsDownloadConfirmation,
+ } from '@/lib/hooks/engineCapabilityRules';
+ import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
+@@ -502,6 +504,7 @@ export function ModelManagement() {
+   const selectedCapability = freshSelectedModel
+     ? getModelCapability(freshSelectedModel.model_name)
+     : undefined;
++  const selectedNotice = engineNotice(selectedCapability);
+ 
+   return (
+     <div className="flex flex-col h-full">
+@@ -886,6 +889,15 @@ export function ModelManagement() {
+                   </div>
+                 )}
+ 
++                {/* FR-003 / C1Q4: why the engine cannot run here, or an advisory warning
++                    (for example too little memory) shown before Download. Never blocks it. */}
++                {selectedNotice && (
++                  <div className="flex items-start gap-2 text-xs text-amber-600 dark:text-amber-400">
++                    <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
++                    <span>{selectedNotice.text}</span>
++                  </div>
++                )}
++
+                 {/* Disk size */}
+                 {freshSelectedModel.downloaded && freshSelectedModel.size_mb && (
+                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
+diff --git a/app/src/lib/hooks/engineCapabilityRules.ts b/app/src/lib/hooks/engineCapabilityRules.ts
+index 3646a20..7757684 100644
+--- a/app/src/lib/hooks/engineCapabilityRules.ts
++++ b/app/src/lib/hooks/engineCapabilityRules.ts
+@@ -15,6 +15,31 @@ export function isEngineSelectable(capability: EngineCapabilityResponse | undefi
+   return capability ? capability.available : true;
+ }
+ 
++/** A line shown next to an engine: why it cannot run, or an advisory warning. */
++export interface EngineNotice {
++  kind: 'reason' | 'warning';
++  text: string;
++}
++
++/**
++ * What to show next to an engine (FR-003, C1Q3, C1Q4). An unavailable engine shows its
++ * `reason`, falling back to a sentence built from its display name so a greyed-out engine
++ * always explains itself; an available engine shows its `warning`. A warning is advisory
++ * only: it never changes `isEngineSelectable`.
++ */
++export function engineNotice(
++  capability: EngineCapabilityResponse | undefined,
++): EngineNotice | null {
++  if (!capability) return null;
++  if (!capability.available) {
++    return {
++      kind: 'reason',
++      text: capability.reason || `${capability.display_name} can't run on this machine.`,
++    };
++  }
++  return capability.warning ? { kind: 'warning', text: capability.warning } : null;
++}
++
+ /**
+  * Whether a cloned (reference-audio) profile can be used with this engine (FR-011, FR-014).
+  *
+@@ -62,9 +87,14 @@ export interface DownloadConfirmationDetails {
+   sizeMb: number;
+   licenseId?: string | null;
+   commercialUse?: boolean | null;
++  /** Advisory only, for example too little memory (C1Q4). Never blocks the download. */
++  warning?: string | null;
+ }
+ 
+-/** Confirmation details for an engine's default download (FR-018: size, FR-005: licence). */
++/**
++ * Confirmation details for an engine's default download (FR-018: size, FR-005: licence,
++ * C1Q4: advisory warning).
++ */
+ export function downloadConfirmationDetails(
+   capability: EngineCapabilityResponse,
+   displayName?: string,
+@@ -74,6 +104,7 @@ export function downloadConfirmationDetails(
+     sizeMb: capability.size_mb,
+     licenseId: capability.license_id,
+     commercialUse: capability.commercial_use,
++    warning: capability.warning,
+   };
+ }
+ 

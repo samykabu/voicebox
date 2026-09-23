@@ -1,0 +1,158 @@
+# A3 SUMMARY: exclude generated openapi-typescript-codegen client from Biome
+# Generated: 2026-09-23T13:11:27Z   Biome 2.3.12   bun 1.4.2
+# Full outputs: A3-biome-before.txt, A3-biome-after.txt (same directory)
+
+## 1. Totals, bun run check (biome check .)
+                  BEFORE   AFTER
+  files checked      697     515   (-182 = 181 files under core/models/schemas/services + index.ts)
+  errors             667     479
+  warnings           349     253
+  infos                7       5
+  exit code            1       1   (still 1 because of existing errors outside app/src/lib/api; expected)
+
+## 2. Diagnostics under app/src/lib/api/ (from --reporter=github --max-diagnostics=none)
+                                             BEFORE (err/warn/info)   AFTER (err/warn/info)
+  generated: core/ models/ schemas/ services/     187 / 96 / 2         0 / 0 / 0  (excluded)
+  generated: index.ts                               1 /  0 / 0         0 / 0 / 0  (excluded)
+  hand-written: client.ts                           2 /  0 / 0         2 / 0 / 0  (still checked)
+  hand-written: types.ts                            1 /  0 / 0         1 / 0 / 0  (still checked)
+
+  Raw group counts BEFORE:
+    TOTAL error: 667
+    TOTAL notice: 7
+    TOTAL warning: 349
+    api-generated-dirs error: 187
+    api-generated-dirs notice: 2
+    api-generated-dirs warning: 96
+    api-handwritten(app/src/lib/api/client.ts) error: 2
+    api-handwritten(app/src/lib/api/types.ts) error: 1
+    api-index.ts error: 1
+    outside-api error: 476
+    outside-api notice: 5
+    outside-api warning: 253
+  Raw group counts AFTER:
+    TOTAL error: 479
+    TOTAL notice: 5
+    TOTAL warning: 253
+    api-handwritten(app/src/lib/api/client.ts) error: 2
+    api-handwritten(app/src/lib/api/types.ts) error: 1
+    outside-api error: 476
+    outside-api notice: 5
+    outside-api warning: 253
+
+  Hand-written diagnostics BEFORE:
+    ::error title=assist/source/organizeImports,file=app/src/lib/api/client.ts,line=1,endLine=1,col=1,endColumn=63::The imports and exports are not sorted.
+    ::error title=format,file=app/src/lib/api/client.ts,line=1,endLine=1,col=2,endColumn=2::Formatter would have printed the following content:
+    ::error title=format,file=app/src/lib/api/types.ts,line=1,endLine=1,col=2,endColumn=2::Formatter would have printed the following content:
+  Hand-written diagnostics AFTER:
+    ::error title=assist/source/organizeImports,file=app/src/lib/api/client.ts,line=1,endLine=1,col=1,endColumn=63::The imports and exports are not sorted.
+    ::error title=format,file=app/src/lib/api/client.ts,line=1,endLine=1,col=2,endColumn=2::Formatter would have printed the following content:
+    ::error title=format,file=app/src/lib/api/types.ts,line=1,endLine=1,col=2,endColumn=2::Formatter would have printed the following content:
+
+## 3. Proof: hand-written files are still checked; generated files are ignored
+$ bunx biome check app/src/lib/api/types.ts app/src/lib/api/client.ts --reporter=summary
+    reporter/format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      i The following files need to be formatted:
+      - app\src\lib\api\client.ts
+      - app\src\lib\api\types.ts
+    reporter/violations ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      i Some lint rules or assist actions reported some violations.
+      i The following files have violations:
+      - app\src\lib\api\client.ts (1 error)
+      i The following lint rules have violations:
+      Rule Name                                   Diagnostics
+      assist/source/organizeImports               1 (1 error)
+    Checked 2 files in 14ms. No fixes applied.
+    Found 3 errors.
+    check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      × Some errors were emitted while running checks.
+    (exit code: 1)
+
+$ bunx biome check app/src/lib/api --reporter=summary
+    reporter/format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      i The following files need to be formatted:
+      - app\src\lib\api\client.ts
+      - app\src\lib\api\types.ts
+    reporter/violations ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      i Some lint rules or assist actions reported some violations.
+      i The following files have violations:
+      - app\src\lib\api\client.ts (1 error)
+      i The following lint rules have violations:
+      Rule Name                                   Diagnostics
+      assist/source/organizeImports               1 (1 error)
+    Checked 2 files in 15ms. No fixes applied.
+    Found 3 errors.
+    check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      × Some errors were emitted while running checks.
+    (exit code: 1)
+
+$ bunx biome check app/src/lib/api/models/EngineCapabilityResponse.ts --reporter=summary
+    Checked 0 files in 2ms. No fixes applied.
+    check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      × No files were processed in the specified paths.
+      i Check your biome.json or biome.jsonc to ensure the paths are not ignored by the configuration.
+      i These paths were provided but ignored:
+      - app/src/lib/api/models/EngineCapabilityResponse.ts
+    (exit code: 1)
+
+$ bunx biome check app/src/lib/api/core/request.ts --reporter=summary
+    Checked 0 files in 2ms. No fixes applied.
+    check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      × No files were processed in the specified paths.
+      i Check your biome.json or biome.jsonc to ensure the paths are not ignored by the configuration.
+      i These paths were provided but ignored:
+      - app/src/lib/api/core/request.ts
+    (exit code: 1)
+
+$ bunx biome check app/src/lib/api/index.ts --reporter=summary
+    Checked 0 files in 2ms. No fixes applied.
+    check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      × No files were processed in the specified paths.
+      i Check your biome.json or biome.jsonc to ensure the paths are not ignored by the configuration.
+      i These paths were provided but ignored:
+      - app/src/lib/api/index.ts
+    (exit code: 1)
+
+## 4. git diff biome.json
+diff --git a/biome.json b/biome.json
+index 45f2a24..d32ea56 100644
+--- a/biome.json
++++ b/biome.json
+@@ -5,6 +5,16 @@
+     "clientKind": "git",
+     "useIgnoreFile": true
+   },
++  "files": {
++    "includes": [
++      "**",
++      "!app/src/lib/api/core",
++      "!app/src/lib/api/models",
++      "!app/src/lib/api/schemas",
++      "!app/src/lib/api/services",
++      "!app/src/lib/api/index.ts"
++    ]
++  },
+   "formatter": {
+     "enabled": true,
+     "indentStyle": "space",
+
+## 5. Checked status outside the generated directories is unchanged
+  Every diagnostic line (github reporter, sorted) for paths NOT under app/src/lib/api/:
+    BEFORE: 734 lines   AFTER: 734 lines
+    Result: byte-for-byte IDENTICAL (476 errors / 253 warnings / 5 infos before and after)
+  Hand-written app/src/lib/api/{types,client}.ts diagnostics are identical before/after (see section 2).
+  The only paths that changed checked status are app/src/lib/api/{core,models,schemas,services}/** and app/src/lib/api/index.ts.
+  Note: biome.json itself carries a pre-existing 'format' diagnostic (CRLF working copy via core.autocrlf=true; index is LF);
+  it is present both before and after and is part of the identical outside-api set.
+
+## 6. Decision on app/src/lib/api/index.ts
+  EXCLUDED. Its header reads '/* generated using openapi-typescript-codegen -- do not edit */', and
+  scripts/generate-api.sh runs codegen with '--output src/lib/api', which rewrites index.ts on every
+  regeneration. Its only diagnostic (organizeImports) could only be fixed by a hand edit that the next
+  'just generate-api' overwrites. It is excluded as an exact file path, so sibling hand-written files
+  (types.ts, client.ts) are unaffected.
+
+## 7. Glob semantics (verified empirically on Biome 2.3.12)
+  files.includes = ["**", "!<dir>", ...]: a negated folder path with no trailing '/**' excludes the whole
+  folder (section 3 shows 'Checked 0 files ... These paths were provided but ignored'). Single '!' was used
+  (ignored for lint/format), not '!!' (which would also drop the files from the project index).

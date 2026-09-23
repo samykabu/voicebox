@@ -1,0 +1,98 @@
+# timestamp: 2026-09-23T01:42:59+03:00
+$ nvidia-smi
+Wed Sep 23 01:42:59 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 616.56                 KMD Version: 616.56        CUDA UMD Version: 13.4     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                  Driver-Model | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070      WDDM  |   00000000:02:00.0  On |                  N/A |
+|  0%   33C    P8              1W /  250W |     414MiB /  12227MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA GeForce RTX 5060 Ti   WDDM  |   00000000:04:00.0  On |                  N/A |
+|  0%   35C    P8              7W /  180W |    3036MiB /  16311MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A            4076    C+G   ...yApp\MicrosoftSecurityApp.exe      N/A      |
+|    0   N/A  N/A           12112    C+G   ...4__8wekyb3d8bbwe\ms-teams.exe      N/A      |
+|    0   N/A  N/A           15556    C+G   C:\Windows\explorer.exe               N/A      |
+|    0   N/A  N/A           22664    C+G   ...Local\PowerToys\PowerToys.exe      N/A      |
+|    0   N/A  N/A           24144    C+G   ...s\PowerToys.ColorPickerUI.exe      N/A      |
+|    0   N/A  N/A           26752    C+G   ...s\PowerToys.PowerLauncher.exe      N/A      |
+|    0   N/A  N/A           47252    C+G   ...1g1gvanyjgm\WhatsApp.Root.exe      N/A      |
+|    0   N/A  N/A          125344    C+G   ...2p2nqsd0c76g0\app\ChatGPT.exe      N/A      |
+|    0   N/A  N/A          180228    C+G   ...4__8wekyb3d8bbwe\ms-teams.exe      N/A      |
+|    1   N/A  N/A            1992    C+G   ....0.4234.32\msedgewebview2.exe      N/A      |
+|    1   N/A  N/A            2416    C+G   ...8wekyb3d8bbwe\M365Copilot.exe      N/A      |
+|    1   N/A  N/A            4076    C+G   ...yApp\MicrosoftSecurityApp.exe      N/A      |
+|    1   N/A  N/A            8744    C+G   ...ms\Microsoft VS Code\Code.exe      N/A      |
+|    1   N/A  N/A           12112    C+G   ...4__8wekyb3d8bbwe\ms-teams.exe      N/A      |
+|    1   N/A  N/A           13620    C+G   ...5n1h2txyewy\TextInputHost.exe      N/A      |
+|    1   N/A  N/A           13828    C+G   ....0.4234.32\msedgewebview2.exe      N/A      |
+|    1   N/A  N/A           15556    C+G   C:\Windows\explorer.exe               N/A      |
+|    1   N/A  N/A           15992    C+G   ...2txyewy\CrossDeviceResume.exe      N/A      |
+|    1   N/A  N/A           17676    C+G   ..._cw5n1h2txyewy\SearchHost.exe      N/A      |
+|    1   N/A  N/A           17700    C+G   ...y\StartMenuExperienceHost.exe      N/A      |
+|    1   N/A  N/A           21312    C+G   ...ayRenderer-Win64-Shipping.exe      N/A      |
+|    1   N/A  N/A           21652    C+G   ...\codex-computer-use-swift.exe      N/A      |
+|    1   N/A  N/A           22588    C+G   ...UI3Apps\PowerToys.Peek.UI.exe      N/A      |
+|    1   N/A  N/A           22664    C+G   ...Local\PowerToys\PowerToys.exe      N/A      |
+|    1   N/A  N/A           23632    C+G   ...pps\PowerToys.QuickAccess.exe      N/A      |
+|    1   N/A  N/A           24144    C+G   ...s\PowerToys.ColorPickerUI.exe      N/A      |
+|    1   N/A  N/A           24336    C+G   ...m Files\Basecamp\Basecamp.exe      N/A      |
+|    1   N/A  N/A           24780    C+G   ...s\PowerToys.AdvancedPaste.exe      N/A      |
+|    1   N/A  N/A           25944    C+G   ...Toys\PowerToys.FancyZones.exe      N/A      |
+|    1   N/A  N/A           25956    C+G   ...8bbwe\Microsoft.CmdPal.UI.exe      N/A      |
+|    1   N/A  N/A           26716    C+G   ...t\Edge\Application\msedge.exe      N/A      |
+|    1   N/A  N/A           26728    C+G   ...ps\PowerToys.PowerDisplay.exe      N/A      |
+|    1   N/A  N/A           26752    C+G   ...s\PowerToys.PowerLauncher.exe      N/A      |
+|    1   N/A  N/A           27036    C+G   ...s\PowerToys.ShortcutGuide.exe      N/A      |
+|    1   N/A  N/A           37160    C+G   ....0.4234.32\msedgewebview2.exe      N/A      |
+|    1   N/A  N/A           43952    C+G   ....0.4234.48\msedgewebview2.exe      N/A      |
+|    1   N/A  N/A           45736    C+G   ... Insiders\Code - Insiders.exe      N/A      |
+|    1   N/A  N/A           47252    C+G   ...1g1gvanyjgm\WhatsApp.Root.exe      N/A      |
+|    1   N/A  N/A           48248    C+G   ...4__8wekyb3d8bbwe\ms-teams.exe      N/A      |
+|    1   N/A  N/A           49300    C+G   ....0.4234.32\msedgewebview2.exe      N/A      |
+|    1   N/A  N/A           50300    C+G   ...ntrolPanel\SystemSettings.exe      N/A      |
+|    1   N/A  N/A           51800    C+G   ...xyewy\ShellExperienceHost.exe      N/A      |
+|    1   N/A  N/A           53332    C+G   ...spp7mzn01xr\TinyClips.App.exe      N/A      |
+|    1   N/A  N/A           55916    C+G   ....0.4234.32\msedgewebview2.exe      N/A      |
+|    1   N/A  N/A           57980    C+G   ...s\Win64\EpicGamesLauncher.exe      N/A      |
+|    1   N/A  N/A           61544    C+G   ...em32\ApplicationFrameHost.exe      N/A      |
+|    1   N/A  N/A           61936    C+G   ...r\frontend\Docker Desktop.exe      N/A      |
+|    1   N/A  N/A           63392    C+G   ....0.4234.32\msedgewebview2.exe      N/A      |
+|    1   N/A  N/A           77516    C+G   ....0.4234.32\msedgewebview2.exe      N/A      |
+|    1   N/A  N/A           95532    C+G   ...SnippingTool\SnippingTool.exe      N/A      |
+|    1   N/A  N/A          103516    C+G   ...m Files\Obsidian\Obsidian.exe      N/A      |
+|    1   N/A  N/A          107604    C+G   ...8bbwe\PhoneExperienceHost.exe      N/A      |
+|    1   N/A  N/A          109968    C+G   ...yb3d8bbwe\WindowsTerminal.exe      N/A      |
+|    1   N/A  N/A          113752    C+G   ...n1h2txyewy\CHXSmartScreen.exe      N/A      |
+|    1   N/A  N/A          125344    C+G   ...2p2nqsd0c76g0\app\ChatGPT.exe      N/A      |
+|    1   N/A  N/A          128212    C+G   ...bwe\YourPhoneAppProxyHost.exe      N/A      |
+|    1   N/A  N/A          137944    C+G   ...aries\Win64\EpicWebHelper.exe      N/A      |
+|    1   N/A  N/A          141972    C+G   ...crosoft OneDrive\OneDrive.exe      N/A      |
+|    1   N/A  N/A          165980    C+G   ...rograms\UniGetUI\UniGetUI.exe      N/A      |
+|    1   N/A  N/A          172680    C+G   ...App_cw5n1h2txyewy\LockApp.exe      N/A      |
+|    1   N/A  N/A          180228    C+G   ...4__8wekyb3d8bbwe\ms-teams.exe      N/A      |
+|    1   N/A  N/A          181204    C+G   ...IA App\CEF\NVIDIA Overlay.exe      N/A      |
+|    1   N/A  N/A          184156    C+G   ...IA App\CEF\NVIDIA Overlay.exe      N/A      |
+|    1   N/A  N/A          190900    C+G   ..._pzs8sxrjxfjjc\app\claude.exe      N/A      |
+|    1   N/A  N/A          219020    C+G   ...indows\System32\ShellHost.exe      N/A      |
+|    1   N/A  N/A          223072    C+G   ..._pzs8sxrjxfjjc\app\claude.exe      N/A      |
+|    1   N/A  N/A          228360    C+G   ...2p2nqsd0c76g0\app\ChatGPT.exe      N/A      |
+|    1   N/A  N/A          230172    C+G   ...m Files\RustDesk\RustDesk.exe      N/A      |
+|    1   N/A  N/A          231352    C+G   ...x64__dt26b99r8h8gj\RtkUWP.exe      N/A      |
++-----------------------------------------------------------------------------------------+
+
+name, memory.total [MiB], driver_version
+NVIDIA GeForce RTX 5070, 12227 MiB, 616.56
+NVIDIA GeForce RTX 5060 Ti, 16311 MiB, 616.56

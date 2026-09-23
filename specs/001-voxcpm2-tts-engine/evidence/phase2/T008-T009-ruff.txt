@@ -1,0 +1,73 @@
+# T008-T009 ruff (ruff ruff 0.16.8); timestamp: 2026-09-23T03:26:17+03:00; cwd D:/Projects/Personal/voicebox
+# Note: an earlier unrecorded pass found PT018 in the test and 7 new UP045 (Optional[...]) in the new base.py code; both fixed before this run.
+
+$ ruff check --config backend/pyproject.toml backend/tests/test_engine_capabilities.py
+All checks passed!
+# exit 0
+
+$ ruff format --check --config backend/pyproject.toml backend/tests/test_engine_capabilities.py backend/backends/base.py
+2 files already formatted
+# exit 0
+
+$ ruff check --config backend/pyproject.toml --statistics backend/backends/__init__.py   (WORKTREE)
+14	UP045 	[*] non-pep604-annotation-optional
+ 5	UP006 	[*] non-pep585-annotation
+ 4	I001  	[*] unsorted-imports
+ 2	UP035 	[ ] deprecated-import
+ 1	ERA001	[ ] commented-out-code
+ 1	E402  	[ ] module-import-not-at-top-of-file
+ 1	RUF100	[*] unused-noqa
+Found 28 errors.
+[*] 24 fixable with the `--fix` option.
+# exit 1
+
+$ git show HEAD:backend/backends/__init__.py | ruff check --config backend/pyproject.toml --statistics --stdin-filename backend/backends/__init__.py -   (HEAD)
+14	UP045 	[*] non-pep604-annotation-optional
+ 5	UP006 	[*] non-pep585-annotation
+ 4	I001  	[*] unsorted-imports
+ 2	UP035 	[ ] deprecated-import
+ 1	ERA001	[ ] commented-out-code
+ 1	E402  	[ ] module-import-not-at-top-of-file
+ 1	RUF100	[*] unused-noqa
+Found 28 errors.
+[*] 24 fixable with the `--fix` option.
+# exit 1
+
+$ ruff format --check --config backend/pyproject.toml backend/backends/__init__.py   (WORKTREE)
+unformatted: File would be reformatted
+   --> backend\backends\__init__.py:213:36
+1 file would be reformatted
+
+$ git show HEAD:backend/backends/__init__.py | ruff format --check --config backend/pyproject.toml --stdin-filename backend/backends/__init__.py -   (HEAD)
+
+$ ruff check --config backend/pyproject.toml --statistics backend/backends/base.py   (WORKTREE)
+4	UP045 	[*] non-pep604-annotation-optional
+3	UP035 	[-] deprecated-import
+3	UP006 	[*] non-pep585-annotation
+1	SIM102	[ ] collapsible-if
+1	I001  	[*] unsorted-imports
+1	F401  	[*] unused-import
+Found 13 errors.
+[*] 10 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).
+# exit 1
+
+$ git show HEAD:backend/backends/base.py | ruff check --config backend/pyproject.toml --statistics --stdin-filename backend/backends/base.py -   (HEAD)
+4	UP045 	[*] non-pep604-annotation-optional
+3	UP035 	[-] deprecated-import
+3	UP006 	[*] non-pep585-annotation
+1	SIM102	[ ] collapsible-if
+1	I001  	[*] unsorted-imports
+1	F401  	[*] unused-import
+Found 13 errors.
+[*] 10 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).
+# exit 1
+
+$ ruff format --check --config backend/pyproject.toml backend/backends/base.py   (WORKTREE)
+1 file already formatted
+
+$ git show HEAD:backend/backends/base.py | ruff format --check --config backend/pyproject.toml --stdin-filename backend/backends/base.py -   (HEAD)
+
+# Verdict: new files clean (check + format). backend/backends/__init__.py: 28 findings in both HEAD and worktree (same rule counts), format diff at lines unrelated to this change (pre-existing, HEAD also unformatted) -> 0 new. backend/backends/base.py: 13 findings in both HEAD and worktree (same counts), formatted -> 0 new.
+
+$ git show HEAD:backend/backends/__init__.py | ruff format --check --config backend/pyproject.toml --stdin-filename backend/backends/__init__.py -  (HEAD, full output)
+# exit 1

@@ -1,0 +1,114 @@
+# T042 start the frozen binary and confirm VoxCPM2 is registered
+# started 2026-09-23T19:02:11.952253+03:00
+$ D:\Projects\Personal\voicebox\backend\dist\voicebox-server.exe --host 127.0.0.1 --port 17593 --data-dir C:\Users\sabus\AppData\Local\Temp\voicebox-t042-b52nujsj --parent-pid 27260
+# env: HF cache = default (C:/Users/sabus/.cache/huggingface/hub); no HF_*/VOICEBOX_* vars set
+# healthy after 23.5s
+
+## GET /health
+{
+  "status": "healthy",
+  "version": "0.5.4",
+  "model_loaded": false,
+  "model_downloaded": true,
+  "model_size": null,
+  "gpu_available": false,
+  "gpu_type": null,
+  "vram_used_mb": null,
+  "backend_type": "pytorch",
+  "backend_variant": "cpu",
+  "supports_rocm": false,
+  "gpu_compatibility_warning": null
+}
+
+## GET /models/engines -> 200
+### voxcpm entry
+[
+  {
+    "engine": "voxcpm",
+    "display_name": "VoxCPM2",
+    "available": true,
+    "reason": null,
+    "warning": null,
+    "supported_accelerators": [
+      "cuda",
+      "mps",
+      "cpu"
+    ],
+    "detected_accelerator": "cpu",
+    "languages": [
+      "zh",
+      "en",
+      "ar",
+      "my",
+      "da",
+      "nl",
+      "fi",
+      "fr",
+      "de",
+      "el",
+      "he",
+      "hi",
+      "id",
+      "it",
+      "ja",
+      "km",
+      "ko",
+      "lo",
+      "ms",
+      "no",
+      "pl",
+      "pt",
+      "ru",
+      "es",
+      "sw",
+      "sv",
+      "tl",
+      "th",
+      "tr",
+      "vi"
+    ],
+    "supports_cloning": true,
+    "supports_voice_design": true,
+    "requires_download_confirmation": true,
+    "advanced_settings": [
+      {
+        "name": "cfg_value",
+        "label": "Guidance",
+        "default": 2.0,
+        "min": 1.0,
+        "max": 3.0
+      },
+      {
+        "name": "inference_timesteps",
+        "label": "Quality steps",
+        "default": 10.0,
+        "min": 4.0,
+        "max": 30.0
+      }
+    ],
+    "size_mb": 4961,
+    "license_id": "Apache-2.0",
+    "commercial_use": true
+  }
+]
+### all engine ids/display names: [('qwen', 'Qwen TTS'), ('qwen_custom_voice', 'Qwen CustomVoice'), ('luxtts', 'LuxTTS'), ('chatterbox', 'Chatterbox TTS'), ('chatterbox_turbo', 'Chatterbox Turbo'), ('tada', 'TADA'), ('kokoro', 'Kokoro'), ('f5_tts', 'F5-TTS'), ('voxcpm', 'VoxCPM2')]
+
+## GET /models/status -> 200
+### voxcpm2 entry
+[
+  {
+    "model_name": "voxcpm2",
+    "display_name": "VoxCPM2 (Multilingual, Voice Design)",
+    "hf_repo_id": "openbmb/VoxCPM2",
+    "downloaded": true,
+    "downloading": false,
+    "size_mb": 4730.922571182251,
+    "loaded": false,
+    "license_id": "Apache-2.0",
+    "commercial_use": true,
+    "dialect": null
+  }
+]
+### all model names: ['qwen-tts-1.7B', 'qwen-tts-0.6B', 'qwen-custom-voice-1.7B', 'qwen-custom-voice-0.6B', 'luxtts', 'chatterbox-tts', 'chatterbox-turbo', 'tada-1b', 'tada-3b-ml', 'kokoro', 'habibi-msa', 'habibi-unified', 'habibi-sau', 'habibi-uae', 'habibi-alg', 'habibi-irq', 'habibi-egy', 'habibi-mar', 'voxcpm2', 'whisper-base', 'whisper-small', 'whisper-medium', 'whisper-large', 'whisper-turbo', 'qwen3-0.6b', 'qwen3-1.7b', 'qwen3-4b']
+
+# stopped server, exit code 1

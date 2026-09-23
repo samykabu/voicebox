@@ -1,0 +1,1004 @@
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_engine_capabilities.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase5/T029-red.xml
+# 2026-09-23T17:31:11+03:00
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 342 items
+
+backend\tests\test_engine_capabilities.py::test_model_config_capability_fields_default_to_todays_behaviour PASSED [  0%]
+backend\tests\test_engine_capabilities.py::test_model_config_declares_the_new_fields PASSED [  0%]
+backend\tests\test_engine_capabilities.py::test_advanced_setting_carries_contract_shape_and_is_frozen PASSED [  0%]
+backend\tests\test_engine_capabilities.py::test_there_are_existing_tts_configs_to_check PASSED [  1%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-tts-1.7B] PASSED [  1%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-tts-0.6B] PASSED [  1%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-custom-voice-1.7B] PASSED [  2%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-custom-voice-0.6B] PASSED [  2%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[luxtts] PASSED [  2%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[chatterbox-tts] PASSED [  2%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[chatterbox-turbo] PASSED [  3%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[tada-1b] PASSED [  3%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[tada-3b-ml] PASSED [  3%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[kokoro] PASSED [  4%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-msa] PASSED [  4%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-unified] PASSED [  4%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-sau] PASSED [  4%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-uae] PASSED [  5%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-alg] PASSED [  5%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-irq] PASSED [  5%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-egy] PASSED [  6%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-mar] PASSED [  6%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-tts-1.7B] PASSED [  6%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-tts-0.6B] PASSED [  7%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-custom-voice-1.7B] PASSED [  7%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-custom-voice-0.6B] PASSED [  7%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-luxtts] PASSED [  7%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-chatterbox-tts] PASSED [  8%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-chatterbox-turbo] PASSED [  8%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-tada-1b] PASSED [  8%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-tada-3b-ml] PASSED [  9%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-kokoro] PASSED [  9%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-msa] PASSED [  9%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-unified] PASSED [  9%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-sau] PASSED [ 10%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-uae] PASSED [ 10%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-alg] PASSED [ 10%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-irq] PASSED [ 11%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-egy] PASSED [ 11%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-mar] PASSED [ 11%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-tts-1.7B] PASSED [ 11%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-tts-0.6B] PASSED [ 12%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-custom-voice-1.7B] PASSED [ 12%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-custom-voice-0.6B] PASSED [ 12%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-luxtts] PASSED [ 13%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-chatterbox-tts] PASSED [ 13%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-chatterbox-turbo] PASSED [ 13%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-tada-1b] PASSED [ 14%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-tada-3b-ml] PASSED [ 14%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-kokoro] PASSED [ 14%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-msa] PASSED [ 14%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-unified] PASSED [ 15%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-sau] PASSED [ 15%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-uae] PASSED [ 15%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-alg] PASSED [ 16%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-irq] PASSED [ 16%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-egy] PASSED [ 16%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-mar] PASSED [ 16%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-tts-1.7B] PASSED [ 17%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-tts-0.6B] PASSED [ 17%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-custom-voice-1.7B] PASSED [ 17%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-custom-voice-0.6B] PASSED [ 18%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-luxtts] PASSED [ 18%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-chatterbox-tts] PASSED [ 18%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-chatterbox-turbo] PASSED [ 19%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-tada-1b] PASSED [ 19%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-tada-3b-ml] PASSED [ 19%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-kokoro] PASSED [ 19%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-msa] PASSED [ 20%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-unified] PASSED [ 20%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-sau] PASSED [ 20%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-uae] PASSED [ 21%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-alg] PASSED [ 21%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-irq] PASSED [ 21%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-egy] PASSED [ 21%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-mar] PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-tts-1.7B] PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-tts-0.6B] PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-custom-voice-1.7B] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-custom-voice-0.6B] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-luxtts] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-chatterbox-tts] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-chatterbox-turbo] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-tada-1b] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-tada-3b-ml] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-kokoro] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-msa] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-unified] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-sau] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-uae] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-alg] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-irq] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-egy] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-mar] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-tts-1.7B] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-tts-0.6B] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-custom-voice-1.7B] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-custom-voice-0.6B] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-luxtts] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-chatterbox-tts] PASSED [ 29%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-chatterbox-turbo] PASSED [ 29%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-tada-1b] PASSED [ 29%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-tada-3b-ml] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-kokoro] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-msa] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-unified] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-sau] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-uae] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-alg] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-irq] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-egy] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-mar] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_empty_accelerators_is_available_with_no_reason PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_in_declared_set_is_available[cuda] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_in_declared_set_is_available[mps] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_in_declared_set_is_available[cpu] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_indexed_cuda_device_counts_as_cuda PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_not_in_set_is_unavailable_with_specific_reason PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_supported_but_marginal_memory_warns_and_never_blocks PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_sufficient_memory_has_no_warning PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_unknown_memory_or_threshold_has_no_warning[None-8192] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_unknown_memory_or_threshold_has_no_warning[4096-None] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_unknown_memory_or_threshold_has_no_warning[None-None] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_unavailable_engine_carries_reason_not_warning_even_with_marginal_memory PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators0] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators1] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators2] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators3] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators0] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators1] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators2] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators3] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators0] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators1] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators2] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators3] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators0] PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators1] PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators2] PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators3] PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators0] PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators1] PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators2] PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators3] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators0] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators1] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators2] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators3] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators0] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators1] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators2] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators3] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators0] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators1] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators2] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators3] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators0] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators1] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators2] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators3] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators0] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators1] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators2] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators3] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators0] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators1] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators2] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators3] PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators0] PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators1] PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators2] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators3] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators0] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators1] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators2] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators3] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators0] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators1] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators2] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators3] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators0] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators1] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators2] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators3] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators0] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators1] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators2] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators3] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators0] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators1] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators2] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators3] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators0] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators1] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators2] PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators3] PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_wrapper_detects_mps_and_resolves PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_wrapper_reads_cuda_memory_for_the_warning PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_engines_route_detects_hardware_once_per_request PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_engines_route_existing_engines_keep_todays_behaviour PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_engines_route_describes_each_engine_from_all_of_its_variants PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_engines_route_display_name_is_the_engine_name PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_engines_route_tada_languages_include_the_multilingual_variant PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_engines_route_f5_license_is_null_when_variants_disagree PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_engines_route_returns_the_shared_license_when_variants_agree PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_engines_route_returns_null_license_when_synthetic_variants_disagree PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_current_engine_variants_agree_on_default_variant_fields PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_engine_configs_declare_the_expected_memory_threshold PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_model_config_min_memory_mb_defaults_to_none PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_engines_route_warns_when_memory_is_below_the_declared_threshold PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_engines_route_has_no_warning_without_a_declared_threshold PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_engines_route_uses_the_default_variant_memory_threshold PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_engines_route_engine_ids_match_the_request_engine_pattern PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_engines_route_invariants_hold_for_a_constrained_engine PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_engines_route_passes_declared_capabilities_through PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_engines_route_never_imports_torch PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_existing_generation_payloads_still_validate PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-None] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-qwen] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-kokoro] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-f5_tts] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-None] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-qwen] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-kokoro] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-f5_tts] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[None] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[qwen] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[luxtts] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[chatterbox] PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[tada] PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[kokoro] PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[f5_tts] PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_voice_description_accepts_500_characters_and_rejects_501 PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[1.0-qwen] PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[1.0-None] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[2.5-qwen] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[2.5-None] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[5.0-qwen] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[5.0-None] PASSED [ 70%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[3-qwen] PASSED [ 70%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[3-None] PASSED [ 70%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[0.99] PASSED [ 71%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[5.01] PASSED [ 71%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[-1.0] PASSED [ 71%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[inf] PASSED [ 71%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[nan] PASSED [ 72%]
+backend\tests\test_engine_capabilities.py::test_undeclared_setting_is_rejected_even_when_the_engine_declares_others PASSED [ 72%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_is_scoped_to_its_engine PASSED [ 72%]
+backend\tests\test_engine_capabilities.py::test_invalid_generation_body_is_a_422_through_fastapi PASSED [ 73%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[6144-cuda] PASSED [ 73%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[6144-mps] PASSED [ 73%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[6144-cpu] PASSED [ 73%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[16384-cuda] PASSED [ 74%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[16384-mps] PASSED [ 74%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[16384-cpu] PASSED [ 74%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[None-cuda] PASSED [ 75%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[None-mps] PASSED [ 75%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[None-cpu] PASSED [ 75%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_warns_but_stays_available_on_a_4gb_gpu PASSED [ 76%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_unavailable_with_a_reason_on_other_accelerators[xpu] PASSED [ 76%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_unavailable_with_a_reason_on_other_accelerators[directml] PASSED [ 76%]
+backend\tests\test_engine_capabilities.py::test_engines_route_describes_voxcpm_from_its_declaration PASSED [ 76%]
+backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-generate] FAILED [ 77%]
+backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-stream] FAILED [ 77%]
+backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-retry] FAILED [ 77%]
+backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-regenerate] FAILED [ 78%]
+backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-speak] FAILED [ 78%]
+backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-mcp_speak] FAILED [ 78%]
+backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-generate] FAILED [ 78%]
+backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-stream] FAILED [ 79%]
+backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-retry] FAILED [ 79%]
+backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-regenerate] FAILED [ 79%]
+backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-speak] FAILED [ 80%]
+backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-mcp_speak] FAILED [ 80%]
+backend\tests\test_engine_capabilities.py::test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[generate] FAILED [ 80%]
+backend\tests\test_engine_capabilities.py::test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[stream] FAILED [ 80%]
+backend\tests\test_engine_capabilities.py::test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[retry] FAILED [ 81%]
+backend\tests\test_engine_capabilities.py::test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[regenerate] FAILED [ 81%]
+backend\tests\test_engine_capabilities.py::test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[speak] FAILED [ 81%]
+backend\tests\test_engine_capabilities.py::test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[mcp_speak] FAILED [ 82%]
+backend\tests\test_engine_capabilities.py::test_generation_proceeds_for_voxcpm_on_a_supported_accelerator[generate] PASSED [ 82%]
+backend\tests\test_engine_capabilities.py::test_generation_proceeds_for_voxcpm_on_a_supported_accelerator[stream] PASSED [ 82%]
+backend\tests\test_engine_capabilities.py::test_generation_proceeds_for_voxcpm_on_a_supported_accelerator[retry] PASSED [ 83%]
+backend\tests\test_engine_capabilities.py::test_generation_proceeds_for_voxcpm_on_a_supported_accelerator[regenerate] PASSED [ 83%]
+backend\tests\test_engine_capabilities.py::test_generation_proceeds_for_voxcpm_on_a_supported_accelerator[speak] PASSED [ 83%]
+backend\tests\test_engine_capabilities.py::test_generation_proceeds_for_voxcpm_on_a_supported_accelerator[mcp_speak] PASSED [ 83%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox-generate] PASSED [ 84%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox-stream] PASSED [ 84%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox-retry] PASSED [ 84%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox-regenerate] PASSED [ 85%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox-speak] PASSED [ 85%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox-mcp_speak] PASSED [ 85%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox_turbo-generate] PASSED [ 85%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox_turbo-stream] PASSED [ 86%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox_turbo-retry] PASSED [ 86%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox_turbo-regenerate] PASSED [ 86%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox_turbo-speak] PASSED [ 87%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox_turbo-mcp_speak] PASSED [ 87%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[f5_tts-generate] PASSED [ 87%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[f5_tts-stream] PASSED [ 88%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[f5_tts-retry] PASSED [ 88%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[f5_tts-regenerate] PASSED [ 88%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[f5_tts-speak] PASSED [ 88%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[f5_tts-mcp_speak] PASSED [ 89%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[kokoro-generate] PASSED [ 89%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[kokoro-stream] PASSED [ 89%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[kokoro-retry] PASSED [ 90%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[kokoro-regenerate] PASSED [ 90%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[kokoro-speak] PASSED [ 90%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[kokoro-mcp_speak] PASSED [ 90%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[luxtts-generate] PASSED [ 91%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[luxtts-stream] PASSED [ 91%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[luxtts-retry] PASSED [ 91%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[luxtts-regenerate] PASSED [ 92%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[luxtts-speak] PASSED [ 92%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[luxtts-mcp_speak] PASSED [ 92%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen-generate] PASSED [ 92%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen-stream] PASSED [ 93%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen-retry] PASSED [ 93%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen-regenerate] PASSED [ 93%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen-speak] PASSED [ 94%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen-mcp_speak] PASSED [ 94%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen_custom_voice-generate] PASSED [ 94%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen_custom_voice-stream] PASSED [ 95%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen_custom_voice-retry] PASSED [ 95%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen_custom_voice-regenerate] PASSED [ 95%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen_custom_voice-speak] PASSED [ 95%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen_custom_voice-mcp_speak] PASSED [ 96%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[tada-generate] PASSED [ 96%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[tada-stream] PASSED [ 96%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[tada-retry] PASSED [ 97%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[tada-regenerate] PASSED [ 97%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[tada-speak] PASSED [ 97%]
+backend\tests\test_engine_capabilities.py::test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[tada-mcp_speak] PASSED [ 97%]
+backend\tests\test_engine_capabilities.py::test_refused_retry_leaves_the_stored_row_untouched[retry] FAILED [ 98%]
+backend\tests\test_engine_capabilities.py::test_refused_retry_leaves_the_stored_row_untouched[regenerate] FAILED [ 98%]
+backend\tests\test_engine_capabilities.py::test_availability_helper_raises_the_resolver_reason FAILED [ 98%]
+backend\tests\test_engine_capabilities.py::test_availability_helper_proceeds_when_torch_is_missing FAILED [ 99%]
+backend\tests\test_engine_capabilities.py::test_availability_helper_ignores_unknown_engines FAILED [ 99%]
+backend\tests\test_engine_capabilities.py::test_in_memory_generation_service_refuses_before_loading FAILED [ 99%]
+backend\tests\test_engine_capabilities.py::test_generation_code_has_no_engine_name_checks PASSED [100%]
+
+================================== FAILURES ===================================
+_ test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-generate] _
+
+generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('xpu', None), row=None, hit=<fun...n_app.<locals>.<lambda> at 0x00000275529227A0>), client=<starlette.testclient.TestClient object at 0x0000027552928A70>)
+entry_point = 'generate', accelerator = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError
+_ test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-stream] _
+
+generation_app = namespace(forbid=True, calls=['get_tts_backend_for_engine'], detect_calls=0, hardware=('xpu', None), row=None, hit=<fu...n_app.<locals>.<lambda> at 0x000002755293CA40>), client=<starlette.testclient.TestClient object at 0x000002755296CB60>)
+entry_point = 'stream', accelerator = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError
+_ test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-retry] _
+
+generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('xpu', None), row=namespace(...n_app.<locals>.<lambda> at 0x000002755293ECA0>), client=<starlette.testclient.TestClient object at 0x00000275529A9070>)
+entry_point = 'retry', accelerator = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError
+_ test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-regenerate] _
+
+generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('xpu', None), row=namespace(...n_app.<locals>.<lambda> at 0x000002755293DEE0>), client=<starlette.testclient.TestClient object at 0x000002755296D250>)
+entry_point = 'regenerate', accelerator = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError
+_ test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-speak] _
+
+generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('xpu', None), row=None, hit=<fun...n_app.<locals>.<lambda> at 0x00000275529847C0>), client=<starlette.testclient.TestClient object at 0x0000027552988860>)
+entry_point = 'speak', accelerator = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError
+_ test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-mcp_speak] _
+
+generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('xpu', None), row=None, hit=<fun...n_app.<locals>.<lambda> at 0x0000027552986AC0>), client=<starlette.testclient.TestClient object at 0x0000027553A9D520>)
+entry_point = 'mcp_speak', accelerator = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+>       status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:1099: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\tests\test_engine_capabilities.py:1067: in _call_entry_point
+    await mcp_tools._speak(
+backend\mcp_server\tools.py:263: in _speak
+    generation = await generate_speech(req, db)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\routes\generations.py:92: in generate_speech
+    generation = await history.create_generation(
+backend\tests\test_engine_capabilities.py:962: in fake_create_generation
+    hit("history.create_generation")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'history.create_generation'
+
+    def hit(name):
+        state.calls.append(name)
+        if state.forbid:
+>           raise AssertionError(f"a refused generation must not reach {name}")
+E           AssertionError: a refused generation must not reach history.create_generation
+
+backend\tests\test_engine_capabilities.py:916: AssertionError
+_ test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-generate] _
+
+generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('directml', None), row=None, hit...n_app.<locals>.<lambda> at 0x0000027553C69120>), client=<starlette.testclient.TestClient object at 0x0000027553A9F170>)
+entry_point = 'generate', accelerator = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError
+_ test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-stream] _
+
+generation_app = namespace(forbid=True, calls=['get_tts_backend_for_engine'], detect_calls=0, hardware=('directml', None), row=None, hi...n_app.<locals>.<lambda> at 0x0000027552985D00>), client=<starlette.testclient.TestClient object at 0x00000275529AAC90>)
+entry_point = 'stream', accelerator = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError
+_ test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-retry] _
+
+generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('directml', None), row=names...n_app.<locals>.<lambda> at 0x0000027552984400>), client=<starlette.testclient.TestClient object at 0x0000027553C7BB00>)
+entry_point = 'retry', accelerator = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError
+_ test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-regenerate] _
+
+generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('directml', None), row=names...n_app.<locals>.<lambda> at 0x0000027553BC0180>), client=<starlette.testclient.TestClient object at 0x0000027553BF2960>)
+entry_point = 'regenerate', accelerator = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError
+_ test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-speak] _
+
+generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('directml', None), row=None, hit...n_app.<locals>.<lambda> at 0x0000027553BC2160>), client=<starlette.testclient.TestClient object at 0x0000027553BA7110>)
+entry_point = 'speak', accelerator = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError
+_ test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-mcp_speak] _
+
+generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('directml', None), row=None, hit...n_app.<locals>.<lambda> at 0x0000027553C6BCE0>), client=<starlette.testclient.TestClient object at 0x0000027553BF32C0>)
+entry_point = 'mcp_speak', accelerator = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+>       status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:1099: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\tests\test_engine_capabilities.py:1067: in _call_entry_point
+    await mcp_tools._speak(
+backend\mcp_server\tools.py:263: in _speak
+    generation = await generate_speech(req, db)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\routes\generations.py:92: in generate_speech
+    generation = await history.create_generation(
+backend\tests\test_engine_capabilities.py:962: in fake_create_generation
+    hit("history.create_generation")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'history.create_generation'
+
+    def hit(name):
+        state.calls.append(name)
+        if state.forbid:
+>           raise AssertionError(f"a refused generation must not reach {name}")
+E           AssertionError: a refused generation must not reach history.create_generation
+
+backend\tests\test_engine_capabilities.py:916: AssertionError
+_ test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[generate] _
+
+generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('mps', None), row=None, hit=<fun...n_app.<locals>.<lambda> at 0x0000027553BC0F40>), client=<starlette.testclient.TestClient object at 0x0000027553C7B920>)
+entry_point = 'generate'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027553BF0B60>
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+        generation_app, entry_point, monkeypatch
+    ):
+        """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+        import backend.backends as backends_pkg
+    
+        configs = _constrained_default_qwen(accelerators=("cuda",))
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+        generation_app.hardware = ("mps", None)
+        expected = _expected_reason(configs()[0], "mps")
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1121: AssertionError
+_ test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[stream] _
+
+generation_app = namespace(forbid=True, calls=['get_tts_backend_for_engine'], detect_calls=0, hardware=('mps', None), row=None, hit=<fu...n_app.<locals>.<lambda> at 0x0000027553BC47C0>), client=<starlette.testclient.TestClient object at 0x0000027553BDBBF0>)
+entry_point = 'stream'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027553BDB1A0>
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+        generation_app, entry_point, monkeypatch
+    ):
+        """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+        import backend.backends as backends_pkg
+    
+        configs = _constrained_default_qwen(accelerators=("cuda",))
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+        generation_app.hardware = ("mps", None)
+        expected = _expected_reason(configs()[0], "mps")
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1121: AssertionError
+_ test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[retry] _
+
+generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('mps', None), row=namespace(...n_app.<locals>.<lambda> at 0x0000027553BC6AC0>), client=<starlette.testclient.TestClient object at 0x0000027553AAC8C0>)
+entry_point = 'retry'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027553AAD010>
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+        generation_app, entry_point, monkeypatch
+    ):
+        """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+        import backend.backends as backends_pkg
+    
+        configs = _constrained_default_qwen(accelerators=("cuda",))
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+        generation_app.hardware = ("mps", None)
+        expected = _expected_reason(configs()[0], "mps")
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1121: AssertionError
+_ test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[regenerate] _
+
+generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('mps', None), row=namespace(...n_app.<locals>.<lambda> at 0x0000027552986520>), client=<starlette.testclient.TestClient object at 0x0000027553BEF4D0>)
+entry_point = 'regenerate'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027553BED580>
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+        generation_app, entry_point, monkeypatch
+    ):
+        """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+        import backend.backends as backends_pkg
+    
+        configs = _constrained_default_qwen(accelerators=("cuda",))
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+        generation_app.hardware = ("mps", None)
+        expected = _expected_reason(configs()[0], "mps")
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1121: AssertionError
+_ test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[speak] _
+
+generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('mps', None), row=None, hit=<fun...n_app.<locals>.<lambda> at 0x0000027553BC65C0>), client=<starlette.testclient.TestClient object at 0x0000027553BF13D0>)
+entry_point = 'speak'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027553BF3110>
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+        generation_app, entry_point, monkeypatch
+    ):
+        """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+        import backend.backends as backends_pkg
+    
+        configs = _constrained_default_qwen(accelerators=("cuda",))
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+        generation_app.hardware = ("mps", None)
+        expected = _expected_reason(configs()[0], "mps")
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+    
+>       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1121: AssertionError
+_ test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[mcp_speak] _
+
+generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('mps', None), row=None, hit=<fun...n_app.<locals>.<lambda> at 0x0000027553AC1C60>), client=<starlette.testclient.TestClient object at 0x0000027553B44410>)
+entry_point = 'mcp_speak'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027553AD77A0>
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+        generation_app, entry_point, monkeypatch
+    ):
+        """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+        import backend.backends as backends_pkg
+    
+        configs = _constrained_default_qwen(accelerators=("cuda",))
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+        generation_app.hardware = ("mps", None)
+        expected = _expected_reason(configs()[0], "mps")
+    
+>       status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:1119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\tests\test_engine_capabilities.py:1067: in _call_entry_point
+    await mcp_tools._speak(
+backend\mcp_server\tools.py:263: in _speak
+    generation = await generate_speech(req, db)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\routes\generations.py:92: in generate_speech
+    generation = await history.create_generation(
+backend\tests\test_engine_capabilities.py:962: in fake_create_generation
+    hit("history.create_generation")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'history.create_generation'
+
+    def hit(name):
+        state.calls.append(name)
+        if state.forbid:
+>           raise AssertionError(f"a refused generation must not reach {name}")
+E           AssertionError: a refused generation must not reach history.create_generation
+
+backend\tests\test_engine_capabilities.py:916: AssertionError
+__________ test_refused_retry_leaves_the_stored_row_untouched[retry] __________
+
+generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('xpu', None), row=namespace(...n_app.<locals>.<lambda> at 0x0000027553F7D800>), client=<starlette.testclient.TestClient object at 0x0000027553F81280>)
+entry_point = 'retry'
+
+    @pytest.mark.parametrize("entry_point", ["retry", "regenerate"])
+    async def test_refused_retry_leaves_the_stored_row_untouched(generation_app, entry_point):
+        generation_app.hardware = ("xpu", None)
+    
+        await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+        row = generation_app.row
+>       assert row.status == ("failed" if entry_point == "retry" else "completed")
+E       AssertionError: assert 'generating' == 'failed'
+E         
+E         - failed
+E         + generating
+
+backend\tests\test_engine_capabilities.py:1159: AssertionError
+_______ test_refused_retry_leaves_the_stored_row_untouched[regenerate] ________
+
+generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('xpu', None), row=namespace(...n_app.<locals>.<lambda> at 0x0000027553F7EAC0>), client=<starlette.testclient.TestClient object at 0x0000027554050500>)
+entry_point = 'regenerate'
+
+    @pytest.mark.parametrize("entry_point", ["retry", "regenerate"])
+    async def test_refused_retry_leaves_the_stored_row_untouched(generation_app, entry_point):
+        generation_app.hardware = ("xpu", None)
+    
+        await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+        row = generation_app.row
+>       assert row.status == ("failed" if entry_point == "retry" else "completed")
+E       AssertionError: assert 'generating' == 'completed'
+E         
+E         - completed
+E         + generating
+
+backend\tests\test_engine_capabilities.py:1159: AssertionError
+_____________ test_availability_helper_raises_the_resolver_reason _____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027554050950>
+
+    def test_availability_helper_raises_the_resolver_reason(monkeypatch):
+        import backend.backends.base as base_mod
+        from backend.services import generation as generation_service
+    
+        monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", lambda: ("directml", None))
+    
+>       with pytest.raises(generation_service.EngineUnavailableError) as excinfo:
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'EngineUnavailableError'
+
+backend\tests\test_engine_capabilities.py:1170: AttributeError
+___________ test_availability_helper_proceeds_when_torch_is_missing ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027553FB8860>
+
+    def test_availability_helper_proceeds_when_torch_is_missing(monkeypatch):
+        """Undetectable hardware resolves to CPU, which VoxCPM2 declares, so generation proceeds."""
+        import backend.backends.base as base_mod
+        from backend.services import generation as generation_service
+    
+        def _no_torch(**_k):
+            raise ImportError("No module named 'torch'")
+    
+        monkeypatch.setattr(base_mod, "get_torch_device", _no_torch)
+    
+        assert base_mod.detect_accelerator_and_memory() == ("cpu", None)
+>       generation_service.ensure_engine_available("voxcpm")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'ensure_engine_available'
+
+backend\tests\test_engine_capabilities.py:1188: AttributeError
+______________ test_availability_helper_ignores_unknown_engines _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027553FBB080>
+
+    def test_availability_helper_ignores_unknown_engines(monkeypatch):
+        import backend.backends.base as base_mod
+        from backend.services import generation as generation_service
+    
+        monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", _forbid("detect_accelerator_and_memory"))
+    
+>       generation_service.ensure_engine_available("not-an-engine")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'ensure_engine_available'
+
+backend\tests\test_engine_capabilities.py:1197: AttributeError
+__________ test_in_memory_generation_service_refuses_before_loading ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000027554053C80>
+
+    async def test_in_memory_generation_service_refuses_before_loading(monkeypatch):
+        """generate_audio_sync (the non-persisting service path) applies the same refusal."""
+        import backend.backends as backends_pkg
+        import backend.backends.base as base_mod
+        from backend.services import generation as generation_service
+    
+        monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", lambda: ("xpu", None))
+        for name in ("load_engine_model", "get_tts_backend_for_engine"):
+            monkeypatch.setattr(backends_pkg, name, _forbid(name))
+        monkeypatch.setattr(generation_service, "get_db", _forbid("get_db"))
+    
+>       with pytest.raises(generation_service.EngineUnavailableError, match="VoxCPM2"):
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'EngineUnavailableError'
+
+backend\tests\test_engine_capabilities.py:1211: AttributeError
+============================== warnings summary ===============================
+backend\venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:33: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:69: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ProfileSampleResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:146: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:211: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationEntryResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:269: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class HistoryResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:378: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureSettingsResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:419: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationSettingsResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:440: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class MCPClientBindingResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:720: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioChannelResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:752: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:766: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:798: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:906: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:920: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-generate]
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase5\T029-red.xml -
+=========================== short test summary info ===========================
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-generate]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-stream]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-retry]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-regenerate]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-speak]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-mcp_speak]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-generate]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-stream]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-retry]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-regenerate]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-speak]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-mcp_speak]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[generate]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[stream]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[retry]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[regenerate]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[speak]
+FAILED backend\tests\test_engine_capabilities.py::test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[mcp_speak]
+FAILED backend\tests\test_engine_capabilities.py::test_refused_retry_leaves_the_stored_row_untouched[retry]
+FAILED backend\tests\test_engine_capabilities.py::test_refused_retry_leaves_the_stored_row_untouched[regenerate]
+FAILED backend\tests\test_engine_capabilities.py::test_availability_helper_raises_the_resolver_reason
+FAILED backend\tests\test_engine_capabilities.py::test_availability_helper_proceeds_when_torch_is_missing
+FAILED backend\tests\test_engine_capabilities.py::test_availability_helper_ignores_unknown_engines
+FAILED backend\tests\test_engine_capabilities.py::test_in_memory_generation_service_refuses_before_loading
+================= 24 failed, 318 passed, 17 warnings in 4.91s =================
+# exit 1

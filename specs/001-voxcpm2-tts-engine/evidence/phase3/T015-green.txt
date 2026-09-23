@@ -1,0 +1,56 @@
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_voxcpm_backend.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase3/T015-green.xml
+# cwd: D:/Projects/Personal/voicebox
+# timestamp: 2026-09-23T16:17:46+03:00
+# state: after T015 (backend/backends/voxcpm_backend.py created); T016 registry not yet changed
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 40 items
+
+backend\tests\test_voxcpm_backend.py::test_load_model_is_idempotent PASSED [  2%]
+backend\tests\test_voxcpm_backend.py::test_load_model_disables_the_modelscope_denoiser PASSED [  5%]
+backend\tests\test_voxcpm_backend.py::test_load_model_passes_an_explicit_device_from_our_policy PASSED [  7%]
+backend\tests\test_voxcpm_backend.py::test_cached_model_loads_with_local_files_only PASSED [ 10%]
+backend\tests\test_voxcpm_backend.py::test_uncached_model_may_download PASSED [ 12%]
+backend\tests\test_voxcpm_backend.py::test_load_runs_inside_model_load_progress[True] PASSED [ 15%]
+backend\tests\test_voxcpm_backend.py::test_load_runs_inside_model_load_progress[False] PASSED [ 17%]
+backend\tests\test_voxcpm_backend.py::test_generate_returns_the_array_and_the_model_runtime_sample_rate PASSED [ 20%]
+backend\tests\test_voxcpm_backend.py::test_generate_keeps_upstream_normalization_off PASSED [ 22%]
+backend\tests\test_voxcpm_backend.py::test_seed_is_applied_before_the_vendor_call_and_never_forwarded PASSED [ 25%]
+backend\tests\test_voxcpm_backend.py::test_no_seed_means_no_manual_seed PASSED [ 27%]
+backend\tests\test_voxcpm_backend.py::test_generate_passes_the_prompt_pair_together PASSED [ 30%]
+backend\tests\test_voxcpm_backend.py::test_generate_without_reference_passes_neither_prompt_key[None] PASSED [ 32%]
+backend\tests\test_voxcpm_backend.py::test_generate_without_reference_passes_neither_prompt_key[voice_prompt1] PASSED [ 35%]
+backend\tests\test_voxcpm_backend.py::test_generate_rejects_half_a_prompt_pair[voice_prompt0] PASSED [ 37%]
+backend\tests\test_voxcpm_backend.py::test_generate_rejects_half_a_prompt_pair[voice_prompt1] PASSED [ 40%]
+backend\tests\test_voxcpm_backend.py::test_generate_rejects_half_a_prompt_pair[voice_prompt2] PASSED [ 42%]
+backend\tests\test_voxcpm_backend.py::test_generate_uses_declared_defaults_without_options PASSED [ 45%]
+backend\tests\test_voxcpm_backend.py::test_generate_maps_advanced_options PASSED [ 47%]
+backend\tests\test_voxcpm_backend.py::test_generate_partial_options_fall_back_per_setting PASSED [ 50%]
+backend\tests\test_voxcpm_backend.py::test_voice_description_becomes_the_ascii_paren_prefix_without_reference PASSED [ 52%]
+backend\tests\test_voxcpm_backend.py::test_voice_description_is_inactive_when_reference_audio_is_present PASSED [ 55%]
+backend\tests\test_voxcpm_backend.py::test_blank_voice_description_adds_no_prefix[None] PASSED [ 57%]
+backend\tests\test_voxcpm_backend.py::test_blank_voice_description_adds_no_prefix[] PASSED [ 60%]
+backend\tests\test_voxcpm_backend.py::test_blank_voice_description_adds_no_prefix[   ] PASSED [ 62%]
+backend\tests\test_voxcpm_backend.py::test_unload_empties_the_device_cache_and_reports_unloaded PASSED [ 65%]
+backend\tests\test_voxcpm_backend.py::test_unload_when_not_loaded_is_a_no_op PASSED [ 67%]
+backend\tests\test_voxcpm_backend.py::test_reload_after_unload_loads_again PASSED [ 70%]
+backend\tests\test_voxcpm_backend.py::test_model_path_is_the_hf_repo PASSED [ 72%]
+backend\tests\test_voxcpm_backend.py::test_is_model_cached_recognises_pth_weights PASSED [ 75%]
+backend\tests\test_voxcpm_backend.py::test_is_model_cached_recognises_safetensors_weights PASSED [ 77%]
+backend\tests\test_voxcpm_backend.py::test_is_model_cached_rejects_incomplete_downloads PASSED [ 80%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_carries_the_audio_path_and_transcript PASSED [ 82%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_is_served_from_the_engine_scoped_cache PASSED [ 85%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_without_cache_writes_nothing PASSED [ 87%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_requires_a_transcript PASSED [ 90%]
+backend\tests\test_voxcpm_backend.py::test_combine_voice_prompts_delegates_to_the_shared_helper PASSED [ 92%]
+backend\tests\test_voxcpm_backend.py::test_module_has_no_top_level_heavy_import PASSED [ 95%]
+backend\tests\test_voxcpm_backend.py::test_vendor_import_is_marked_lazy PASSED [ 97%]
+backend\tests\test_voxcpm_backend.py::test_importing_and_constructing_the_backend_does_not_import_the_vendor PASSED [100%]
+
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase3\T015-green.xml -
+============================= 40 passed in 4.52s ==============================
+# exit code: 0

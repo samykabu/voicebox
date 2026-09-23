@@ -1,0 +1,51 @@
+# timestamp start: 2026-09-23T02:04:24+03:00
+# venv1 (py3.13, full deps, torch 2.14.0+cpu). Model cached. device=cpu, load_denoiser=False, optimize=False (default optimize is a no-op off CUDA anyway)
+$ python probe_run.py --device cpu --out C:\Users\sabus\voxcpm-probe-out
+=== ENV ===
+python 3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]
+executable C:\Users\sabus\voxcpm-probe\Scripts\python.exe
+HF_HOME=None
+HF_HUB_CACHE=None
+HUGGINGFACE_HUB_CACHE=None
+HF_HUB_OFFLINE=None
+TRANSFORMERS_OFFLINE=None
+HTTP_PROXY=None
+HTTPS_PROXY=None
+NO_PROXY=None
+MODELSCOPE_CACHE=None
+HF_TOKEN=None
+args {'device': 'cpu', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out', 'denoiser': False, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\jit\_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+=== VERSIONS ===
+numpy 2.5.3 | torch 2.14.0+cpu cuda build None | cuda available False | huggingface_hub 1.32.0
+transformers 5.17.0
+HF_HUB_CACHE resolved: C:\Users\sabus\.cache\huggingface\hub | HF_HUB_OFFLINE const: False
+=== LOAD ===
+[NET] getaddrinfo: huggingface.co:443
+[NET] connect: ('3.175.149.15', 443)
+[LOG] httpx INFO HTTP Request: GET https://huggingface.co/api/models/openbmb/VoxCPM2/revision/main "HTTP/1.1 200 OK"
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\nn\utils\weight_norm.py:145: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cpu, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Loaded VoxCPM2Model
+model device: cpu | dtype: bfloat16
+tts_model.sample_rate (output): 48000
+tts_model._encode_sample_rate: 16000
+audio_vae.sample_rate: 16000 | audio_vae.out_sample_rate: 48000
+denoiser: None
+peak RSS after load (MB): 10988
+=== GENERATE ===
+GEN {'label': 'cpu_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 12.84, 'audio_s': 4.32, 'rtf': 2.972, 'dtype': 'float32', 'shape': (207360,), 'rms': 0.1311, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\cpu_plain.wav', 'file_sr': 48000}
+=== SUMMARY ===
+timings {'import_s': 2.74, 'load_s': 9.56}
+peak RSS sampled (MB): 10988
+peak working set (MB, Windows peak_wset): 11234
+RESULT {'label': 'cpu_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 12.84, 'audio_s': 4.32, 'rtf': 2.972, 'dtype': 'float32', 'shape': (207360,), 'rms': 0.1311, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\cpu_plain.wav', 'file_sr': 48000}
+NETWORK getaddrinfo hosts: ['huggingface.co:443']
+NETWORK connect count: 1
+exit=0 dur=26s
+# timestamp end: 2026-09-23T02:04:50+03:00

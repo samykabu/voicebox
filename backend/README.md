@@ -88,7 +88,7 @@ Detection is handled by `utils/platform_detect.py`. Both backends implement the 
 | Stories | `/stories` | Multi-track timeline editor, audio export |
 | Effects | `/effects` | Effect presets, preview, version management |
 | Audio | `/audio`, `/samples` | Audio file serving |
-| Models | `/models` | Load, unload, download, migrate, status |
+| Models | `/models` | Load, unload, download, migrate, status, engine capabilities |
 | Tasks | `/tasks`, `/cache` | Active task tracking, cache management |
 | CUDA | `/backend/cuda-*` | CUDA binary download and management |
 
@@ -106,6 +106,102 @@ curl http://localhost:17493/profiles
 # Stream generation status (SSE)
 curl http://localhost:17493/generate/{id}/status
 ```
+
+### Engine capabilities
+
+`GET /models/engines` is read-only and takes no parameters. It returns one entry per TTS engine in `TTS_ENGINES`, so the app can learn what an engine supports and whether it can run on this machine. It never loads a model, never starts a download and never imports torch at module scope.
+
+```bash
+curl http://localhost:17493/models/engines
+```
+
+```json
+{
+  "engines": [
+    {
+      "engine": "kokoro",
+      "display_name": "Kokoro",
+      "available": true,
+      "reason": null,
+      "warning": null,
+      "supported_accelerators": [],
+      "detected_accelerator": "cuda",
+      "languages": ["en", "es", "fr", "hi", "it", "pt", "ja", "zh"],
+      "supports_cloning": false,
+      "supports_voice_design": false,
+      "requires_download_confirmation": false,
+      "advanced_settings": [],
+      "size_mb": 350,
+      "license_id": null,
+      "commercial_use": null
+    }
+  ]
+}
+```
+
+Each entry describes the engine across all of its model variants:
+
+- `display_name` is the engine name from `TTS_ENGINES` (for example "TADA" or "F5-TTS"), not a variant name.
+- `languages` is the union of every variant's languages.
+- `license_id` and `commercial_use` hold the shared value when every variant agrees, and `null` when they differ.
+- `size_mb`, `supports_voice_design`, `requires_download_confirmation`, `advanced_settings` and `supported_accelerators` come from the default-size variant, the one downloaded by default.
+- `supports_cloning` comes from `CLONING_ENGINES`.
+- `detected_accelerator` is the accelerator detected on this machine.
+- `reason` is non-null if and only if `available` is false. An empty `supported_accelerators` list means unconstrained, and such an engine is always available.
+- `reason` and `warning` depend on `supported_accelerators`. If the detected accelerator is in the list, the engine is available. If it is not, but the list includes `cpu`, the engine is still available and runs on the processor. If the list has no `cpu`, the engine is unavailable and `reason` says why.
+- `warning` is advisory and never blocks generation. It carries one of two messages. The memory warning appears when detected memory is below the engine's usual need (`min_memory_mb`). The processor-fallback warning appears when the engine runs on the processor instead of the detected accelerator, for example VoxCPM2 on an Intel XPU or DirectML machine: "VoxCPM2 (Multilingual, Voice Design) doesn't support Intel XPU here, so it will run on the processor, which is slower." The memory warning is not given in that case.
+
+`POST /generate` accepts two optional fields, both defaulting to `null`, so existing callers are unaffected:
+
+- `voice_description`: up to 500 characters, for engines with `supports_voice_design`. It is never sent as `instruct`. It is stored with the generation (nullable `generations.voice_description`, added by an additive migration) so retry and regenerate replay it.
+- `advanced_settings`: an object mapping a setting name to a number. Only names the engine declares in `advanced_settings` are allowed, within their `min`/`max`. Anything else returns 422. With `"engine": null` the check runs against the profile's default engine.
+
+See [contracts/engine-capabilities.md](../specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md) for the full field contract.
+
+A generation route asked to use an engine this machine can't run returns 400. The detail is the same `reason` that `/models/engines` reports. `/generate`, `/generate/stream`, retry and regenerate all check. Only an engine that declares accelerators without `cpu` can be refused. No registered engine does that today: the existing engines declare nothing, and VoxCPM2 declares `cpu`, so on an Intel XPU or DirectML machine it runs on the processor with a warning instead of being refused.
+
+### Profile export manifest
+
+`GET /profiles/{id}/export` returns a ZIP with `manifest.json`, `samples.json`, a `samples/` folder and, when set, the avatar. The manifest is version `1.1`:
+
+```json
+{
+  "version": "1.1",
+  "profile": {
+    "name": "Narrator",
+    "description": null,
+    "language": "en",
+    "voice_type": "designed",
+    "preset_engine": null,
+    "preset_voice_id": null,
+    "design_prompt": "A calm older woman with a low, warm voice",
+    "default_engine": "voxcpm"
+  },
+  "has_avatar": false
+}
+```
+
+- Version 1.1 adds `voice_type`, `design_prompt`, `default_engine`, `preset_engine` and `preset_voice_id`. `POST /profiles/import` restores them instead of rebuilding the profile as cloned. An invalid combination is refused, not downgraded.
+- A cloned profile needs at least one sample to export. Designed and preset profiles export without samples.
+- Version 1.0 manifests still import, as cloned profiles with no default engine.
+- The personality prompt is not exported.
+
+The change is additive: 1.1 keeps every 1.0 key and adds the new ones beside them.
+
+### Generation export manifest
+
+Generation export archives are also version `1.1`. They add `voice_description`, `engine` and `model_size` to the generation entry. Import restores the description, and restores the engine and size only after checking them against the TTS engine registry: an unknown engine falls back to the default engine, and an invalid size to that engine's default size, each with a logged warning. A 1.0 archive imports with no description and the default engine.
+
+### AI-generated label in WAV files
+
+Every WAV the backend generates carries a RIFF `LIST/INFO` chunk with `ICMT` = "AI-generated by Voicebox" and `ISFT` = "Voicebox". The audio samples are unchanged. Two helpers in `utils/audio.py` write it, and both default to `AI_GENERATED_DISCLOSURE`:
+
+- `save_audio(audio, path, sample_rate, *, disclosure=...)` writes files: generations (including those started by `POST /speak` and the MCP `voicebox.speak` tool), effects versions and story exports.
+- `wav_bytes(audio, sample_rate, *, disclosure=...)` returns bytes without saving. It is used by `/generate/stream` (through `services/tts.audio_to_wav_bytes()`) and the effects preview.
+
+The user's own audio is saved with `disclosure=None` and has no label: profile reference samples, the combined reference, and the temp WAV re-encoded for transcription.
+
+Code that parses WAV headers by hand should skip unknown chunks, as the RIFF format expects. soundfile reads the files and the tag back (see `tests/test_audio_disclosure.py`).
 
 ## Data directory
 

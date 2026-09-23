@@ -1,0 +1,68 @@
+N-docs-fixes: documentation fixes for analyze revalidation findings N1-N7 (2026-09-23)
+Source of findings: evidence/revalidation/analyze-2026-09-23.md (not edited)
+HEAD at start: 4b72fed. Nothing staged or committed.
+
+Format: finding -> file:line -> summary -> code source
+
+N1 (HIGH) stale refusal and greying-out on XPU/DirectML
+Warning text used everywhere, from backend/backends/base.py:304-319 (resolve_engine_availability)
+with display_name "VoxCPM2 (Multilingual, Voice Design)" (backend/backends/__init__.py:494)
+and label "Intel XPU" (base.py:229-235):
+  "VoxCPM2 (Multilingual, Voice Design) doesn't support Intel XPU here, so it will run on the processor, which is slower."
+
+- backend/README.md:151 -> new bullet: available if detected is declared; processor fallback if `cpu` declared; unavailable with a reason otherwise -> base.py:277-351
+- backend/README.md:152 -> `warning` now names both sources (memory, processor fallback) and quotes the fallback text; memory warning not given on fallback -> base.py:304-319, :338-345; test_cpu_fallback.py test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml
+- backend/README.md:161 -> 400 applies only to an engine declaring accelerators without `cpu`; none today; VoxCPM2 runs on the processor with a warning -> base.py:321-336; services/generation.py:41 ensure_engine_available
+- CHANGELOG.md:30-33 -> "greyed out" bullet replaced: VoxCPM2 runs on the processor on XPU/DirectML with a note; greying out remains for an engine that can't run, none today -> base.py:304-336; app/src/lib/hooks/engineCapabilityRules.ts:40 shows `warning` next to the engine
+- CHANGELOG.md:57-63 -> 400 only for an engine declaring hardware without `cpu`, none today; new bullet: `warning` carries memory or fallback message -> base.py:304-345
+- docs/content/docs/developer/model-management.mdx:41 -> VoxCPM2 stays available on XPU/DirectML and runs on the processor, with the quoted warning -> base.py:304-319
+- model-management.mdx:51 -> dialog shows any `warning` (memory or processor fallback), not only memory -> app/src/components/Generation/DownloadConfirmDialog.tsx:66-67
+- model-management.mdx:154 -> `warning` set in two cases -> base.py:304-345
+- model-management.mdx:243-244 -> 400 row: engine declares neither the accelerator nor `cpu`, none today; new row for the "will run on the processor" warning -> base.py:304-336
+- docs/content/docs/developer/tts-generation.mdx:147 -> "reported unavailable" replaced with available on the processor plus the quoted warning -> base.py:304-319
+- tts-generation.mdx:174 -> refusal rule now "neither the accelerator nor `cpu`"; example reason no longer says "or CPU" (now "it needs CUDA or Apple Silicon (MPS), but this machine is using Intel XPU", as _join_labels builds it); no registered engine refused today -> base.py:265-269, :321-336; test_cpu_fallback.py test_engine_without_the_processor_is_still_unavailable_on_xpu_and_directml
+- docs/content/docs/developer/tts-engines.mdx:227 -> `accelerators` row: lists `cpu` -> processor with warning; no `cpu` -> greyed out and refused -> base.py:304-336
+- tts-engines.mdx:663 -> Device bullet: on XPU/DirectML the engine runs on the processor and is reported available with a fallback warning -> base.py:304-319
+- tts-engines.mdx:687 -> `warning` field row names both sources -> base.py:304-345
+- tts-engines.mdx:694 -> "memory warning" only on CUDA; quotes the fallback text -> base.py:356-378 (detect_accelerator_and_memory reads memory only for CUDA)
+- tts-engines.mdx:696 -> refusal path reachable only by an engine declaring accelerators without `cpu`; none today -> base.py:321-336
+- tts-engines.mdx:732 -> download dialog shows any warning (memory or processor fallback) -> DownloadConfirmDialog.tsx:66-67
+
+Stale-mention grep ("DirectML", "XPU", "greyed", "can't run", "unavailable", "400") over the five files and docs/content/docs/overview/*.mdx. Left alone, with reasons:
+- backend/README.md:70-71 -> backend support table (IPEX/XPU, DirectML) -> correct, not about VoxCPM2 availability
+- CHANGELOG.md:183, 320, 351, 360-372, 606 -> older releases or unrelated "400" -> historical, correct
+- tts-generation.mdx:141 -> device-selection order lists XPU -> correct
+- overview/generating-speech.mdx:25 and overview/introduction.mdx:65 -> "an engine this computer can't run is greyed out" -> still true of the mechanism; not in this worker's edit scope. Could add "none is today"; flagged for the orchestrator.
+- overview/gpu-acceleration.mdx:102 "All PyTorch-based engines work on XPU" -> slightly inaccurate for VoxCPM2 (it runs on the processor there); outside edit scope, flagged for the orchestrator.
+- overview/creating-voice-profiles.mdx:224 -> greyed preset profiles, unrelated
+- other overview hits (400 MB model sizes, gpu-acceleration XPU/DirectML sections, introduction tables) -> unrelated, correct
+
+N2 (LOW) T054 "non-persisted /speak"
+- specs/001-voxcpm2-tts-engine/tasks.md:193-194 -> "non-persisted /speak" replaced with "`generate_audio_sync`, which has no live route caller"; added: /speak and MCP speak call generate_speech and persist through save_audio (tagged by default); the non-persisted surfaces tagged through wav_bytes are /generate/stream and the effects preview -> backend/routes/speak.py:72-83; backend/mcp_server/tools.py:250-263; backend/routes/generations.py:346 and :441 (/generate/stream); backend/routes/effects.py:18 and :50-53 (preview); backend/services/generation.py:396 (generate_audio_sync, no non-test caller found by grep)
+
+N3 (LOW) Principle V boxes
+- specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md:102-106 -> all five boxes ticked with evidence:
+  - Pydantic models -> backend/models.py:620 EngineAdvancedSettingResponse, :630 EngineCapabilityResponse, :659 EngineCapabilitiesResponse
+  - generated client -> app/src/lib/api/services/DefaultService.ts:2278 getEngineCapabilitiesModelsEnginesGet (url '/models/engines' at :2281); codegen header in app/src/lib/api/models/EngineCapabilityResponse.ts:1
+  - GenerationRequest fields -> backend/models.py:108-138 (voice_description max_length=500, advanced_settings, _check_advanced_settings validator)
+  - README -> backend/README.md:110-161 ("Engine capabilities" section)
+  - additive -> both request fields default None; `git diff main...HEAD -- backend/models.py` removes only pattern lines, each replaced by a wider pattern (added languages, added voxcpm)
+
+N4 (LOW) note only
+- specs/001-voxcpm2-tts-engine/tasks.md:295 -> new Notes bullet next to "Two engines that do not both fit in memory": on a processor-only machine, running out of system memory can make the OS stop the backend instead of raising an error; probe CPU peak RSS about 11.0 GB (Windows peak working set 11.2-11.5 GB); no memory warning guards this on CPU -> evidence/probe.md:48 (row 8, "CPU: peak RSS ~11.0 GB") and :127 ("CPU RSS ≈ 11 GB"); base.py:356-378 reads memory only for CUDA
+  Correction to the finding's suggested wording: the pre-download memory warning is NOT a guard on CPU, because memory is read only for CUDA. The note says so.
+
+N5 (LOW) code name in spec
+- specs/001-voxcpm2-tts-engine/spec.md:155 -> removed `supports_voice_design`; now "whether it can create a voice from a written description (its voice-design capability)" -> n/a (wording)
+
+N6 (LOW) T008 rule and Notes record
+- specs/001-voxcpm2-tts-engine/tasks.md:65 -> T008 detail adds: not in the set but `cpu` declared -> available on the processor with a fallback warning and no reason (FR-023, 699f362); not in the set and no `cpu` -> unavailable with a reason -> base.py:304-336
+- specs/001-voxcpm2-tts-engine/tasks.md:297 -> new Notes paragraph "H1 behaviour change after the analyze revalidation (2026-09-23)": commit 699f362, FR-023, the new rule, backend/tests/test_cpu_fallback.py, and evidence/revalidation/T044-directml-xpu-superseded.md -> git show 699f362
+
+N7 (LOW) US3 Independent Test
+- specs/001-voxcpm2-tts-engine/spec.md:58 -> added: on real hardware VoxCPM2 is never unavailable today, so the unavailable path is exercised with an injected engine configuration (backend/tests/test_cpu_fallback.py, backend/tests/test_engine_capabilities.py) -> base.py:304-319; test_cpu_fallback.py uses _config(accelerators=("cuda",))
+
+Checks
+- tasks.md: 56 "- [x]", 0 "- [ ]" (grep -c)
+- Files changed: backend/README.md, CHANGELOG.md, docs/content/docs/developer/{model-management,tts-generation,tts-engines}.mdx, specs/001-voxcpm2-tts-engine/{tasks.md,spec.md,contracts/engine-capabilities.md}, plus this file.
+- Orchestrator addition (N1 follow-through): docs/content/docs/overview/gpu-acceleration.mdx, in the XPU engines paragraph and the DirectML section, now says VoxCPM2 runs on the processor with a slower warning (base.py resolve_engine_availability).

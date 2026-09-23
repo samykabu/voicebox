@@ -1,0 +1,79 @@
+# T010 ruff results
+# timestamp: 2026-09-23T00:33:31Z
+# cwd: /d/Projects/Personal/voicebox
+ruff 0.16.8
+
+################ Earlier attempts (kept) ################
+# Attempt 1a, backend/tests/test_engine_capabilities.py, before the red run: 'ruff check' passed; 'ruff format --check' reported 1 file would be reformatted
+# (one monkeypatch.setitem(...) call in section 5 wrapped over 3 lines; ruff wants it on one line). Fixed by 'ruff format' on that file only;
+# a diff against the pre-T010 copy confirmed only the import block and section 5 changed (sections 1-4 byte-identical). Raw output of that run was shown in the terminal, not saved.
+# Attempt 1b, backend/models.py, after the first implementation: ruff check found 10 NEW findings vs HEAD (sorted rule list, line numbers stripped):
+$ diff <HEAD findings> <working-tree findings>
+1c1
+< Found 187 errors.
+---
+> Found 197 errors.
+39a40,43
+> UP006 [*] Use `list` instead of `List` for type annotation
+> UP006 [*] Use `list` instead of `List` for type annotation
+> UP006 [*] Use `list` instead of `List` for type annotation
+> UP006 [*] Use `list` instead of `List` for type annotation
+189c193,199
+< [*] 186 fixable with the `--fix` option.
+---
+> UP045 [*] Use `X | None` for type annotations
+> UP045 [*] Use `X | None` for type annotations
+> UP045 [*] Use `X | None` for type annotations
+> UP045 [*] Use `X | None` for type annotations
+> UP045 [*] Use `X | None` for type annotations
+> UP045 [*] Use `X | None` for type annotations
+> [*] 196 fixable with the `--fix` option.
+# Fixed by writing the new annotations as X | None / list[X] (new lines only; existing Optional/List lines untouched).
+
+################ Final ################
+
+$ ruff check --config backend/pyproject.toml backend/tests/test_engine_capabilities.py
+All checks passed!
+# exit code: 0
+
+$ ruff format --check --config backend/pyproject.toml backend/tests/test_engine_capabilities.py
+1 file already formatted
+# exit code: 0
+
+$ ruff check --config backend/pyproject.toml backend/routes/models.py
+
+Found 11 errors.
+[*] 5 fixable with the `--fix` option (2 hidden fixes can be enabled with the `--unsafe-fixes` option).
+# exit code: 1
+
+$ ruff format --check --config backend/pyproject.toml backend/routes/models.py
+1 file already formatted
+# exit code: 0
+
+$ git show HEAD:backend/routes/models.py | ruff check --config backend/pyproject.toml --stdin-filename backend/routes/models.py -  (for comparison)
+
+Found 11 errors.
+[*] 5 fixable with the `--fix` option (2 hidden fixes can be enabled with the `--unsafe-fixes` option).
+
+# backend/tests/test_engine_capabilities.py is untracked (no HEAD version); it is clean, so there is nothing pre-existing to separate.
+
+---- backend/models.py: ruff check, working tree vs HEAD (sorted rule list, line numbers stripped) ----
+working tree: Found 187 errors.; HEAD: Found 187 errors.
+$ diff <HEAD> <working tree>
+# diff exit code: 0 (0 = no new ruff check findings)
+
+---- backend/models.py: ruff format --diff, working tree vs HEAD (changed lines only, voxcpm alternation normalised) ----
+working-tree format-diff lines: 29; HEAD format-diff lines: 28
+$ diff <HEAD> <working tree>
+7c7,8
+< +        default="qwen", pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$"
+---
+> +        default="qwen",
+> +        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$",
+# diff exit code: 1
+# The one difference is pre-existing line 92 (GenerationRequest.engine), already recorded in T006-T007-ruff.txt: ruff already wanted to wrap it at HEAD;
+# with |voxcpm the suggested wrap shape changes. None of the T010 additions (fields, validator, response models) appear in the formatter diff.
+
+---- backend/routes/models.py: ruff check, working tree vs HEAD (sorted rule list, line numbers stripped) ----
+$ diff <HEAD> <working tree>
+# diff exit code: 0 (0 = no new ruff check findings; all 11 are pre-existing)

@@ -1,0 +1,119 @@
+# T036 frontend: labelled voice-description input. Generated 2026-09-23T18:11:55+03:00
+Base: HEAD 2ade0e0. Test file: copy of evidence/phase5/T031-T032-capability-logic.test.ts in <scratchpad>/t036/, with T036 cases added at the end (final copy: T036-capability-logic.test.ts).
+i18n: the new strings use t() like the rest of the component. i18n/index.ts sets fallbackLng 'en', so keys were added to locales/en/translation.json only; other locales show the English text.
+
+## 1. RED run 1 (helpers not exported yet), timestamp 2026-09-23T18:08:15+03:00
+$ bun test <scratchpad>/t036/capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/t036/red.xml
+SyntaxError: Export named 'supportsVoiceDesign' not found in module 'D:/Projects/Personal/voicebox/app/src/lib/hooks/engineCapabilityRules.ts'.
+ 0 pass / 1 fail / 1 error. exit=1
+(Module load failed, so no test ran and bun wrote no XML.)
+
+## 2. RED run 2 (signature-only stubs that throw 'not implemented'), timestamp 2026-09-23T18:08:24+03:00
+$ bun test <scratchpad>/t036/capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/t036/red.xml   (saved as T036-fe-red.xml)
+ 32 pass, 11 fail, exit=1. All 11 failures are the new T036 cases.
+### counts from T036-fe-red.xml
+capability-logic.test.ts: tests=43 failures=11 skipped=0
+T036 supportsVoiceDesign: tests=1 failures=1 skipped=0
+T036 voiceDescriptionState: tests=4 failures=4 skipped=0
+T036 buildVoiceDescriptionPayload: tests=6 failures=6 skipped=0
+(all earlier suites T019-T032: failures=0)
+
+## 3. GREEN (helpers implemented), timestamp 2026-09-23T18:08:37+03:00
+$ bun test <scratchpad>/t036/capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/t036/green.xml   (saved as T036-fe.xml)
+ 43 pass, 0 fail, exit=0
+### counts from T036-fe.xml
+capability-logic.test.ts: tests=43 failures=0 skipped=0
+T020 getLanguageOptionsForEngine: tests=6 failures=0 skipped=0
+T019 isEngineSelectable: tests=2 failures=0 skipped=0
+T022 needsDownloadConfirmation: tests=3 failures=0 skipped=0
+T023 buildAdvancedSettingsPayload: tests=5 failures=0 skipped=0
+T023 advancedSettingStep: tests=1 failures=0 skipped=0
+T028 supportsCloning: tests=4 failures=0 skipped=0
+T028 declaredCloningEngineOptions: tests=3 failures=0 skipped=0
+T031 engineNotice: tests=5 failures=0 skipped=0
+T032 downloadConfirmationDetails warning: tests=3 failures=0 skipped=0
+T036 supportsVoiceDesign: tests=1 failures=0 skipped=0
+T036 voiceDescriptionState: tests=4 failures=0 skipped=0
+T036 buildVoiceDescriptionPayload: tests=6 failures=0 skipped=0
+
+## 4. Typecheck, timestamp 2026-09-23T18:11:05+03:00 (after the final edit)
+$ bun run typecheck
+$ bunx tsc -p app/tsconfig.json --noEmit && cd web && bunx tsc --noEmit
+exit=0
+
+## 5. Biome, touched files vs HEAD
+Method: the working files are CRLF on disk (autocrlf) and HEAD blobs are LF, so a direct comparison flags the whole file as a format change. LF copies of the working files (<scratchpad>/t036/work) and the HEAD blobs (<scratchpad>/t036/head) were both placed at the same relative path beside the repo's biome.json. Each was checked with node_modules/.bin/biome check --vcs-enabled=false <path>. The formatter's changes were compared by running format --write on a copy and diffing.
+- engineCapabilityRules.ts: HEAD clean, working clean.
+- useGenerationForm.ts: HEAD clean, working clean.
+- FloatingGenerateBox.tsx: HEAD 1 error (format), working 1 error (format). The formatter change is identical in both, and it predates this change: the persona aria-label and tooltip ternaries (lines left long at HEAD) plus a stray blank line.
+- en/translation.json: HEAD 1 error (format), working 1 error (format). Identical and pre-existing: '},      "remove": {' on one line.
+- A first draft had role="status" on the unused notice, which raised lint/a11y/useSemanticElements (a NEW finding). It was replaced with aria-live="polite", and the finding is gone.
+Result: no new Biome findings.
+Formatter diff comparison:
+=== formatter changes, head app/src/components/Generation/FloatingGenerateBox.tsx
+<                                     aria-label={active ? t('generation.persona.ariaLabelActive') : t('generation.persona.ariaLabelInactive')}
+>                                     aria-label={
+>                                       active
+>                                         ? t('generation.persona.ariaLabelActive')
+>                                         : t('generation.persona.ariaLabelInactive')
+>                                     }
+<                                     {active ? t('generation.persona.tooltipActive') : t('generation.persona.tooltipInactive')}
+>                                     {active
+>                                       ? t('generation.persona.tooltipActive')
+>                                       : t('generation.persona.tooltipInactive')}
+< 
+=== formatter changes, work app/src/components/Generation/FloatingGenerateBox.tsx
+<                                     aria-label={active ? t('generation.persona.ariaLabelActive') : t('generation.persona.ariaLabelInactive')}
+>                                     aria-label={
+>                                       active
+>                                         ? t('generation.persona.ariaLabelActive')
+>                                         : t('generation.persona.ariaLabelInactive')
+>                                     }
+<                                     {active ? t('generation.persona.tooltipActive') : t('generation.persona.tooltipInactive')}
+>                                     {active
+>                                       ? t('generation.persona.tooltipActive')
+>                                       : t('generation.persona.tooltipInactive')}
+< 
+=== formatter changes, head app/src/i18n/locales/en/translation.json
+<       },      "remove": {
+>       },
+>       "remove": {
+=== formatter changes, work app/src/i18n/locales/en/translation.json
+<       },      "remove": {
+>       },
+>       "remove": {
+
+## 6. No engine-name branching added
+$ git diff -U0 -- app/ | grep '^+' | grep -E "=== *'(voxcpm|kokoro|qwen|chatterbox)"  -> 0 lines
+Every decision comes from supports_voice_design (capability data) and the profile's voice_type. A test shows that a capability named 'kokoro' that declares voice design is 'active', and one named 'voxcpm' without it is 'hidden'.
+
+## 7. UI flow (file:line)
+Helpers, app/src/lib/hooks/engineCapabilityRules.ts:
+- supportsVoiceDesign :150
+- VoiceDescriptionState and voiceDescriptionState :162-171
+  - 'hidden' when there is no supports_voice_design.
+  - 'unused' when the profile's voice_type is 'cloned' or missing (the recording wins, C1Q6).
+  - otherwise 'active'.
+- buildVoiceDescriptionPayload :178. Returns the trimmed text only when active and non-blank, otherwise undefined.
+
+app/src/components/Generation/FloatingGenerateBox.tsx:
+- :170-171 showVoiceDescription = supportsVoiceDesign(selectedCapability); descriptionState = voiceDescriptionState(selectedCapability, selectedProfile).
+- :519-551 the toggle in the action row.
+  - It is shown only when isExpanded && showVoiceDescription (:521).
+  - It uses the lucide UserRoundPen icon (:543). Wand2 was already taken by the persona toggle.
+  - aria-label "Voice description" (:540), aria-pressed (:541), and the hover tooltip "Voice description" (:546).
+- :650-694 the block below the text, after the delivery-instruction block and before the advanced settings. Condition: isExpanded && isVoiceDescriptionExpanded && showVoiceDescription (:653).
+  - The visible <label> is a FormLabel "Voice description" (:666-668), tied to the textarea through FormControl's id.
+  - The helper text is a FormDescription (:669-671): "Describe the voice to create, for example 'A calm older woman with a low, warm voice'. Any language works."
+  - A Textarea bound to voiceDescription, with maxLength 500 (:673-680).
+  - The unused notice (:683-687), shown when descriptionState === 'unused': "This profile has a voice recording, so the recording sets the voice and this description is not used." The input stays editable.
+- :293 onSubmit passes selectedProfile to handleSubmit as the new optional third argument.
+- When the engine changes to one without voice design, showVoiceDescription is false. The toggle and block unmount, and the payload helper returns undefined, so the field is omitted.
+
+app/src/lib/hooks/useGenerationForm.ts:
+- :52 schema voiceDescription: z.string().max(500).optional().
+- :111 handleSubmit(data, selectedProfileId, selectedProfile?: Pick<VoiceProfileResponse,'voice_type'>).
+- :231-235 voice_description: buildVoiceDescriptionPayload(capability, selectedProfile, data.voiceDescription). It is a separate request field. The instruct logic is unchanged: instruct is still sent only for qwen_custom_voice, as at HEAD.
+- :252 form.reset keeps voiceDescription, so the user can iterate on the text with one designed voice.
+
+i18n, app/src/i18n/locales/en/translation.json:728-733: generation.voiceDescription.{label, help, placeholder, unused}.

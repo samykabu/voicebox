@@ -62,6 +62,7 @@ const ENGINE_DISPLAY_NAMES: Record<string, string> = {
   chatterbox: 'Chatterbox',
   chatterbox_turbo: 'Chatterbox Turbo',
   f5_tts: 'Arabic F5 / Habibi',
+  voxcpm: 'VoxCPM2',
 };
 
 export function formatEngineName(engine?: string, modelSize?: string): string {

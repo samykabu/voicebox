@@ -52,7 +52,8 @@ async def transcribe_audio(
         # unchanged.
         if file_suffix != ".wav":
             stt_path = f"{tmp_path}.stt.wav"
-            await asyncio.to_thread(save_audio, audio, stt_path, sr)
+            # A re-encode of the user's upload for Whisper: no AI-generated disclosure.
+            await asyncio.to_thread(save_audio, audio, stt_path, sr, disclosure=None)
 
         whisper_model = transcribe.get_whisper_model()
         model_size = model if model else whisper_model.model_size

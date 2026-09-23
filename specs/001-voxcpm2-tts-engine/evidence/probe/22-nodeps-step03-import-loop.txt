@@ -1,0 +1,452 @@
+# timestamp start: 2026-09-23T01:56:52+03:00
+# loop script: C:\Users\sabus\voxcpm-nodeps\nodeps_loop.sh ; check = 'from voxcpm import VoxCPM'
+#!/usr/bin/env bash
+# Add one dependency at a time until `$CHECK` succeeds. Each install uses the project constraints.
+W=/c/Users/sabus/voxcpm-nodeps/Scripts
+C=/c/Users/sabus/voxcpm-nodeps/project-constraints.txt
+CHECK="$1"          # python snippet to run
+MAXIT=${2:-25}
+declare -A MAP=( [yaml]=pyyaml [sklearn]=scikit-learn [PIL]=pillow [huggingface_hub]=huggingface-hub [google]=protobuf [cv2]=opencv-python )
+for i in $(seq 1 $MAXIT); do
+  echo "---- iteration $i  $(date -Iseconds)"
+  OUT=$($W/python.exe -c "$CHECK" 2>&1); RC=$?
+  echo "$OUT" | tail -6
+  if [ $RC -eq 0 ]; then echo "CHECK PASSED at iteration $i"; exit 0; fi
+  MOD=$(echo "$OUT" | grep -oE "No module named '[^']+'" | tail -1 | sed -E "s/No module named '([^'.]+).*'/\1/")
+  if [ -z "$MOD" ]; then echo "STOP: failure is not a missing module; needs manual action"; exit 2; fi
+  PKG=${MAP[$MOD]:-$MOD}
+  echo ">> missing module '$MOD' -> pip install $PKG  (-c project-constraints)"
+  S=$(date +%s)
+  $W/python.exe -m pip install "$PKG" -c "$C" 2>&1 | grep -E "Successfully installed|ERROR|error|conflict|requires" | head -20
+  echo ">> install dur=$(( $(date +%s)-S ))s"
+done
+echo "STOP: max iterations"; exit 3
+
+---- iteration 1  2026-09-23T01:56:53+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=23s
+---- iteration 2  2026-09-23T01:57:16+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=16s
+---- iteration 3  2026-09-23T01:57:32+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=16s
+---- iteration 4  2026-09-23T01:57:49+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=16s
+---- iteration 5  2026-09-23T01:58:06+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=16s
+---- iteration 6  2026-09-23T01:58:22+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=16s
+---- iteration 7  2026-09-23T01:58:38+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 8  2026-09-23T01:58:53+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=16s
+---- iteration 9  2026-09-23T01:59:09+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 10  2026-09-23T01:59:24+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 11  2026-09-23T01:59:41+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 12  2026-09-23T01:59:56+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 13  2026-09-23T02:00:12+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 14  2026-09-23T02:00:28+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 15  2026-09-23T02:00:43+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 16  2026-09-23T02:00:59+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=16s
+---- iteration 17  2026-09-23T02:01:15+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 18  2026-09-23T02:01:30+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 19  2026-09-23T02:01:46+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 20  2026-09-23T02:02:01+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 21  2026-09-23T02:02:17+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 22  2026-09-23T02:02:33+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=16s
+---- iteration 23  2026-09-23T02:02:49+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 24  2026-09-23T02:03:04+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=15s
+---- iteration 25  2026-09-23T02:03:20+03:00
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  ..\meson.build:1:0: ERROR: Unable to detect linker for compiler `clang -Wl,--version`
+  clang: error: unable to execute command: program not executable
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+Encountered error while generating package metadata.
+>> install dur=16s
+STOP: max iterations
+exit=3
+# timestamp end: 2026-09-23T02:03:36+03:00

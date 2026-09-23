@@ -39,15 +39,15 @@
       "distribution": "local-development"
     },
     "workflow": {
-      "version": "1.0.0",
+      "version": "1.2.0",
       "enabled": true,
-      "manifest_hash": "sha256:0eb92043a5dcb0aed81f2fa6c8688aa4ac421297c13270a7028c9f966fa036f9",
+      "manifest_hash": "sha256:2e1d076b6aec073c11d0bee48cfece79bbdb06c321fa9a0df4348e34b6755ac3",
       "source": "local",
-      "release_url": "https://github.com/samykabu/sanduq/releases/download/workflow-v1.0.0/workflow.zip",
+      "release_url": "https://github.com/samykabu/sanduq/releases/download/workflow-v1.2.0/workflow.zip",
       "distribution": "local-development"
     }
   },
-  "dependency_digest": "cbe49c54173803273109984b75d2a078de661d2a3d88389641a490d374554b65",
+  "dependency_digest": "e59b9f46ff13271d896bdda3fafca27f42a992823e767a359132482e0b6f7f70",
   "aliases": {
     ".agents/skills/speckit-scope/SKILL.md": "bfd463e13e19ae2c10da7016407a37333046fabe2c946648431af5016b03a64e",
     ".claude/skills/speckit-scope/SKILL.md": "bfd463e13e19ae2c10da7016407a37333046fabe2c946648431af5016b03a64e",
@@ -59,19 +59,19 @@
       "version": "1.4.0",
       "enabled": true,
       "priority": 2,
-      "manifest_hash": "sha256:8924e7de9b23679992be6ddef32ddd37e4f25cc4db0f576335b622646624f00d"
+      "manifest_hash": "sha256:0a514cf8474dca3f3e0a4add96a346b28b93adff5b50261493eca5a75c4cf10e"
     },
     "scope-brainstorm": {
       "version": "1.4.0",
       "enabled": true,
       "priority": 2,
-      "manifest_hash": "sha256:bec4e5ca1927c8917f13eeed676ba35512b595eb0537379036f90b91483f481c"
+      "manifest_hash": "sha256:0314622993ce4373af0866c1d66dfd517051635fe95e24e512b6d7e9822200e5"
     },
     "workflow": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "enabled": true,
       "priority": 1,
-      "manifest_hash": "sha256:1050299d565843c4e8afc0d34d8fedc88a43aa261265c0d803cd54ddb89f44a1"
+      "manifest_hash": "sha256:8cee630c6a8c652f42d481af66dd61fe799fdb23f0b4312dc93563c81fc784b0"
     }
   },
   "tested_compatibility": {

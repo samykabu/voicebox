@@ -1,0 +1,240 @@
+timestamp: 2026-09-23T21:37:50+03:00
+command: backend/venv/Scripts/python.exe -m pytest backend/tests/test_review_s5.py -q -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/review/S5-red.xml
+
+FF.F.FFF                                                                 [100%]
+================================== FAILURES ===================================
+___ TestGenerationExportEngine.test_voxcpm_designed_generation_round_trips ____
+
+self = <backend.tests.test_review_s5.TestGenerationExportEngine object at 0x000002B0FAC62BD0>
+test_db = <sqlalchemy.orm.session.Session object at 0x000002B0FB054D70>
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-109/test_voxcpm_designed_generatio0/data')
+
+    @pytest.mark.asyncio
+    async def test_voxcpm_designed_generation_round_trips(self, test_db, data_dir):
+        generation = _generation(
+            test_db, _profile(test_db), engine="voxcpm", model_size=None, voice_description=DESCRIPTION
+        )
+    
+        zip_bytes = export_generation_to_zip(generation.id, test_db)
+        exported = _manifest(zip_bytes)
+        assert exported["version"] == "1.1"
+>       assert exported["generation"]["engine"] == "voxcpm"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'engine'
+
+backend\tests\test_review_s5.py:137: KeyError
+_ TestGenerationExportEngine.test_qwen_small_model_round_trips_with_its_size __
+
+self = <backend.tests.test_review_s5.TestGenerationExportEngine object at 0x000002B0FB042780>
+test_db = <sqlalchemy.orm.session.Session object at 0x000002B0FB0D0B30>
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-109/test_qwen_small_model_round_tr0/data')
+
+    @pytest.mark.asyncio
+    async def test_qwen_small_model_round_trips_with_its_size(self, test_db, data_dir):
+        generation = _generation(test_db, _profile(test_db), engine="qwen", model_size="0.6B")
+    
+        zip_bytes = export_generation_to_zip(generation.id, test_db)
+>       assert _manifest(zip_bytes)["generation"]["model_size"] == "0.6B"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'model_size'
+
+backend\tests\test_review_s5.py:153: KeyError
+_ TestGenerationExportEngine.test_unknown_engine_falls_back_to_the_default_with_a_warning _
+
+self = <backend.tests.test_review_s5.TestGenerationExportEngine object at 0x000002B0FB042F90>
+test_db = <sqlalchemy.orm.session.Session object at 0x000002B0FB318800>
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-109/test_unknown_engine_falls_back0/data')
+caplog = <_pytest.logging.LogCaptureFixture object at 0x000002B0FB37C7A0>
+
+    @pytest.mark.asyncio
+    async def test_unknown_engine_falls_back_to_the_default_with_a_warning(self, test_db, data_dir, caplog):
+        _profile(test_db)
+    
+        with caplog.at_level(logging.WARNING):
+            result = await import_generation_from_zip(
+                _archive("1.1", engine="evil_engine", model_size="0.6B"), test_db
+            )
+    
+        row = _row(test_db, result["id"])
+        assert row.engine == "qwen"
+        assert row.model_size is None
+>       assert any("evil_engine" in r.getMessage() for r in caplog.records if r.levelno == logging.WARNING)
+E       assert False
+E        +  where False = any(<generator object TestGenerationExportEngine.test_unknown_engine_falls_back_to_the_default_with_a_warning.<locals>.<genexpr> at 0x000002B0FB38CA00>)
+
+backend\tests\test_review_s5.py:186: AssertionError
+_ TestGenerationExportEngine.test_known_engine_with_bogus_size_keeps_engine_and_uses_its_default_size _
+
+self = <backend.tests.test_review_s5.TestGenerationExportEngine object at 0x000002B0FB043740>
+test_db = <sqlalchemy.orm.session.Session object at 0x000002B0FB37C6B0>
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-109/test_known_engine_with_bogus_s0/data')
+caplog = <_pytest.logging.LogCaptureFixture object at 0x000002B0FC38BB30>
+
+    @pytest.mark.asyncio
+    async def test_known_engine_with_bogus_size_keeps_engine_and_uses_its_default_size(
+        self, test_db, data_dir, caplog
+    ):
+        _profile(test_db)
+    
+        with caplog.at_level(logging.WARNING):
+            result = await import_generation_from_zip(_archive("1.1", engine="qwen", model_size="999B"), test_db)
+    
+        row = _row(test_db, result["id"])
+        assert row.engine == "qwen"
+>       assert row.model_size == get_default_model_size("qwen")
+E       AssertionError: assert None == '1.7B'
+E        +  where None = <backend.database.models.Generation object at 0x000002B0FB341C40>.model_size
+E        +  and   '1.7B' = get_default_model_size('qwen')
+
+backend\tests\test_review_s5.py:209: AssertionError
+____ TestGenerationExportEngine.test_engine_without_sizes_stores_null_size ____
+
+self = <backend.tests.test_review_s5.TestGenerationExportEngine object at 0x000002B0FB043B30>
+test_db = <sqlalchemy.orm.session.Session object at 0x000002B0FB341F10>
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-109/test_engine_without_sizes_stor0/data')
+caplog = <_pytest.logging.LogCaptureFixture object at 0x000002B0FB31ADE0>
+
+    @pytest.mark.asyncio
+    async def test_engine_without_sizes_stores_null_size(self, test_db, data_dir, caplog):
+        _profile(test_db)
+    
+        with caplog.at_level(logging.WARNING):
+            result = await import_generation_from_zip(
+                _archive("1.1", engine="voxcpm", model_size="bogus", voice_description=DESCRIPTION), test_db
+            )
+    
+        row = _row(test_db, result["id"])
+>       assert row.engine == "voxcpm"
+E       AssertionError: assert 'qwen' == 'voxcpm'
+E         
+E         - voxcpm
+E         + qwen
+
+backend\tests\test_review_s5.py:222: AssertionError
+_ TestGenerationExportEngine.test_regenerate_after_import_runs_voxcpm_with_the_description _
+
+self = <backend.tests.test_review_s5.TestGenerationExportEngine object at 0x000002B0FB043EC0>
+test_db = <sqlalchemy.orm.session.Session object at 0x000002B0FB0D0560>
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-109/test_regenerate_after_import_r0/data')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002B0FB31B860>
+
+    @pytest.mark.asyncio
+    async def test_regenerate_after_import_runs_voxcpm_with_the_description(self, test_db, data_dir, monkeypatch):
+        from backend.routes import generations as routes_mod
+    
+        generation = _generation(
+            test_db, _profile(test_db), engine="voxcpm", model_size=None, voice_description=DESCRIPTION
+        )
+        result = await import_generation_from_zip(export_generation_to_zip(generation.id, test_db), test_db)
+    
+        run = {}
+    
+        def fake_run_generation(**kwargs):
+            run.update(kwargs)
+            return "job"
+    
+        required = []
+        monkeypatch.setattr(routes_mod, "_require_available_engine", required.append)
+        monkeypatch.setattr(routes_mod, "run_generation", fake_run_generation)
+        monkeypatch.setattr(routes_mod, "enqueue_generation", lambda *_a, **_k: None)
+        monkeypatch.setattr(
+            routes_mod, "get_task_manager", lambda: SimpleNamespace(start_generation=lambda **_k: None)
+        )
+    
+        await routes_mod.regenerate_generation(result["id"], db=test_db)
+    
+>       assert required == ["voxcpm"]
+E       AssertionError: assert ['qwen'] == ['voxcpm']
+E         
+E         At index 0 diff: 'qwen' != 'voxcpm'
+E         Use -v to get more diff
+
+backend\tests\test_review_s5.py:252: AssertionError
+============================== warnings summary ===============================
+backend\database\models.py:26
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+backend\models.py:33
+  D:\Projects\Personal\voicebox\backend\models.py:33: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(BaseModel):
+
+backend\models.py:69
+  D:\Projects\Personal\voicebox\backend\models.py:69: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ProfileSampleResponse(BaseModel):
+
+backend\models.py:162
+  D:\Projects\Personal\voicebox\backend\models.py:162: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationResponse(BaseModel):
+
+backend\models.py:227
+  D:\Projects\Personal\voicebox\backend\models.py:227: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationEntryResponse(BaseModel):
+
+backend\models.py:285
+  D:\Projects\Personal\voicebox\backend\models.py:285: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class HistoryResponse(BaseModel):
+
+backend\models.py:339
+  D:\Projects\Personal\voicebox\backend\models.py:339: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureResponse(BaseModel):
+
+backend\models.py:394
+  D:\Projects\Personal\voicebox\backend\models.py:394: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureSettingsResponse(BaseModel):
+
+backend\models.py:435
+  D:\Projects\Personal\voicebox\backend\models.py:435: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationSettingsResponse(BaseModel):
+
+backend\models.py:456
+  D:\Projects\Personal\voicebox\backend\models.py:456: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class MCPClientBindingResponse(BaseModel):
+
+backend\models.py:736
+  D:\Projects\Personal\voicebox\backend\models.py:736: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioChannelResponse(BaseModel):
+
+backend\models.py:768
+  D:\Projects\Personal\voicebox\backend\models.py:768: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+backend\models.py:782
+  D:\Projects\Personal\voicebox\backend\models.py:782: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+backend\models.py:814
+  D:\Projects\Personal\voicebox\backend\models.py:814: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+backend\models.py:922
+  D:\Projects\Personal\voicebox\backend\models.py:922: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+backend\models.py:936
+  D:\Projects\Personal\voicebox\backend\models.py:936: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+tests/test_review_s5.py: 19 warnings
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\sqlalchemy\sql\schema.py:3627: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+tests/test_review_s5.py::TestGenerationExportEngine::test_legacy_manifest_without_the_keys_gets_the_column_defaults
+tests/test_review_s5.py::TestGenerationExportEngine::test_unknown_engine_falls_back_to_the_default_with_a_warning
+tests/test_review_s5.py::TestGenerationExportEngine::test_non_string_engine_falls_back_to_the_default
+tests/test_review_s5.py::TestGenerationExportEngine::test_known_engine_with_bogus_size_keeps_engine_and_uses_its_default_size
+tests/test_review_s5.py::TestGenerationExportEngine::test_engine_without_sizes_stores_null_size
+tests/test_review_s5.py::TestGenerationExportEngine::test_regenerate_after_import_runs_voxcpm_with_the_description
+  D:\Projects\Personal\voicebox\backend\services\export_import.py:477: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\test_review_s5.py::TestGenerationExportEngine::test_voxcpm_designed_generation_round_trips
+FAILED backend\tests\test_review_s5.py::TestGenerationExportEngine::test_qwen_small_model_round_trips_with_its_size
+FAILED backend\tests\test_review_s5.py::TestGenerationExportEngine::test_unknown_engine_falls_back_to_the_default_with_a_warning
+FAILED backend\tests\test_review_s5.py::TestGenerationExportEngine::test_known_engine_with_bogus_size_keeps_engine_and_uses_its_default_size
+FAILED backend\tests\test_review_s5.py::TestGenerationExportEngine::test_engine_without_sizes_stores_null_size
+FAILED backend\tests\test_review_s5.py::TestGenerationExportEngine::test_regenerate_after_import_runs_voxcpm_with_the_description
+6 failed, 2 passed, 41 warnings in 3.21s
+exit: 1

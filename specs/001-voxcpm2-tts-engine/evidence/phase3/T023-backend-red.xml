@@ -1,0 +1,659 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="24" skipped="0" tests="25" time="2.422" timestamp="2026-09-23T16:27:46.572806+03:00" hostname="DevelopmentPC"><testcase classname="tests.test_generation_advanced_settings" name="test_declaring_engine_receives_the_settings_as_options" time="0.851"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.OptionsBackend object at 0x0000020AA498B890&gt;, statuses=[])
+
+    @pytest.mark.asyncio
+    async def test_declaring_engine_receives_the_settings_as_options(service) -&gt; None:
+        service.backend = OptionsBackend()
+    
+&gt;       await _run("voxcpm", SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_declaring_engine_without_settings_gets_no_options[None]" time="0.002"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.OptionsBackend object at 0x0000020AA49C38C0&gt;, statuses=[])
+advanced_settings = None
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("advanced_settings", [None, {}])
+    async def test_declaring_engine_without_settings_gets_no_options(service, advanced_settings) -&gt; None:
+        service.backend = OptionsBackend()
+    
+&gt;       await _run("voxcpm", advanced_settings)
+
+backend\tests\test_generation_advanced_settings.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_declaring_engine_without_settings_gets_no_options[advanced_settings1]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.OptionsBackend object at 0x0000020AA49C3890&gt;, statuses=[])
+advanced_settings = {}
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("advanced_settings", [None, {}])
+    async def test_declaring_engine_without_settings_gets_no_options(service, advanced_settings) -&gt; None:
+        service.backend = OptionsBackend()
+    
+&gt;       await _run("voxcpm", advanced_settings)
+
+backend\tests\test_generation_advanced_settings.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm', advanced_settings = {}
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_never_receive_an_options_keyword[qwen]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F0320&gt;, statuses=[])
+engine = 'qwen'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -&gt; None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'qwen'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_never_receive_an_options_keyword[qwen_custom_voice]" time="0.002"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F3500&gt;, statuses=[])
+engine = 'qwen_custom_voice'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -&gt; None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'qwen_custom_voice'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_never_receive_an_options_keyword[luxtts]" time="0.002"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F1A00&gt;, statuses=[])
+engine = 'luxtts'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -&gt; None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'luxtts'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_never_receive_an_options_keyword[chatterbox]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F2780&gt;, statuses=[])
+engine = 'chatterbox'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -&gt; None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'chatterbox'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_never_receive_an_options_keyword[chatterbox_turbo]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F3740&gt;, statuses=[])
+engine = 'chatterbox_turbo'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -&gt; None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'chatterbox_turbo'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_never_receive_an_options_keyword[tada]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A101A0&gt;, statuses=[])
+engine = 'tada'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -&gt; None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'tada'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_never_receive_an_options_keyword[kokoro]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A10C80&gt;, statuses=[])
+engine = 'kokoro'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -&gt; None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'kokoro'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_never_receive_an_options_keyword[f5_tts]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A11C10&gt;, statuses=[])
+engine = 'f5_tts'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -&gt; None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'f5_tts'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_are_called_exactly_as_before_without_settings[qwen]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A12A80&gt;, statuses=[])
+engine = 'qwen'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -&gt; None:
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'qwen', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_are_called_exactly_as_before_without_settings[qwen_custom_voice]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A13DD0&gt;, statuses=[])
+engine = 'qwen_custom_voice'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -&gt; None:
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'qwen_custom_voice', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_are_called_exactly_as_before_without_settings[luxtts]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A12A20&gt;, statuses=[])
+engine = 'luxtts'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -&gt; None:
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'luxtts', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_are_called_exactly_as_before_without_settings[chatterbox]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A10EC0&gt;, statuses=[])
+engine = 'chatterbox'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -&gt; None:
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'chatterbox', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_are_called_exactly_as_before_without_settings[chatterbox_turbo]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA2C8B5F0&gt;, statuses=[])
+engine = 'chatterbox_turbo'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -&gt; None:
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'chatterbox_turbo', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_are_called_exactly_as_before_without_settings[tada]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F3920&gt;, statuses=[])
+engine = 'tada'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -&gt; None:
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'tada', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_are_called_exactly_as_before_without_settings[kokoro]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F0C50&gt;, statuses=[])
+engine = 'kokoro'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -&gt; None:
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'kokoro', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_existing_engines_are_called_exactly_as_before_without_settings[f5_tts]" time="0.001"><failure message="TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'">service = namespace(backend=&lt;backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F0410&gt;, statuses=[])
+engine = 'f5_tts'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -&gt; None:
+        service.backend = StrictBackend()
+    
+&gt;       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'f5_tts', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+&gt;       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_backend_is_returned_unwrapped_when_nothing_applies" time="0.000"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'backend_with_generation_options'">def test_backend_is_returned_unwrapped_when_nothing_applies() -&gt; None:
+        backend = StrictBackend()
+    
+&gt;       assert generation_service.backend_with_generation_options(backend, "kokoro", SETTINGS) is backend
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'backend_with_generation_options'
+
+backend\tests\test_generation_advanced_settings.py:149: AttributeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_wrapped_backend_delegates_everything_else" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'backend_with_generation_options'">@pytest.mark.asyncio
+    async def test_wrapped_backend_delegates_everything_else() -&gt; None:
+        backend = OptionsBackend()
+&gt;       wrapped = generation_service.backend_with_generation_options(backend, "voxcpm", SETTINGS)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'backend_with_generation_options'
+
+backend\tests\test_generation_advanced_settings.py:157: AttributeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_declaration_lookup_reads_the_model_configs" time="0.000"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'engine_declares_advanced_settings'">def test_declaration_lookup_reads_the_model_configs() -&gt; None:
+&gt;       assert generation_service.engine_declares_advanced_settings("voxcpm") is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'engine_declares_advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:168: AttributeError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_voxcpm_backend_applies_options_with_declared_defaults_as_fallback" time="0.088" /><testcase classname="tests.test_generation_advanced_settings" name="test_generate_route_threads_advanced_settings_to_the_service" time="0.025"><failure message="KeyError: 'advanced_settings'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000020AA4A15640&gt;
+
+    @pytest.mark.asyncio
+    async def test_generate_route_threads_advanced_settings_to_the_service(monkeypatch) -&gt; None:
+        from backend.routes import generations as routes_mod
+    
+        captured: dict = {}
+    
+        async def fake_get_profile(*_a, **_k):
+            return SimpleNamespace(default_engine=None, preset_engine=None, personality=None, effects_chain=None)
+    
+        async def fake_create_generation(**kwargs):
+            return SimpleNamespace(id=kwargs["generation_id"])
+    
+        def fake_run_generation(**kwargs):
+            captured.update(kwargs)
+            return "job"
+    
+        class FakeQuery:
+            def filter_by(self, **_k):
+                return self
+    
+            def first(self):
+                return None
+    
+        fake_db = SimpleNamespace(query=lambda *_a: FakeQuery())
+    
+        monkeypatch.setattr(routes_mod.profiles, "get_profile", fake_get_profile)
+        monkeypatch.setattr(routes_mod.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+        monkeypatch.setattr(routes_mod.history, "create_generation", fake_create_generation)
+        monkeypatch.setattr(routes_mod, "run_generation", fake_run_generation)
+        monkeypatch.setattr(routes_mod, "enqueue_generation", lambda *_a, **_k: None)
+    
+        data = models.GenerationRequest(profile_id="p1", text="Hello.", engine="voxcpm", advanced_settings=SETTINGS)
+        await routes_mod.generate_speech(data, db=fake_db)
+    
+        assert captured["engine"] == "voxcpm"
+&gt;       assert captured["advanced_settings"] == SETTINGS
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:246: KeyError</failure></testcase><testcase classname="tests.test_generation_advanced_settings" name="test_stream_route_passes_options_to_a_declaring_engine" time="0.003"><failure message="AssertionError: assert None == {'cfg_value': 2.5, 'inference_timesteps': 16.0}">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000020AA4E17170&gt;
+
+    @pytest.mark.asyncio
+    async def test_stream_route_passes_options_to_a_declaring_engine(monkeypatch) -&gt; None:
+        import backend.backends as backends_pkg
+        from backend.routes import generations as routes_mod
+    
+        backend = OptionsBackend()
+    
+        async def fake_get_profile(*_a, **_k):
+            return SimpleNamespace(default_engine=None, preset_engine=None, personality=None, effects_chain=None)
+    
+        async def noop(*_a, **_k):
+            return None
+    
+        async def fake_voice_prompt(*_a, **_k):
+            return {}
+    
+        monkeypatch.setattr(routes_mod.profiles, "get_profile", fake_get_profile)
+        monkeypatch.setattr(routes_mod.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+        monkeypatch.setattr(routes_mod.profiles, "create_voice_prompt_for_profile", fake_voice_prompt)
+        monkeypatch.setattr(routes_mod.pronunciation, "apply_pronunciations", lambda text, *_a, **_k: (text, []))
+        monkeypatch.setattr(backends_pkg, "get_tts_backend_for_engine", lambda _engine: backend)
+        monkeypatch.setattr(backends_pkg, "ensure_model_cached_or_raise", noop)
+        monkeypatch.setattr(backends_pkg, "load_engine_model", noop)
+    
+        data = models.GenerationRequest(profile_id="p1", text="Hello.", engine="voxcpm", advanced_settings=SETTINGS)
+        await routes_mod.stream_speech(data, db=None)
+    
+&gt;       assert backend.calls[0]["options"] == SETTINGS
+E       AssertionError: assert None == {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+backend\tests\test_generation_advanced_settings.py:276: AssertionError</failure></testcase></testsuite></testsuites>

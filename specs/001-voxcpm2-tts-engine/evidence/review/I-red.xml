@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="14" skipped="0" tests="19" time="3.362" timestamp="2026-09-23T21:10:38.687740+03:00" hostname="DevelopmentPC"><testcase classname="tests.test_voxcpm_review.TestNoVoiceboxRunawayRetry" name="test_voxcpm_does_not_declare_voicebox_runaway_retry" time="0.002"><failure message="AssertionError: assert True is False&#10; +  where True = engine_retries_runaway('voxcpm')">self = &lt;backend.tests.test_voxcpm_review.TestNoVoiceboxRunawayRetry object at 0x00000168811D6B10&gt;
+
+    def test_voxcpm_does_not_declare_voicebox_runaway_retry(self) -&gt; None:
+&gt;       assert engine_retries_runaway("voxcpm") is False
+E       AssertionError: assert True is False
+E        +  where True = engine_retries_runaway('voxcpm')
+
+tests\test_voxcpm_review.py:151: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestNoVoiceboxRunawayRetry" name="test_chunked_path_never_calls_the_detector_or_resplits" time="0.161"><failure message="RuntimeError: TTS output remained unstable after retrying smaller text chunks">self = &lt;backend.tests.test_voxcpm_review.TestNoVoiceboxRunawayRetry object at 0x00000168811D6E10&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000168817777A0&gt;
+vendor = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x0000016881777830&gt;
+
+    @pytest.mark.asyncio
+    async def test_chunked_path_never_calls_the_detector_or_resplits(self, backend, vendor: _Vendor) -&gt; None:
+        vendor.audio_for = lambda _index, _kwargs: _runaway_audio(FAKE_SAMPLE_RATE)
+        assert has_tts_runaway(_runaway_audio(FAKE_SAMPLE_RATE), FAKE_SAMPLE_RATE) is True
+    
+        detector_calls: list[int] = []
+    
+        def spy_detector(audio, sample_rate):
+            detector_calls.append(len(audio))
+            return has_tts_runaway(audio, sample_rate)
+    
+        # Built exactly as services/generation.py and routes/generations.py build it.
+        runaway_detector = spy_detector if engine_retries_runaway("voxcpm") else None
+    
+&gt;       await generate_chunked(
+            backend,
+            LONG_TEXT,
+            {},
+            max_chunk_chars=MAX_CHARS,
+            runaway_detector=runaway_detector,
+        )
+
+tests\test_voxcpm_review.py:167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+utils\chunked_tts.py:337: in generate_chunked
+    chunk_audio, chunk_sr = await generate_one(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+chunk_text = 'The lighthouse keeper climbed the spiral stairs every evening before the sun went down.'
+chunk_seed = None, retry_depth = 0
+
+    async def generate_one(
+        chunk_text: str,
+        chunk_seed: int | None,
+        retry_depth: int = 0,
+    ) -&gt; tuple[np.ndarray, int]:
+        chunk_audio, chunk_sr = await backend.generate(
+            chunk_text,
+            voice_prompt,
+            language,
+            chunk_seed,
+            instruct,
+        )
+    
+        if runaway_detector is not None and runaway_detector(chunk_audio, chunk_sr):
+            if retry_depth &gt;= MAX_RUNAWAY_RETRIES or len(chunk_text) &lt;= MIN_RUNAWAY_RETRY_CHARS:
+&gt;               raise RuntimeError(
+                    "TTS output remained unstable after retrying smaller text chunks"
+                )
+E               RuntimeError: TTS output remained unstable after retrying smaller text chunks
+
+utils\chunked_tts.py:268: RuntimeError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestNoVoiceboxRunawayRetry" name="test_service_path_never_calls_the_detector_for_voxcpm" time="0.246"><failure message="RuntimeError: TTS output remained unstable after retrying smaller text chunks">self = &lt;backend.tests.test_voxcpm_review.TestNoVoiceboxRunawayRetry object at 0x00000168811D7290&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x0000016881777920&gt;
+vendor = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x0000016881777200&gt;
+reference_file = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-84/test_service_path_never_calls_0/reference.wav')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000168817947D0&gt;
+
+    @pytest.mark.asyncio
+    async def test_service_path_never_calls_the_detector_for_voxcpm(
+        self, backend, vendor: _Vendor, reference_file: Path, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        import backend.backends as backends_pkg
+        import backend.utils.audio as audio_utils
+        from backend.services import generation as generation_service
+    
+        vendor.audio_for = lambda _index, _kwargs: _runaway_audio(FAKE_SAMPLE_RATE)
+        detector_calls: list[int] = []
+    
+        def spy_detector(audio, sample_rate=24000, **kwargs):
+            detector_calls.append(len(audio))
+            return True
+    
+        class FakeSession:
+            def close(self) -&gt; None:
+                pass
+    
+        def fake_get_db():
+            yield FakeSession()
+    
+        async def fake_voice_prompt(*_a, **_k):
+            return _clone_prompt(reference_file)
+    
+        async def fake_load(*_a, **_k):
+            return None
+    
+        monkeypatch.setattr(audio_utils, "has_tts_runaway", spy_detector)
+        monkeypatch.setattr(generation_service, "get_db", fake_get_db)
+        monkeypatch.setattr(generation_service.profiles, "create_voice_prompt_for_profile", fake_voice_prompt)
+        monkeypatch.setattr(generation_service, "ensure_engine_available", lambda _engine: None)
+        monkeypatch.setattr(backends_pkg, "get_tts_backend_for_engine", lambda _engine: backend)
+        monkeypatch.setattr(backends_pkg, "load_engine_model", fake_load)
+    
+&gt;       await generation_service.generate_audio_sync(
+            profile_id="p1",
+            text=LONG_TEXT,
+            language="en",
+            engine="voxcpm",
+            model_size="default",
+            max_chunk_chars=MAX_CHARS,
+            normalize=False,
+        )
+
+tests\test_voxcpm_review.py:213: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+services\generation.py:486: in generate_audio_sync
+    audio, sample_rate = await generate_chunked(
+utils\chunked_tts.py:337: in generate_chunked
+    chunk_audio, chunk_sr = await generate_one(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+chunk_text = 'The lighthouse keeper climbed the spiral stairs every evening before the sun went down.'
+chunk_seed = None, retry_depth = 0
+
+    async def generate_one(
+        chunk_text: str,
+        chunk_seed: int | None,
+        retry_depth: int = 0,
+    ) -&gt; tuple[np.ndarray, int]:
+        chunk_audio, chunk_sr = await backend.generate(
+            chunk_text,
+            voice_prompt,
+            language,
+            chunk_seed,
+            instruct,
+        )
+    
+        if runaway_detector is not None and runaway_detector(chunk_audio, chunk_sr):
+            if retry_depth &gt;= MAX_RUNAWAY_RETRIES or len(chunk_text) &lt;= MIN_RUNAWAY_RETRY_CHARS:
+&gt;               raise RuntimeError(
+                    "TTS output remained unstable after retrying smaller text chunks"
+                )
+E               RuntimeError: TTS output remained unstable after retrying smaller text chunks
+
+utils\chunked_tts.py:268: RuntimeError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestLoadAndInferenceLocks" name="test_concurrent_async_loads_call_from_pretrained_once" time="0.205"><failure message="assert 5 == 1&#10; +  where 5 = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F1400&gt;.from_pretrained_calls">self = &lt;backend.tests.test_voxcpm_review.TestLoadAndInferenceLocks object at 0x00000168811D76E0&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000168832F13D0&gt;
+vendor = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F1400&gt;
+
+    @pytest.mark.asyncio
+    async def test_concurrent_async_loads_call_from_pretrained_once(self, backend, vendor: _Vendor) -&gt; None:
+        vendor.load_delay = 0.2
+    
+        await asyncio.gather(*(backend.load_model() for _ in range(5)))
+    
+&gt;       assert vendor.from_pretrained_calls == 1
+E       assert 5 == 1
+E        +  where 5 = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F1400&gt;.from_pretrained_calls
+
+tests\test_voxcpm_review.py:236: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestLoadAndInferenceLocks" name="test_concurrent_thread_loads_call_from_pretrained_once" time="0.203"><failure message="assert 5 == 1&#10; +  where 5 = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F2750&gt;.from_pretrained_calls">self = &lt;backend.tests.test_voxcpm_review.TestLoadAndInferenceLocks object at 0x00000168811D7B00&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000168832F2720&gt;
+vendor = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F2750&gt;
+
+    def test_concurrent_thread_loads_call_from_pretrained_once(self, backend, vendor: _Vendor) -&gt; None:
+        vendor.load_delay = 0.2
+        barrier = threading.Barrier(5)
+        errors: list[BaseException] = []
+    
+        def worker() -&gt; None:
+            try:
+                barrier.wait()
+                backend._load_model_sync()
+            except BaseException as exc:  # noqa: BLE001 -- surface worker failures in the test
+                errors.append(exc)
+    
+        threads = [threading.Thread(target=worker) for _ in range(5)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+    
+        assert errors == []
+&gt;       assert vendor.from_pretrained_calls == 1
+E       assert 5 == 1
+E        +  where 5 = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F2750&gt;.from_pretrained_calls
+
+tests\test_voxcpm_review.py:258: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestLoadAndInferenceLocks" name="test_concurrent_generates_never_overlap_in_the_vendor" time="0.058"><failure message="assert 4 == 1&#10; +  where 4 = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F3E60&gt;.max_active">self = &lt;backend.tests.test_voxcpm_review.TestLoadAndInferenceLocks object at 0x00000168811D7F20&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000168832F3E30&gt;
+vendor = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F3E60&gt;
+reference_file = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-84/test_concurrent_generates_neve0/reference.wav')
+
+    @pytest.mark.asyncio
+    async def test_concurrent_generates_never_overlap_in_the_vendor(
+        self, backend, vendor: _Vendor, reference_file: Path
+    ) -&gt; None:
+        vendor.generate_delay = 0.05
+        prompt = _clone_prompt(reference_file)
+    
+        results = await asyncio.gather(*(backend.generate(f"Line {i}.", prompt, seed=i) for i in range(4)))
+    
+        assert len(results) == 4
+        assert len(vendor.generate_calls) == 4
+&gt;       assert vendor.max_active == 1
+E       assert 4 == 1
+E        +  where 4 = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F3E60&gt;.max_active
+
+tests\test_voxcpm_review.py:271: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestLoadAndInferenceLocks" name="test_generate_during_a_load_waits_and_loads_once" time="0.208"><failure message="assert 3 == 1&#10; +  where 3 = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F2F00&gt;.from_pretrained_calls">self = &lt;backend.tests.test_voxcpm_review.TestLoadAndInferenceLocks object at 0x00000168811F4380&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000168832F2ED0&gt;
+vendor = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F2F00&gt;
+reference_file = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-84/test_generate_during_a_load_wa0/reference.wav')
+
+    @pytest.mark.asyncio
+    async def test_generate_during_a_load_waits_and_loads_once(
+        self, backend, vendor: _Vendor, reference_file: Path
+    ) -&gt; None:
+        vendor.load_delay = 0.2
+        prompt = _clone_prompt(reference_file)
+    
+        await asyncio.gather(backend.load_model(), backend.generate("One.", prompt), backend.generate("Two.", prompt))
+    
+&gt;       assert vendor.from_pretrained_calls == 1
+E       assert 3 == 1
+E        +  where 3 = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F2F00&gt;.from_pretrained_calls
+
+tests\test_voxcpm_review.py:284: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_later_chunks_continue_from_chunk_zero" time="0.003"><failure message="AssertionError: assert ['(A young wo...name at all.'] == ['(A young wo...name at all.']&#10;  &#10;  At index 1 diff: '(A young woman, warm and bright voice)He polished the great lens until it shone, then lit the lamp and watched the sea turn.' != 'He polished the great lens until it shone, then lit the lamp and watched the sea turn.'&#10;  Use -v to get more diff">self = &lt;backend.tests.test_voxcpm_review.TestDesignModeChunkContinuity object at 0x00000168811F4890&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x00000168832F2780&gt;
+vendor = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x00000168832F3950&gt;
+
+    @pytest.mark.asyncio
+    async def test_later_chunks_continue_from_chunk_zero(self, backend, vendor: _Vendor) -&gt; None:
+        audio, sample_rate = await generate_chunked(
+            backend,
+            LONG_TEXT,
+            {"voice_type": "designed", "design_prompt": DESCRIPTION},
+            seed=42,
+            instruct=DESCRIPTION,
+            max_chunk_chars=MAX_CHARS,
+        )
+    
+        calls = vendor.generate_calls
+&gt;       assert [c["text"] for c in calls] == [f"({DESCRIPTION}){SENTENCES[0]}", SENTENCES[1], SENTENCES[2]]
+E       AssertionError: assert ['(A young wo...name at all.'] == ['(A young wo...name at all.']
+E         
+E         At index 1 diff: '(A young woman, warm and bright voice)He polished the great lens until it shone, then lit the lamp and watched the sea turn.' != 'He polished the great lens until it shone, then lit the lamp and watched the sea turn.'
+E         Use -v to get more diff
+
+tests\test_voxcpm_review.py:303: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_continuation_temp_file_is_removed" time="0.002"><failure message="TypeError: _path_exists: path should be string, bytes, os.PathLike or integer, not NoneType">self = &lt;backend.tests.test_voxcpm_review.TestDesignModeChunkContinuity object at 0x00000168811F4CE0&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x0000016883314DA0&gt;
+vendor = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x0000016883315850&gt;
+
+    @pytest.mark.asyncio
+    async def test_continuation_temp_file_is_removed(self, backend, vendor: _Vendor) -&gt; None:
+        await generate_chunked(backend, LONG_TEXT, {}, instruct=DESCRIPTION, max_chunk_chars=MAX_CHARS)
+    
+        continuation_wav = vendor.generate_calls[1]["prompt_wav_path"]
+&gt;       assert not os.path.exists(continuation_wav)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: _path_exists: path should be string, bytes, os.PathLike or integer, not NoneType
+
+tests\test_voxcpm_review.py:326: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_continuation_temp_file_is_removed_when_a_later_chunk_fails" time="0.003"><failure message="assert None">self = &lt;backend.tests.test_voxcpm_review.TestDesignModeChunkContinuity object at 0x00000168811F5130&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x0000016883315A90&gt;
+vendor = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x0000016883315AC0&gt;
+
+    @pytest.mark.asyncio
+    async def test_continuation_temp_file_is_removed_when_a_later_chunk_fails(self, backend, vendor: _Vendor) -&gt; None:
+        vendor.fail_on_call = 2
+    
+        with pytest.raises(RuntimeError, match="vendor failed"):
+            await generate_chunked(backend, LONG_TEXT, {}, instruct=DESCRIPTION, max_chunk_chars=MAX_CHARS)
+    
+        continuation_wav = vendor.generate_calls[1]["prompt_wav_path"]
+&gt;       assert continuation_wav
+E       assert None
+
+tests\test_voxcpm_review.py:336: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_seeds_still_vary_per_chunk" time="0.002" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_short_design_text_is_a_single_unchanged_call" time="0.002" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_long_text_without_a_description_is_unchanged" time="0.003" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_cloned_profile_keeps_its_reference_for_every_chunk" time="0.008" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_hook_is_reached_through_the_advanced_settings_wrapper" time="0.004"><failure message="assert False&#10; +  where False = all(&lt;generator object TestDesignModeChunkContinuity.test_hook_is_reached_through_the_advanced_settings_wrapper.&lt;locals&gt;.&lt;genexpr&gt; at 0x00000168834941E0&gt;)">self = &lt;backend.tests.test_voxcpm_review.TestDesignModeChunkContinuity object at 0x00000168811F4A10&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001688337C3B0&gt;
+vendor = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x000001688337C950&gt;
+
+    @pytest.mark.asyncio
+    async def test_hook_is_reached_through_the_advanced_settings_wrapper(self, backend, vendor: _Vendor) -&gt; None:
+        from backend.services.generation import backend_with_generation_options
+    
+        wrapped = backend_with_generation_options(backend, "voxcpm", {"cfg_value": 2.5})
+        assert wrapped is not backend
+    
+        await generate_chunked(wrapped, LONG_TEXT, {}, instruct=DESCRIPTION, max_chunk_chars=MAX_CHARS)
+    
+        calls = vendor.generate_calls
+        assert calls[0]["prompt_wav_path"] is None
+&gt;       assert all(c["prompt_text"] == SENTENCES[0] for c in calls[1:])
+E       assert False
+E        +  where False = all(&lt;generator object TestDesignModeChunkContinuity.test_hook_is_reached_through_the_advanced_settings_wrapper.&lt;locals&gt;.&lt;genexpr&gt; at 0x00000168834941E0&gt;)
+
+tests\test_voxcpm_review.py:389: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_hook_returns_nothing_outside_design_mode" time="0.005"><failure message="AttributeError: 'VoxCPMBackend' object has no attribute 'continuation_voice_prompt'">self = &lt;backend.tests.test_voxcpm_review.TestDesignModeChunkContinuity object at 0x00000168811F40B0&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x0000016883317380&gt;
+reference_file = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-84/test_hook_returns_nothing_outs0/reference.wav')
+
+    def test_hook_returns_nothing_outside_design_mode(self, backend, reference_file: Path) -&gt; None:
+        audio = np.zeros(10, dtype=np.float32)
+    
+&gt;       assert backend.continuation_voice_prompt({}, None, "Hi.", audio, FAKE_SAMPLE_RATE) is None
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'VoxCPMBackend' object has no attribute 'continuation_voice_prompt'
+
+tests\test_voxcpm_review.py:395: AttributeError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_engines_without_the_hook_are_unaffected" time="0.001" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_a_hook_that_declines_leaves_the_prompt_unchanged" time="0.001"><failure message="assert 0 == 1&#10; +  where 0 = &lt;backend.tests.test_voxcpm_review.TestDesignModeChunkContinuity.test_a_hook_that_declines_leaves_the_prompt_unchanged.&lt;locals&gt;.DecliningBackend object at 0x000001688337D850&gt;.hook_calls">self = &lt;backend.tests.test_voxcpm_review.TestDesignModeChunkContinuity object at 0x00000168811F5B50&gt;
+
+    @pytest.mark.asyncio
+    async def test_a_hook_that_declines_leaves_the_prompt_unchanged(self) -&gt; None:
+        class DecliningBackend:
+            def __init__(self) -&gt; None:
+                self.prompts: list = []
+                self.hook_calls = 0
+    
+            async def generate(self, text, voice_prompt, language="en", seed=None, instruct=None):
+                self.prompts.append(voice_prompt)
+                return np.zeros(2_400, dtype=np.float32), 24_000
+    
+            def continuation_voice_prompt(self, *_args):
+                self.hook_calls += 1
+                return None
+    
+        declining = DecliningBackend()
+        prompt: dict = {}
+    
+        await generate_chunked(declining, LONG_TEXT, prompt, instruct=DESCRIPTION, max_chunk_chars=MAX_CHARS)
+    
+&gt;       assert declining.hook_calls == 1
+E       assert 0 == 1
+E        +  where 0 = &lt;backend.tests.test_voxcpm_review.TestDesignModeChunkContinuity.test_a_hook_that_declines_leaves_the_prompt_unchanged.&lt;locals&gt;.DecliningBackend object at 0x000001688337D850&gt;.hook_calls
+
+tests\test_voxcpm_review.py:446: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_backend" name="test_model_config_declares_the_data_model_values" time="0.001"><failure message="AssertionError: assert True is False&#10; +  where True = ModelConfig(model_name='voxcpm2', display_name='VoxCPM2 (Multilingual, Voice Design)', engine='voxcpm', hf_repo_id='op...0), AdvancedSetting(name='inference_timesteps', label='Quality steps', default=10, min=4, max=30)), min_memory_mb=6144).retries_runaway">def test_model_config_declares_the_data_model_values() -&gt; None:
+        configs = _voxcpm_configs()
+        assert len(configs) == 1
+        config = configs[0]
+    
+        assert config.model_name == "voxcpm2"
+        assert config.display_name == "VoxCPM2 (Multilingual, Voice Design)"
+        assert config.hf_repo_id == "openbmb/VoxCPM2"
+        assert config.model_size == "default"
+        assert config.size_mb == 4961
+        assert config.needs_trim is False
+        # The vendor retries runaway output itself (retry_badcase), so Voicebox must not (protocol rule 4).
+&gt;       assert config.retries_runaway is False
+E       AssertionError: assert True is False
+E        +  where True = ModelConfig(model_name='voxcpm2', display_name='VoxCPM2 (Multilingual, Voice Design)', engine='voxcpm', hf_repo_id='op...0), AdvancedSetting(name='inference_timesteps', label='Quality steps', default=10, min=4, max=30)), min_memory_mb=6144).retries_runaway
+
+tests\test_voxcpm_backend.py:873: AssertionError</failure></testcase></testsuite></testsuites>

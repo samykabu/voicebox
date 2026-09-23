@@ -1,0 +1,69 @@
+# 2026-09-23T18:29:46+03:00  ruff: ruff 0.16.8
+## HEAD backend/services/export_import.py
+
+Found 78 errors.
+[*] 57 fixable with the `--fix` option (15 hidden fixes can be enabled with the `--unsafe-fixes` option).
+## working backend/services/export_import.py
+
+Found 76 errors.
+[*] 55 fixable with the `--fix` option (15 hidden fixes can be enabled with the `--unsafe-fixes` option).
+## HEAD rule counts
+65	W293  	[-] blank-line-with-whitespace
+ 6	B904  	[ ] raise-without-from-inside-except
+ 2	RUF010	[*] explicit-f-string-type-conversion
+ 2	I001  	[*] unsorted-imports
+ 2	F841  	[-] unused-variable
+ 1	F401  	[*] unused-import
+Found 78 errors.
+[*] 57 fixable with the `--fix` option (15 hidden fixes can be enabled with the `--unsafe-fixes` option).
+## working rule counts
+63	W293  	[-] blank-line-with-whitespace
+ 6	B904  	[ ] raise-without-from-inside-except
+ 2	RUF010	[*] explicit-f-string-type-conversion
+ 2	I001  	[*] unsorted-imports
+ 2	F841  	[-] unused-variable
+ 1	F401  	[*] unused-import
+Found 76 errors.
+[*] 55 fixable with the `--fix` option (15 hidden fixes can be enabled with the `--unsafe-fixes` option).
+## new file backend/tests/test_profile_export_provenance.py
+I001 [*] Import block is un-sorted or un-formatted
+  --> backend\tests\test_profile_export_provenance.py:11:1
+   |
+ 9 |   """
+10 |
+11 | / import io
+12 | | import json
+13 | | import shutil
+14 | | import tempfile
+15 | | import zipfile
+16 | | from pathlib import Path
+17 | |
+18 | | import numpy as np
+19 | | import pytest
+20 | | import soundfile as sf
+21 | | from sqlalchemy import create_engine
+22 | | from sqlalchemy.orm import sessionmaker
+23 | |
+24 | | from backend import config
+25 | | from backend.database import Base
+26 | | from backend.database import ProfileSample as DBProfileSample
+27 | | from backend.database import VoiceProfile as DBVoiceProfile
+28 | | from backend.models import VoiceProfileCreate
+29 | | from backend.services.export_import import export_profile_to_zip, import_profile_from_zip
+30 | | from backend.services.profiles import add_profile_sample, create_profile
+   | |________________________________________________________________________^
+help: Organize imports
+   |
+24 | from backend import config
+   - from backend.database import Base
+   - from backend.database import ProfileSample as DBProfileSample
+   - from backend.database import VoiceProfile as DBVoiceProfile
+25 + from backend.database import Base, ProfileSample as DBProfileSample, VoiceProfile as DBVoiceProfile
+26 | from backend.models import VoiceProfileCreate
+   |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.
+## after ruff --fix (import sort only) on new test file
+All checks passed!
+## summary: export_import.py HEAD 78 -> working 76 findings (2 fewer W293, no new rules/counts); new test file clean

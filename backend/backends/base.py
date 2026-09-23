@@ -9,8 +9,9 @@ import logging
 import os
 import platform
 from contextlib import contextmanager
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, List, Optional, Tuple
+from typing import TYPE_CHECKING, Callable, List, Optional, Tuple
 
 import numpy as np
 
@@ -18,6 +19,9 @@ from ..utils.audio import normalize_audio, load_audio
 from ..utils.progress import get_progress_manager
 from ..utils.hf_progress import HFProgressTracker, create_hf_progress_callback
 from ..utils.tasks import get_task_manager
+
+if TYPE_CHECKING:
+    from . import ModelConfig
 
 logger = logging.getLogger(__name__)
 
@@ -216,6 +220,170 @@ def check_cuda_compatibility() -> tuple[bool, str | None]:
         pass
 
     return True, None
+
+
+# Engine availability (FR-002, FR-003, FR-004; contracts/engine-capabilities.md).
+
+_ACCELERATOR_LABELS = {
+    "cuda": "CUDA",
+    "mps": "Apple Silicon (MPS)",
+    "cpu": "CPU",
+    "xpu": "Intel XPU",
+    "directml": "DirectML",
+}
+
+# Accelerators whose memory is dedicated graphics memory rather than shared system memory.
+_GRAPHICS_MEMORY_ACCELERATORS = {"cuda", "xpu", "directml"}
+
+
+@dataclass
+class EngineAvailability:
+    """Whether an engine can be selected on this machine. Transient, never persisted."""
+
+    engine: str
+    available: bool
+    reason: str | None  # non-null if and only if available is False (FR-003)
+    warning: str | None  # advisory only, e.g. marginal memory (C1Q4); never blocks
+    supported_accelerators: list[str] = field(default_factory=list)
+    detected_accelerator: str = "cpu"
+
+
+def normalize_accelerator(device: object) -> str:
+    """Reduce a torch device (``"cuda:1"``, a DirectML device, ...) to an accelerator name."""
+    name = str(device).split(":", 1)[0].strip().lower()
+    if name == "privateuseone":
+        return "directml"
+    return name or "cpu"
+
+
+def _accelerator_label(accelerator: str) -> str:
+    return _ACCELERATOR_LABELS.get(accelerator, accelerator.upper())
+
+
+def _join_labels(labels: list[str]) -> str:
+    if len(labels) <= 1:
+        return "".join(labels)
+    return ", ".join(labels[:-1]) + " or " + labels[-1]
+
+
+def _format_memory(memory_mb: int) -> str:
+    if memory_mb < 1024:
+        return f"{memory_mb} MB"
+    return f"{round(memory_mb / 1024)} GB"
+
+
+def resolve_engine_availability(
+    config: "ModelConfig",
+    detected_accelerator: object,
+    memory_mb: int | None = None,
+    min_memory_mb: int | None = None,
+) -> EngineAvailability:
+    """Resolve availability from a model's declared accelerators and detected hardware.
+
+    Pure: no torch, no model load, no download. ``memory_mb`` is the memory the detected
+    accelerator offers and ``min_memory_mb`` what the model usually needs; either may be
+    None when unknown. Memory never blocks (C1Q4), it only produces a warning.
+    """
+    detected = normalize_accelerator(detected_accelerator)
+    supported = list(config.accelerators)
+    name = config.display_name
+
+    # Unconstrained: every existing engine, exactly as before.
+    if not supported:
+        return EngineAvailability(
+            engine=config.engine,
+            available=True,
+            reason=None,
+            warning=None,
+            supported_accelerators=supported,
+            detected_accelerator=detected,
+        )
+
+    if detected not in supported and "cpu" in supported:
+        # FR-023: the engine resolves its own device and falls back to the processor when the
+        # detected accelerator is not one it supports (e.g. Intel XPU or DirectML), so it is
+        # offered with an advisory warning. The memory warning describes the detected
+        # accelerator's memory, which the engine will not use, so it does not apply here.
+        return EngineAvailability(
+            engine=config.engine,
+            available=True,
+            reason=None,
+            warning=(
+                f"{name} doesn't support {_accelerator_label(detected)} here, "
+                "so it will run on the processor, which is slower."
+            ),
+            supported_accelerators=supported,
+            detected_accelerator=detected,
+        )
+
+    if detected not in supported:
+        # "cpu" is not declared here (handled above), so the list never names the processor
+        # every machine has, nor the detected accelerator.
+        needed = _join_labels([_accelerator_label(a) for a in supported])
+        reason = (
+            f"{name} can't run on this machine: it needs {needed}, "
+            f"but this machine is using {_accelerator_label(detected)}."
+        )
+        return EngineAvailability(
+            engine=config.engine,
+            available=False,
+            reason=reason,
+            warning=None,
+            supported_accelerators=supported,
+            detected_accelerator=detected,
+        )
+
+    warning = None
+    if memory_mb is not None and min_memory_mb is not None and memory_mb < min_memory_mb:
+        kind = "graphics memory" if detected in _GRAPHICS_MEMORY_ACCELERATORS else "memory"
+        warning = (
+            f"This machine has about {_format_memory(memory_mb)} of {kind}. "
+            f"{name} usually needs about {_format_memory(min_memory_mb)}, so generation may fail."
+        )
+
+    return EngineAvailability(
+        engine=config.engine,
+        available=True,
+        reason=None,
+        warning=warning,
+        supported_accelerators=supported,
+        detected_accelerator=detected,
+    )
+
+
+def detect_accelerator_and_memory() -> tuple[str, int | None]:
+    """Detect this machine's accelerator and, for CUDA, its total memory in MB.
+
+    Reads device state only; never loads a model or downloads anything.
+    """
+    try:
+        device = get_torch_device(allow_xpu=True, allow_directml=True, allow_mps=True)
+    except ImportError:
+        logger.info("torch is not installed; treating this machine as CPU-only")
+        return "cpu", None
+
+    accelerator = normalize_accelerator(device)
+    memory_mb: int | None = None
+    if accelerator == "cuda":
+        try:
+            import torch  # lazy: heavy import
+
+            _, _, raw_index = str(device).partition(":")
+            index = int(raw_index) if raw_index else torch.cuda.current_device()
+            memory_mb = int(torch.cuda.get_device_properties(index).total_memory // (1024 * 1024))
+        except Exception as exc:
+            logger.warning("Could not read CUDA memory for %s: %s", device, exc)
+    return accelerator, memory_mb
+
+
+def detect_engine_availability(
+    config: "ModelConfig",
+    *,
+    min_memory_mb: int | None = None,
+) -> EngineAvailability:
+    """Resolve availability for ``config`` against the hardware detected on this machine."""
+    accelerator, memory_mb = detect_accelerator_and_memory()
+    return resolve_engine_availability(config, accelerator, memory_mb=memory_mb, min_memory_mb=min_memory_mb)
 
 
 def empty_device_cache(device: str) -> None:

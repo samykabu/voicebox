@@ -66,12 +66,14 @@ setup-python:
     {{ pip }} install -r {{ backend_dir }}/requirements.txt
     # Chatterbox pins numpy<1.26 / torch==2.6 which break on Python 3.12+
     {{ pip }} install --no-deps chatterbox-tts
-    # HumeAI TADA pins torch>=2.7,<2.8 which conflicts with our torch>=2.1
+    # HumeAI TADA pins torch>=2.7,<2.8 which conflicts with our torch>=2.5.0
     {{ pip }} install --no-deps hume-tada
     # F5-TTS causes dependency resolution hell due to gradio/accelerate bounds
     {{ pip }} install --no-deps 'f5-tts==1.1.21'
     # Habibi supplies the Arabic-aware inference formatter and model utilities
     {{ pip }} install --no-deps 'habibi-tts==0.1.1'
+    # VoxCPM2 declares gradio>=6, datasets>=3, modelscope, funasr and unpinned numpy/transformers; its runtime deps are in requirements.txt
+    {{ pip }} install --no-deps 'voxcpm==2.0.3'
     # Apple Silicon: install MLX backend
     if [ "$(uname -m)" = "arm64" ] && [ "$(uname)" = "Darwin" ]; then
         echo "Detected Apple Silicon — installing MLX dependencies..."
@@ -121,6 +123,7 @@ setup-python:
     & "{{ pip }}" install --no-deps hume-tada
     & "{{ pip }}" install --no-deps "f5-tts==1.1.21"
     & "{{ pip }}" install --no-deps "habibi-tts==0.1.1"
+    & "{{ pip }}" install --no-deps "voxcpm==2.0.3"
     & "{{ pip }}" install git+https://github.com/QwenLM/Qwen3-TTS.git
     & "{{ pip }}" install pyinstaller ruff pytest pytest-asyncio -q
     Write-Host "Python environment ready."

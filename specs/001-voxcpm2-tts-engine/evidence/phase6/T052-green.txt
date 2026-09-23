@@ -1,0 +1,128 @@
+# 2026-09-23T18:30:05+03:00
+# cwd: D:/Projects/Personal/voicebox
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_profile_export_provenance.py backend/tests/test_profile_duplicate_names.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase6/T052-green.xml
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 14 items
+
+backend\tests\test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys PASSED [  7%]
+backend\tests\test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine PASSED [ 14%]
+backend\tests\test_profile_export_provenance.py::test_designed_profile_without_samples_is_exportable PASSED [ 21%]
+backend\tests\test_profile_export_provenance.py::test_designed_round_trip_restores_design_prompt_and_default_engine PASSED [ 28%]
+backend\tests\test_profile_export_provenance.py::test_preset_round_trip_restores_preset_fields PASSED [ 35%]
+backend\tests\test_profile_export_provenance.py::test_cloned_profile_without_samples_still_refuses_export PASSED [ 42%]
+backend\tests\test_profile_export_provenance.py::test_legacy_1_0_manifest_imports_as_cloned PASSED [ 50%]
+backend\tests\test_profile_export_provenance.py::test_import_rejects_designed_manifest_with_blank_prompt PASSED [ 57%]
+backend\tests\test_profile_duplicate_names.py::test_create_profile_duplicate_name_raises_error PASSED [ 64%]
+backend\tests\test_profile_duplicate_names.py::test_create_profile_different_names_succeeds PASSED [ 71%]
+backend\tests\test_profile_duplicate_names.py::test_update_profile_to_duplicate_name_raises_error PASSED [ 78%]
+backend\tests\test_profile_duplicate_names.py::test_update_profile_keep_same_name_succeeds PASSED [ 85%]
+backend\tests\test_profile_duplicate_names.py::test_update_profile_to_new_unique_name_succeeds PASSED [ 92%]
+backend\tests\test_profile_duplicate_names.py::test_case_sensitive_names_allowed PASSED [100%]
+
+============================== warnings summary ===============================
+backend\database\models.py:26
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+backend\models.py:33
+  D:\Projects\Personal\voicebox\backend\models.py:33: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(BaseModel):
+
+backend\models.py:69
+  D:\Projects\Personal\voicebox\backend\models.py:69: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ProfileSampleResponse(BaseModel):
+
+backend\models.py:146
+  D:\Projects\Personal\voicebox\backend\models.py:146: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationResponse(BaseModel):
+
+backend\models.py:211
+  D:\Projects\Personal\voicebox\backend\models.py:211: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationEntryResponse(BaseModel):
+
+backend\models.py:269
+  D:\Projects\Personal\voicebox\backend\models.py:269: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class HistoryResponse(BaseModel):
+
+backend\models.py:323
+  D:\Projects\Personal\voicebox\backend\models.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureResponse(BaseModel):
+
+backend\models.py:378
+  D:\Projects\Personal\voicebox\backend\models.py:378: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureSettingsResponse(BaseModel):
+
+backend\models.py:419
+  D:\Projects\Personal\voicebox\backend\models.py:419: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationSettingsResponse(BaseModel):
+
+backend\models.py:440
+  D:\Projects\Personal\voicebox\backend\models.py:440: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class MCPClientBindingResponse(BaseModel):
+
+backend\models.py:720
+  D:\Projects\Personal\voicebox\backend\models.py:720: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioChannelResponse(BaseModel):
+
+backend\models.py:752
+  D:\Projects\Personal\voicebox\backend\models.py:752: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+backend\models.py:766
+  D:\Projects\Personal\voicebox\backend\models.py:766: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+backend\models.py:798
+  D:\Projects\Personal\voicebox\backend\models.py:798: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+backend\models.py:906
+  D:\Projects\Personal\voicebox\backend\models.py:906: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+backend\models.py:920
+  D:\Projects\Personal\voicebox\backend\models.py:920: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+tests/test_profile_export_provenance.py: 10 warnings
+tests/test_profile_duplicate_names.py: 9 warnings
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:186: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+tests/test_profile_export_provenance.py: 10 warnings
+tests/test_profile_duplicate_names.py: 9 warnings
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:187: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    updated_at=datetime.utcnow(),
+
+tests/test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:16: DeprecationWarning: 'aifc' is deprecated and slated for removal in Python 3.13
+    import aifc
+
+tests/test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:17: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+tests/test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:19: DeprecationWarning: 'sunau' is deprecated and slated for removal in Python 3.13
+    import sunau
+
+tests/test_profile_export_provenance.py::test_export_manifest_contains_provenance_keys
+tests/test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine
+tests/test_profile_export_provenance.py::test_cloned_round_trip_preserves_voice_type_and_default_engine
+tests/test_profile_export_provenance.py::test_legacy_1_0_manifest_imports_as_cloned
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:247: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    profile.updated_at = datetime.utcnow()
+
+tests/test_profile_duplicate_names.py::test_update_profile_keep_same_name_succeeds
+tests/test_profile_duplicate_names.py::test_update_profile_to_new_unique_name_succeeds
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:406: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    profile.updated_at = datetime.utcnow()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase6\T052-green.xml -
+======================= 14 passed, 63 warnings in 5.76s =======================

@@ -1,0 +1,450 @@
+# T042 frozen desktop backend build (Windows, CPU binary), built from a throwaway venv OUTSIDE the repo.
+# backend/venv was never used for the build or pip. build_binary.py uses sys.executable for its torch swap/restore, so it only touched the build venv;
+# the build venv already had CPU torch, so build_binary.py found no CUDA torch and did no swap (restore_torch=None).
+
+## backend/venv torch BEFORE (2026-09-23T18:43+03:00)
+$ D:/Projects/Personal/voicebox/backend/venv/Scripts/python.exe -c "import torch;print(torch.__version__, torch.cuda.is_available())"
+2.11.0+cu128 True
+
+## Build venv setup (mirrors justfile setup-python [windows] and release.yml 'Install Python dependencies'; CPU torch first like release.yml's Linux step)
+BE=/c/Users/sabus/voicebox-buildenv
+PY=$BE/Scripts/python.exe
+cd /d/Projects/Personal/voicebox
+uv venv --python 3.12 "C:/Users/sabus/voicebox-buildenv" --seed || exit 1
+$PY -m pip install --upgrade pip -q || exit 1
+# CPU-only torch first (the CPU binary; release.yml Linux step does the same), so build_binary.py finds no CUDA torch to swap
+$PY -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu || exit 1
+$PY -m pip install pyinstaller || exit 1
+$PY -m pip install -r backend/requirements.txt || exit 1
+$PY -m pip install --no-deps chatterbox-tts || exit 1
+$PY -m pip install --no-deps hume-tada || exit 1
+$PY -m pip install --no-deps "f5-tts==1.1.21" || exit 1
+$PY -m pip install --no-deps "habibi-tts==0.1.1" || exit 1
+$PY -m pip install --no-deps "voxcpm==2.0.3" || exit 1
+$PY -m pip install git+https://github.com/QwenLM/Qwen3-TTS.git || exit 1
+$PY -c "import torch,torchaudio;print('BUILDENV torch', torch.__version__, torch.version.cuda, torch.cuda.is_available(), torchaudio.__version__)"
+date -Iseconds
+echo SETUP_DONE
+# then, because the CPU index resolved torch 2.14.0 with torchaudio 2.11.0 (mismatched set), realigned to backend/venv's versions:
+$ /c/Users/sabus/voicebox-buildenv/Scripts/python.exe -m pip install torch==2.11.0 torchvision==0.26.0 torchaudio==2.11.0 --index-url https://download.pytorch.org/whl/cpu --force-reinstall --no-deps
+
+## Build venv setup log (tail)
++ date -Iseconds
+2026-09-23T18:44:47+03:00
++ BE=/c/Users/sabus/voicebox-buildenv
++ PY=/c/Users/sabus/voicebox-buildenv/Scripts/python.exe
++ cd /d/Projects/Personal/voicebox
++ uv venv --python 3.12 C:/Users/sabus/voicebox-buildenv --seed
++ /c/Users/sabus/voicebox-buildenv/Scripts/python.exe -m pip install --upgrade pip -q
++ /c/Users/sabus/voicebox-buildenv/Scripts/python.exe -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
++ /c/Users/sabus/voicebox-buildenv/Scripts/python.exe -m pip install pyinstaller
++ /c/Users/sabus/voicebox-buildenv/Scripts/python.exe -m pip install -r backend/requirements.txt
++ /c/Users/sabus/voicebox-buildenv/Scripts/python.exe -m pip install --no-deps chatterbox-tts
++ /c/Users/sabus/voicebox-buildenv/Scripts/python.exe -m pip install --no-deps hume-tada
++ /c/Users/sabus/voicebox-buildenv/Scripts/python.exe -m pip install --no-deps f5-tts==1.1.21
++ /c/Users/sabus/voicebox-buildenv/Scripts/python.exe -m pip install --no-deps habibi-tts==0.1.1
++ /c/Users/sabus/voicebox-buildenv/Scripts/python.exe -m pip install --no-deps voxcpm==2.0.3
++ /c/Users/sabus/voicebox-buildenv/Scripts/python.exe -m pip install git+https://github.com/QwenLM/Qwen3-TTS.git
++ /c/Users/sabus/voicebox-buildenv/Scripts/python.exe -c 'import torch,torchaudio;print('\''BUILDENV torch'\'', torch.__version__, torch.version.cuda, torch.cuda.is_available(), torchaudio.__version__)'
+BUILDENV torch 2.14.0+cpu None False 2.11.0+cpu
++ date -Iseconds
+2026-09-23T18:51:30+03:00
++ echo SETUP_DONE
+SETUP_DONE
+Successfully installed torch-2.11.0+cpu torchaudio-2.11.0+cpu torchvision-0.26.0+cpu
+BUILDENV torch 2.11.0+cpu None False 2.11.0+cpu 0.26.0+cpu
+
+## pip freeze of the build venv (C:\Users\sabus\voicebox-buildenv, CPython 3.12.14)
+absl-py==2.5.0
+accelerate==1.12.0
+addict==2.4.0
+aiofile==3.12.3
+aiohappyeyeballs==2.7.1
+aiohttp==3.14.3
+aiosignal==1.4.0
+alembic==1.20.0
+altgraph==0.17.5
+annotated-doc==0.0.5
+annotated-types==0.8.0
+antlr4-python3-runtime==4.9.3
+anyio==4.15.1
+attrs==26.1.0
+audioread==3.1.0
+Authlib==1.8.0
+babel==2.18.0
+beartype==0.22.9
+blis==1.3.3
+boto3==1.43.100
+botocore==1.43.100
+brotli==1.2.0
+cached_path==1.8.10
+cachetools==7.2.0
+caio==0.12.4
+catalogue==2.0.10
+certifi==2026.7.22
+cffi==2.1.1
+cfgv==3.5.0
+charset-normalizer==3.5.1
+chatterbox-tts==0.1.7
+click==8.5.0
+cloudpathlib==0.25.0
+cloudpickle==3.1.2
+cn2an==0.5.24
+colorama==0.4.6
+confection==1.3.3
+conformer==0.3.2
+contourpy==1.3.3
+cryptography==50.0.1
+csvw==4.1.0
+curated-tokenizers==0.0.10
+curated-transformers==0.1.1
+cycler==0.12.1
+cyclopts==4.25.3
+cymem==2.0.13
+cytoolz==1.1.0
+datasets==5.0.1
+decorator==5.3.1
+Deprecated==1.3.1
+diffusers==0.39.0
+dill==0.4.1
+distlib==0.4.3
+dlinfo==2.0.0
+dnspython==2.8.0
+docopt==0.6.2
+docstring_parser==0.18.0
+einops==0.8.2
+einx==0.4.3
+ema-pytorch==0.8.3
+email-validator==2.3.0
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl#sha256=1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85
+encodec==0.1.1
+espeakng-loader==0.2.4
+exceptiongroup==1.3.1
+f5-tts==1.1.21
+fastapi==0.141.1
+fastmcp==3.4.7
+fastmcp-slim==3.4.7
+filelock==3.32.3
+flatbuffers==25.12.19
+fonttools==4.65.0
+frozendict==2.4.7
+frozenlist==1.8.0
+fsspec==2026.6.0
+fugashi==1.5.2
+google-api-core==2.38.0
+google-auth==2.58.0
+google-cloud-core==2.7.0
+google-cloud-storage==3.14.1
+google-crc32c==1.8.0
+google-resumable-media==2.10.2
+googleapis-common-protos==1.75.3
+gradio==6.17.3
+gradio_client==2.5.0
+greenlet==3.5.6
+griffelib==2.3.0
+groovy==0.1.2
+grpcio==1.84.0
+h11==0.16.0
+habibi-tts==0.1.1
+hf-gradio==0.4.1
+httpcore==1.0.9
+httptools==0.8.0
+httpx==0.28.1
+httpx-sse==0.4.3
+huggingface_hub==0.36.2
+hume-tada==0.1.9
+hydra-core==1.3.7
+identify==2.6.19
+idna==3.20
+importlib_metadata==9.0.1
+inflect==7.5.0
+intervaltree==3.2.1
+isodate==0.7.2
+jaconv==0.5.0
+jaraco.classes==3.4.0
+jaraco.context==6.1.2
+jaraco.functools==4.6.0
+jieba==0.42.1
+Jinja2==3.1.6
+jmespath==1.1.0
+joblib==1.6.0
+joserfc==1.7.5
+jsonargparse==4.52.0
+jsonref==1.1.0
+jsonschema==4.26.0
+jsonschema-path==0.5.0
+jsonschema-specifications==2025.9.1
+keyring==25.7.0
+kiwisolver==1.5.1
+kokoro==0.9.4
+language-tags==1.3.1
+lazy-loader==0.6
+lhotse==1.33.0
+librosa==0.11.0
+linacodec @ git+https://github.com/ysharma3501/LinaCodec.git@c0ae7c7285e121475c27592cfbb600624b714290
+llvmlite==0.43.0
+loguru==0.7.3
+Mako==1.4.3
+Markdown==3.10.3
+markdown-it-py==4.2.0
+MarkupSafe==3.0.3
+matplotlib==3.11.2
+mcp==1.30.0
+mdurl==0.1.2
+misaki==0.9.4
+ml_dtypes==0.5.4
+mojimoji==0.0.13
+more-itertools==11.1.0
+mpmath==1.3.0
+msgpack==1.2.2
+multidict==6.9.1
+multiprocess==0.70.19
+murmurhash==1.0.15
+narwhals==2.26.0
+networkx==3.6.1
+nodeenv==1.10.0
+num2words==0.5.14
+numba==0.60.0
+numpy==1.26.4
+omegaconf==2.3.1
+onnx==1.23.0
+onnxruntime==1.30.0
+openapi-pydantic==0.5.1
+opentelemetry-api==1.44.0
+opentelemetry-exporter-otlp-proto-common==1.44.0
+opentelemetry-exporter-otlp-proto-http==1.44.0
+opentelemetry-proto==1.44.0
+opentelemetry-sdk==1.44.0
+opentelemetry-semantic-conventions==0.65b0
+ordered-set==4.1.0
+orjson==3.12.0
+packaging==26.3
+pandas==3.0.6
+pathable==0.6.0
+pedalboard==0.9.25
+pefile==2024.8.26
+phonemizer-fork==3.3.2
+pillow==12.3.0
+piper_phonemize==1.4.7
+plac==1.4.7
+platformdirs==4.11.12
+pooch==1.9.0
+pre_commit==4.6.2
+preshed==3.0.13
+proces==0.1.7
+propcache==0.5.4
+proto-plus==1.28.4
+protobuf==7.36.2
+psutil==7.2.2
+py-key-value-aio==0.4.6
+pyarrow==25.0.1
+pyasn1==0.6.4
+pyasn1_modules==0.4.2
+pycparser==3.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+pydantic_core==2.46.5
+pydub==0.25.1
+Pygments==2.21.0
+pyinstaller==6.22.3
+pyinstaller-hooks-contrib==2026.7
+PyJWT==2.14.0
+pykakasi==2.3.0
+pyloudnorm==0.2.0
+pyopenjtalk==0.4.1
+pyparsing==3.3.3
+pyperclip==1.11.0
+pypinyin==0.55.0
+pypinyin-dict==0.9.0
+python-dateutil==2.9.0.post0
+python-discovery==1.6.1
+python-dotenv==1.2.3
+python-multipart==0.0.32
+pytz==2026.3.post1
+pywin32==312
+pywin32-ctypes==0.2.3
+PyYAML==6.0.3
+qwen-tts==0.1.1
+rdflib==7.6.0
+referencing==0.37.0
+regex==2026.9.10
+requests==2.34.2
+resemble-perth==1.0.1
+rfc3986==1.5.0
+rich==13.9.4
+rich-rst==2.1.0
+rjieba==0.2.1
+rpds-py==2026.6.3
+s3tokenizer==0.3.0
+s3transfer==0.19.2
+safehttpx==0.1.7
+safetensors==0.8.0
+scikit-learn==1.9.1
+scipy==1.17.1
+segments==2.4.0
+semantic-version==2.10.0
+setuptools==78.1.0
+shellingham==1.5.4
+six==1.17.0
+smart_open==8.0.1
+sortedcontainers==2.4.0
+soundfile==0.14.0
+sox==1.5.0
+soxr==1.1.0
+spacy==3.8.16
+spacy-curated-transformers==0.3.1
+spacy-legacy==3.0.12
+spacy-loggers==1.0.5
+spacy_pkuseg==1.0.1
+SQLAlchemy==2.0.54
+srsly==2.5.3
+sse-starlette==3.4.11
+starlette==1.7.0
+sympy==1.14.0
+tabulate==0.10.0
+tensorboard==2.21.0
+tensorboard-data-server==0.7.2
+termcolor==3.3.0
+thinc==8.3.13
+threadpoolctl==3.7.0
+tokenizers==0.22.2
+tomlkit==0.14.0
+toolz==1.1.0
+torch==2.11.0+cpu
+torch-einops-utils==0.1.29
+torchaudio==2.11.0+cpu
+torchdiffeq==0.2.5
+torchvision==0.26.0+cpu
+tqdm==4.70.1
+transformers==4.57.3
+transformers-stream-generator==0.0.5
+typeguard==4.6.0
+typer==0.27.2
+typeshed_client==2.13.0
+typing-inspection==0.4.4
+typing_extensions==4.16.0
+tzdata==2026.4
+uncalled-for==0.4.0
+Unidecode==1.4.0
+unidic==1.1.0
+unidic-lite==1.0.8
+uritemplate==4.2.0
+urllib3==2.8.0
+uvicorn==0.53.0
+virtualenv==21.11.1
+vocos==0.1.0
+voxcpm==2.0.3
+wandb==0.30.0
+wasabi==0.10.1
+watchfiles==1.3.0
+weasel==1.0.0
+websockets==17.1
+Werkzeug==3.1.8
+win32_setctime==1.2.0
+wrapt==2.4.1
+x-transformers==2.30.5
+xxhash==4.0.1
+yarl==1.25.1
+zipp==4.1.0
+Zipvoice @ git+https://github.com/ysharma3501/LuxTTS.git@28ae6a61151684fffc9d1a7aa15eafa02286fe0b
+
+## Build command
+$ cd D:/Projects/Personal/voicebox && C:\Users\sabus\voicebox-buildenv\Scripts\python.exe backend/build_binary.py    # no flags = default CPU --onefile build (flags: --cuda, --rocm, --shim)
+
+## Build log: VoxCPM2-related lines, errors/warnings
+51:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\jieba\__init__.py:44: SyntaxWarning: invalid escape sequence '\.'
+53:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\jieba\__init__.py:46: SyntaxWarning: invalid escape sequence '\s'
+56:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\jieba\finalseg\__init__.py:78: SyntaxWarning: invalid escape sequence '\.'
+84:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\jieba\posseg\__init__.py:16: SyntaxWarning: invalid escape sequence '\.'
+86:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\jieba\posseg\__init__.py:17: SyntaxWarning: invalid escape sequence '\.'
+88:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\jieba\posseg\__init__.py:18: SyntaxWarning: invalid escape sequence '\s'
+90:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\jieba\posseg\__init__.py:21: SyntaxWarning: invalid escape sequence '\.'
+94:272173 ERROR: Hidden import 'pkg_resources.extern' not found
+123:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\misaki\g2pkc\special.py:59: SyntaxWarning: invalid escape sequence '\s'
+125:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\misaki\g2pkc\utils.py:9: SyntaxWarning: invalid escape sequence '\d'
+127:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\misaki\g2pkc\utils.py:248: SyntaxWarning: invalid escape sequence '\['
+129:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\misaki\g2pkc\numerals.py:111: SyntaxWarning: invalid escape sequence '\d'
+132:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\misaki\vi_cleaner\currency_vi.py:8: SyntaxWarning: invalid escape sequence '\$'
+134:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\misaki\vi_cleaner\currency_vi.py:40: SyntaxWarning: invalid escape sequence '\$'
+136:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\misaki\vi_cleaner\abbreviation_vi.py:10: SyntaxWarning: invalid escape sequence '\.'
+138:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\misaki\vi_cleaner\abbreviation_vi.py:35: SyntaxWarning: invalid escape sequence '\.'
+140:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\misaki\vi_cleaner\abbreviation_vi.py:50: SyntaxWarning: invalid escape sequence '\+'
+166:275298 INFO: Analyzing hidden import 'voxcpm.cli'
+203:276447 INFO: Analyzing hidden import 'fastmcp.server.middleware.error_handling'
+227:277539 WARNING: Hidden import "pycparser.lextab" not found!
+228:277539 WARNING: Hidden import "pycparser.yacctab" not found!
+240:289738 WARNING: Hidden import "scipy.special._cdflib" not found!
+242:290216 WARNING: Hidden import "pysqlite2" not found!
+243:290216 WARNING: Hidden import "MySQLdb" not found!
+244:290216 WARNING: Hidden import "psycopg2" not found!
+248:328273 WARNING: Ignoring /usr/lib64/libgomp.so.1 imported from C:\Users\sabus\voicebox-buildenv\Lib\site-packages\torch\_inductor\codecache.py - only basenames are supported with ctypes imports!
+249:328402 WARNING: Library _name.dll required via ctypes not found
+250:328408 WARNING: Library _handle.dll required via ctypes not found
+267:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\PyInstaller\building\build_main.py:227: UserWarning: The numpy.array_api submodule is still experimental. See NEP 47.
+269:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\PyInstaller\building\build_main.py:227: FastMCPDeprecationWarning: fastmcp.server.openapi is deprecated. Import from fastmcp.server.providers.openapi instead.
+271:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\authlib\integrations\httpx_client\assertion_client.py:5: AuthlibDeprecationWarning: The httpx module is deprecated; please use httpx2 instead.
+273:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\PyInstaller\building\build_main.py:227: AuthlibDeprecationWarning: authlib.jose module is deprecated, please use joserfc instead.
+280:30583 WARNING: SoX could not be found!
+288:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `torch.distributed._sharding_spec` will be deprecated, use `torch.distributed._shard.sharding_spec` instead
+290:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `torch.distributed._sharded_tensor` will be deprecated, use `torch.distributed._shard.sharded_tensor` instead
+292:C:\Users\sabus\voicebox-buildenv\Lib\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `torch.distributed._shard.checkpoint` will be deprecated, use `torch.distributed.checkpoint` instead
+296:Warning: flash-attn is not installed. Will only run the manual PyTorch version. Please install flash-attn for faster inference.
+299:C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\tempfile.py:940: ResourceWarning: Implicitly cleaning up <TemporaryDirectory 'C:\\Users\\sabus\\AppData\\Local\\Temp\\tmpew3isf3p'>
+300:  _warnings.warn(warn_message, ResourceWarning)
+303:369650 WARNING: Library not found: could not resolve 'tbb12.dll', dependency of 'C:\\Users\\sabus\\voicebox-buildenv\\Lib\\site-packages\\numba\\np\\ufunc\\tbbpool.cp312-win_amd64.pyd'.
+304:369998 INFO: Warnings written to D:\Projects\Personal\voicebox\backend\build\voicebox-server\warn-voicebox-server.txt
+
+## Build log tail (last 40 lines of 327)
+C:\Users\sabus\voicebox-buildenv\Lib\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `torch.distributed._sharding_spec` will be deprecated, use `torch.distributed._shard.sharding_spec` instead
+  __import__(package)
+C:\Users\sabus\voicebox-buildenv\Lib\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `torch.distributed._sharded_tensor` will be deprecated, use `torch.distributed._shard.sharded_tensor` instead
+  __import__(package)
+C:\Users\sabus\voicebox-buildenv\Lib\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `torch.distributed._shard.checkpoint` will be deprecated, use `torch.distributed.checkpoint` instead
+  __import__(package)
+
+********
+Warning: flash-attn is not installed. Will only run the manual PyTorch version. Please install flash-attn for faster inference.
+********
+ 
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\tempfile.py:940: ResourceWarning: Implicitly cleaning up <TemporaryDirectory 'C:\\Users\\sabus\\AppData\\Local\\Temp\\tmpew3isf3p'>
+  _warnings.warn(warn_message, ResourceWarning)
+363886 INFO: Extra DLL search directories (AddDllDirectory): ['C:\\Users\\sabus\\voicebox-buildenv\\Lib\\site-packages\\numpy.libs', 'C:\\Users\\sabus\\voicebox-buildenv\\Lib\\site-packages\\torch\\lib', 'C:\\Users\\sabus\\voicebox-buildenv\\Lib\\site-packages\\pyarrow.libs', 'C:\\Users\\sabus\\voic
+363886 INFO: Extra DLL search directories (PATH): ['C:\\Users\\sabus\\.lhotse\\tools\\sph2pipe-2.5']
+369650 WARNING: Library not found: could not resolve 'tbb12.dll', dependency of 'C:\\Users\\sabus\\voicebox-buildenv\\Lib\\site-packages\\numba\\np\\ufunc\\tbbpool.cp312-win_amd64.pyd'.
+369998 INFO: Warnings written to D:\Projects\Personal\voicebox\backend\build\voicebox-server\warn-voicebox-server.txt
+371170 INFO: Graph cross-reference written to D:\Projects\Personal\voicebox\backend\build\voicebox-server\xref-voicebox-server.html
+371522 INFO: checking PYZ
+371522 INFO: Building PYZ because PYZ-00.toc is non existent
+371522 INFO: Building PYZ (ZlibArchive) D:\Projects\Personal\voicebox\backend\build\voicebox-server\PYZ-00.pyz
+382474 INFO: Building PYZ (ZlibArchive) D:\Projects\Personal\voicebox\backend\build\voicebox-server\PYZ-00.pyz completed successfully.
+383219 INFO: checking PKG
+383219 INFO: Building PKG because PKG-00.toc is non existent
+383219 INFO: Building PKG (CArchive) voicebox-server.pkg
+484200 INFO: Building PKG (CArchive) voicebox-server.pkg completed successfully.
+484334 INFO: Bootloader C:\Users\sabus\voicebox-buildenv\Lib\site-packages\PyInstaller\bootloader\Windows-64bit-intel\runw.exe
+484334 INFO: checking EXE
+484334 INFO: Building EXE because EXE-00.toc is non existent
+484334 INFO: Building EXE from EXE-00.toc
+484334 INFO: Copying bootloader EXE to D:\Projects\Personal\voicebox\backend\dist\voicebox-server.exe
+484376 INFO: Copying icon to EXE
+484385 INFO: Copying 0 resources to EXE
+484385 INFO: Embedding manifest in EXE
+484387 INFO: Appending PKG archive to EXE
+484723 INFO: Fixing EXE headers
+489127 INFO: Building EXE from EXE-00.toc completed successfully.
+489257 INFO: Build complete! The results are available in: D:\Projects\Personal\voicebox\backend\dist
+489270 INFO: Binary built in D:\Projects\Personal\voicebox\backend\dist\voicebox-server
+END 2026-09-23T19:01:00+03:00 rc=0 duration_s=490
+
+## Output
+total 583284
+drwxr-xr-x 1 sabus 197609         0 Sep 23 19:00 .
+drwxr-xr-x 1 sabus 197609         0 Sep 23 18:59 ..
+-rwxr-xr-x 1 sabus 197609 597281957 Sep 23 19:00 voicebox-server.exe
+path: D:\Projects\Personal\voicebox\backend\dist\voicebox-server.exe  size_bytes=597281957 (~569 MiB), --onefile, --noconsole
+work dir: D:\Projects\Personal\voicebox\backend\build\voicebox-server (backend/dist and backend/build are gitignored: .gitignore:14 dist/, :15 build/)
+duration: END 2026-09-23T19:01:00+03:00 rc=0 duration_s=490
+
+## backend/venv torch AFTER
+$ D:/Projects/Personal/voicebox/backend/venv/Scripts/python.exe -c "import torch;print(torch.__version__, torch.cuda.is_available())"
+2.11.0+cu128 True

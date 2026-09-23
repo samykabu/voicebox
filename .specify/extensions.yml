@@ -72,23 +72,6 @@ hooks:
     description: Create native task sub-issues and move the parent feature issue to
       the ready column after task generation
     condition: null
-  - extension: assure
-    command: speckit.assure.analyze
-    enabled: false
-    optional: true
-    priority: 10
-    prompt: Analyze the active feature for missing QA readiness tasks before implementation?
-    description: Run early while missing tests and evidence tasks are still inexpensive
-      to add
-    condition: null
-  - extension: user-manual
-    command: speckit.user-manual.analyze
-    enabled: false
-    optional: true
-    priority: 10
-    prompt: Analyze which User Manual modules and assets this feature must update?
-    description: Add documentation and evidence work to tasks.md before implementation
-    condition: null
   - extension: speckit-superpowers-bridge
     command: speckit.speckit-superpowers-bridge.handoff
     enabled: false
@@ -106,6 +89,23 @@ hooks:
     description: Verify task coverage and add Superpowers execution markers after
       core task generation
     condition: null
+  - extension: assure
+    command: speckit.assure.analyze
+    enabled: false
+    optional: true
+    priority: 10
+    prompt: Analyze the active feature for missing QA readiness tasks before implementation?
+    description: Run early while missing tests and evidence tasks are still inexpensive
+      to add
+    condition: null
+  - extension: user-manual
+    command: speckit.user-manual.analyze
+    enabled: false
+    optional: true
+    priority: 10
+    prompt: Analyze which User Manual modules and assets this feature must update?
+    description: Add documentation and evidence work to tasks.md before implementation
+    condition: null
   before_implement:
   - extension: project
     command: speckit.project.sync
@@ -116,16 +116,6 @@ hooks:
       /speckit-project-sync in-progress'
     description: Move the parent feature issue to the in-progress column as implementation
       begins
-    condition: null
-  - extension: assure
-    command: speckit.assure.analyze
-    enabled: false
-    optional: true
-    priority: 10
-    prompt: Run the QA readiness gate before implementation? Assure.Init can make
-      this mandatory.
-    description: Mandatory in lifecycle-integrated mode; verifies or refreshes QA
-      analysis before implementation
     condition: null
   - extension: speckit-superpowers-bridge
     command: speckit.speckit-superpowers-bridge.guard
@@ -144,6 +134,16 @@ hooks:
     description: Enforce TDD discipline and Superpowers execution guidance before
       core implementation
     condition: null
+  - extension: assure
+    command: speckit.assure.analyze
+    enabled: false
+    optional: true
+    priority: 10
+    prompt: Run the QA readiness gate before implementation? Assure.Init can make
+      this mandatory.
+    description: Mandatory in lifecycle-integrated mode; verifies or refreshes QA
+      analysis before implementation
+    condition: null
   after_implement:
   - extension: project
     command: speckit.project.sync
@@ -154,24 +154,6 @@ hooks:
       Run: /speckit-project-sync in-progress'
     description: Close sub-issues for tasks checked off in tasks.md; advance to in-review
       when an open PR exists for the branch
-    condition: null
-  - extension: assure
-    command: speckit.assure.document
-    enabled: false
-    optional: true
-    priority: 10
-    prompt: Generate or refresh the QA test manual now that implementation is complete?
-    description: Optional early generation; PR generation performs a mandatory freshness
-      preflight in lifecycle-integrated mode
-    condition: null
-  - extension: user-manual
-    command: speckit.user-manual.update
-    enabled: false
-    optional: true
-    priority: 10
-    prompt: Update the audience-aware User Manual and generate a private preview?
-    description: Update affected manual modules after implemented behavior can be
-      observed
     condition: null
   - extension: pr
     command: speckit.pr.generate
@@ -198,6 +180,24 @@ hooks:
     priority: 10
     prompt: Run Superpowers review against the specification and implementation?
     description: Review implementation against the spec, plan, tasks, and constitution
+    condition: null
+  - extension: assure
+    command: speckit.assure.document
+    enabled: false
+    optional: true
+    priority: 10
+    prompt: Generate or refresh the QA test manual now that implementation is complete?
+    description: Optional early generation; PR generation performs a mandatory freshness
+      preflight in lifecycle-integrated mode
+    condition: null
+  - extension: user-manual
+    command: speckit.user-manual.update
+    enabled: false
+    optional: true
+    priority: 10
+    prompt: Update the audience-aware User Manual and generate a private preview?
+    description: Update affected manual modules after implemented behavior can be
+      observed
     condition: null
   before_specify:
   - extension: scope

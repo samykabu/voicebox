@@ -1,0 +1,67 @@
+# T041 VoxCPM2 E2E, OPTED IN, against the T042 frozen CPU binary
+# 2026-09-23T19:04:26+03:00
+# nvidia-smi: 3521 MiB, 12227 MiB;3109 MiB, 16311 MiB; (binary is CPU-only torch; GPU unused)
+# env: VOICEBOX_E2E=1 HF_HUB_OFFLINE=1 (model cached in default HF cache C:/Users/sabus/.cache/huggingface/hub)
+# env: VOICEBOX_E2E_ARGS=--binary D:/Projects/Personal/voicebox/backend/dist/voicebox-server.exe --port 17593 --reference-wav C:/Users/sabus/voxcpm-probe-out/cuda_plain.wav --reference-text "Hello, this is a short test of the VoxCPM two speech engine, running locally." --timeout-cached 900 --output-dir C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/e2e-results --keep-data-dir
+# reference: C:/Users/sabus/voxcpm-probe-out/cuda_plain.wav (48 kHz, 5.6 s, the probe's VoxCPM2 output; outside the repo)
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_all_models_e2e.py -v -rs -s -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase7/T041-voxcpm-e2e.xml
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 4 items
+
+backend\tests\test_all_models_e2e.py::test_voxcpm2_rows_declared PASSED
+backend\tests\test_all_models_e2e.py::test_voxcpm2_rows_follow_only_and_skip PASSED
+backend\tests\test_all_models_e2e.py::test_voxcpm2_request_bodies PASSED
+backend\tests\test_all_models_e2e.py::test_voxcpm2_frozen_binary_e2e [pytest] D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe D:\Projects\Personal\voicebox\backend\tests\test_all_models_e2e.py --only voxcpm --skip-build --binary D:/Projects/Personal/voicebox/backend/dist/voicebox-server.exe --port 17593 --reference-wav C:/Users/sabus/voxcpm-probe-out/cuda_plain.wav --reference-text Hello, this is a short test of the VoxCPM two speech engine, running locally. --timeout-cached 900 --output-dir C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/e2e-results --keep-data-dir
+FAILED
+
+================================== FAILURES ===================================
+_______________________ test_voxcpm2_frozen_binary_e2e ________________________
+
+tmp_path = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-64/test_voxcpm2_frozen_binary_e2e0')
+
+    def test_voxcpm2_frozen_binary_e2e(tmp_path):
+        import shlex
+    
+        import pytest
+    
+        if os.environ.get(E2E_OPT_IN_ENV) != "1":
+            pytest.skip(f"frozen-binary E2E is opt-in: set {E2E_OPT_IN_ENV}=1 (and build with backend/build_binary.py)")
+    
+        extra = shlex.split(os.environ.get(E2E_ARGS_ENV, ""), posix=os.name != "nt")
+        extra = [a.strip('"') for a in extra]
+        cmd = [sys.executable, str(Path(__file__).resolve()), "--only", "voxcpm", "--skip-build"]
+        if "--output-dir" not in extra:
+            extra += ["--output-dir", str(tmp_path)]
+        cmd += extra
+        output_dir = Path(extra[extra.index("--output-dir") + 1])
+        before = set(output_dir.glob("e2e-*.json")) if output_dir.exists() else set()
+    
+        print(f"[pytest] {' '.join(cmd)}", flush=True)
+        # UTF-8 pipes: the harness prints non-ASCII ("\u2192"), which a cp1252 pipe on Windows cannot encode.
+        env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
+        proc = subprocess.run(
+            cmd, cwd=str(REPO_ROOT), env=env, capture_output=True, text=True, encoding="utf-8", errors="replace"
+        )
+>       print(proc.stdout)
+
+backend\tests\test_all_models_e2e.py:735: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <encodings.cp1252.IncrementalEncoder object at 0x000002567B0A4050>
+input = '[binary] D:\\Projects\\Personal\\voicebox\\backend\\dist\\voicebox-server.exe\r\n[fixture] reference WAV:  C:\\Users\...0-dd0d-4a44-a944-6b0a6c359932\\scratchpad\\e2e-results\\server-20260923-160426.log\r\n\r\n== 2 passed, 0 failed ==\r\n'
+final = False
+
+    def encode(self, input, final=False):
+>       return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       UnicodeEncodeError: 'charmap' codec can't encode character '\u2192' in position 682: character maps to <undefined>
+
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\encodings\cp1252.py:19: UnicodeEncodeError
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase7\T041-voxcpm-e2e.xml -
+=================== 1 failed, 3 passed in 71.71s (0:01:11) ====================
+# pytest exit=1 wall_s=72 2026-09-23T19:05:38+03:00

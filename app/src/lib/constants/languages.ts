@@ -6,6 +6,7 @@
  * Chatterbox Multilingual supports 23 languages.
  * Chatterbox Turbo is English-only.
  * Kokoro supports 8 languages.
+ * VoxCPM2 declares 30 languages through the engine capabilities (all in ALL_LANGUAGES).
  */
 
 /** All languages that any engine supports. */
@@ -20,10 +21,14 @@ export const ALL_LANGUAGES = {
   fr: 'French',
   he: 'Hebrew',
   hi: 'Hindi',
+  id: 'Indonesian',
   it: 'Italian',
   ja: 'Japanese',
+  km: 'Khmer',
   ko: 'Korean',
+  lo: 'Lao',
   ms: 'Malay',
+  my: 'Burmese',
   nl: 'Dutch',
   no: 'Norwegian',
   pl: 'Polish',
@@ -31,7 +36,10 @@ export const ALL_LANGUAGES = {
   ru: 'Russian',
   sv: 'Swedish',
   sw: 'Swahili',
+  th: 'Thai',
+  tl: 'Tagalog',
   tr: 'Turkish',
+  vi: 'Vietnamese',
   zh: 'Chinese',
 } as const;
 
@@ -73,9 +81,24 @@ export const ENGINE_LANGUAGES: Record<string, readonly LanguageCode[]> = {
   f5_tts: ['ar'],
 } as const;
 
-/** Helper: get language options for a given engine. */
-export function getLanguageOptionsForEngine(engine: string) {
-  const codes = ENGINE_LANGUAGES[engine] ?? ENGINE_LANGUAGES.qwen;
+function isLanguageCode(code: string): code is LanguageCode {
+  return (Object.keys(ALL_LANGUAGES) as string[]).includes(code);
+}
+
+/**
+ * Helper: get language options for a given engine.
+ *
+ * `declaredLanguages` is the engine's `languages` from `useEngineCapabilities` (FR-007,
+ * FR-024). It is used for any engine without an app-side list above; the engines listed in
+ * `ENGINE_LANGUAGES` are not migrated to the capability channel yet and keep their list
+ * (contracts/engine-capabilities.md, "Scope boundary"). Declared codes missing from
+ * `ALL_LANGUAGES` are dropped: the app has no name for them and the backend's
+ * `GenerationRequest.language` pattern would reject them.
+ */
+export function getLanguageOptionsForEngine(engine: string, declaredLanguages?: readonly string[]) {
+  const declared = declaredLanguages?.filter(isLanguageCode) ?? [];
+  const codes =
+    ENGINE_LANGUAGES[engine] ?? (declared.length > 0 ? declared : ENGINE_LANGUAGES.qwen);
   return codes.map((code) => ({
     value: code,
     label: ALL_LANGUAGES[code],

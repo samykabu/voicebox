@@ -1,0 +1,290 @@
+# Offline / Principle I checks (attempt 3; see 14a-* hang and 14b-* runner bug). Model fully cached in C:\Users\sabus\.cache\huggingface\hub.
+# Evidence method: probe_run.py hooks socket.getaddrinfo + socket.socket.connect for the whole process; every Python-level lookup/connect is logged as [NET]. With PROBE_DENY_NET=1 any non-loopback lookup/connect is REFUSED (hard block, no admin) and logged as [NET] BLOCKED. HTTP(S)_PROXY -> 127.0.0.1:1 (verified no listener). urllib3/httpx/huggingface_hub/modelscope loggers at DEBUG.
+# Limitation: hook sees Python sockets only; native hf-xet (Rust) bypasses it but only runs for actual file downloads.
+
+################ O1 nodeps312 (hub 0.36.2): network UP, no offline env, defaults  (2026-09-23T02:29:48+03:00)
+cmd: env /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --out C:\Users\sabus\voxcpm-probe-out\offline
+HF_HUB_OFFLINE=None
+TRANSFORMERS_OFFLINE=None
+HTTP_PROXY=None
+HTTPS_PROXY=None
+PROBE_DENY_NET=None
+args {'device': 'cuda', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': False, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (1): huggingface.co:443
+[NET] getaddrinfo: huggingface.co:443
+[NET] connect: ('3.175.149.15', 443)
+[LOG] urllib3.connectionpool DEBUG https://huggingface.co:443 "GET /api/models/openbmb/VoxCPM2/revision/main HTTP/1.1" 200 None
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+Loaded VoxCPM2Model
+denoiser: None
+GEN {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 4.75, 'audio_s': 4.32, 'rtf': 1.099, 'dtype': 'float32', 'shape': (207360,), 'rms': 0.13, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+timings {'import_s': 2.73, 'load_s': 8.64}
+RESULT {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 4.75, 'audio_s': 4.32, 'rtf': 1.099, 'dtype': 'float32', 'shape': (207360,), 'rms': 0.13, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+NETWORK getaddrinfo hosts: ['huggingface.co:443']
+NETWORK connect count: 1
+exit=0 (124=timeout) dur=17s
+
+################ O2 nodeps312: network BLOCKED, no offline env vars  (2026-09-23T02:30:05+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --out C:\Users\sabus\voxcpm-probe-out\offline
+HF_HUB_OFFLINE=None
+TRANSFORMERS_OFFLINE=None
+HTTP_PROXY=http://127.0.0.1:1
+HTTPS_PROXY=http://127.0.0.1:1
+PROBE_DENY_NET=1
+args {'device': 'cuda', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': False, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (1): huggingface.co:443
+[NET] getaddrinfo: 127.0.0.1:1
+[NET] connect: ('127.0.0.1', 1)
+Traceback (most recent call last):
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\urllib3\connection.py", line 239, in _new_conn
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\urllib3\util\connection.py", line 85, in create_connection
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\urllib3\util\connection.py", line 73, in create_connection
+  File "D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\probe\probe_run.py", line 45, in _hook_connect
+ConnectionRefusedError: [WinError 10061] No connection could be made because the target machine actively refused it
+Traceback (most recent call last):
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\urllib3\connectionpool.py", line 779, in urlopen
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\urllib3\connectionpool.py", line 1074, in _prepare_proxy
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\urllib3\connection.py", line 827, in connect
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\urllib3\connection.py", line 254, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: HTTPSConnection(host='127.0.0.1', port=1): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it
+urllib3.exceptions.ProxyError: ('Unable to connect to proxy', NewConnectionError("HTTPSConnection(host='127.0.0.1', port=1): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+Traceback (most recent call last):
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\requests\adapters.py", line 696, in send
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\urllib3\connectionpool.py", line 847, in urlopen
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\urllib3\util\retry.py", line 555, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='huggingface.co', port=443): Max retries exceeded with url: /api/models/openbmb/VoxCPM2/revision/main (Caused by ProxyError('Unable to connect to proxy', NewConnectionError("HTTPSConnection(host='127.0.0.1', port=1): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refus
+Traceback (most recent call last):
+  File "D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\probe\probe_run.py", line 128, in <module>
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\core.py", line 157, in from_pretrained
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\huggingface_hub\utils\_validators.py", line 114, in _inner_fn
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\huggingface_hub\_snapshot_download.py", line 165, in snapshot_download
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\huggingface_hub\utils\_validators.py", line 114, in _inner_fn
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\huggingface_hub\hf_api.py", line 2867, in repo_info
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\huggingface_hub\utils\_validators.py", line 114, in _inner_fn
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\huggingface_hub\hf_api.py", line 2660, in model_info
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\requests\sessions.py", line 671, in get
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\requests\sessions.py", line 651, in request
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\requests\sessions.py", line 784, in send
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\huggingface_hub\utils\_http.py", line 96, in send
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\requests\adapters.py", line 723, in send
+    raise ProxyError(e, request=request)
+requests.exceptions.ProxyError: (MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /api/models/openbmb/VoxCPM2/revision/main (Caused by ProxyError(\'Unable to connect to proxy\', NewConnectionError("HTTPSConnection(host=\'127.0.0.1\', port=1): Failed to establish a new connection: [WinError 10061] No connection could be made because the target ma
+exit=1 (124=timeout) dur=5s
+
+################ O3 nodeps312: network BLOCKED + HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1  (2026-09-23T02:30:10+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --out C:\Users\sabus\voxcpm-probe-out\offline
+HF_HUB_OFFLINE=1
+TRANSFORMERS_OFFLINE=1
+HTTP_PROXY=http://127.0.0.1:1
+HTTPS_PROXY=http://127.0.0.1:1
+PROBE_DENY_NET=1
+args {'device': 'cuda', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': False, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+Loaded VoxCPM2Model
+denoiser: None
+GEN {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 4.58, 'audio_s': 4.16, 'rtf': 1.101, 'dtype': 'float32', 'shape': (199680,), 'rms': 0.2161, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+timings {'import_s': 2.76, 'load_s': 8.63}
+RESULT {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 4.58, 'audio_s': 4.16, 'rtf': 1.101, 'dtype': 'float32', 'shape': (199680,), 'rms': 0.2161, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+NETWORK getaddrinfo hosts: []
+NETWORK connect count: 0
+exit=0 (124=timeout) dur=17s
+
+################ O4 nodeps312: network BLOCKED, no env vars, from_pretrained(local_files_only=True)  (2026-09-23T02:30:27+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --local-files-only --out C:\Users\sabus\voxcpm-probe-out\offline
+HF_HUB_OFFLINE=None
+TRANSFORMERS_OFFLINE=None
+HTTP_PROXY=http://127.0.0.1:1
+HTTPS_PROXY=http://127.0.0.1:1
+PROBE_DENY_NET=1
+args {'device': 'cuda', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': False, 'optimize': False, 'local_files_only': True, 'design': False, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+Loaded VoxCPM2Model
+denoiser: None
+GEN {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 4.81, 'audio_s': 4.32, 'rtf': 1.114, 'dtype': 'float32', 'shape': (207360,), 'rms': 0.1836, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+timings {'import_s': 2.76, 'load_s': 8.6}
+RESULT {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 4.81, 'audio_s': 4.32, 'rtf': 1.114, 'dtype': 'float32', 'shape': (207360,), 'rms': 0.1836, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+NETWORK getaddrinfo hosts: []
+NETWORK connect count: 0
+exit=0 (124=timeout) dur=17s
+
+################ O4b nodeps312: proxy only (no PROBE_DENY_NET), no env vars, local_files_only=True  (2026-09-23T02:30:45+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --local-files-only --out C:\Users\sabus\voxcpm-probe-out\offline
+HF_HUB_OFFLINE=None
+TRANSFORMERS_OFFLINE=None
+HTTP_PROXY=http://127.0.0.1:1
+HTTPS_PROXY=http://127.0.0.1:1
+PROBE_DENY_NET=None
+args {'device': 'cuda', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': False, 'optimize': False, 'local_files_only': True, 'design': False, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+Loaded VoxCPM2Model
+denoiser: None
+GEN {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 5.68, 'audio_s': 5.28, 'rtf': 1.075, 'dtype': 'float32', 'shape': (253440,), 'rms': 0.1409, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+timings {'import_s': 2.82, 'load_s': 8.69}
+RESULT {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 5.68, 'audio_s': 5.28, 'rtf': 1.075, 'dtype': 'float32', 'shape': (253440,), 'rms': 0.1409, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+NETWORK getaddrinfo hosts: []
+NETWORK connect count: 0
+exit=0 (124=timeout) dur=18s
+
+################ O5 nodeps312: BLOCKED + offline env, load_denoiser=True (LIBRARY DEFAULT); modelscope NOT installed here  (2026-09-23T02:31:03+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --denoiser --skip-generate --out C:\Users\sabus\voxcpm-probe-out\offline
+HF_HUB_OFFLINE=1
+TRANSFORMERS_OFFLINE=1
+HTTP_PROXY=http://127.0.0.1:1
+HTTPS_PROXY=http://127.0.0.1:1
+PROBE_DENY_NET=1
+args {'device': 'cuda', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': True, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': True, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: iic/speech_zipenhancer_ans_multiloss_16k_base, enable_denoiser: True
+C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+Loaded VoxCPM2Model
+Traceback (most recent call last):
+  File "D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\probe\probe_run.py", line 128, in <module>
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\core.py", line 163, in from_pretrained
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\core.py", line 91, in __init__
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\zipenhancer.py", line 12, in <module>
+    from modelscope.pipelines import pipeline
+ModuleNotFoundError: No module named 'modelscope'
+exit=1 (124=timeout) dur=12s
+
+################ O6 venv1 (full deps, hub 1.32.0, torch cpu): BLOCKED, no offline env vars  (2026-09-23T02:31:15+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 /c/Users/sabus/voxcpm-probe/Scripts/python.exe probe_run.py --device cpu --skip-generate --out C:\Users\sabus\voxcpm-probe-out\offline
+HF_HUB_OFFLINE=None
+TRANSFORMERS_OFFLINE=None
+HTTP_PROXY=http://127.0.0.1:1
+HTTPS_PROXY=http://127.0.0.1:1
+PROBE_DENY_NET=1
+args {'device': 'cpu', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': False, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': True, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\jit\_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+[LOG] httpcore.connection DEBUG connect_tcp.started host='127.0.0.1' port=1 local_address=None timeout=None socket_options=None
+[NET] getaddrinfo: 127.0.0.1:1
+[NET] connect: ('127.0.0.1', 1)
+[LOG] httpcore.connection DEBUG connect_tcp.failed exception=ConnectError(ConnectionRefusedError(10061, 'No connection could be made because the target machine actively refused it', None, 10061, None))
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\nn\utils\weight_norm.py:145: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+Loaded VoxCPM2Model
+denoiser: None
+timings {'import_s': 2.63, 'load_s': 10.43}
+NETWORK getaddrinfo hosts: ['127.0.0.1:1']
+NETWORK connect count: 1
+exit=0 (124=timeout) dur=14s
+
+################ O7 venv1: BLOCKED + HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 (+generate)  (2026-09-23T02:31:29+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 /c/Users/sabus/voxcpm-probe/Scripts/python.exe probe_run.py --device cpu --out C:\Users\sabus\voxcpm-probe-out\offline
+HF_HUB_OFFLINE=1
+TRANSFORMERS_OFFLINE=1
+HTTP_PROXY=http://127.0.0.1:1
+HTTPS_PROXY=http://127.0.0.1:1
+PROBE_DENY_NET=1
+args {'device': 'cpu', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': False, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\jit\_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\nn\utils\weight_norm.py:145: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+Loaded VoxCPM2Model
+denoiser: None
+GEN {'label': 'cpu_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 11.18, 'audio_s': 4.32, 'rtf': 2.589, 'dtype': 'float32', 'shape': (207360,), 'rms': 0.1261, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cpu_plain.wav', 'file_sr': 48000}
+timings {'import_s': 2.55, 'load_s': 8.28}
+RESULT {'label': 'cpu_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 11.18, 'audio_s': 4.32, 'rtf': 2.589, 'dtype': 'float32', 'shape': (207360,), 'rms': 0.1261, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cpu_plain.wav', 'file_sr': 48000}
+NETWORK getaddrinfo hosts: []
+NETWORK connect count: 0
+exit=0 (124=timeout) dur=23s
+
+################ O8 venv1: BLOCKED + offline env, load_denoiser=True (LIBRARY DEFAULT); modelscope installed  (2026-09-23T02:31:52+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 /c/Users/sabus/voxcpm-probe/Scripts/python.exe probe_run.py --device cpu --denoiser --skip-generate --out C:\Users\sabus\voxcpm-probe-out\offline
+HF_HUB_OFFLINE=1
+TRANSFORMERS_OFFLINE=1
+HTTP_PROXY=http://127.0.0.1:1
+HTTPS_PROXY=http://127.0.0.1:1
+PROBE_DENY_NET=1
+args {'device': 'cpu', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': True, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': True, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\jit\_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: iic/speech_zipenhancer_ans_multiloss_16k_base, enable_denoiser: True
+C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\nn\utils\weight_norm.py:145: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+Loaded VoxCPM2Model
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (1): modelscope.cn:443
+[NET] getaddrinfo: 127.0.0.1:1
+[NET] connect: ('127.0.0.1', 1)
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (2): modelscope.cn:443
+[NET] getaddrinfo: 127.0.0.1:1
+[NET] connect: ('127.0.0.1', 1)
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (3): modelscope.cn:443
+[NET] getaddrinfo: 127.0.0.1:1
+[NET] connect: ('127.0.0.1', 1)
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (4): modelscope.cn:443
+[NET] getaddrinfo: 127.0.0.1:1
+[NET] connect: ('127.0.0.1', 1)
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (5): modelscope.cn:443
+[NET] getaddrinfo: 127.0.0.1:1
+[NET] connect: ('127.0.0.1', 1)
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (1): modelscope.cn:443
+[NET] getaddrinfo: 127.0.0.1:1
+[NET] connect: ('127.0.0.1', 1)
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (2): modelscope.cn:443
+[NET] getaddrinfo: 127.0.0.1:1
+[NET] connect: ('127.0.0.1', 1)
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (3): modelscope.cn:443
+[NET] getaddrinfo: 127.0.0.1:1
+[NET] connect: ('127.0.0.1', 1)
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (4): modelscope.cn:443
+[NET] getaddrinfo: 127.0.0.1:1
+[NET] connect: ('127.0.0.1', 1)
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (5): modelscope.cn:443
+[NET] getaddrinfo: 127.0.0.1:1
+[NET] connect: ('127.0.0.1', 1)
+Traceback (most recent call last):
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\modelscope\pipelines\util.py", line 35, in is_official_hub_impl
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\modelscope_hub\compat\hub_api.py", line 167, in get_model
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\modelscope_hub\api.py", line 1012, in get_repo
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\modelscope_hub\_openapi.py", line 657, in get_model
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\modelscope_hub\_openapi.py", line 415, in _request
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\modelscope_hub\_openapi.py", line 574, in _send
+modelscope_hub.errors.NetworkError: [E1020] Connection error: HTTPSConnectionPool(host='modelscope.cn', port=443): Max retries exceeded with url: /openapi/v1/models/iic/speech_zipenhancer_ans_multiloss_16k_base (Caused by ProxyError('Unable to connect to proxy', NewConnectionError("HTTPSConnection(host='127.0.0.1', port=1): Failed to establish a new connection: [WinError 10061] No connection could
+Traceback (most recent call last):
+  File "D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\probe\probe_run.py", line 128, in <module>
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\voxcpm\core.py", line 163, in from_pretrained
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\voxcpm\core.py", line 93, in __init__
+    self.denoiser = ZipEnhancer(zipenhancer_model_path)
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\voxcpm\zipenhancer.py", line 26, in __init__
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\modelscope\pipelines\builder.py", line 138, in pipeline
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\modelscope\pipelines\util.py", line 41, in is_official_hub_path
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\modelscope\pipelines\util.py", line 38, in is_official_hub_impl
+    raise ValueError(f'invalid model repo path {e}')
+ValueError: invalid model repo path [E1020] Connection error: HTTPSConnectionPool(host='modelscope.cn', port=443): Max retries exceeded with url: /openapi/v1/models/iic/speech_zipenhancer_ans_multiloss_16k_base (Caused by ProxyError('Unable to connect to proxy', NewConnectionError("HTTPSConnection(host='127.0.0.1', port=1): Failed to establish a new connection: [WinError 10061] No connection could
+exit=1 (124=timeout) dur=66s
+
+################ O2b nodeps312 (hub 0.36.2): PROBE_DENY_NET=1 only (no proxy = unplugged-cable analogue), no offline env  (2026-09-23T02:33:26+03:00)
+HF_HUB_CACHE resolved: C:\Users\sabus\.cache\huggingface\hub | HF_HUB_OFFLINE const: False
+[NET] getaddrinfo: huggingface.co:443
+[NET] BLOCKED: getaddrinfo huggingface.co:443
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Loaded VoxCPM2Model
+timings {'import_s': 2.72, 'load_s': 8.61}
+NETWORK getaddrinfo hosts: ['huggingface.co:443']
+NETWORK connect count: 0
+exit=0 dur=12s
+
+################ O6b venv1 (hub 1.32.0): PROBE_DENY_NET=1 only, no offline env  (2026-09-23T02:33:38+03:00)
+C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\jit\_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+HF_HUB_CACHE resolved: C:\Users\sabus\.cache\huggingface\hub | HF_HUB_OFFLINE const: False
+[NET] getaddrinfo: huggingface.co:443
+[NET] BLOCKED: getaddrinfo huggingface.co:443
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\nn\utils\weight_norm.py:145: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Loaded VoxCPM2Model
+timings {'import_s': 2.58, 'load_s': 8.22}
+NETWORK getaddrinfo hosts: ['huggingface.co:443']
+NETWORK connect count: 0
+exit=0 dur=12s

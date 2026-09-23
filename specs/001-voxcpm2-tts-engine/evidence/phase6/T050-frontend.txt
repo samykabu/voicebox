@@ -1,0 +1,58 @@
+# T050 frontend: responsible-use acknowledgement in the profile dialog (FR-025). Generated 2026-09-23T18:29+03:00
+Base: HEAD 2ade0e0 plus the T036/T049 working-tree changes.
+Files changed:
+- app/src/components/VoiceProfiles/ProfileForm.tsx
+- app/src/i18n/locales/en/translation.json (en only; i18n fallbackLng is 'en')
+No new helper was added, so no logic tests were needed.
+
+## 1. The sentence, and where it is (app/src/components/VoiceProfiles/ProfileForm.tsx)
+- :3 imports ShieldCheck (lucide); react-i18next now also imports Trans.
+- :72-73 RESPONSIBLE_USE_URL = 'https://github.com/samykabu/voicebox/blob/main/RESPONSIBLE_USE.md'
+- :926-945 is the acknowledgement, placed in DialogHeader right after DialogDescription (:920-925). It renders as:
+  - a bordered, tinted box with a ShieldCheck icon (:928)
+  - <Trans i18nKey="profileForm.responsibleUse"> (:930-943)
+  - Rendered text: "Only create voices you have the right to use. See Responsible Use.", with "Responsible Use" as a link.
+
+Why it is always visible:
+- It sits in the dialog header, outside the voiceSource branches (clone / builtin / design), so the source toggle cannot hide or remove it.
+- It is not behind any toggle.
+
+Create vs edit:
+- It shows for both creating and editing.
+- FR-025 requires at least the creation dialog. Editing a cloned profile can still add voice samples (SampleList), so the same acknowledgement applies there.
+
+## 2. Link target and how external links are opened
+- The URL is https://github.com/samykabu/voicebox/blob/main/RESPONSIBLE_USE.md
+  - It is the same repo the app already links: AboutPage.tsx:100 links "https://github.com/samykabu/voicebox" and AboutPage.tsx:127 links ".../blob/main/LICENSE".
+  - RESPONSIBLE_USE.md is tracked at HEAD and exists on origin/main ('git cat-file -e origin/main:RESPONSIBLE_USE.md' succeeded).
+- Link mechanism: same as the existing links. The app uses plain <a href target="_blank" rel="noopener noreferrer">; there is no openUrl, plugin-opener or plugin-shell helper in app/src.
+- Specifically, this mirrors the AboutPage.tsx:121-135 pattern: Trans with components={{ link: <a .../> }} and the same "biome-ignore lint/a11y/useAnchorContent: Trans fills content at runtime" comment.
+
+## 3. i18n keys (app/src/i18n/locales/en/translation.json)
+- :240 profileForm.createDescription, now: "Create a new voice profile from an audio sample, a built-in voice, or a written description."
+- :241 profileForm.responsibleUse (new): "Only create voices you have the right to use. See <link>Responsible Use</link>."
+- Other locales fall back to English for responsibleUse. Their existing createDescription translations still name only two sources.
+
+## 4. Typecheck, timestamp 2026-09-23T18:28:52+03:00 (final)
+$ bun run typecheck
+$ bunx tsc -p app/tsconfig.json --noEmit && cd web && bunx tsc --noEmit
+exit=0
+
+## 5. Biome, touched files vs HEAD
+Method: LF copies of the HEAD blobs and the working files, each beside the repo's biome.json, checked with node_modules/.bin/biome check --vcs-enabled=false. The formatter's changes were compared by running format --write on each copy and diffing.
+- ProfileForm.tsx: HEAD 1 format error, working 1 format error. Formatter changes are identical HEAD vs working.
+  - The only change is a pre-existing one at HEAD: the personalityHint FormDescription could be put on one line.
+  - The first pass showed a NEW format difference: a multi-line lucide import that fits on one line. It was fixed.
+- translation.json (en): HEAD 1, working 1, identical. Pre-existing: '},      "remove": {'.
+- No lint findings. The biome-ignore on the anchor mirrors AboutPage.
+Result: no new Biome findings.
+
+## 6. Note: T049 line numbers have shifted
+The T049-frontend.txt line numbers for ProfileForm.tsx were taken before this change. Since then:
+- +2 lines from :72 on (the new URL constant).
+- +22 lines in total from :926 on (the 20-line acknowledgement block).
+Examples:
+- The design toggle moved from :991-1005 to :1013-1027.
+- The create payload moved from :626-634 to :628-636.
+- The read-only designed-profile edit block moved from :1278-1292 to :1300-1314.
+- The Default Engine disabled condition moved from :1440 to :1462.

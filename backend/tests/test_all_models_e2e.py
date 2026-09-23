@@ -47,9 +47,14 @@ class MatrixRow:
     label: str            # human-readable (appears in report)
     engine: str           # /generate engine
     model_size: Optional[str]  # /generate model_size (None = omit)
-    profile_kind: str     # "cloned" | "preset_kokoro" | "preset_qwen_cv"
+    profile_kind: str     # "cloned" | "preset_kokoro" | "preset_qwen_cv" | "designed"
     model_name: str       # /models/status key for cache lookup
+    voice_description: str | None = None  # /generate voice_description (None = omit)
 
+
+# Written voice description for the voice-design row. The designed profile saves it
+# as its design_prompt and the request also sends it as voice_description (FR-015).
+DESIGN_DESCRIPTION = "A calm, warm adult narrator with a clear, steady voice."
 
 MATRIX: list[MatrixRow] = [
     MatrixRow("qwen 1.7B",              "qwen",              "1.7B", "cloned",          "qwen-tts-1.7B"),
@@ -62,6 +67,11 @@ MATRIX: list[MatrixRow] = [
     MatrixRow("tada 1B",                "tada",              "1B",   "cloned",          "tada-1b"),
     MatrixRow("tada 3B",                "tada",              "3B",   "cloned",          "tada-3b-ml"),
     MatrixRow("kokoro",                 "kokoro",            None,   "preset_kokoro",   "kokoro"),
+    # VoxCPM2 has no model sizes. The first row clones the shared reference (FR-011);
+    # the second designs a voice from a written description (no reference audio).
+    MatrixRow("voxcpm2",                "voxcpm",            None,   "cloned",          "voxcpm2"),
+    MatrixRow("voxcpm2 voice design",   "voxcpm",            None,   "designed",        "voxcpm2",
+              voice_description=DESIGN_DESCRIPTION),
 ]
 
 TEXT = "The quick brown fox jumps over the lazy dog."
@@ -271,6 +281,34 @@ def create_preset_profile(client: httpx.Client, base_url: str, name: str, engine
     return r.json()["id"]
 
 
+def create_designed_profile(client: httpx.Client, base_url: str, name: str, design_prompt: str) -> str:
+    r = client.post(f"{base_url}/profiles", json={
+        "name": name,
+        "voice_type": "designed",
+        "language": "en",
+        "design_prompt": design_prompt,
+    })
+    r.raise_for_status()
+    return r.json()["id"]
+
+
+def build_generation_body(row: MatrixRow, profile_id: str) -> dict:
+    """Return the /generate request body for *row*; optional fields are omitted when unset."""
+    body = {
+        "profile_id": profile_id,
+        "text": TEXT,
+        "language": "en",
+        "engine": row.engine,
+        "seed": 42,
+        "normalize": True,
+    }
+    if row.model_size is not None:
+        body["model_size"] = row.model_size
+    if row.voice_description is not None:
+        body["voice_description"] = row.voice_description
+    return body
+
+
 def run_one_generation(
     client: httpx.Client,
     base_url: str,
@@ -282,16 +320,7 @@ def run_one_generation(
 
     Returns (status, payload) where status is "completed" | "failed" | "timeout".
     """
-    body = {
-        "profile_id": profile_id,
-        "text": TEXT,
-        "language": "en",
-        "engine": row.engine,
-        "seed": 42,
-        "normalize": True,
-    }
-    if row.model_size is not None:
-        body["model_size"] = row.model_size
+    body = build_generation_body(row, profile_id)
 
     r = client.post(f"{base_url}/generate", json=body, timeout=30.0)
     r.raise_for_status()
@@ -550,11 +579,16 @@ def main() -> int:
             if "preset_qwen_cv" in needed_kinds:
                 print("[profile] creating qwen_custom_voice preset...", flush=True)
                 qwen_cv_profile_id = create_preset_profile(client, base_url, "e2e-qwen-cv", "qwen_custom_voice", "Ryan")
+            designed_profile_id: str | None = None
+            if "designed" in needed_kinds:
+                print("[profile] creating designed profile...", flush=True)
+                designed_profile_id = create_designed_profile(client, base_url, "e2e-designed", DESIGN_DESCRIPTION)
 
             profile_lookup = {
                 "cloned": cloned_profile_id,
                 "preset_kokoro": kokoro_profile_id,
                 "preset_qwen_cv": qwen_cv_profile_id,
+                "designed": designed_profile_id,
             }
 
             # Matrix loop
@@ -624,6 +658,93 @@ def main() -> int:
     failed = len(results) - passed
     print(f"\n== {passed} passed, {failed} failed ==")
     return 0 if failed == 0 else 1
+
+
+# ── pytest entry points (VoxCPM2) ────────────────────────────────────
+#
+# The harness above is a script (see E2E_MODEL_TEST_DESIGN.md); pytest only
+# collects the checks below. The frozen-binary run is opt-in: it skips unless
+# VOICEBOX_E2E=1, so `just test` never spawns a binary, builds one, or loads or
+# downloads a model. When opted in, it runs this script with `--only voxcpm
+# --skip-build` plus any flags in VOICEBOX_E2E_ARGS (e.g. --binary,
+# --reference-wav, --reference-text, --port, --timeout-cached), so the cached /
+# download timeout split and the --only/--skip selection behave exactly as for
+# every other engine.
+
+E2E_OPT_IN_ENV = "VOICEBOX_E2E"
+E2E_ARGS_ENV = "VOICEBOX_E2E_ARGS"
+
+
+def _voxcpm_rows() -> list[MatrixRow]:
+    return [r for r in MATRIX if r.engine == "voxcpm"]
+
+
+def test_voxcpm2_rows_declared():
+    rows = _voxcpm_rows()
+    assert [r.profile_kind for r in rows] == ["cloned", "designed"]
+    for r in rows:
+        assert r.model_size is None
+        assert r.model_name == "voxcpm2"
+    assert rows[0].voice_description is None
+    assert rows[1].voice_description == DESIGN_DESCRIPTION
+
+
+def test_voxcpm2_rows_follow_only_and_skip():
+    only = filter_matrix(argparse.Namespace(only="voxcpm", skip=None))
+    assert only == _voxcpm_rows()
+    skipped = filter_matrix(argparse.Namespace(only=None, skip="voxcpm"))
+    assert all(r.engine != "voxcpm" for r in skipped)
+    assert len(skipped) == len(MATRIX) - len(_voxcpm_rows())
+
+
+def test_voxcpm2_request_bodies():
+    clone_row, design_row = _voxcpm_rows()
+    clone = build_generation_body(clone_row, "p1")
+    assert clone["engine"] == "voxcpm"
+    assert "model_size" not in clone
+    assert "voice_description" not in clone
+    design = build_generation_body(design_row, "p2")
+    assert "model_size" not in design
+    assert design["voice_description"] == DESIGN_DESCRIPTION
+    assert "instruct" not in design
+
+
+def test_voxcpm2_frozen_binary_e2e(tmp_path):
+    import shlex
+
+    import pytest
+
+    if os.environ.get(E2E_OPT_IN_ENV) != "1":
+        pytest.skip(f"frozen-binary E2E is opt-in: set {E2E_OPT_IN_ENV}=1 (and build with backend/build_binary.py)")
+
+    extra = shlex.split(os.environ.get(E2E_ARGS_ENV, ""), posix=os.name != "nt")
+    extra = [a.strip('"') for a in extra]
+    cmd = [sys.executable, str(Path(__file__).resolve()), "--only", "voxcpm", "--skip-build"]
+    if "--output-dir" not in extra:
+        extra += ["--output-dir", str(tmp_path)]
+    cmd += extra
+    output_dir = Path(extra[extra.index("--output-dir") + 1])
+    before = set(output_dir.glob("e2e-*.json")) if output_dir.exists() else set()
+
+    print(f"[pytest] {' '.join(cmd)}", flush=True)
+    # UTF-8 pipes: the harness prints non-ASCII ("→"), which a cp1252 pipe on Windows cannot encode.
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
+    proc = subprocess.run(
+        cmd, cwd=str(REPO_ROOT), env=env, capture_output=True, text=True, encoding="utf-8", errors="replace"
+    )
+    for text, stream in ((proc.stdout, sys.stdout), (proc.stderr, sys.stderr)):
+        enc = getattr(stream, "encoding", None) or "utf-8"
+        print(text.encode(enc, errors="replace").decode(enc), file=stream)
+
+    reports = sorted(set(output_dir.glob("e2e-*.json")) - before)
+    assert reports, f"harness wrote no report (exit {proc.returncode})"
+    doc = json.loads(reports[-1].read_text())
+    results = {r["label"]: r for r in doc["results"]}
+    assert set(results) == {r.label for r in _voxcpm_rows()}
+    for label, r in results.items():
+        assert r["status"] == "passed", f"{label}: {r['status']}: {r.get('error')}"
+        assert r["audio_bytes"], f"{label}: no audio file"
+    assert proc.returncode == 0
 
 
 if __name__ == "__main__":

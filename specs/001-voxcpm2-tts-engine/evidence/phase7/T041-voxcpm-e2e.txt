@@ -1,0 +1,88 @@
+# T041 VoxCPM2 E2E, OPTED IN, against the T042 frozen CPU binary
+# 2026-09-23T19:05:51+03:00
+# nvidia-smi: 5377 MiB, 12227 MiB;3653 MiB, 16311 MiB; (binary is CPU-only torch; GPU unused)
+# env: VOICEBOX_E2E=1 HF_HUB_OFFLINE=1 (model cached in default HF cache C:/Users/sabus/.cache/huggingface/hub)
+# env: VOICEBOX_E2E_ARGS=--binary D:/Projects/Personal/voicebox/backend/dist/voicebox-server.exe --port 17593 --reference-wav C:/Users/sabus/voxcpm-probe-out/cuda_plain.wav --reference-text "Hello, this is a short test of the VoxCPM two speech engine, running locally." --timeout-cached 900 --output-dir C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/e2e-results --keep-data-dir
+# reference: C:/Users/sabus/voxcpm-probe-out/cuda_plain.wav (48 kHz, 5.6 s, the probe's VoxCPM2 output; outside the repo)
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_all_models_e2e.py -v -rs -s -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase7/T041-voxcpm-e2e.xml
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 4 items
+
+backend\tests\test_all_models_e2e.py::test_voxcpm2_rows_declared PASSED
+backend\tests\test_all_models_e2e.py::test_voxcpm2_rows_follow_only_and_skip PASSED
+backend\tests\test_all_models_e2e.py::test_voxcpm2_request_bodies PASSED
+backend\tests\test_all_models_e2e.py::test_voxcpm2_frozen_binary_e2e [pytest] D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe D:\Projects\Personal\voicebox\backend\tests\test_all_models_e2e.py --only voxcpm --skip-build --binary D:/Projects/Personal/voicebox/backend/dist/voicebox-server.exe --port 17593 --reference-wav C:/Users/sabus/voxcpm-probe-out/cuda_plain.wav --reference-text Hello, this is a short test of the VoxCPM two speech engine, running locally. --timeout-cached 900 --output-dir C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/e2e-results --keep-data-dir
+
+[binary] D:\Projects\Personal\voicebox\backend\dist\voicebox-server.exe
+[fixture] reference WAV:  C:\Users\sabus\voxcpm-probe-out\cuda_plain.wav
+[fixture] reference text: 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'
+[spawn] D:\Projects\Personal\voicebox\backend\dist\voicebox-server.exe --host 127.0.0.1 --port 17593 --data-dir C:\Users\sabus\AppData\Local\Temp\voicebox-e2e-gxslvkfr --parent-pid 91756
+[health] waiting for http://127.0.0.1:17593/health ...
+[health] ready
+[profile] creating cloned profile...
+[profile] creating designed profile...
+
+[run] voxcpm2 (engine=voxcpm, size=None)
+[run] cached=True timeout=900s
+[run] voxcpm2 ? passed in 32.71s
+
+[run] voxcpm2 voice design (engine=voxcpm, size=None)
+[run] cached=True timeout=900s
+[run] voxcpm2 voice design ? passed in 15.1s
+[cleanup] keeping data dir: C:\Users\sabus\AppData\Local\Temp\voicebox-e2e-gxslvkfr
+
+[report] C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\e2e-results\e2e-windows-amd64-20260923-160551.json
+[report] C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\e2e-results\e2e-windows-amd64-20260923-160551.md
+[report] server log: C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\e2e-results\server-20260923-160551.log
+
+== 2 passed, 0 failed ==
+
+PASSED
+
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase7\T041-voxcpm-e2e.xml -
+======================== 4 passed in 70.80s (0:01:10) =========================
+# pytest exit=0 wall_s=71 2026-09-23T19:07:02+03:00
+
+## Harness report (copied to T041-voxcpm-e2e-report.json)
+# Voicebox E2E ó windows-amd64 ó 2026-09-23 16:05 UTC
+
+Binary: `D:\Projects\Personal\voicebox\backend\dist\voicebox-server.exe`  
+Elapsed: 69.5s
+
+| Model | Status | Cached | Elapsed | Audio | Error |
+|-------|--------|--------|---------|-------|-------|
+| voxcpm2 | PASS | yes | 32.7s | 2.56s |  |
+| voxcpm2 voice design | PASS | yes | 15.1s | 2.72s |  |
+
+## Output WAVs (kept data dir)
+
+## Server log: VoxCPM2 lines
+2026-09-23 19:06:07,904 - __main__ - INFO - Backend variant: CPU
+2026-09-23 19:06:08,086 - backend.app - INFO - Profiles: 0, Generations: 0
+2026-09-23 19:06:08,086 - backend.app - INFO - GPU: None (CPU only)
+INFO:     127.0.0.1:62416 - "POST /generate HTTP/1.1" 200 OK
+2026-09-23 19:06:13,837 - backend.backends.voxcpm_backend - INFO - Loading VoxCPM2 on cpu...
+2026-09-23 19:06:13,837 - backend.utils.hf_offline_patch - INFO - [offline-guard] VoxCPM2 is cached √¢‚Ç¨‚Äù forcing offline mode
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cpu, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Warning: torch.compile disabled - VoxCPMModel can only be optimized on CUDA device
+Loaded VoxCPM2Model
+Warm up VoxCPMModel...
+2026-09-23 19:06:31,840 - backend.backends.voxcpm_backend - INFO - VoxCPM2 loaded successfully
+INFO:     127.0.0.1:54940 - "POST /generate HTTP/1.1" 200 OK
+
+## JUnit counts (from T041-voxcpm-e2e.xml)
+errors="0" failures="0" skipped="0" tests="4" 
+
+## Output WAVs (kept data dir; recomputed, the section above failed on an MSYS path)
+binary D:\Projects\Personal\voicebox\backend\dist\voicebox-server.exe 569.6 MB; harness elapsed_s 69.462562
+voxcpm2: status=passed cached=True elapsed_s=32.71 audio_duration_s=2.56 bytes=245886 sr=48000 ch=1 frames=122880 sha256=58fea5b267e71045 path=C:\Users\sabus\AppData\Local\Temp\voicebox-e2e-gxslvkfr\generations\c5272635-86d2-4ac5-a924-df5f63f58ed1.wav
+voxcpm2 voice design: status=passed cached=True elapsed_s=15.1 audio_duration_s=2.72 bytes=261246 sr=48000 ch=1 frames=130560 sha256=ff239ad3dc699e1d path=C:\Users\sabus\AppData\Local\Temp\voicebox-e2e-gxslvkfr\generations\748bddb9-68c1-4531-a5d0-aa91f510bdde.wav

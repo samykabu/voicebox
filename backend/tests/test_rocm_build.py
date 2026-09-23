@@ -9,6 +9,7 @@ Usage:
     python -m pytest backend/tests/test_rocm_build.py -v -m "slow"    # include E2E
 """
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -80,6 +81,10 @@ class TestRocmBuildCli:
 
 @pytest.mark.slow()
 @pytest.mark.skipif(sys.platform != "win32", reason="ROCm build E2E only runs on Windows")
+@pytest.mark.skipif(
+    not os.environ.get("VOICEBOX_TEST_ROCM_INSTALL"),
+    reason="Set VOICEBOX_TEST_ROCM_INSTALL=1 to run the heavy ROCm build (reinstalls torch in the venv)",
+)
 class TestRocmBuildE2E:
     """
     True end-to-end build test.

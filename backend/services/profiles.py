@@ -24,7 +24,7 @@ from ..utils.images import process_avatar, validate_image
 
 logger = logging.getLogger(__name__)
 
-CLONING_ENGINES = {"qwen", "luxtts", "chatterbox", "chatterbox_turbo", "tada", "f5_tts"}
+CLONING_ENGINES = {"qwen", "luxtts", "chatterbox", "chatterbox_turbo", "tada", "f5_tts", "voxcpm"}
 
 
 def _profile_to_response(
@@ -233,7 +233,8 @@ async def add_profile_sample(
     profile_dir.mkdir(parents=True, exist_ok=True)
 
     dest_path = profile_dir / f"{sample_id}.wav"
-    await asyncio.to_thread(save_audio, audio, str(dest_path), sr)
+    # The user's own recording: no AI-generated disclosure (FR-026 covers generated audio).
+    await asyncio.to_thread(save_audio, audio, str(dest_path), sr, disclosure=None)
 
     db_sample = DBProfileSample(
         id=sample_id,
@@ -620,7 +621,8 @@ async def create_voice_prompt_for_profile(
     cache_dir.mkdir(parents=True, exist_ok=True)
     combined_path = cache_dir / f"combined_{profile_id}_{combination_hash}.wav"
 
-    save_audio(combined_audio, str(combined_path), 24000)
+    # Concatenated from the user's own samples: no AI-generated disclosure.
+    save_audio(combined_audio, str(combined_path), 24000, disclosure=None)
 
     prompt_kwargs = {"use_cache": use_cache}
     if engine == "tada":

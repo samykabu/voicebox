@@ -81,7 +81,8 @@ export interface GenerationRequest {
     | 'chatterbox_turbo'
     | 'tada'
     | 'kokoro'
-    | 'f5_tts';
+    | 'f5_tts'
+    | 'voxcpm';
   instruct?: string;
   /** When true and the profile has a personality prompt, input text is rewritten in-character before TTS. */
   personality?: boolean;
@@ -89,6 +90,10 @@ export interface GenerationRequest {
   crossfade_ms?: number;
   normalize?: boolean;
   effects_chain?: EffectConfig[];
+  /** Written voice description for engines that support voice design. Never sent as instruct. */
+  voice_description?: string | null;
+  /** Advanced generation settings by name; only names the engine declares, within their bounds. */
+  advanced_settings?: Record<string, number> | null;
 }
 
 export interface GenerationVersionResponse {

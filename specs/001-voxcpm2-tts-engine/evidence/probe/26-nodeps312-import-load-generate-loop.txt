@@ -1,0 +1,165 @@
+# timestamp start: 2026-09-23T02:07:40+03:00
+# venv C:\Users\sabus\voxcpm-nodeps312 (py3.12.14), voxcpm --no-deps + torch/torchaudio 2.11.0+cu128; each added dep installed normally (with its own deps) under project constraints numpy<2, transformers<=4.57.6, numba<0.61
+## PHASE A: check = import
+---- iteration 1  2026-09-23T02:07:40+03:00
+  File "<string>", line 1, in <module>
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'
+>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+Successfully installed numpy-1.26.4
+>> install dur=7s
+---- iteration 2  2026-09-23T02:07:47+03:00
+  File "<string>", line 1, in <module>
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\__init__.py", line 1, in <module>
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\core.py", line 8, in <module>
+    from huggingface_hub import snapshot_download
+ModuleNotFoundError: No module named 'huggingface_hub'
+>> missing module 'huggingface_hub' -> pip install huggingface-hub  (-c project-constraints)
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+voxcpm 2.0.3 requires addict, which is not installed.
+voxcpm 2.0.3 requires argbind, which is not installed.
+voxcpm 2.0.3 requires datasets<4,>=3, which is not installed.
+voxcpm 2.0.3 requires einops, which is not installed.
+voxcpm 2.0.3 requires funasr, which is not installed.
+voxcpm 2.0.3 requires gradio<7,>=6, which is not installed.
+voxcpm 2.0.3 requires inflect, which is not installed.
+voxcpm 2.0.3 requires librosa, which is not installed.
+voxcpm 2.0.3 requires matplotlib, which is not installed.
+voxcpm 2.0.3 requires modelscope>=1.22.0, which is not installed.
+voxcpm 2.0.3 requires pydantic, which is not installed.
+voxcpm 2.0.3 requires safetensors, which is not installed.
+voxcpm 2.0.3 requires simplejson, which is not installed.
+voxcpm 2.0.3 requires sortedcontainers, which is not installed.
+voxcpm 2.0.3 requires soundfile, which is not installed.
+voxcpm 2.0.3 requires spaces, which is not installed.
+voxcpm 2.0.3 requires torchcodec, which is not installed.
+voxcpm 2.0.3 requires transformers>=4.36.2, which is not installed.
+voxcpm 2.0.3 requires wetext, which is not installed.
+>> install dur=8s
+---- iteration 3  2026-09-23T02:07:55+03:00
+    from .model.voxcpm import VoxCPMModel, LoRAConfig
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\model\__init__.py", line 1, in <module>
+    from .voxcpm import VoxCPMModel
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\model\voxcpm.py", line 29, in <module>
+    from einops import rearrange
+ModuleNotFoundError: No module named 'einops'
+>> missing module 'einops' -> pip install einops  (-c project-constraints)
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+voxcpm 2.0.3 requires addict, which is not installed.
+voxcpm 2.0.3 requires argbind, which is not installed.
+voxcpm 2.0.3 requires datasets<4,>=3, which is not installed.
+voxcpm 2.0.3 requires funasr, which is not installed.
+voxcpm 2.0.3 requires gradio<7,>=6, which is not installed.
+voxcpm 2.0.3 requires inflect, which is not installed.
+voxcpm 2.0.3 requires librosa, which is not installed.
+voxcpm 2.0.3 requires matplotlib, which is not installed.
+voxcpm 2.0.3 requires modelscope>=1.22.0, which is not installed.
+voxcpm 2.0.3 requires pydantic, which is not installed.
+voxcpm 2.0.3 requires safetensors, which is not installed.
+voxcpm 2.0.3 requires simplejson, which is not installed.
+voxcpm 2.0.3 requires sortedcontainers, which is not installed.
+voxcpm 2.0.3 requires soundfile, which is not installed.
+voxcpm 2.0.3 requires spaces, which is not installed.
+voxcpm 2.0.3 requires torchcodec, which is not installed.
+voxcpm 2.0.3 requires transformers>=4.36.2, which is not installed.
+voxcpm 2.0.3 requires wetext, which is not installed.
+Successfully installed einops-0.8.2
+>> install dur=2s
+---- iteration 4  2026-09-23T02:08:00+03:00
+    from .model.voxcpm import VoxCPMModel, LoRAConfig
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\model\__init__.py", line 1, in <module>
+    from .voxcpm import VoxCPMModel
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\model\voxcpm.py", line 30, in <module>
+    from pydantic import BaseModel
+ModuleNotFoundError: No module named 'pydantic'
+>> missing module 'pydantic' -> pip install pydantic  (-c project-constraints)
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+voxcpm 2.0.3 requires addict, which is not installed.
+voxcpm 2.0.3 requires argbind, which is not installed.
+voxcpm 2.0.3 requires datasets<4,>=3, which is not installed.
+voxcpm 2.0.3 requires funasr, which is not installed.
+voxcpm 2.0.3 requires gradio<7,>=6, which is not installed.
+voxcpm 2.0.3 requires inflect, which is not installed.
+voxcpm 2.0.3 requires librosa, which is not installed.
+voxcpm 2.0.3 requires matplotlib, which is not installed.
+voxcpm 2.0.3 requires modelscope>=1.22.0, which is not installed.
+voxcpm 2.0.3 requires safetensors, which is not installed.
+voxcpm 2.0.3 requires simplejson, which is not installed.
+voxcpm 2.0.3 requires sortedcontainers, which is not installed.
+voxcpm 2.0.3 requires soundfile, which is not installed.
+voxcpm 2.0.3 requires spaces, which is not installed.
+voxcpm 2.0.3 requires torchcodec, which is not installed.
+voxcpm 2.0.3 requires transformers>=4.36.2, which is not installed.
+voxcpm 2.0.3 requires wetext, which is not installed.
+Successfully installed annotated-types-0.8.0 pydantic-2.13.5 pydantic-core-2.46.5 typing-inspection-0.4.4
+>> install dur=4s
+---- iteration 5  2026-09-23T02:08:06+03:00
+    from .model.voxcpm import VoxCPMModel, LoRAConfig
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\model\__init__.py", line 1, in <module>
+    from .voxcpm import VoxCPMModel
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\model\voxcpm.py", line 39, in <module>
+    from transformers import LlamaTokenizerFast
+ModuleNotFoundError: No module named 'transformers'
+>> missing module 'transformers' -> pip install transformers  (-c project-constraints)
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+voxcpm 2.0.3 requires addict, which is not installed.
+voxcpm 2.0.3 requires argbind, which is not installed.
+voxcpm 2.0.3 requires datasets<4,>=3, which is not installed.
+voxcpm 2.0.3 requires funasr, which is not installed.
+voxcpm 2.0.3 requires gradio<7,>=6, which is not installed.
+voxcpm 2.0.3 requires inflect, which is not installed.
+voxcpm 2.0.3 requires librosa, which is not installed.
+voxcpm 2.0.3 requires matplotlib, which is not installed.
+voxcpm 2.0.3 requires modelscope>=1.22.0, which is not installed.
+voxcpm 2.0.3 requires simplejson, which is not installed.
+voxcpm 2.0.3 requires sortedcontainers, which is not installed.
+voxcpm 2.0.3 requires soundfile, which is not installed.
+voxcpm 2.0.3 requires spaces, which is not installed.
+voxcpm 2.0.3 requires torchcodec, which is not installed.
+voxcpm 2.0.3 requires wetext, which is not installed.
+Successfully installed charset_normalizer-3.5.1 huggingface-hub-0.36.2 regex-2026.9.10 requests-2.34.2 safetensors-0.8.0 tokenizers-0.22.2 transformers-4.57.6 urllib3-2.8.0
+>> install dur=32s
+---- iteration 6  2026-09-23T02:08:41+03:00
+    from .model.voxcpm import VoxCPMModel, LoRAConfig
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\model\__init__.py", line 2, in <module>
+    from .voxcpm2 import VoxCPM2Model
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\model\voxcpm2.py", line 28, in <module>
+    import librosa
+ModuleNotFoundError: No module named 'librosa'
+>> missing module 'librosa' -> pip install librosa  (-c project-constraints)
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+voxcpm 2.0.3 requires addict, which is not installed.
+voxcpm 2.0.3 requires argbind, which is not installed.
+voxcpm 2.0.3 requires datasets<4,>=3, which is not installed.
+voxcpm 2.0.3 requires funasr, which is not installed.
+voxcpm 2.0.3 requires gradio<7,>=6, which is not installed.
+voxcpm 2.0.3 requires inflect, which is not installed.
+voxcpm 2.0.3 requires matplotlib, which is not installed.
+voxcpm 2.0.3 requires modelscope>=1.22.0, which is not installed.
+voxcpm 2.0.3 requires simplejson, which is not installed.
+voxcpm 2.0.3 requires sortedcontainers, which is not installed.
+voxcpm 2.0.3 requires spaces, which is not installed.
+voxcpm 2.0.3 requires torchcodec, which is not installed.
+voxcpm 2.0.3 requires wetext, which is not installed.
+Successfully installed audioread-3.1.0 cffi-2.1.1 cloudpickle-3.1.2 decorator-5.3.1 joblib-1.6.0 lazy_loader-0.6 librosa-0.11.0 llvmlite-0.43.0 msgpack-1.2.2 narwhals-2.26.0 numba-0.60.0 platformdirs-4.11.12 pooch-1.9.0 pycparser-3.0 scikit-learn-1.9.1 scipy-1.17.1 soundfile-0.14.0 soxr-1.1.0 threadpoolctl-3.7.0
+>> install dur=38s
+---- iteration 7  2026-09-23T02:09:22+03:00
+IMPORT OK
+CHECK PASSED at iteration 7
+exit=0
+
+## PHASE B: check = load (cached, cpu) + generate
+---- iteration 1  2026-09-23T02:09:26+03:00
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cpu, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Loaded VoxCPM2Model
+  0%|          | 0/58 [00:00<?, ?it/s]  2%|1         | 1/58 [00:00<00:25,  2.21it/s]  3%|3         | 2/58 [00:00<00:24,  2.27it/s]  5%|5         | 3/58 [00:01<00:24,  2.29it/s]  7%|6         | 4/58 [00:01<00:23,  2.28it/s]  9%|8         | 5/58 [00:02<00:23,  2.24it/s] 10%|#         | 6/58 [00:02<00:23,  2.20it/s] 12%|#2        | 7/58 [00:03<00:23,  2.18it/s] 14%|#3        | 8/58 [00:03<00:22,  2.20it/s] 16%|#5        | 9/58 [00:04<00:21,  2.25it/s] 16%|#5        | 9/58 [00:04<00:23,  2.10it/s]
+GENERATE OK 1.6 s @ 48000
+CHECK PASSED at iteration 1
+exit=0
+# timestamp end: 2026-09-23T02:09:44+03:00

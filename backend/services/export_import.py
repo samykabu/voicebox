@@ -6,6 +6,7 @@ Also handles exporting individual generations.
 """
 
 import json
+import logging
 import zipfile
 import io
 from pathlib import Path
@@ -17,6 +18,8 @@ from ..database import VoiceProfile as DBVoiceProfile, ProfileSample as DBProfil
 from .profiles import create_profile, add_profile_sample
 from ..models import VoiceProfileCreate
 from .. import config
+
+logger = logging.getLogger(__name__)
 
 
 def _get_unique_profile_name(name: str, db: Session) -> str:
@@ -42,6 +45,27 @@ def _get_unique_profile_name(name: str, db: Session) -> str:
         counter += 1
 
 
+# Manifest 1.1 adds provenance (FR-027): voice_type, design_prompt,
+# default_engine, and the preset engine/voice id that preset profiles need
+# to be valid. Import still accepts 1.0 manifests, which lack these fields.
+PROFILE_MANIFEST_VERSION = "1.1"
+
+# Generation manifest 1.1 adds generation.voice_description (the written voice
+# description retry and regenerate replay) and generation.engine / model_size (the
+# engine and variant retry and regenerate run on). Import still accepts 1.0
+# manifests, which lack them: voice_description restores null, and engine and
+# model_size keep the column defaults.
+GENERATION_MANIFEST_VERSION = "1.1"
+
+PROVENANCE_FIELDS = (
+    "voice_type",
+    "preset_engine",
+    "preset_voice_id",
+    "design_prompt",
+    "default_engine",
+)
+
+
 def export_profile_to_zip(profile_id: str, db: Session) -> bytes:
     """
     Export a voice profile to a ZIP archive.
@@ -54,16 +78,19 @@ def export_profile_to_zip(profile_id: str, db: Session) -> bytes:
         ZIP file contents as bytes
         
     Raises:
-        ValueError: If profile not found or has no samples
+        ValueError: If profile not found, or a cloned profile has no samples
     """
     # Get profile
     profile = db.query(DBVoiceProfile).filter_by(id=profile_id).first()
     if not profile:
         raise ValueError(f"Profile {profile_id} not found")
-    
-    # Get all samples
+
+    voice_type = profile.voice_type or "cloned"
+
+    # Get all samples. Only cloned profiles depend on reference audio; designed
+    # and preset profiles are fully described by their metadata.
     samples = db.query(DBProfileSample).filter_by(profile_id=profile_id).all()
-    if not samples:
+    if not samples and voice_type == "cloned":
         raise ValueError(f"Profile {profile_id} has no samples")
     
     # Create ZIP in memory
@@ -82,11 +109,16 @@ def export_profile_to_zip(profile_id: str, db: Session) -> bytes:
 
         # Create manifest.json
         manifest = {
-            "version": "1.0",
+            "version": PROFILE_MANIFEST_VERSION,
             "profile": {
                 "name": profile.name,
                 "description": profile.description,
                 "language": profile.language,
+                "voice_type": voice_type,
+                "preset_engine": profile.preset_engine,
+                "preset_voice_id": profile.preset_voice_id,
+                "design_prompt": profile.design_prompt,
+                "default_engine": profile.default_engine,
             },
             "has_avatar": has_avatar,
         }
@@ -168,13 +200,26 @@ async def import_profile_from_zip(file_bytes: bytes, db: Session) -> VoiceProfil
             original_name = profile_data.get("name", "Imported Profile")
             unique_name = _get_unique_profile_name(original_name, db)
             
+            # Restore provenance (FR-027) when the manifest carries it. Older
+            # 1.0 manifests have none of these keys and import as cloned with
+            # no default engine, as before. create_profile validates the
+            # combination and raises ValueError on an invalid one (e.g. a
+            # designed profile with a blank design_prompt) rather than
+            # silently downgrading it.
+            provenance = {
+                field: profile_data[field]
+                for field in PROVENANCE_FIELDS
+                if profile_data.get(field) is not None
+            }
+
             # Create profile
             profile_create = VoiceProfileCreate(
                 name=unique_name,
                 description=profile_data.get("description"),
                 language=profile_data.get("language", "en"),
+                **provenance,
             )
-            
+
             profile = await create_profile(profile_create, db)
 
             # Extract and add samples
@@ -294,7 +339,7 @@ def export_generation_to_zip(generation_id: str, db: Session) -> bytes:
             })
 
         manifest = {
-            "version": "1.0",
+            "version": GENERATION_MANIFEST_VERSION,
             "generation": {
                 "id": generation.id,
                 "text": generation.text,
@@ -302,6 +347,9 @@ def export_generation_to_zip(generation_id: str, db: Session) -> bytes:
                 "duration": generation.duration,
                 "seed": generation.seed,
                 "instruct": generation.instruct,
+                "voice_description": generation.voice_description,
+                "engine": generation.engine,
+                "model_size": generation.model_size,
                 "created_at": generation.created_at.isoformat(),
             },
             "profile": {
@@ -328,6 +376,117 @@ def export_generation_to_zip(generation_id: str, db: Session) -> bytes:
     
     zip_buffer.seek(0)
     return zip_buffer.read()
+
+
+def _validated_engine_fields(generation_data: dict) -> dict:
+    """Return the ``engine`` / ``model_size`` columns to restore from a generation manifest.
+
+    Values are checked against the TTS registry before they reach the database:
+
+    - no ``engine`` (a 1.0 manifest), or one that is not a string in
+      ``backends.TTS_ENGINES``: return nothing, so the column defaults apply
+      (engine ``"qwen"``, model_size null), exactly as import did before 1.1;
+    - a known engine with several sizes: keep ``model_size`` when it is one of that
+      engine's configured sizes, otherwise store the engine's registry default;
+    - a known engine without sizes: store null, as ``POST /generate`` does.
+
+    Every rejected manifest value is logged as a warning.
+    """
+    from ..backends import TTS_ENGINES, engine_has_model_sizes, get_default_model_size, get_tts_model_configs
+
+    if "engine" not in generation_data or generation_data["engine"] is None:
+        return {}
+    engine = generation_data["engine"]
+    if not isinstance(engine, str) or engine not in TTS_ENGINES:
+        logger.warning("Generation import: unknown engine %r in manifest; using the default engine", engine)
+        return {}
+
+    model_size = generation_data.get("model_size")
+    valid = isinstance(model_size, str) and model_size in {
+        c.model_size for c in get_tts_model_configs() if c.engine == engine
+    }
+    if not engine_has_model_sizes(engine):
+        if model_size is not None and not valid:
+            logger.warning(
+                "Generation import: model_size %r is not valid for engine %r; storing null",
+                model_size,
+                engine,
+            )
+        return {"engine": engine, "model_size": None}
+
+    if not valid:
+        fallback = get_default_model_size(engine)
+        if model_size is not None:
+            logger.warning(
+                "Generation import: model_size %r is not valid for engine %r; using %r",
+                model_size,
+                engine,
+                fallback,
+            )
+        return {"engine": engine, "model_size": fallback}
+    return {"engine": engine, "model_size": model_size}
+
+
+def _validated_voice_description(generation_data: dict, engine: str) -> str | None:
+    """Return the ``voice_description`` to restore from a generation manifest, or None.
+
+    The manifest value gets the same checks as ``POST /generate``: it must be a string of
+    at most ``MAX_VOICE_DESCRIPTION_CHARS`` characters once stripped (the API rejects a
+    longer one rather than truncating it, so import stores null), and it is then kept only
+    when *engine*, the engine the row is restored with, supports voice design
+    (``stored_voice_description``). A blank value stores null. Every rejected non-blank
+    value is logged as a warning.
+    """
+    from ..models import MAX_VOICE_DESCRIPTION_CHARS
+    from .generation import stored_voice_description
+
+    value = generation_data.get("voice_description")
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        logger.warning(
+            "Generation import: voice_description is a %s, not a string; storing null",
+            type(value).__name__,
+        )
+        return None
+    value = value.strip()
+    if not value:
+        return None
+    if len(value) > MAX_VOICE_DESCRIPTION_CHARS:
+        logger.warning(
+            "Generation import: voice_description has %d characters, over the %d limit; storing null",
+            len(value),
+            MAX_VOICE_DESCRIPTION_CHARS,
+        )
+        return None
+    stored = stored_voice_description(engine, value)
+    if stored is None:
+        logger.warning(
+            "Generation import: engine %r does not support voice design; storing voice_description as null",
+            engine,
+        )
+    return stored
+
+
+def _manifest_value(generation_data: dict, field: str, types: tuple[type, ...], fallback):
+    """Return ``generation_data[field]`` when it is one of *types*, else *fallback*.
+
+    ``bool`` is never accepted (it is an ``int`` subclass). A missing or null value
+    returns *fallback* silently; any other rejected value is logged as a warning, so a
+    crafted manifest cannot fail the database commit.
+    """
+    value = generation_data.get(field)
+    if value is None:
+        return fallback
+    if isinstance(value, bool) or not isinstance(value, types):
+        logger.warning(
+            "Generation import: %s is a %s, not the expected type; using %r",
+            field,
+            type(value).__name__,
+            fallback,
+        )
+        return fallback
+    return value
 
 
 async def import_generation_from_zip(file_bytes: bytes, db: Session) -> dict:
@@ -377,7 +536,24 @@ async def import_generation_from_zip(file_bytes: bytes, db: Session) -> dict:
             for field in required_fields:
                 if field not in generation_data:
                     raise ValueError(f"Invalid manifest.json: missing generation.{field}")
-            
+
+            # Type-check every restored field before any file is copied, so a crafted
+            # value cannot fail the commit and orphan the audio (review S6).
+            text = generation_data["text"]
+            if not isinstance(text, str) or not text.strip():
+                raise ValueError("Invalid manifest.json: generation.text must be a non-empty string")
+            engine_fields = _validated_engine_fields(generation_data)
+            restored_engine = engine_fields.get("engine") or DBGeneration.__table__.c.engine.default.arg
+            restored_fields = {
+                "text": text,
+                "language": _manifest_value(generation_data, "language", (str,), "en"),
+                "duration": _manifest_value(generation_data, "duration", (int, float), None),
+                "seed": _manifest_value(generation_data, "seed", (int,), None),
+                "instruct": _manifest_value(generation_data, "instruct", (str,), None),
+                "voice_description": _validated_voice_description(generation_data, restored_engine),
+                **engine_fields,
+            }
+
             # Find audio file in archive
             audio_files = [f for f in namelist if f.startswith("audio/") and f.endswith(".wav")]
             if not audio_files:
@@ -426,17 +602,19 @@ async def import_generation_from_zip(file_bytes: bytes, db: Session) -> dict:
                 db_generation = DBGeneration(
                     id=new_generation_id,
                     profile_id=profile_id,
-                    text=generation_data["text"],
-                    language=generation_data["language"],
                     audio_path=config.to_storage_path(audio_dest),
-                    duration=generation_data["duration"],
-                    seed=generation_data.get("seed"),
-                    instruct=generation_data.get("instruct"),
                     created_at=datetime.utcnow(),
+                    **restored_fields,
                 )
-                
-                db.add(db_generation)
-                db.commit()
+
+                try:
+                    db.add(db_generation)
+                    db.commit()
+                except Exception:
+                    # Never leave the copied audio behind without a row that references it.
+                    db.rollback()
+                    audio_dest.unlink(missing_ok=True)
+                    raise
                 db.refresh(db_generation)
                 
                 return {

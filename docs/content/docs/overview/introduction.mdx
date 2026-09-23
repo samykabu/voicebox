@@ -27,8 +27,10 @@ shared between input and output.
   into the focused field on macOS and Windows (see [Dictation](/overview/dictation))
 - **Captures tab** — paired audio + transcript archive, retranscribe,
   refine, play-as-voice, promote-to-sample (see [Captures](/overview/captures))
-- **Voice cloning** — 5 cloning engines covering 23 languages. Zero-shot
+- **Voice cloning** — 7 cloning engines covering up to 30 languages. Zero-shot
   cloning from a reference sample (see [Voice Cloning](/overview/voice-cloning))
+- **Voice design** — describe a voice in words and VoxCPM2 creates it, with no
+  recording needed (see [Creating Voice Profiles](/overview/creating-voice-profiles#workflow-c--designed-profiles))
 - **Preset voices** — 50+ curated voices via Kokoro and Qwen CustomVoice
   for when you don't want to clone (see [Preset Voices](/overview/preset-voices))
 - **Voice personalities** — optional free-form personality on any profile
@@ -46,7 +48,7 @@ shared between input and output.
 
 ## TTS Engines
 
-Seven engines with different strengths, switchable per-generation:
+Nine engines with different strengths, switchable per-generation:
 
 | Engine | Profile Type | Languages | Strengths |
 |--------|--------------|-----------|-----------|
@@ -57,6 +59,10 @@ Seven engines with different strengths, switchable per-generation:
 | **Chatterbox Turbo** | Cloned | English | Fast 350M model with paralinguistic emotion/sound tags |
 | **TADA** (1B / 3B) | Cloned | 10 | HumeAI speech-language model — 700s+ coherent audio |
 | **Kokoro** | Preset (50 voices) | 9 | 82M parameters, CPU realtime, lowest VRAM of any engine |
+| **F5-TTS / Habibi** | Cloned | Arabic | Arabic dialect checkpoints |
+| **VoxCPM2** | Cloned or Designed | 30 | Apache-2.0, 48 kHz, voice design from a written description |
+
+An engine your computer can't run is shown greyed out with the reason.
 
 ## STT and local LLM
 
@@ -100,7 +106,7 @@ No cloud fallback, no bring-your-own-API-key. Local is the product.
 | Frontend | React, TypeScript, Tailwind CSS |
 | State | Zustand, React Query |
 | Backend | FastAPI (Python) |
-| TTS Engines | Qwen3-TTS, Qwen CustomVoice, LuxTTS, Chatterbox, Chatterbox Turbo, TADA, Kokoro |
+| TTS Engines | Qwen3-TTS, Qwen CustomVoice, LuxTTS, Chatterbox, Chatterbox Turbo, TADA, Kokoro, F5-TTS, VoxCPM2 |
 | STT | Whisper / Whisper Turbo (PyTorch or MLX) |
 | Local LLM | Qwen3 0.6B / 1.7B / 4B (MLX or PyTorch) |
 | Effects | Pedalboard (Spotify) |

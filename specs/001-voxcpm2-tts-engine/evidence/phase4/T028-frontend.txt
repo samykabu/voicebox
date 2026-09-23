@@ -1,0 +1,228 @@
+# T028 frontend: cloning profiles for engines that declare supports_cloning. Generated 2026-09-23T17:32:00+03:00
+Test file: copy of evidence/phase3/frontend-capability-tests/capability-logic.test.ts in <scratchpad>/t028/, T028 cases appended (final copy: T028-capability-logic.test.ts).
+
+## 1. RED run (before the helpers existed), timestamp 2026-09-23T17:29:21+03:00
+$ bun test <scratchpad>/t028/capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/t028/t028-red.xml
+bun test v1.4.2 (744846f84)
+
+C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\t028\capability-logic.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+SyntaxError: Export named 'declaredCloningEngineOptions' not found in module 'D:/Projects/Personal/voicebox/app/src/lib/hooks/engineCapabilityRules.ts'.
+-------------------------------
+
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [21.00ms]
+exit=1
+(bun wrote no JUnit file for this run: the module failed to load, so no test ran. Failure reason is the missing export, as intended.)
+
+## 2. GREEN run (after implementation), timestamp 2026-09-23T17:30:19+03:00
+$ bun test <scratchpad>/t028/capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/t028/t028.xml   (saved as T028-fe.xml)
+bun test v1.4.2 (744846f84)
+
+C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\t028\capability-logic.test.ts:
+47 | describe('T020 getLanguageOptionsForEngine', () => {
+48 |   test('an engine without an app-side list uses its declared languages, in declared order', () => {
+49 |     const codes = getLanguageOptionsForEngine('engine-under-test', VOXCPM_LANGS).map((o) => o.value);
+50 |     expect(codes[0]).toBe('zh');
+51 |     expect(codes).toContain('ar');
+52 |     expect(codes).toHaveLength(23);
+                       ^
+error: expect(received).toHaveLength(expected)
+
+Expected length: 23
+Received length: 30
+
+      at <anonymous> (C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\t028\capability-logic.test.ts:52:19)
+(fail) T020 getLanguageOptionsForEngine > an engine without an app-side list uses its declared languages, in declared order [0.64ms]
+53 |   });
+54 | 
+55 |   test('declared codes the app cannot name or the backend cannot accept are filtered out', () => {
+56 |     const codes = getLanguageOptionsForEngine('engine-under-test', VOXCPM_LANGS).map((o) => o.value);
+57 |     for (const unknown of ['my', 'id', 'km', 'lo', 'tl', 'th', 'vi']) {
+58 |       expect(codes).not.toContain(unknown);
+                             ^
+error: expect(received).not.toContain(expected)
+
+Expected to not contain: "my"
+Received: [
+  "zh", "en", "ar", "my", "da", "nl", "fi", "fr", "de", "el", "he", "hi", "id", "it", "ja", "km", "ko", "lo", "ms", "no",
+  "pl", "pt", "ru", "es", "sw", "sv", "tl", "th", "tr", "vi"
+]
+
+      at <anonymous> (C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\t028\capability-logic.test.ts:58:25)
+(fail) T020 getLanguageOptionsForEngine > declared codes the app cannot name or the backend cannot accept are filtered out [0.87ms]
+
+ 21 pass
+ 2 fail
+ 115 expect() calls
+Ran 23 tests across 1 file. [23.00ms]
+exit=1
+
+## 3. Counts parsed from T028-fe.xml testsuite attributes
+capability-logic.test.ts: tests=23 failures=2 skipped=0
+T020 getLanguageOptionsForEngine: tests=5 failures=2 skipped=0
+T019 isEngineSelectable: tests=2 failures=0 skipped=0
+T022 needsDownloadConfirmation: tests=3 failures=0 skipped=0
+T023 buildAdvancedSettingsPayload: tests=5 failures=0 skipped=0
+T023 advancedSettingStep: tests=1 failures=0 skipped=0
+T028 supportsCloning: tests=4 failures=0 skipped=0
+T028 declaredCloningEngineOptions: tests=3 failures=0 skipped=0
+
+The 2 failures are the Phase 3 T020 language cases (expected 23 codes, 'my' etc. filtered out).
+They fail because a concurrent Phase 4 worker is editing app/src/lib/constants/languages.ts (not a T028 path):
+$ git diff --stat -- app/src/lib/constants/languages.ts
+ app/src/lib/constants/languages.ts | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+It adds id, km, lo, my, th, tl, vi to ALL_LANGUAGES, so all 30 declared codes now survive. T020 assertions were left unedited on purpose.
+All T028 cases: 7 tests, 0 failures (T028 supportsCloning 4/4, T028 declaredCloningEngineOptions 3/3).
+
+## 4. voxcpm in the T028 app diff
+$ git diff -U0 -- app/src/components/Generation/EngineModelSelector.tsx app/src/components/VoiceProfiles/ProfileForm.tsx app/src/lib/hooks/engineCapabilityRules.ts | grep -n -i voxcpm
+grep exit=1 (no hits)
+In the test file, only lines 197-198 are T028 hits: they pass the id 'voxcpm' with supports_cloning false then true and assert the answer follows the capability.
+
+## 5. The T028 diff
+diff --git a/app/src/components/Generation/EngineModelSelector.tsx b/app/src/components/Generation/EngineModelSelector.tsx
+index 09615f0..c5a7d83 100644
+--- a/app/src/components/Generation/EngineModelSelector.tsx
++++ b/app/src/components/Generation/EngineModelSelector.tsx
+@@ -21 +21 @@ import { getLanguageOptionsForEngine } from '@/lib/constants/languages';
+-import { isEngineSelectable } from '@/lib/hooks/engineCapabilityRules';
++import { isEngineSelectable, supportsCloning } from '@/lib/hooks/engineCapabilityRules';
+@@ -63 +63,4 @@ const ENGLISH_ONLY_ENGINES = new Set(['luxtts', 'chatterbox_turbo']);
+-/** Engines that support cloned (reference audio) profiles. */
++/**
++ * Engines that support cloned (reference audio) profiles without a capability declaration.
++ * Any other engine clones only when it declares `supports_cloning` (see supportsCloning).
++ */
+@@ -273 +276 @@ export function isProfileCompatibleWithEngine(
+-  // Engines outside the app-side list count as cloning engines only when they declare it.
++  // Engines outside the app-side set clone only when their capability declares it.
+@@ -275 +278 @@ export function isProfileCompatibleWithEngine(
+-    return CLONING_ENGINES.has(engine) || capability?.supports_cloning === true;
++    return supportsCloning(engine, capability, CLONING_ENGINES);
+diff --git a/app/src/components/VoiceProfiles/ProfileForm.tsx b/app/src/components/VoiceProfiles/ProfileForm.tsx
+index d6caf03..de3003a 100644
+--- a/app/src/components/VoiceProfiles/ProfileForm.tsx
++++ b/app/src/components/VoiceProfiles/ProfileForm.tsx
+@@ -4 +4 @@ import { Edit2, Mic, Monitor, Music, Upload, X } from 'lucide-react';
+-import { useEffect, useRef, useState } from 'react';
++import { useEffect, useMemo, useRef, useState } from 'react';
+@@ -40,0 +41 @@ import { LANGUAGE_CODES, LANGUAGE_OPTIONS, type LanguageCode } from '@/lib/const
++import { declaredCloningEngineOptions } from '@/lib/hooks/engineCapabilityRules';
+@@ -42,0 +44 @@ import { useAudioRecording } from '@/lib/hooks/useAudioRecording';
++import { useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
+@@ -74,0 +77,3 @@ const DEFAULT_ENGINE_OPTIONS = [
++const LISTED_DEFAULT_ENGINES: ReadonlySet<string> = new Set(
++  DEFAULT_ENGINE_OPTIONS.map((option) => option.value),
++);
+@@ -293,2 +298,11 @@ export function ProfileForm() {
+-  const availableDefaultEngines = DEFAULT_ENGINE_OPTIONS.filter(
+-    (option) => !isSampleBasedProfile || !PRESET_ONLY_ENGINES.has(option.value),
++  const { data: engineCapabilities, isSuccess: engineCapabilitiesLoaded } = useEngineCapabilities();
++  // Engines not listed above are offered when the backend declares `supports_cloning`
++  // (FR-011, FR-014), labelled with the declared display name.
++  const availableDefaultEngines = useMemo<{ value: string; label: string }[]>(
++    () => [
++      ...DEFAULT_ENGINE_OPTIONS.filter(
++        (option) => !isSampleBasedProfile || !PRESET_ONLY_ENGINES.has(option.value),
++      ),
++      ...declaredCloningEngineOptions(engineCapabilities, LISTED_DEFAULT_ENGINES),
++    ],
++    [isSampleBasedProfile, engineCapabilities],
+@@ -390 +404,3 @@ export function ProfileForm() {
+-      !availableDefaultEngines.some((option) => option.value === defaultEngine)
++      !availableDefaultEngines.some((option) => option.value === defaultEngine) &&
++      // A saved engine that only the capability list names is unknown until it loads.
++      (LISTED_DEFAULT_ENGINES.has(defaultEngine) || engineCapabilitiesLoaded)
+@@ -394 +410 @@ export function ProfileForm() {
+-  }, [availableDefaultEngines, defaultEngine]);
++  }, [availableDefaultEngines, defaultEngine, engineCapabilitiesLoaded]);
+diff --git a/app/src/lib/hooks/engineCapabilityRules.ts b/app/src/lib/hooks/engineCapabilityRules.ts
+index 73e0c2e..3646a20 100644
+--- a/app/src/lib/hooks/engineCapabilityRules.ts
++++ b/app/src/lib/hooks/engineCapabilityRules.ts
+@@ -1,0 +2 @@ import type { EngineAdvancedSettingResponse } from '@/lib/api/models/EngineAdvan
++import type { EngineCapabilitiesResponse } from '@/lib/api/models/EngineCapabilitiesResponse';
+@@ -16,0 +18,29 @@ export function isEngineSelectable(capability: EngineCapabilityResponse | undefi
++/**
++ * Whether a cloned (reference-audio) profile can be used with this engine (FR-011, FR-014).
++ *
++ * Engines in `appSideCloningEngines` are not migrated to the capability channel yet and keep
++ * cloning whether or not the backend reports them (the same scope boundary as languages);
++ * any other engine clones only when its capability declares `supports_cloning`.
++ */
++export function supportsCloning(
++  engine: string,
++  capability: EngineCapabilityResponse | undefined,
++  appSideCloningEngines: ReadonlySet<string>,
++): boolean {
++  return appSideCloningEngines.has(engine) || capability?.supports_cloning === true;
++}
++
++/**
++ * Cloning-capable engines the backend reports that an app-side option list does not name,
++ * as options labelled with each engine's declared `display_name`. An unavailable engine is
++ * still offered: availability is shown when generating (FR-003), not hidden here.
++ */
++export function declaredCloningEngineOptions(
++  capabilities: EngineCapabilitiesResponse | undefined,
++  listedEngines: ReadonlySet<string>,
++): { value: string; label: string }[] {
++  return (capabilities?.engines ?? [])
++    .filter((entry) => entry.supports_cloning && !listedEngines.has(entry.engine))
++    .map((entry) => ({ value: entry.engine, label: entry.display_name }));
++}
++
+
+## 6. RERUN after languages.ts was committed final (e7096ed), timestamp 2026-09-23T17:33:45+03:00
+The T020 block in the scratch test copy was replaced with the committed block from evidence/phase3/lang-fe-capability-logic.test.ts:
+the declared-order count is now 30, 'all 30 declared languages are offered' was added, and the 'filtered out' case now checks that the unknown code 'xx' is dropped. No app source was touched.
+Sections 2-3 above (23 tests, 2 T020 failures) are kept as history. T028-fe.xml and T028-capability-logic.test.ts now hold this rerun.
+$ diff <previous scratch copy> <rerun scratch copy>
+52c52
+<     expect(codes).toHaveLength(23);
+---
+>     expect(codes).toHaveLength(30);
+55c55
+<   test('declared codes the app cannot name or the backend cannot accept are filtered out', () => {
+---
+>   test('all 30 declared VoxCPM2 languages are offered, including the 7 added ones', () => {
+57,58c57,59
+<     for (const unknown of ['my', 'id', 'km', 'lo', 'tl', 'th', 'vi']) {
+<       expect(codes).not.toContain(unknown);
+---
+>     expect(codes).toEqual(VOXCPM_LANGS);
+>     for (const added of ['my', 'id', 'km', 'lo', 'tl', 'th', 'vi']) {
+>       expect(codes).toContain(added);
+59a61,68
+>   });
+> 
+>   test('declared codes the app cannot name are still filtered out', () => {
+>     const codes = getLanguageOptionsForEngine('engine-under-test', [...VOXCPM_LANGS, 'xx']).map(
+>       (o) => o.value,
+>     );
+>     expect(codes).not.toContain('xx');
+>     expect(codes).toHaveLength(30);
+$ bun test <scratchpad>/t028/capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/t028/t028-rerun.xml   (saved as T028-fe.xml)
+bun test v1.4.2 (744846f84)
+
+ 24 pass
+ 0 fail
+ 124 expect() calls
+Ran 24 tests across 1 file. [20.00ms]
+exit=0
+### Counts parsed from T028-fe.xml (rerun) testsuite attributes
+capability-logic.test.ts: tests=24 failures=0 skipped=0
+T020 getLanguageOptionsForEngine: tests=6 failures=0 skipped=0
+T019 isEngineSelectable: tests=2 failures=0 skipped=0
+T022 needsDownloadConfirmation: tests=3 failures=0 skipped=0
+T023 buildAdvancedSettingsPayload: tests=5 failures=0 skipped=0
+T023 advancedSettingStep: tests=1 failures=0 skipped=0
+T028 supportsCloning: tests=4 failures=0 skipped=0
+T028 declaredCloningEngineOptions: tests=3 failures=0 skipped=0

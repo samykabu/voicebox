@@ -32,39 +32,6 @@
       "registered_skills": [],
       "installed_at": "2026-09-22T16:51:50.962027+00:00"
     },
-    "assure": {
-      "version": "2.1.0",
-      "source": "local",
-      "manifest_hash": "sha256:a49aa75a04a50311763fb2d30ab7cab8b50dac07069272f7f90cd0507c9db2d1",
-      "enabled": true,
-      "priority": 10,
-      "registered_commands": {
-        "claude": [
-          "speckit.assure.init",
-          "speckit.assure.analyze",
-          "speckit.assure.document"
-        ]
-      },
-      "registered_skills": [],
-      "installed_at": "2026-09-22T16:51:53.123424+00:00"
-    },
-    "user-manual": {
-      "version": "1.1.0",
-      "source": "local",
-      "manifest_hash": "sha256:0691dd6da42f4ae99bce6cb43a286420d7180fd1b57999f6831569e39671e795",
-      "enabled": true,
-      "priority": 10,
-      "registered_commands": {
-        "claude": [
-          "speckit.user-manual.init",
-          "speckit.user-manual.analyze",
-          "speckit.user-manual.update",
-          "speckit.user-manual.release"
-        ]
-      },
-      "registered_skills": [],
-      "installed_at": "2026-09-22T16:51:55.214800+00:00"
-    },
     "pr": {
       "version": "4.1.0",
       "source": "local",
@@ -100,27 +67,6 @@
       "registered_skills": [],
       "installed_at": "2026-09-22T16:51:59.218782+00:00"
     },
-    "workflow": {
-      "version": "1.0.0",
-      "source": "local",
-      "manifest_hash": "sha256:0eb92043a5dcb0aed81f2fa6c8688aa4ac421297c13270a7028c9f966fa036f9",
-      "enabled": true,
-      "priority": 10,
-      "registered_commands": {
-        "claude": [
-          "speckit.workflow.init",
-          "speckit.workflow.scope",
-          "speckit.workflow.clarify",
-          "speckit.workflow.continue",
-          "speckit.workflow.finalize",
-          "speckit.workflow.status",
-          "speckit.workflow.doctor",
-          "speckit.workflow.reconcile"
-        ]
-      },
-      "registered_skills": [],
-      "installed_at": "2026-09-22T16:52:01.366426+00:00"
-    },
     "speckit-superpowers-bridge": {
       "version": "1.2.0",
       "source": "local",
@@ -155,6 +101,60 @@
       },
       "registered_skills": [],
       "installed_at": "2026-09-22T17:04:59.936926+00:00"
+    },
+    "assure": {
+      "version": "2.2.0",
+      "source": "local",
+      "manifest_hash": "sha256:d61dd3f64cfacb202242838384fdd8bec7ce764444d0996d2d08100b71842de3",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.assure.init",
+          "speckit.assure.analyze",
+          "speckit.assure.document"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T16:51:53.123424+00:00"
+    },
+    "user-manual": {
+      "version": "1.2.0",
+      "source": "local",
+      "manifest_hash": "sha256:27bc570196efc9d30dcf5fb68ea6beba2bf48da2a43ec1b546c971faef3250e3",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.user-manual.init",
+          "speckit.user-manual.analyze",
+          "speckit.user-manual.update",
+          "speckit.user-manual.release"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T16:51:55.214800+00:00"
+    },
+    "workflow": {
+      "version": "1.2.0",
+      "source": "local",
+      "manifest_hash": "sha256:2e1d076b6aec073c11d0bee48cfece79bbdb06c321fa9a0df4348e34b6755ac3",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.workflow.init",
+          "speckit.workflow.scope",
+          "speckit.workflow.clarify",
+          "speckit.workflow.continue",
+          "speckit.workflow.finalize",
+          "speckit.workflow.status",
+          "speckit.workflow.doctor",
+          "speckit.workflow.reconcile"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-22T16:52:01.366426+00:00"
     }
   }
 }

@@ -1,0 +1,70 @@
+# 2026-09-23T18:10:42+03:00
+# ruff: ruff 0.16.8
+
+=== backend/services/generation.py : HEAD (git show HEAD:backend/services/generation.py | ruff check --stdin-filename backend/services/generation.py -) ===
+backend\services\generation.py:17:1: I001 [*] Import block is un-sorted or un-formatted
+backend\services\generation.py:117:11: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:119:20: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:120:15: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:122:22: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:123:19: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:124:17: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:132:5: I001 [*] Import block is un-sorted or un-formatted
+backend\services\generation.py:271:20: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:350:11: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:351:15: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:353:22: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:354:19: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:368:5: I001 [*] Import block is un-sorted or un-formatted
+backend\services\generation.py:423:17: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:433:5: I001 [*] Import block is un-sorted or un-formatted
+Found 16 errors.
+[*] 16 fixable with the `--fix` option.
+=== backend/services/generation.py : working tree (ruff check backend/services/generation.py) ===
+backend\services\generation.py:17:1: I001 [*] Import block is un-sorted or un-formatted
+backend\services\generation.py:148:11: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:150:20: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:151:15: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:153:22: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:154:19: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:155:17: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:164:5: I001 [*] Import block is un-sorted or un-formatted
+backend\services\generation.py:303:20: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:382:11: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:383:15: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:385:22: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:386:19: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:401:5: I001 [*] Import block is un-sorted or un-formatted
+backend\services\generation.py:456:17: UP045 [*] Use `X | None` for type annotations
+backend\services\generation.py:466:5: I001 [*] Import block is un-sorted or un-formatted
+Found 16 errors.
+[*] 16 fixable with the `--fix` option.
+--- HEAD finding count: 16, working tree: 16
+
+=== backend/routes/generations.py : HEAD (git show HEAD:backend/routes/generations.py | ruff check --stdin-filename backend/routes/generations.py -) ===
+backend\routes\generations.py:3:1: I001 [*] Import block is un-sorted or un-formatted
+backend\routes\generations.py:94:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\generations.py:105:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\generations.py:141:13: SIM105 Use `contextlib.suppress(Exception)` instead of `try`-`except`-`pass`
+backend\routes\generations.py:365:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\generations.py:492:9: SIM105 Use `contextlib.suppress(OSError)` instead of `try`-`except`-`pass`
+Found 6 errors.
+[*] 1 fixable with the `--fix` option (2 hidden fixes can be enabled with the `--unsafe-fixes` option).
+=== backend/routes/generations.py : working tree (ruff check backend/routes/generations.py) ===
+backend\routes\generations.py:3:1: I001 [*] Import block is un-sorted or un-formatted
+backend\routes\generations.py:95:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\generations.py:106:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\generations.py:142:13: SIM105 Use `contextlib.suppress(Exception)` instead of `try`-`except`-`pass`
+backend\routes\generations.py:367:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+backend\routes\generations.py:494:9: SIM105 Use `contextlib.suppress(OSError)` instead of `try`-`except`-`pass`
+Found 6 errors.
+[*] 1 fixable with the `--fix` option (2 hidden fixes can be enabled with the `--unsafe-fixes` option).
+--- HEAD finding count: 6, working tree: 6
+
+=== backend/tests/test_voxcpm_backend.py : HEAD (git show HEAD:backend/tests/test_voxcpm_backend.py | ruff check --stdin-filename backend/tests/test_voxcpm_backend.py -) ===
+All checks passed!
+=== backend/tests/test_voxcpm_backend.py : working tree (ruff check backend/tests/test_voxcpm_backend.py) ===
+All checks passed!
+--- HEAD finding count: 0, working tree: 0
+
+# Verdict: no new findings. Every working-tree finding is a pre-existing HEAD finding (same rule codes, same count per file), shifted by the added lines. HEAD copies were checked via stdin with --stdin-filename so the same backend/pyproject.toml config applies; no git stash used.

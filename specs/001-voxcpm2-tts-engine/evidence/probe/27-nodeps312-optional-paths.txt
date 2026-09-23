@@ -1,0 +1,69 @@
+# timestamp start: 2026-09-23T02:10:00+03:00
+## PHASE C1: cloning paths (reference_wav_path, prompt_wav_path+prompt_text) with the minimal set, no torchcodec installed
+(none of torchcodec/inflect/wetext/modelscope/gradio installed)
+---- iteration 1  2026-09-23T02:10:00+03:00
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Loaded VoxCPM2Model
+  0%|          | 0/40 [00:00<?, ?it/s]  2%|2         | 1/40 [00:00<00:16,  2.33it/s]  5%|5         | 2/40 [00:00<00:16,  2.35it/s]  8%|7         | 3/40 [00:01<00:15,  2.38it/s] 10%|#         | 4/40 [00:01<00:15,  2.37it/s] 12%|#2        | 5/40 [00:02<00:14,  2.34it/s] 15%|#5        | 6/40 [00:02<00:14,  2.37it/s] 15%|#5        | 6/40 [00:02<00:15,  2.13it/s]
+CLONE-REF OK 1.12
+  0%|          | 0/46 [00:00<?, ?it/s]  2%|2         | 1/46 [00:00<00:18,  2.46it/s]  4%|4         | 2/46 [00:00<00:18,  2.35it/s]  7%|6         | 3/46 [00:01<00:18,  2.33it/s]  9%|8         | 4/46 [00:01<00:17,  2.35it/s] 11%|#         | 5/46 [00:02<00:17,  2.36it/s] 13%|#3        | 6/46 [00:02<00:17,  2.35it/s] 15%|#5        | 7/46 [00:02<00:16,  2.37it/s] 15%|#5        | 7/46 [00:03<00:18,  2.16it/s]
+CLONE-PROMPT OK 1.28
+CHECK PASSED at iteration 1
+exit=0
+
+## PHASE C2: normalize=True
+---- iteration 1  2026-09-23T02:10:30+03:00
+           ^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\core.py", line 278, in _generate
+    from .utils.text_normalize import TextNormalizer
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\utils\text_normalize.py", line 4, in <module>
+    import inflect
+ModuleNotFoundError: No module named 'inflect'
+>> missing module 'inflect' -> pip install inflect  (-c project-constraints)
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+voxcpm 2.0.3 requires addict, which is not installed.
+voxcpm 2.0.3 requires argbind, which is not installed.
+voxcpm 2.0.3 requires datasets<4,>=3, which is not installed.
+voxcpm 2.0.3 requires funasr, which is not installed.
+voxcpm 2.0.3 requires gradio<7,>=6, which is not installed.
+voxcpm 2.0.3 requires matplotlib, which is not installed.
+voxcpm 2.0.3 requires modelscope>=1.22.0, which is not installed.
+voxcpm 2.0.3 requires simplejson, which is not installed.
+voxcpm 2.0.3 requires sortedcontainers, which is not installed.
+voxcpm 2.0.3 requires spaces, which is not installed.
+voxcpm 2.0.3 requires torchcodec, which is not installed.
+voxcpm 2.0.3 requires wetext, which is not installed.
+Successfully installed inflect-7.5.0 more_itertools-11.1.0 typeguard-4.6.0
+>> install dur=2s
+---- iteration 2  2026-09-23T02:10:45+03:00
+           ^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\core.py", line 278, in _generate
+    from .utils.text_normalize import TextNormalizer
+  File "C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\voxcpm\utils\text_normalize.py", line 5, in <module>
+    from wetext import Normalizer
+ModuleNotFoundError: No module named 'wetext'
+>> missing module 'wetext' -> pip install wetext  (-c project-constraints)
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+voxcpm 2.0.3 requires addict, which is not installed.
+voxcpm 2.0.3 requires argbind, which is not installed.
+voxcpm 2.0.3 requires datasets<4,>=3, which is not installed.
+voxcpm 2.0.3 requires funasr, which is not installed.
+voxcpm 2.0.3 requires gradio<7,>=6, which is not installed.
+voxcpm 2.0.3 requires matplotlib, which is not installed.
+voxcpm 2.0.3 requires modelscope>=1.22.0, which is not installed.
+voxcpm 2.0.3 requires simplejson, which is not installed.
+voxcpm 2.0.3 requires sortedcontainers, which is not installed.
+voxcpm 2.0.3 requires spaces, which is not installed.
+voxcpm 2.0.3 requires torchcodec, which is not installed.
+Successfully installed anyascii-0.3.3 contractions-0.1.73 kaldifst-1.8.0 pyahocorasick-2.3.1 textsearch-0.0.24 wetext-0.1.8
+>> install dur=5s
+---- iteration 3  2026-09-23T02:11:03+03:00
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cpu, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Loaded VoxCPM2Model
+  0%|          | 0/88 [00:00<?, ?it/s]  1%|1         | 1/88 [00:00<00:41,  2.09it/s]  2%|2         | 2/88 [00:00<00:41,  2.07it/s]  3%|3         | 3/88 [00:01<00:41,  2.06it/s]  5%|4         | 4/88 [00:01<00:40,  2.09it/s]  6%|5         | 5/88 [00:02<00:39,  2.11it/s]  7%|6         | 6/88 [00:02<00:38,  2.11it/s]  8%|7         | 7/88 [00:03<00:37,  2.15it/s]  9%|9         | 8/88 [00:03<00:36,  2.18it/s] 10%|#         | 9/88 [00:04<00:37,  2.09it/s] 11%|#1        | 10/88 [00:04<00:38,  2.04it/s] 12%|#2        | 11/88 [00:05<00:38,  2.01it/s] 14%|#3        | 12/88 [00:05<00:38,  1.99it/s] 15%|#4        | 13/88 [00:06<00:37,  2.00it/s] 16%|#5        | 14/88 [00:06<00:36,  2.01it/s] 17%|#7        | 15/88 [00:07<00:35,  2.05it/s] 18%|#8        | 16/88 [00:07<00:35,  2.04it/s] 19%|#9        | 17/88 [00:08<00:35,  2.02it/s] 20%|##        | 18/88 [00:08<00:33,  2.06it/s] 22%|##1       | 19/88 [00:09<00:33,  2.08it/s] 23%|##2       | 20/88 [00:09<00:34,  1.99it/s] 24%|##3       | 21/88 [00:10<00:34,  1.94it/s] 25%|##5       | 22/88 [00:10<00:33,  1.98it/s] 25%|##5       | 22/88 [00:11<00:33,  1.99it/s]
+NORMALIZE OK 3.68
+CHECK PASSED at iteration 3
+exit=0
+# timestamp end: 2026-09-23T02:11:29+03:00

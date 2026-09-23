@@ -1,0 +1,100 @@
+# T031/T032 frontend checks. Generated 2026-09-23T17:41:31+03:00
+
+## 1. Typecheck, timestamp 2026-09-23T17:40:27+03:00
+$ bun run typecheck
+$ bunx tsc -p app/tsconfig.json --noEmit && cd web && bunx tsc --noEmit
+exit=0
+
+## 2. Biome, HEAD (60cd4fe) vs working copy, both LF-normalised (method of evidence/phase3/T019-T023-checks.txt; script <scratchpad>/t031/biome-compare-t031.sh)
+Result: the same findings on both sides. ModelManagement has 2 useOptionalChain warnings (only their line numbers moved) and a pre-existing format diff; EngineModelSelector has the pre-existing CLONING_ENGINES wrap. DownloadConfirmDialog.tsx and engineCapabilityRules.ts are clean.
+$ bash <scratchpad>/t031/biome-compare-t031.sh
+##### biome check, head side (2026-09-23T17:40:35+03:00)
+exit=1
+app\src\components\ServerSettings\ModelManagement.tsx:633:49 lint/complexity/useOptionalChain  FIXABLE  ━━━━━━━━━━
+app\src\components\ServerSettings\ModelManagement.tsx:939:47 lint/complexity/useOptionalChain  FIXABLE  ━━━━━━━━━━
+app\src\components\Generation\EngineModelSelector.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app\src\components\ServerSettings\ModelManagement.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Checked 4 files in 32ms. No fixes applied.
+Found 2 errors.
+Found 2 warnings.
+##### biome check, work side (2026-09-23T17:40:35+03:00)
+exit=1
+app\src\components\ServerSettings\ModelManagement.tsx:636:49 lint/complexity/useOptionalChain  FIXABLE  ━━━━━━━━━━
+app\src\components\ServerSettings\ModelManagement.tsx:951:47 lint/complexity/useOptionalChain  FIXABLE  ━━━━━━━━━━
+app\src\components\Generation\EngineModelSelector.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+app\src\components\ServerSettings\ModelManagement.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Checked 4 files in 15ms. No fixes applied.
+Found 2 errors.
+Found 2 warnings.
+##### what biome --write would change (formatter + import sorting), per file: HEAD vs working
+=== app/src/components/Generation/EngineModelSelector.tsx
+--- HEAD:
+67c67,74
+< const CLONING_ENGINES = new Set(['qwen', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'f5_tts']);
+---
+> const CLONING_ENGINES = new Set([
+>   'qwen',
+>   'luxtts',
+>   'chatterbox',
+>   'chatterbox_turbo',
+>   'tada',
+>   'f5_tts',
+> ]);
+--- working:
+72c72,79
+< const CLONING_ENGINES = new Set(['qwen', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'f5_tts']);
+---
+> const CLONING_ENGINES = new Set([
+>   'qwen',
+>   'luxtts',
+>   'chatterbox',
+>   'chatterbox_turbo',
+>   'tada',
+>   'f5_tts',
+> ]);
+=== app/src/components/ServerSettings/ModelManagement.tsx
+--- HEAD:
+46,50c46
+< import {
+<   getHabibiModel,
+<   HABIBI_MODELS,
+<   isHabibiModelId,
+< } from '@/lib/constants/habibiModels';
+---
+> import { getHabibiModel, HABIBI_MODELS, isHabibiModelId } from '@/lib/constants/habibiModels';
+--- working:
+47,51c47
+< import {
+<   getHabibiModel,
+<   HABIBI_MODELS,
+<   isHabibiModelId,
+< } from '@/lib/constants/habibiModels';
+---
+> import { getHabibiModel, HABIBI_MODELS, isHabibiModelId } from '@/lib/constants/habibiModels';
+=== app/src/components/Generation/DownloadConfirmDialog.tsx
+--- HEAD:
+--- working:
+=== app/src/lib/hooks/engineCapabilityRules.ts
+--- HEAD:
+--- working:
+
+## 3. Web build, timestamp 2026-09-23T17:40:43+03:00
+$ bun run build:web
+$ cd web && bun run build
+$ tsc && vite build
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 3638 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                         [39m[1m[2m    0.47 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+[2mdist/[22m[32massets/voicebox-logo-DQ1k8iIe.png  [39m[1m[2m4,245.54 kB[22m[1m[22m
+[2mdist/[22m[35massets/index-C6kK28HR.css          [39m[1m[2m  107.87 kB[22m[1m[22m[2m │ gzip:  16.59 kB[22m
+[2mdist/[22m[36massets/index-CmzMhQP2.js           [39m[1m[33m1,762.77 kB[39m[22m[2m │ gzip: 561.80 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 4.30s[39m
+exit=0

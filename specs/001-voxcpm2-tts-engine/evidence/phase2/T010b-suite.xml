@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="10" failures="15" skipped="5" tests="456" time="10.109" timestamp="2026-09-23T05:41:24.816116+03:00" hostname="DevelopmentPC"><testcase classname="" name="tests.test_audioop_python313" time="0.000"><error message="collection failure">ImportError while importing test module 'D:\Projects\Personal\voicebox\backend\tests\test_audioop_python313.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_audioop_python313.py:18: in &lt;module&gt;
+    from build_binary import build_server
+backend\build_binary.py:9: in &lt;module&gt;
+    import PyInstaller.__main__
+E   ModuleNotFoundError: No module named 'PyInstaller'</error></testcase><testcase classname="" name="tests.test_client_id_middleware" time="0.000"><error message="collection failure">ImportError while importing test module 'D:\Projects\Personal\voicebox\backend\tests\test_client_id_middleware.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_client_id_middleware.py:11: in &lt;module&gt;
+    from backend.mcp_server.context import _is_stamped_path
+backend\mcp_server\__init__.py:8: in &lt;module&gt;
+    from .server import mount_into
+backend\mcp_server\server.py:16: in &lt;module&gt;
+    from fastmcp import FastMCP
+E   ModuleNotFoundError: No module named 'fastmcp'</error></testcase><testcase classname="" name="tests.test_hf_symlink_probe" time="0.000"><error message="collection failure">ImportError while importing test module 'D:\Projects\Personal\voicebox\backend\tests\test_hf_symlink_probe.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_hf_symlink_probe.py:6: in &lt;module&gt;
+    from huggingface_hub import file_download
+E   ModuleNotFoundError: No module named 'huggingface_hub'</error></testcase><testcase classname="" name="tests.test_hume_encode_inference_mode" time="0.000"><error message="collection failure">ImportError while importing test module 'D:\Projects\Personal\voicebox\backend\tests\test_hume_encode_inference_mode.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_hume_encode_inference_mode.py:11: in &lt;module&gt;
+    import torch
+E   ModuleNotFoundError: No module named 'torch'</error></testcase><testcase classname="" name="tests.test_mcp_speak" time="0.000"><error message="collection failure">ImportError while importing test module 'D:\Projects\Personal\voicebox\backend\tests\test_mcp_speak.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_mcp_speak.py:13: in &lt;module&gt;
+    import backend.routes.generations as generations
+backend\routes\generations.py:14: in &lt;module&gt;
+    from ..services import history, personality, profiles, pronunciation, tts
+backend\services\profiles.py:22: in &lt;module&gt;
+    from ..utils.cache import _get_cache_dir, clear_profile_cache
+backend\utils\cache.py:7: in &lt;module&gt;
+    import torch
+E   ModuleNotFoundError: No module named 'torch'</error></testcase><testcase classname="" name="tests.test_offline_patch" time="0.000"><error message="collection failure">ImportError while importing test module 'D:\Projects\Personal\voicebox\backend\tests\test_offline_patch.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_offline_patch.py:21: in &lt;module&gt;
+    from huggingface_hub.errors import OfflineModeIsEnabled  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ModuleNotFoundError: No module named 'huggingface_hub'</error></testcase><testcase classname="" name="tests.test_profile_duplicate_names" time="0.000"><error message="collection failure">ImportError while importing test module 'D:\Projects\Personal\voicebox\backend\tests\test_profile_duplicate_names.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_profile_duplicate_names.py:19: in &lt;module&gt;
+    from database import Base, VoiceProfile as DBVoiceProfile
+backend\database\__init__.py:8: in &lt;module&gt;
+    from .models import (
+backend\database\models.py:21: in &lt;module&gt;
+    from ..utils.capture_chords import (
+E   ImportError: attempted relative import beyond top-level package</error></testcase><testcase classname="" name="tests.test_pronunciation" time="0.000"><error message="collection failure">ImportError while importing test module 'D:\Projects\Personal\voicebox\backend\tests\test_pronunciation.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_pronunciation.py:27: in &lt;module&gt;
+    from backend.app import app  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\app.py:110: in &lt;module&gt;
+    import torch
+E   ModuleNotFoundError: No module named 'torch'</error></testcase><testcase classname="" name="tests.test_rocm_build" time="0.000"><error message="collection failure">ImportError while importing test module 'D:\Projects\Personal\voicebox\backend\tests\test_rocm_build.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_rocm_build.py:19: in &lt;module&gt;
+    from build_binary import build_server
+backend\build_binary.py:9: in &lt;module&gt;
+    import PyInstaller.__main__
+E   ModuleNotFoundError: No module named 'PyInstaller'</error></testcase><testcase classname="" name="tests.test_tada_language_alignment" time="0.000"><error message="collection failure">ImportError while importing test module 'D:\Projects\Personal\voicebox\backend\tests\test_tada_language_alignment.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_tada_language_alignment.py:5: in &lt;module&gt;
+    from backend.backends import hume_backend
+backend\backends\hume_backend.py:32: in &lt;module&gt;
+    from ..utils.cache import get_cache_key, get_cached_voice_prompt, cache_voice_prompt
+backend\utils\cache.py:7: in &lt;module&gt;
+    import torch
+E   ModuleNotFoundError: No module named 'torch'</error></testcase><testcase classname="tests.test_amd_gpu_detect.TestAmdGpuWindows" name="test_returns_false_on_linux" time="0.001" /><testcase classname="tests.test_amd_gpu_detect.TestAmdGpuWindows" name="test_detects_amd_via_wmi" time="0.000" /><testcase classname="tests.test_amd_gpu_detect.TestAmdGpuWindows" name="test_no_amd_via_wmi" time="0.001" /><testcase classname="tests.test_amd_gpu_detect.TestAmdGpuWindows" name="test_fallback_to_torch_radeon" time="0.001"><failure message="ModuleNotFoundError: No module named 'torch'">args = (&lt;backend.tests.test_amd_gpu_detect.TestAmdGpuWindows object at 0x000001FAD4B074A0&gt;,)
+keywargs = {}
+
+    @wraps(func)
+    def patched(*args, **keywargs):
+&gt;       with self.decoration_helper(patched,
+                                    args,
+                                    keywargs) as (newargs, newkeywargs):
+
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1393: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1375: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:526: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1451: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\pkgutil.py:513: in resolve_name
+    mod = importlib.import_module(modname)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'torch', package = None
+
+    def import_module(name, package=None):
+        """Import a module.
+    
+        The 'package' argument is required when performing a relative import. It
+        specifies the package to use as the anchor point from which to resolve the
+        relative import to an absolute import.
+    
+        """
+        level = 0
+        if name.startswith('.'):
+            if not package:
+                raise TypeError("the 'package' argument is required to perform a "
+                                f"relative import for {name!r}")
+            for character in name:
+                if character != '.':
+                    break
+                level += 1
+&gt;       return _bootstrap._gcd_import(name[level:], package, level)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ModuleNotFoundError: No module named 'torch'
+
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_amd_gpu_detect.TestAmdGpuWindows" name="test_fallback_to_torch_nvidia" time="0.001"><failure message="ModuleNotFoundError: No module named 'torch'">args = (&lt;backend.tests.test_amd_gpu_detect.TestAmdGpuWindows object at 0x000001FAD4B07740&gt;,)
+keywargs = {}
+
+    @wraps(func)
+    def patched(*args, **keywargs):
+&gt;       with self.decoration_helper(patched,
+                                    args,
+                                    keywargs) as (newargs, newkeywargs):
+
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1393: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1375: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:526: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1451: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\pkgutil.py:513: in resolve_name
+    mod = importlib.import_module(modname)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'torch', package = None
+
+    def import_module(name, package=None):
+        """Import a module.
+    
+        The 'package' argument is required when performing a relative import. It
+        specifies the package to use as the anchor point from which to resolve the
+        relative import to an absolute import.
+    
+        """
+        level = 0
+        if name.startswith('.'):
+            if not package:
+                raise TypeError("the 'package' argument is required to perform a "
+                                f"relative import for {name!r}")
+            for character in name:
+                if character != '.':
+                    break
+                level += 1
+&gt;       return _bootstrap._gcd_import(name[level:], package, level)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ModuleNotFoundError: No module named 'torch'
+
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_amd_gpu_detect.TestAmdGpuWindows" name="test_no_torch_cuda" time="0.001"><failure message="ModuleNotFoundError: No module named 'torch'">args = (&lt;backend.tests.test_amd_gpu_detect.TestAmdGpuWindows object at 0x000001FAD4B079E0&gt;,)
+keywargs = {}
+
+    @wraps(func)
+    def patched(*args, **keywargs):
+&gt;       with self.decoration_helper(patched,
+                                    args,
+                                    keywargs) as (newargs, newkeywargs):
+
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1393: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1375: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:526: in enter_context
+    result = _enter(cm)
+             ^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1451: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\pkgutil.py:513: in resolve_name
+    mod = importlib.import_module(modname)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'torch', package = None
+
+    def import_module(name, package=None):
+        """Import a module.
+    
+        The 'package' argument is required when performing a relative import. It
+        specifies the package to use as the anchor point from which to resolve the
+        relative import to an absolute import.
+    
+        """
+        level = 0
+        if name.startswith('.'):
+            if not package:
+                raise TypeError("the 'package' argument is required to perform a "
+                                f"relative import for {name!r}")
+            for character in name:
+                if character != '.':
+                    break
+                level += 1
+&gt;       return _bootstrap._gcd_import(name[level:], package, level)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ModuleNotFoundError: No module named 'torch'
+
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_amd_gpu_detect.TestAmdGpuWindows" name="test_torch_not_installed" time="0.001" /><testcase classname="tests.test_audio_failed_generation" name="test_resolve_storage_path_empty_returns_none" time="0.000" /><testcase classname="tests.test_audio_failed_generation" name="test_failed_generation_returns_404[gen-failed-empty]" time="0.099" /><testcase classname="tests.test_audio_failed_generation" name="test_failed_generation_returns_404[gen-failed-null]" time="0.084" /><testcase classname="tests.test_audio_failed_generation" name="test_missing_audio_file_returns_404" time="0.084" /><testcase classname="tests.test_audio_failed_generation" name="test_unknown_generation_returns_404" time="0.078" /><testcase classname="tests.test_audio_failed_generation" name="test_audio_path_pointing_at_directory_returns_404[/audio/gen-with-version]" time="0.081" /><testcase classname="tests.test_audio_failed_generation" name="test_audio_path_pointing_at_directory_returns_404[/audio/version/version-dir]" time="0.079" /><testcase classname="tests.test_audio_failed_generation" name="test_audio_path_pointing_at_directory_returns_404[/samples/sample-dir]" time="0.084" /><testcase classname="tests.test_audio_preprocess" name="test_peak_cap_scales_hot_input" time="1.527" /><testcase classname="tests.test_audio_preprocess" name="test_peak_cap_leaves_moderate_input_untouched" time="0.001" /><testcase classname="tests.test_audio_preprocess" name="test_dc_offset_removed" time="0.001" /><testcase classname="tests.test_audio_preprocess" name="test_silence_is_trimmed_with_padding_kept" time="0.001" /><testcase classname="tests.test_audio_preprocess" name="test_clean_audio_is_not_padded_past_original_length" time="0.001" /><testcase classname="tests.test_audio_preprocess" name="test_empty_input_returns_empty" time="0.000" /><testcase classname="tests.test_audio_preprocess" name="test_validate_accepts_previously_rejected_hot_file" time="0.090" /><testcase classname="tests.test_audio_preprocess" name="test_validate_still_rejects_silent_input" time="0.007" /><testcase classname="tests.test_audio_preprocess" name="test_validate_rejects_too_short" time="0.009" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_allowed_origins[http://localhost:5173]" time="0.003" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_allowed_origins[http://127.0.0.1:5173]" time="0.002" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_allowed_origins[http://localhost:17493]" time="0.002" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_allowed_origins[http://127.0.0.1:17493]" time="0.002" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_allowed_origins[tauri://localhost]" time="0.002" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_allowed_origins[https://tauri.localhost]" time="0.002" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_blocked_origins[http://evil.com]" time="0.002" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_blocked_origins[http://localhost:9999]" time="0.002" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_blocked_origins[https://attacker.example.com]" time="0.002" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_blocked_origins[null]" time="0.002" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_preflight_allowed" time="0.001" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_preflight_blocked" time="0.001" /><testcase classname="tests.test_cors.TestCORSDefaultOrigins" name="test_credentials_header_present" time="0.002" /><testcase classname="tests.test_cors.TestCORSCustomOrigins" name="test_custom_origin_allowed" time="0.002" /><testcase classname="tests.test_cors.TestCORSCustomOrigins" name="test_other_custom_origin_allowed" time="0.002" /><testcase classname="tests.test_cors.TestCORSCustomOrigins" name="test_default_origins_still_work" time="0.002" /><testcase classname="tests.test_cors.TestCORSCustomOrigins" name="test_unlisted_origin_still_blocked" time="0.002" /><testcase classname="tests.test_cors.TestCORSEnvVarParsing" name="test_empty_env_var" time="0.002" /><testcase classname="tests.test_cors.TestCORSEnvVarParsing" name="test_whitespace_trimmed" time="0.002" /><testcase classname="tests.test_cors.TestCORSEnvVarParsing" name="test_trailing_comma_ignored" time="0.002" /><testcase classname="tests.test_cuda_device_selection" name="test_selects_cuda_device_with_most_free_memory" time="0.000" /><testcase classname="tests.test_cuda_device_selection" name="test_cuda_device_environment_override_wins" time="0.000" /><testcase classname="tests.test_cuda_device_selection" name="test_auto_override_uses_free_memory_selection" time="0.000" /><testcase classname="tests.test_cuda_download" name="test_cuda_status_reports_unsupported_linux_download" time="0.002" /><testcase classname="tests.test_cuda_download" name="test_cuda_download_rejects_linux_before_network" time="0.002" /><testcase classname="tests.test_engine_capabilities" name="test_model_config_capability_fields_default_to_todays_behaviour" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_model_config_declares_the_new_fields" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_advanced_setting_carries_contract_shape_and_is_frozen" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_there_are_existing_tts_configs_to_check" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[qwen-tts-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[qwen-tts-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[qwen-custom-voice-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[qwen-custom-voice-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[luxtts]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[chatterbox-tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[chatterbox-turbo]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[tada-1b]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[tada-3b-ml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-msa]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-unified]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-sau]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-uae]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-alg]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-irq]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-egy]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-mar]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-qwen-tts-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-qwen-tts-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-qwen-custom-voice-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-qwen-custom-voice-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-chatterbox-tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-chatterbox-turbo]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-tada-1b]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-tada-3b-ml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-msa]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-unified]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-sau]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-uae]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-alg]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-irq]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-egy]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-mar]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-qwen-tts-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-qwen-tts-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-qwen-custom-voice-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-qwen-custom-voice-0.6B]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-chatterbox-tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-chatterbox-turbo]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-tada-1b]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-tada-3b-ml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-msa]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-unified]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-sau]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-uae]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-alg]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-irq]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-egy]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-mar]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-qwen-tts-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-qwen-tts-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-qwen-custom-voice-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-qwen-custom-voice-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-chatterbox-tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-chatterbox-turbo]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-tada-1b]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-tada-3b-ml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-msa]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-unified]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-sau]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-uae]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-alg]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-irq]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-egy]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-mar]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-qwen-tts-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-qwen-tts-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-qwen-custom-voice-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-qwen-custom-voice-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-chatterbox-tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-chatterbox-turbo]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-tada-1b]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-tada-3b-ml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-msa]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-unified]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-sau]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-uae]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-alg]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-irq]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-egy]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-mar]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-qwen-tts-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-qwen-tts-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-qwen-custom-voice-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-qwen-custom-voice-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-chatterbox-tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-chatterbox-turbo]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-tada-1b]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-tada-3b-ml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-msa]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-unified]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-sau]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-uae]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-alg]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-irq]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-egy]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-mar]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_accelerators_is_available_with_no_reason" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_detected_accelerator_in_declared_set_is_available[cuda]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_detected_accelerator_in_declared_set_is_available[mps]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_detected_accelerator_in_declared_set_is_available[cpu]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_indexed_cuda_device_counts_as_cuda" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_detected_accelerator_not_in_set_is_unavailable_with_specific_reason" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_supported_but_marginal_memory_warns_and_never_blocks" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_sufficient_memory_has_no_warning" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_unknown_memory_or_threshold_has_no_warning[None-8192]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_unknown_memory_or_threshold_has_no_warning[4096-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_unknown_memory_or_threshold_has_no_warning[None-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_unavailable_engine_carries_reason_not_warning_even_with_marginal_memory" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda-accelerators0]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-mps-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-mps-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-mps-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-mps-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cpu-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cpu-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cpu-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cpu-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-xpu-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-xpu-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-xpu-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-xpu-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-directml-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-directml-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-directml-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-directml-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators2]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_wrapper_detects_mps_and_resolves" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_wrapper_reads_cuda_memory_for_the_warning" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_returns_every_tts_engine_with_every_contract_field" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_detects_hardware_once_per_request" time="0.004" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_existing_engines_keep_todays_behaviour" time="0.030" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_describes_each_engine_from_all_of_its_variants" time="0.004" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_display_name_is_the_engine_name" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_tada_languages_include_the_multilingual_variant" time="0.004" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_f5_license_is_null_when_variants_disagree" time="0.004" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_returns_the_shared_license_when_variants_agree" time="0.003" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_returns_null_license_when_synthetic_variants_disagree" time="0.003" /><testcase classname="tests.test_engine_capabilities" name="test_current_engine_variants_agree_on_default_variant_fields" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_current_engine_configs_declare_no_memory_threshold" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_model_config_min_memory_mb_defaults_to_none" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_warns_when_memory_is_below_the_declared_threshold" time="0.004" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_has_no_warning_without_a_declared_threshold" time="0.003" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_uses_the_default_variant_memory_threshold" time="0.003" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_engine_ids_match_the_request_engine_pattern" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_invariants_hold_for_a_constrained_engine" time="0.004" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_passes_declared_capabilities_through" time="0.003" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_never_imports_torch" time="0.003" /><testcase classname="tests.test_engine_capabilities" name="test_existing_generation_payloads_still_validate" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[None-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[None-qwen]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[None-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[None-f5_tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[value1-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[value1-qwen]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[value1-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[value1-f5_tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[None]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[qwen]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[chatterbox]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[tada]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[f5_tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_voice_description_accepts_500_characters_and_rejects_501" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[1.0-qwen]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[1.0-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[2.5-qwen]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[2.5-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[5.0-qwen]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[5.0-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[3-qwen]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[3-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_out_of_bounds_is_rejected[0.99]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_out_of_bounds_is_rejected[5.01]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_out_of_bounds_is_rejected[-1.0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_out_of_bounds_is_rejected[inf]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_out_of_bounds_is_rejected[nan]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_undeclared_setting_is_rejected_even_when_the_engine_declares_others" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_is_scoped_to_its_engine" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_invalid_generation_body_is_a_422_through_fastapi" time="0.011" /><testcase classname="tests.test_engine_patterns" name="test_voxcpm_is_accepted[GenerationRequest.engine]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_voxcpm_is_accepted[MCPClientBindingResponse.default_engine]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_voxcpm_is_accepted[MCPClientBindingUpsert.default_engine]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_voxcpm_is_accepted[SpeakRequest.engine]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[GenerationRequest.engine-qwen]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[GenerationRequest.engine-qwen_custom_voice]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[GenerationRequest.engine-luxtts]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[GenerationRequest.engine-chatterbox]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[GenerationRequest.engine-chatterbox_turbo]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[GenerationRequest.engine-tada]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[GenerationRequest.engine-kokoro]" time="0.001" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[GenerationRequest.engine-f5_tts]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-qwen]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-qwen_custom_voice]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-luxtts]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-chatterbox]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-chatterbox_turbo]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-tada]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-kokoro]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-f5_tts]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-qwen]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-qwen_custom_voice]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-luxtts]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-chatterbox]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-chatterbox_turbo]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-tada]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-kokoro]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-f5_tts]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[SpeakRequest.engine-qwen]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[SpeakRequest.engine-qwen_custom_voice]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[SpeakRequest.engine-luxtts]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[SpeakRequest.engine-chatterbox]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[SpeakRequest.engine-chatterbox_turbo]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[SpeakRequest.engine-tada]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[SpeakRequest.engine-kokoro]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_existing_engines_still_accepted[SpeakRequest.engine-f5_tts]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[GenerationRequest.engine-not_an_engine]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[GenerationRequest.engine-voxcpm2]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[GenerationRequest.engine-VOXCPM]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[GenerationRequest.engine- voxcpm]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[GenerationRequest.engine-]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[MCPClientBindingResponse.default_engine-not_an_engine]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[MCPClientBindingResponse.default_engine-voxcpm2]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[MCPClientBindingResponse.default_engine-VOXCPM]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[MCPClientBindingResponse.default_engine- voxcpm]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[MCPClientBindingResponse.default_engine-]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[MCPClientBindingUpsert.default_engine-not_an_engine]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[MCPClientBindingUpsert.default_engine-voxcpm2]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[MCPClientBindingUpsert.default_engine-VOXCPM]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[MCPClientBindingUpsert.default_engine- voxcpm]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[MCPClientBindingUpsert.default_engine-]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[SpeakRequest.engine-not_an_engine]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[SpeakRequest.engine-voxcpm2]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[SpeakRequest.engine-VOXCPM]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[SpeakRequest.engine- voxcpm]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_unknown_engine_is_rejected[SpeakRequest.engine-]" time="0.000" /><testcase classname="tests.test_engine_patterns" name="test_engine_patterns_are_identical" time="0.004" /><testcase classname="tests.test_f5tts_backend" name="test_arabic_model_registry_has_canonical_ids_and_checkpoint_paths" time="0.000" /><testcase classname="tests.test_f5tts_backend" name="test_model_configs_expose_language_and_license_policy" time="0.000" /><testcase classname="tests.test_f5tts_backend" name="test_shared_repository_cache_status_checks_the_selected_variant" time="0.000" /><testcase classname="tests.test_f5tts_backend" name="test_cache_requires_nested_files_from_the_same_snapshot" time="0.003"><failure message="ModuleNotFoundError: No module named 'huggingface_hub'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001FABA410470&gt;
+tmp_path = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-6/test_cache_requires_nested_fil0')
+
+    def test_cache_requires_nested_files_from_the_same_snapshot(
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -&gt; None:
+&gt;       from huggingface_hub import constants as hf_constants
+E       ModuleNotFoundError: No module named 'huggingface_hub'
+
+backend\tests\test_f5tts_backend.py:111: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_f5tts_backend" name="test_model_management_load_status_and_unload_are_variant_specific" time="0.002" /><testcase classname="tests.test_f5tts_backend" name="test_generation_request_accepts_only_canonical_habibi_model_ids" time="0.000" /><testcase classname="tests.test_f5tts_backend" name="test_omitted_f5_model_resolves_to_specialized_msa" time="0.001" /><testcase classname="tests.test_f5tts_backend" name="test_model_selection_alias_and_switching" time="0.004" /><testcase classname="tests.test_f5tts_backend" name="test_voice_prompt_requires_file_exact_text_and_max_twelve_seconds" time="0.005" /><testcase classname="tests.test_f5tts_backend" name="test_concurrent_requests_keep_model_selection_atomic_and_serialize_inference" time="0.087" /><testcase classname="tests.test_f5tts_backend" name="test_generate_rejects_wrong_language_and_empty_text" time="0.004" /><testcase classname="tests.test_f5tts_backend" name="test_inference_passes_only_unified_dialect_token_and_normalizes_audio" time="0.002" /><testcase classname="tests.test_f5tts_backend" name="test_safe_audio_loader_falls_back_to_pydub" time="0.001"><failure message="ModuleNotFoundError: No module named 'pydub'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001FABA371CA0&gt;
+
+    def test_safe_audio_loader_falls_back_to_pydub(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -&gt; None:
+        import soundfile
+&gt;       from pydub import AudioSegment
+E       ModuleNotFoundError: No module named 'pydub'
+
+backend\tests\test_f5tts_backend.py:353: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_f5tts_backend" name="test_combining_references_decodes_each_duration_once" time="0.003" /><testcase classname="tests.test_f5tts_backend" name="test_generation_error_releases_inference_lock" time="0.004" /><testcase classname="tests.test_generation_download" name="test_generation_with_cached_model" time="2.319" /><testcase classname="tests.test_generation_download" name="test_generation_with_fresh_download" time="2.288" /><testcase classname="tests.test_history_bulk_delete" name="test_bulk_delete_removes_selected_files_and_preserves_active_jobs" time="0.263" /><testcase classname="tests.test_mlx_smoke" name="test_mlx_core_runs" time="0.000"><skipped type="pytest.skip" message="MLX packages are only installed on Apple Silicon macOS">D:\Projects\Personal\voicebox\backend\tests\test_mlx_smoke.py:25: MLX packages are only installed on Apple Silicon macOS</skipped></testcase><testcase classname="tests.test_mlx_smoke" name="test_mlx_audio_tts_entry_point" time="0.000"><skipped type="pytest.skip" message="MLX packages are only installed on Apple Silicon macOS">D:\Projects\Personal\voicebox\backend\tests\test_mlx_smoke.py:32: MLX packages are only installed on Apple Silicon macOS</skipped></testcase><testcase classname="tests.test_mlx_smoke" name="test_mlx_audio_stt_entry_point" time="0.000"><skipped type="pytest.skip" message="MLX packages are only installed on Apple Silicon macOS">D:\Projects\Personal\voicebox\backend\tests\test_mlx_smoke.py:39: MLX packages are only installed on Apple Silicon macOS</skipped></testcase><testcase classname="tests.test_mlx_smoke" name="test_mlx_lm_entry_points" time="0.000"><skipped type="pytest.skip" message="MLX packages are only installed on Apple Silicon macOS">D:\Projects\Personal\voicebox\backend\tests\test_mlx_smoke.py:50: MLX packages are only installed on Apple Silicon macOS</skipped></testcase><testcase classname="tests.test_model_status_pending_downloads" name="test_errored_download_is_not_pending" time="0.000" /><testcase classname="tests.test_model_status_pending_downloads" name="test_retry_after_error_is_pending_again" time="0.000" /><testcase classname="tests.test_model_status_pending_downloads" name="test_completed_download_is_removed_everywhere" time="0.000" /><testcase classname="tests.test_model_status_pending_downloads" name="test_cancel_dismisses_errored_download" time="0.000" /><testcase classname="tests.test_offline_guard" name="test_mutates_cached_huggingface_hub_constant" time="0.001"><failure message="ModuleNotFoundError: No module named 'huggingface_hub'">def test_mutates_cached_huggingface_hub_constant():
+&gt;       original = _hf_const().HF_HUB_OFFLINE
+                   ^^^^^^^^^^^
+
+backend\tests\test_offline_guard.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _hf_const():
+&gt;       import huggingface_hub.constants as hf_const
+E       ModuleNotFoundError: No module named 'huggingface_hub'
+
+backend\tests\test_offline_guard.py:28: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_offline_guard" name="test_mutates_cached_transformers_constant" time="0.001"><failure message="ModuleNotFoundError: No module named 'transformers'">def test_mutates_cached_transformers_constant():
+&gt;       original = _tf_hub()._is_offline_mode
+                   ^^^^^^^^^
+
+backend\tests\test_offline_guard.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _tf_hub():
+&gt;       import transformers.utils.hub as tf_hub
+E       ModuleNotFoundError: No module named 'transformers'
+
+backend\tests\test_offline_guard.py:34: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_offline_guard" name="test_sets_env_variable" time="0.001" /><testcase classname="tests.test_offline_guard" name="test_noop_when_not_cached" time="0.001"><failure message="ModuleNotFoundError: No module named 'huggingface_hub'">def test_noop_when_not_cached():
+&gt;       before = _hf_const().HF_HUB_OFFLINE
+                 ^^^^^^^^^^^
+
+backend\tests\test_offline_guard.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _hf_const():
+&gt;       import huggingface_hub.constants as hf_const
+E       ModuleNotFoundError: No module named 'huggingface_hub'
+
+backend\tests\test_offline_guard.py:28: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_offline_guard" name="test_nested_contexts_respect_refcount" time="0.001"><failure message="ModuleNotFoundError: No module named 'huggingface_hub'">def test_nested_contexts_respect_refcount():
+&gt;       original = _hf_const().HF_HUB_OFFLINE
+                   ^^^^^^^^^^^
+
+backend\tests\test_offline_guard.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _hf_const():
+&gt;       import huggingface_hub.constants as hf_const
+E       ModuleNotFoundError: No module named 'huggingface_hub'
+
+backend\tests\test_offline_guard.py:28: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_offline_guard" name="test_concurrent_threads_share_offline_window" time="0.001"><failure message="ModuleNotFoundError: No module named 'huggingface_hub'">def test_concurrent_threads_share_offline_window():
+        """A slow thread must keep seeing offline mode even if a peer exits first."""
+&gt;       original = _hf_const().HF_HUB_OFFLINE
+                   ^^^^^^^^^^^
+
+backend\tests\test_offline_guard.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def _hf_const():
+&gt;       import huggingface_hub.constants as hf_const
+E       ModuleNotFoundError: No module named 'huggingface_hub'
+
+backend\tests\test_offline_guard.py:28: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_runtime_files_are_rocm[_internal/torch/lib/amdhip64.dll]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_runtime_files_are_rocm[_internal/torch/lib/rocblas.dll]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_runtime_files_are_rocm[_internal/torch/lib/hipblaslt.dll]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_runtime_files_are_rocm[_internal/torch/lib/miopen.dll]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_runtime_files_are_rocm[_internal/_rocm_sdk_core/amd_comgr.dll]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_runtime_files_are_rocm[_internal/_rocm_sdk_libraries_custom/lib/rocblas/library/TensileLibrary.dat]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_runtime_files_are_rocm[_internal/_rocm_sdk_libraries_custom/lib/miopen/db/kernels.kdb]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_runtime_files_are_rocm[_internal\\torch\\lib\\rccl.dll]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_core_files_are_not_rocm[voicebox-server-rocm.exe]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_core_files_are_not_rocm[_internal/python312.dll]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_core_files_are_not_rocm[_internal/torch/lib/torch_cpu.dll]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_core_files_are_not_rocm[_internal/torch/lib/c10.dll]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_core_files_are_not_rocm[_internal/rocm_sdk/__init__.py]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_core_files_are_not_rocm[_internal/_rocm_sdk_core/_dist_info.py]" time="0.000" /><testcase classname="tests.test_package_rocm.TestIsRocmFile" name="test_core_files_are_not_rocm[_internal/torch/_inductor/codegen/something.py]" time="0.000" /><testcase classname="tests.test_package_rocm.TestPackage" name="test_split_and_manifest" time="0.026" /><testcase classname="tests.test_package_rocm.TestPackage" name="test_empty_rocm_set_exits" time="0.005" /><testcase classname="tests.test_progress" name="test_progress_manager_basic" time="0.001" /><testcase classname="tests.test_progress" name="test_progress_manager_sse" time="0.852" /><testcase classname="tests.test_progress" name="test_hf_progress_tracker" time="0.001" /><testcase classname="tests.test_progress" name="test_full_integration" time="0.211"><failure message="AssertionError: Should end with 'complete'&#10;assert 'error' == 'complete'&#10;  &#10;  - complete&#10;  + error">async def test_full_integration():
+        """Test 4: Full integration test."""
+        print("\n" + "=" * 60)
+        print("Test 4: Full Integration (ProgressManager + HFProgressTracker)")
+        print("=" * 60)
+    
+        pm = get_progress_manager()
+        collected_events: List[Dict] = []
+    
+        # SSE client
+        async def sse_client():
+            print("  SSE client: Subscribing...")
+            async for event in pm.subscribe("integration-test"):
+                if event.startswith("data: "):
+                    data = json.loads(event[6:])
+                    print(f"  SSE client: {data['status']} - {data.get('progress', 0):.1f}% - {data.get('filename', '')}")
+                    collected_events.append(data)
+                    if data.get("status") in ("complete", "error"):
+                        break
+    
+        # Simulate backend download with HFProgressTracker
+        async def simulate_real_download():
+            await asyncio.sleep(0.2)  # Let SSE subscribe
+    
+            print("  Backend: Starting download with HFProgressTracker...")
+    
+            # Set up tracking (like the real backend does)
+            progress_callback = create_hf_progress_callback("integration-test", pm)
+            tracker = HFProgressTracker(progress_callback)
+    
+            # Initialize progress
+            pm.update_progress(
+                model_name="integration-test",
+                current=0,
+                total=1,
+                filename="",
+                status="downloading"
+            )
+    
+            # Simulate download with tqdm patching
+            with tracker.patch_download():
+                try:
+                    from tqdm import tqdm
+    
+                    # Simulate multi-file download (like HuggingFace does)
+                    files = [
+                        ("model.safetensors", 5000),
+                        ("config.json", 1000),
+                        ("tokenizer.json", 500),
+                    ]
+    
+                    for filename, size in files:
+                        print(f"  Backend: Downloading {filename}...")
+                        with tqdm(total=size, desc=filename, unit="B") as pbar:
+                            for chunk in range(0, size, 500):
+                                chunk_size = min(500, size - chunk)
+                                pbar.update(chunk_size)
+                                await asyncio.sleep(0.05)
+    
+                    # Mark complete
+                    print("  Backend: Download complete")
+                    pm.mark_complete("integration-test")
+    
+                except ImportError:
+                    print("  ✗ tqdm not available")
+                    pm.mark_error("integration-test", "tqdm not available")
+    
+        # Run both
+        await asyncio.gather(
+            sse_client(),
+            simulate_real_download()
+        )
+    
+        # Verify
+        print(f"\n  Collected {len(collected_events)} events")
+        if len(collected_events) &gt; 0:
+            print(f"  First event: {collected_events[0]}")
+            print(f"  Last event: {collected_events[-1]}")
+&gt;           assert collected_events[-1]["status"] == "complete", "Should end with 'complete'"
+E           AssertionError: Should end with 'complete'
+E           assert 'error' == 'complete'
+E             
+E             - complete
+E             + error
+
+backend\tests\test_progress.py:244: AssertionError</failure></testcase><testcase classname="tests.test_qwen_runaway_retry" name="test_mlx_qwen_enables_runaway_retry_without_aggressive_trim" time="0.001" /><testcase classname="tests.test_qwen_runaway_retry" name="test_pytorch_qwen_keeps_runaway_retry_disabled" time="0.000" /><testcase classname="tests.test_qwen_runaway_retry" name="test_detector_flags_long_internal_silence" time="0.001" /><testcase classname="tests.test_qwen_runaway_retry" name="test_detector_ignores_normal_internal_pause" time="0.001" /><testcase classname="tests.test_qwen_runaway_retry" name="test_trailing_silence_is_not_a_runaway" time="0.001" /><testcase classname="tests.test_qwen_runaway_retry" name="test_runaway_chunk_is_retried_as_smaller_chunks" time="0.003" /><testcase classname="tests.test_qwen_runaway_retry" name="test_persistent_runaway_fails_instead_of_returning_corrupt_audio" time="0.004" /><testcase classname="tests.test_refinement_collapse" name="test_single_word_loop_stripped" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_single_word_loop_with_punctuation_normalized" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_single_word_loop_case_insensitive" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_short_single_word_run_preserved" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_rhetorical_repetition_preserved" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_multi_word_english_loop_stripped" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_three_word_loop_stripped" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_long_phrase_loop_within_60_char_cap" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_multi_word_short_run_preserved" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_cjk_loop_stripped" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_japanese_loop_stripped" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_cjk_short_run_preserved" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_empty_string_passes_through" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_below_word_threshold_passes_through_unmodified" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_emphasis_vowel_run_preserved" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_custom_threshold_honored" time="0.000" /><testcase classname="tests.test_refinement_collapse" name="test_leading_and_trailing_whitespace_stripped_after_collapse" time="0.000" /><testcase classname="tests.test_rocm_backends.TestCheckCudaCompatibility" name="test_no_gpu_returns_compatible" time="0.001"><failure message="ModuleNotFoundError: No module named 'torch'">self = &lt;backend.tests.test_rocm_backends.TestCheckCudaCompatibility object at 0x000001FAFF6A0B60&gt;
+
+    def test_no_gpu_returns_compatible(self):
+        from backend.backends.base import check_cuda_compatibility
+    
+&gt;       with patch("torch.cuda.is_available", return_value=False):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_rocm_backends.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1451: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\pkgutil.py:513: in resolve_name
+    mod = importlib.import_module(modname)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;frozen importlib._bootstrap&gt;:1387: in _gcd_import
+    ???
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'torch', import_ = &lt;function _gcd_import at 0x000001FAD11A80E0&gt;
+
+&gt;   ???
+E   ModuleNotFoundError: No module named 'torch'
+
+&lt;frozen importlib._bootstrap&gt;:1324: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_rocm_backends.TestCheckCudaCompatibility" name="test_rocm_skips_compute_check" time="0.001"><failure message="ModuleNotFoundError: No module named 'torch'">self = &lt;backend.tests.test_rocm_backends.TestCheckCudaCompatibility object at 0x000001FAFF6A0EF0&gt;
+
+    def test_rocm_skips_compute_check(self):
+        """On ROCm, the NVIDIA compute-capability check should be skipped."""
+        from backend.backends.base import check_cuda_compatibility
+    
+&gt;       with patch("torch.cuda.is_available", return_value=True):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_rocm_backends.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1451: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\pkgutil.py:513: in resolve_name
+    mod = importlib.import_module(modname)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;frozen importlib._bootstrap&gt;:1387: in _gcd_import
+    ???
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'torch', import_ = &lt;function _gcd_import at 0x000001FAD11A80E0&gt;
+
+&gt;   ???
+E   ModuleNotFoundError: No module named 'torch'
+
+&lt;frozen importlib._bootstrap&gt;:1324: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_rocm_backends.TestCheckCudaCompatibility" name="test_cuda_compatible_arch" time="0.001"><failure message="ModuleNotFoundError: No module named 'torch'">self = &lt;backend.tests.test_rocm_backends.TestCheckCudaCompatibility object at 0x000001FAFF6A1D30&gt;
+
+    def test_cuda_compatible_arch(self):
+        from backend.backends.base import check_cuda_compatibility
+    
+&gt;       with patch("torch.cuda.is_available", return_value=True):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_rocm_backends.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1451: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\pkgutil.py:513: in resolve_name
+    mod = importlib.import_module(modname)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;frozen importlib._bootstrap&gt;:1387: in _gcd_import
+    ???
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'torch', import_ = &lt;function _gcd_import at 0x000001FAD11A80E0&gt;
+
+&gt;   ???
+E   ModuleNotFoundError: No module named 'torch'
+
+&lt;frozen importlib._bootstrap&gt;:1324: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_rocm_backends.TestCheckCudaCompatibility" name="test_cuda_incompatible_arch" time="0.001"><failure message="ModuleNotFoundError: No module named 'torch'">self = &lt;backend.tests.test_rocm_backends.TestCheckCudaCompatibility object at 0x000001FAFF6A2E10&gt;
+
+    def test_cuda_incompatible_arch(self):
+        from backend.backends.base import check_cuda_compatibility
+    
+&gt;       with patch("torch.cuda.is_available", return_value=True):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_rocm_backends.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\unittest\mock.py:1451: in __enter__
+    self.target = self.getter()
+                  ^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\pkgutil.py:513: in resolve_name
+    mod = importlib.import_module(modname)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;frozen importlib._bootstrap&gt;:1387: in _gcd_import
+    ???
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'torch', import_ = &lt;function _gcd_import at 0x000001FAD11A80E0&gt;
+
+&gt;   ???
+E   ModuleNotFoundError: No module named 'torch'
+
+&lt;frozen importlib._bootstrap&gt;:1324: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_rocm_download" name="test_get_rocm_status_not_installed" time="0.004" /><testcase classname="tests.test_rocm_download" name="test_download_rocm_binary_progress_reporting" time="0.018" /><testcase classname="tests.test_rocm_download" name="test_is_rocm_active" time="0.002" /><testcase classname="tests.test_rocm_download" name="test_delete_rocm_binary" time="0.003" /><testcase classname="tests.test_rocm_requirements.TestRocmRequirements" name="test_requirements_file_exists" time="0.000" /><testcase classname="tests.test_rocm_requirements.TestRocmRequirements" name="test_requirements_file_content" time="0.000" /><testcase classname="tests.test_rocm_requirements.TestRocmRequirements" name="test_rocm_torch_installs_and_detects_amd" time="0.000"><skipped type="pytest.skip" message="Set VOICEBOX_TEST_ROCM_INSTALL=1 to run the heavy install test">D:\Projects\Personal\voicebox\backend\tests\test_rocm_requirements.py:66: Set VOICEBOX_TEST_ROCM_INSTALL=1 to run the heavy install test</skipped></testcase><testcase classname="tests.test_task_queue_cancellation" name="test_cancel_queued_generation_skips_execution" time="0.113" /><testcase classname="tests.test_task_queue_cancellation" name="test_cancel_running_generation_cancels_task" time="0.001" /></testsuite></testsuites>

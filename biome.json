@@ -5,6 +5,16 @@
     "clientKind": "git",
     "useIgnoreFile": true
   },
+  "files": {
+    "includes": [
+      "**",
+      "!app/src/lib/api/core",
+      "!app/src/lib/api/models",
+      "!app/src/lib/api/schemas",
+      "!app/src/lib/api/services",
+      "!app/src/lib/api/index.ts"
+    ]
+  },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",

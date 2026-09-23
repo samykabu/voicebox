@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="8" time="3.202" timestamp="2026-09-23T21:37:50.619437+03:00" hostname="DevelopmentPC"><testcase classname="tests.test_review_s5.TestGenerationExportEngine" name="test_voxcpm_designed_generation_round_trips" time="0.121"><failure message="KeyError: 'engine'">self = &lt;backend.tests.test_review_s5.TestGenerationExportEngine object at 0x000002B0FAC62BD0&gt;
+test_db = &lt;sqlalchemy.orm.session.Session object at 0x000002B0FB054D70&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-109/test_voxcpm_designed_generatio0/data')
+
+    @pytest.mark.asyncio
+    async def test_voxcpm_designed_generation_round_trips(self, test_db, data_dir):
+        generation = _generation(
+            test_db, _profile(test_db), engine="voxcpm", model_size=None, voice_description=DESCRIPTION
+        )
+    
+        zip_bytes = export_generation_to_zip(generation.id, test_db)
+        exported = _manifest(zip_bytes)
+        assert exported["version"] == "1.1"
+&gt;       assert exported["generation"]["engine"] == "voxcpm"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'engine'
+
+backend\tests\test_review_s5.py:137: KeyError</failure></testcase><testcase classname="tests.test_review_s5.TestGenerationExportEngine" name="test_qwen_small_model_round_trips_with_its_size" time="0.105"><failure message="KeyError: 'model_size'">self = &lt;backend.tests.test_review_s5.TestGenerationExportEngine object at 0x000002B0FB042780&gt;
+test_db = &lt;sqlalchemy.orm.session.Session object at 0x000002B0FB0D0B30&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-109/test_qwen_small_model_round_tr0/data')
+
+    @pytest.mark.asyncio
+    async def test_qwen_small_model_round_trips_with_its_size(self, test_db, data_dir):
+        generation = _generation(test_db, _profile(test_db), engine="qwen", model_size="0.6B")
+    
+        zip_bytes = export_generation_to_zip(generation.id, test_db)
+&gt;       assert _manifest(zip_bytes)["generation"]["model_size"] == "0.6B"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'model_size'
+
+backend\tests\test_review_s5.py:153: KeyError</failure></testcase><testcase classname="tests.test_review_s5.TestGenerationExportEngine" name="test_legacy_manifest_without_the_keys_gets_the_column_defaults" time="0.337" /><testcase classname="tests.test_review_s5.TestGenerationExportEngine" name="test_unknown_engine_falls_back_to_the_default_with_a_warning" time="0.084"><failure message="assert False&#10; +  where False = any(&lt;generator object TestGenerationExportEngine.test_unknown_engine_falls_back_to_the_default_with_a_warning.&lt;locals&gt;.&lt;genexpr&gt; at 0x000002B0FB38CA00&gt;)">self = &lt;backend.tests.test_review_s5.TestGenerationExportEngine object at 0x000002B0FB042F90&gt;
+test_db = &lt;sqlalchemy.orm.session.Session object at 0x000002B0FB318800&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-109/test_unknown_engine_falls_back0/data')
+caplog = &lt;_pytest.logging.LogCaptureFixture object at 0x000002B0FB37C7A0&gt;
+
+    @pytest.mark.asyncio
+    async def test_unknown_engine_falls_back_to_the_default_with_a_warning(self, test_db, data_dir, caplog):
+        _profile(test_db)
+    
+        with caplog.at_level(logging.WARNING):
+            result = await import_generation_from_zip(
+                _archive("1.1", engine="evil_engine", model_size="0.6B"), test_db
+            )
+    
+        row = _row(test_db, result["id"])
+        assert row.engine == "qwen"
+        assert row.model_size is None
+&gt;       assert any("evil_engine" in r.getMessage() for r in caplog.records if r.levelno == logging.WARNING)
+E       assert False
+E        +  where False = any(&lt;generator object TestGenerationExportEngine.test_unknown_engine_falls_back_to_the_default_with_a_warning.&lt;locals&gt;.&lt;genexpr&gt; at 0x000002B0FB38CA00&gt;)
+
+backend\tests\test_review_s5.py:186: AssertionError</failure></testcase><testcase classname="tests.test_review_s5.TestGenerationExportEngine" name="test_non_string_engine_falls_back_to_the_default" time="0.093" /><testcase classname="tests.test_review_s5.TestGenerationExportEngine" name="test_known_engine_with_bogus_size_keeps_engine_and_uses_its_default_size" time="0.099"><failure message="AssertionError: assert None == '1.7B'&#10; +  where None = &lt;backend.database.models.Generation object at 0x000002B0FB341C40&gt;.model_size&#10; +  and   '1.7B' = get_default_model_size('qwen')">self = &lt;backend.tests.test_review_s5.TestGenerationExportEngine object at 0x000002B0FB043740&gt;
+test_db = &lt;sqlalchemy.orm.session.Session object at 0x000002B0FB37C6B0&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-109/test_known_engine_with_bogus_s0/data')
+caplog = &lt;_pytest.logging.LogCaptureFixture object at 0x000002B0FC38BB30&gt;
+
+    @pytest.mark.asyncio
+    async def test_known_engine_with_bogus_size_keeps_engine_and_uses_its_default_size(
+        self, test_db, data_dir, caplog
+    ):
+        _profile(test_db)
+    
+        with caplog.at_level(logging.WARNING):
+            result = await import_generation_from_zip(_archive("1.1", engine="qwen", model_size="999B"), test_db)
+    
+        row = _row(test_db, result["id"])
+        assert row.engine == "qwen"
+&gt;       assert row.model_size == get_default_model_size("qwen")
+E       AssertionError: assert None == '1.7B'
+E        +  where None = &lt;backend.database.models.Generation object at 0x000002B0FB341C40&gt;.model_size
+E        +  and   '1.7B' = get_default_model_size('qwen')
+
+backend\tests\test_review_s5.py:209: AssertionError</failure></testcase><testcase classname="tests.test_review_s5.TestGenerationExportEngine" name="test_engine_without_sizes_stores_null_size" time="0.087"><failure message="AssertionError: assert 'qwen' == 'voxcpm'&#10;  &#10;  - voxcpm&#10;  + qwen">self = &lt;backend.tests.test_review_s5.TestGenerationExportEngine object at 0x000002B0FB043B30&gt;
+test_db = &lt;sqlalchemy.orm.session.Session object at 0x000002B0FB341F10&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-109/test_engine_without_sizes_stor0/data')
+caplog = &lt;_pytest.logging.LogCaptureFixture object at 0x000002B0FB31ADE0&gt;
+
+    @pytest.mark.asyncio
+    async def test_engine_without_sizes_stores_null_size(self, test_db, data_dir, caplog):
+        _profile(test_db)
+    
+        with caplog.at_level(logging.WARNING):
+            result = await import_generation_from_zip(
+                _archive("1.1", engine="voxcpm", model_size="bogus", voice_description=DESCRIPTION), test_db
+            )
+    
+        row = _row(test_db, result["id"])
+&gt;       assert row.engine == "voxcpm"
+E       AssertionError: assert 'qwen' == 'voxcpm'
+E         
+E         - voxcpm
+E         + qwen
+
+backend\tests\test_review_s5.py:222: AssertionError</failure></testcase><testcase classname="tests.test_review_s5.TestGenerationExportEngine" name="test_regenerate_after_import_runs_voxcpm_with_the_description" time="0.213"><failure message="AssertionError: assert ['qwen'] == ['voxcpm']&#10;  &#10;  At index 0 diff: 'qwen' != 'voxcpm'&#10;  Use -v to get more diff">self = &lt;backend.tests.test_review_s5.TestGenerationExportEngine object at 0x000002B0FB043EC0&gt;
+test_db = &lt;sqlalchemy.orm.session.Session object at 0x000002B0FB0D0560&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-109/test_regenerate_after_import_r0/data')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002B0FB31B860&gt;
+
+    @pytest.mark.asyncio
+    async def test_regenerate_after_import_runs_voxcpm_with_the_description(self, test_db, data_dir, monkeypatch):
+        from backend.routes import generations as routes_mod
+    
+        generation = _generation(
+            test_db, _profile(test_db), engine="voxcpm", model_size=None, voice_description=DESCRIPTION
+        )
+        result = await import_generation_from_zip(export_generation_to_zip(generation.id, test_db), test_db)
+    
+        run = {}
+    
+        def fake_run_generation(**kwargs):
+            run.update(kwargs)
+            return "job"
+    
+        required = []
+        monkeypatch.setattr(routes_mod, "_require_available_engine", required.append)
+        monkeypatch.setattr(routes_mod, "run_generation", fake_run_generation)
+        monkeypatch.setattr(routes_mod, "enqueue_generation", lambda *_a, **_k: None)
+        monkeypatch.setattr(
+            routes_mod, "get_task_manager", lambda: SimpleNamespace(start_generation=lambda **_k: None)
+        )
+    
+        await routes_mod.regenerate_generation(result["id"], db=test_db)
+    
+&gt;       assert required == ["voxcpm"]
+E       AssertionError: assert ['qwen'] == ['voxcpm']
+E         
+E         At index 0 diff: 'qwen' != 'voxcpm'
+E         Use -v to get more diff
+
+backend\tests\test_review_s5.py:252: AssertionError</failure></testcase></testsuite></testsuites>

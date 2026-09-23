@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "issue": 13,
+  "snapshot_digest": "2eabd490f0d7cc107bf6c2c54278a0c217e25d1b8129fef5dfec12300ffa34f3",
+  "engine": "brainstorm",
+  "coverage": {
+    "functional": "Clear for generation, cloning and model lifecycle. The voice-design path is unclear: it is not settled whether it reuses the existing delivery-instruction input or needs its own affordance.",
+    "actors": "Clear. One actor: the person using Voicebox to generate speech. No multi-user or permission dimension.",
+    "exclusions": "Clear. Streaming, extra model variants, the optional denoiser and transcript-aligned cloning are all explicitly out, and the existing Arabic models stay.",
+    "data": "Clear. Reuses existing Voice Profiles, reference clips and the pronunciation dictionary. No migration, no new stored data beyond a written voice description.",
+    "lifecycle": "Partial. Download, load and unload are specified, but the behaviour when a multi-gigabyte download is interrupted is not, and neither is what the app tells the user before starting it.",
+    "ui_states": "Missing. The unavailable-engine state is the whole point of one user story and is still specified as 'hidden or disabled', which are two different products.",
+    "error_states": "Partial. A machine that cannot run the engine is covered in principle, but a machine that technically can yet lacks the memory in practice is not.",
+    "empty_blocked_states": "Partial. What happens when a voice description and reference audio are supplied together is undefined.",
+    "accessibility_locales": "Partial. Arabic is verified end to end, but whether a voice description must be written in the same language as the speech is undefined.",
+    "integrations": "Missing. Nothing in the product carries engine capability from the backend to the interface today, so the requirement that capability be declared once and read has no mechanism behind it.",
+    "security_tenancy": "Clear. No new remote path, no new sensitive data, existing consent affordances apply unchanged.",
+    "performance": "Partial. Generation-quality settings have no agreed defaults and it is unsettled whether users should be able to change them.",
+    "scale": "Not applicable. Single-user desktop application.",
+    "reliability": "Partial. Interrupted downloads and out-of-memory conditions are the two realistic partial failures and both are open.",
+    "observability": "Clear. Download progress reuses the existing mechanism.",
+    "acceptance_verification": "Clear. Nineteen acceptance criteria carried from the source issue, each mapped to a requirement.",
+    "deployment": "Clear. Ships with the desktop application; packaging must still build."
+  },
+  "summary": "The specification is complete enough to plan against except for nine decisions, and two of them change what the feature is rather than how it behaves. The first is whether an engine that may only run on NVIDIA hardware should ship at all, given it would be the first engine in Voicebox that an entire platform cannot use. The second is whether this feature builds the missing channel that lets the backend tell the interface what each engine can do, which the project's own engineering rules require but the source issue never asked for. The remaining seven cover how an unusable engine is presented, what happens when hardware is supported but memory is short, how voice-from-description is offered, what happens when a description and reference audio are supplied together, whether the largest download in the product deserves a warning, whether generation-quality settings are exposed, and whether a voice description must be written in the same language as the speech.",
+  "answers": [],
+  "questions": [
+    {
+      "key": "accelerator-only-acceptable",
+      "question": "If VoxCPM2 turns out to run only on NVIDIA graphics hardware, should it still ship?",
+      "why": "It decides whether this feature is worth building as described. Every engine in Voicebox today works on every supported machine, falling back to the processor when there is no graphics acceleration. The people who publish this model document no such fallback. If that holds, this becomes the first engine that Mac users and AMD users simply cannot have, and the unavailable-engine experience stops being an edge case and becomes the normal experience for a large share of users.",
+      "details": "The source issue flags this as an open question and asks for a dependency probe before any code is written, so the factual answer is coming either way. What the probe cannot decide is whether a partial-platform engine is acceptable in a product that has always shipped engines that work everywhere. Worth weighing: the Arabic licensing gap this engine closes is real and has no other solution today, so refusing to ship on NVIDIA-only grounds keeps that gap open indefinitely. Also worth weighing: the project's engineering rules say the processor is the guaranteed fallback and must stay working, which this engine would be the first to not honour. If the probe finds the engine does run on an ordinary processor, just slowly, this question disappears and everything proceeds normally.",
+      "recommendation": "Ship it on the hardware it supports, and make the unavailable state genuinely informative on everything else.",
+      "justification": "The Arabic licensing problem is real today and has no other fix in the product, so an engine that helps some users is better than an engine that helps none. The project's fallback rule allows an engine to declare and enforce unsupported hardware rather than pretend to work, so this is a permitted exception rather than a violation, provided the unavailable state is honest. Waiting for a processor path that the model's authors have not promised risks waiting forever.",
+      "options": [
+        "Ship it on supported hardware, with a clear unavailable state everywhere else",
+        "Ship it only if the probe finds a working processor path, however slow",
+        "Ship it but hidden behind an opt-in setting, so it never appears by accident",
+        "Do not ship it; close this issue and keep looking for a permissively licensed Arabic engine that runs everywhere"
+      ],
+      "recommended_option": 1,
+      "follows_up": []
+    },
+    {
+      "key": "capability-channel",
+      "question": "Should this feature build the missing channel that lets the backend tell the app what each engine can do, or add VoxCPM2 to the hand-maintained lists and record that we broke our own rule?",
+      "why": "It changes the size and the risk of this work. The project's engineering rules say engine abilities must be declared once and then asked for, never written as per-engine special cases in the interface. Right now nothing carries that information: the app keeps its own hand-written list of engines and its own hand-written list of which languages each one speaks, and the backend's own list of engines is never sent anywhere. Adding VoxCPM2 the existing way means editing roughly eight interface files by hand, which is exactly what the rule forbids.",
+      "details": "This matters more than usual here because this engine is the first one whose availability depends on the user's hardware. A hand-maintained list cannot express 'available on this machine but not that one', so the hardware requirement in particular has nowhere to live without some form of this channel. Building it properly also pulls in the project's contract rule: any new interface between backend and app must update the typed definitions, regenerate the client, and update the backend documentation in the same change. Doing the minimum instead means VoxCPM2 works but the next engine faces the same problem again, and this repository is a fork that has to stay easy to merge with its upstream, so a large architectural change carries its own cost.",
+      "recommendation": "Build the smallest real version of the channel: declare hardware support and languages on the engine, expose them, and have the app read them for this engine.",
+      "justification": "The hardware requirement has nowhere to live otherwise, so some version of this is unavoidable rather than optional. Keeping it small means the seven existing engines are left alone, the change stays additive and easy to merge upstream, and the rule is honoured for the new engine without a product-wide refactor that this issue never asked for.",
+      "options": [
+        "Build the smallest real channel and use it for VoxCPM2 only",
+        "Build the full channel and move all engines onto it now",
+        "Add VoxCPM2 to the existing hand-maintained lists and record a deliberate exception to the rule"
+      ],
+      "recommended_option": 1,
+      "follows_up": []
+    },
+    {
+      "key": "unavailable-presentation",
+      "question": "On a machine that cannot run VoxCPM2, should the engine be hidden completely or shown greyed out with the reason?",
+      "why": "The specification currently allows either, which means it cannot be tested and two reasonable people would build different products. It is also the only thing a large group of users will ever see of this feature, so it is their entire experience of it.",
+      "details": "Hiding it means those users never learn the engine exists, never wonder why it is missing, and never file a report about it not working. Showing it greyed out means they learn the product supports it and understand what they would need to use it, at the cost of showing everyone a permanent reminder of something they cannot have. A middle path is to show it greyed out only where engines are being compared or managed, and hide it in the picker where the user is trying to get work done.",
+      "recommendation": "Show it greyed out with a short, specific reason.",
+      "justification": "A silently missing engine is indistinguishable from a bug, and users comparing Voicebox against other tools should be able to see what it supports. A greyed-out entry with one plain sentence costs almost nothing and prevents both confusion and mistaken reports.",
+      "options": [
+        "Show it greyed out everywhere, with a specific reason",
+        "Hide it completely wherever it cannot be used",
+        "Hide it in the generation picker, show it greyed out in model management"
+      ],
+      "recommended_option": 1,
+      "follows_up": []
+    },
+    {
+      "key": "insufficient-memory",
+      "question": "If a machine has the right kind of graphics hardware but not enough memory for the model, should the engine count as unavailable?",
+      "why": "This is the most likely real-world failure and the specification does not cover it. VoxCPM2 is expected to be the heaviest engine in the product by a wide margin. Plenty of machines have supported hardware with far less memory than it needs, and those users would pass every availability check and then fail at generation.",
+      "details": "Treating it as unavailable is honest but needs a memory threshold that will be wrong for somebody, and available memory changes while the app is running depending on what else is open. Treating it as available means the user downloads several gigabytes before discovering the problem. A warning keeps the choice with the user but leaves them to judge something they may not understand. Note that whatever is chosen here also decides what happens when another engine is already loaded and holding memory.",
+      "recommendation": "Offer it, but warn before the download when the machine looks short of memory.",
+      "justification": "A hard block based on a threshold will wrongly exclude machines that would have worked, and available memory is not a fixed property of a machine. A warning before the expensive step gives the user the information at the moment it is actionable, without the product pretending to know more than it does.",
+      "options": [
+        "Treat it as unavailable below a memory threshold, same as unsupported hardware",
+        "Offer it, but warn before the download when memory looks insufficient",
+        "Offer it normally and let generation fail with a clear message if memory runs out"
+      ],
+      "recommended_option": 2,
+      "follows_up": []
+    },
+    {
+      "key": "voice-design-affordance",
+      "question": "Should describing a voice in words reuse the existing delivery-instruction box, or get its own clearly labelled input?",
+      "why": "These are two different things that would look identical. The existing box tells an engine how to deliver a line, such as speaking it cheerfully. The new capability describes who is speaking, such as a young woman with a gentle voice. Putting both in one box means users will mix them and get results they cannot explain.",
+      "details": "Reusing the existing box is much less work and keeps the interface unchanged, but the same text would mean different things depending on which engine is selected, and nothing would tell the user that. A separate input is honest and discoverable but adds an option that only one engine supports, which the interface then has to show or hide. This connects to the next question about what happens when someone supplies both a description and a reference recording.",
+      "recommendation": "Give it its own clearly labelled input, shown only when the selected engine supports it.",
+      "justification": "Describing a speaker and directing a performance are genuinely different, and one box that silently changes meaning between engines is the kind of thing users blame themselves for. Showing it only for engines that support it keeps the interface honest without cluttering it.",
+      "options": [
+        "Give it its own labelled input, shown only for engines that support it",
+        "Reuse the existing delivery-instruction box",
+        "Reuse the existing box but relabel and explain it when this engine is selected"
+      ],
+      "recommended_option": 1,
+      "follows_up": []
+    },
+    {
+      "key": "description-plus-reference",
+      "question": "If someone supplies both a written voice description and a Voice Profile with reference audio, what should happen?",
+      "why": "Both are ways of choosing a voice and they can contradict each other. Without a decision, whichever the code happens to check first silently wins, and the user gets a voice they did not ask for with no indication why.",
+      "details": "Letting the recording win matches the rest of the product, where a profile is the strongest statement of which voice to use, but it means a description the user deliberately typed is silently ignored. Letting the description win is surprising, because selecting a profile is a much more deliberate act than typing in a box. Refusing the combination is the clearest but interrupts someone who may just have left old text behind. Whatever is chosen, the user should be able to tell which one is in effect.",
+      "recommendation": "The reference recording wins, and the interface says the description is not being used.",
+      "justification": "A selected Voice Profile is the most deliberate voice choice a user can make and it already behaves that way everywhere else in the product. Saying plainly that the description is inactive prevents the silent-wrong-voice outcome without blocking the user's work.",
+      "options": [
+        "The reference recording wins; show that the description is not in use",
+        "The written description wins; show that the profile's audio is not in use",
+        "Refuse the combination and ask the user to pick one"
+      ],
+      "recommended_option": 1,
+      "follows_up": []
+    },
+    {
+      "key": "large-download-warning",
+      "question": "Should the app warn before starting this engine's download, given it will be the largest in the product?",
+      "why": "The exact size will be measured during implementation, but it is expected to be several gigabytes, well beyond anything else here. Users on metered connections, limited disk space or slow links deserve to know before it starts rather than after. The specification currently only requires a progress bar, which is what every other engine gets.",
+      "details": "Every other engine downloads without ceremony because they are small enough not to matter. Adding a confirmation for this one is a small inconsistency that buys real protection. Adding it for all engines above some size is more consistent but affects engines that work fine today. This also connects to interrupted downloads: if the app is going to ask first, it should also handle a cancelled or failed download cleanly rather than leaving the engine half-installed.",
+      "recommendation": "Show the measured size and ask for confirmation before starting, for this engine.",
+      "justification": "The gap between this engine and every other one is large enough that treating it identically is the surprising choice rather than the consistent one. Confirming once, with the real number in front of the user, costs a single click and prevents an expensive mistake that cannot be undone quickly.",
+      "options": [
+        "Show the size and confirm before downloading, for this engine",
+        "Show the size and confirm for any engine above a set size",
+        "No confirmation; show the size and the progress bar as with every other engine"
+      ],
+      "recommended_option": 1,
+      "follows_up": []
+    },
+    {
+      "key": "advanced-generation-settings",
+      "question": "Should this engine's generation-quality settings be exposed to users, or fixed at chosen defaults for this release?",
+      "why": "The engine has two settings that trade generation speed against output quality. The source issue suggests choosing sensible defaults and says exposing them is worth considering. Leaving it undecided means they either ship hidden by accident or get exposed without anyone deciding what a user is meant to do with them.",
+      "details": "Fixing them means one predictable experience and one less thing to explain, at the cost of users who want to trade quality for speed having no way to. Exposing them gives control to the small group who will use it, but these are the kind of settings that are hard to describe without technical language, and a badly chosen value produces worse output that users will read as the engine being poor. Nothing prevents exposing them in a later release once good defaults are known.",
+      "recommendation": "Fix them at chosen defaults for this release.",
+      "justification": "Nobody knows yet what good values look like for this engine in this product, and shipping controls before that is understood invites users to make their own output worse. Defaults can be exposed later once there is evidence; an exposed setting is much harder to take away.",
+      "options": [
+        "Fix them at chosen defaults for this release",
+        "Expose them as advanced settings with the chosen defaults preselected",
+        "Fix them now and expose them in a later release once good values are known"
+      ],
+      "recommended_option": 1,
+      "follows_up": []
+    },
+    {
+      "key": "description-language",
+      "question": "Must a written voice description be in the same language as the speech being generated?",
+      "why": "The engine speaks thirty languages, so an English description paired with Arabic speech is an obvious thing for a user to try. If it does not work, the user needs to be told rather than getting an unexpected voice.",
+      "details": "Allowing any language is the most flexible and is likely what users expect, especially those who read documentation in English but generate in their own language. Requiring a match is more predictable but blocks a reasonable use. There is a real possibility that the underlying model handles this poorly regardless of what is decided, in which case the honest answer is to describe the limitation rather than pretend it works. This one is low risk either way and can be settled by trying it during implementation.",
+      "recommendation": "Allow any language, and document the limitation if it turns out not to work well.",
+      "justification": "Blocking something users will reasonably expect to work, before knowing whether it works, adds a restriction for no evidence. Trying it during implementation and documenting the real behaviour is cheaper and more truthful than a rule chosen in advance.",
+      "options": [
+        "Allow any language; document the real behaviour once it is known",
+        "Require the description to be in the same language as the speech",
+        "Allow any language but warn when it differs from the speech language"
+      ],
+      "recommended_option": 1,
+      "follows_up": []
+    }
+  ],
+  "spec_edits": []
+}

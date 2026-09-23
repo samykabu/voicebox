@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "repo": "samykabu/voicebox",
+  "parent": 13,
+  "feature": "specs/001-voxcpm2-tts-engine",
+  "tasks": {
+    "T001": {
+      "number": 17,
+      "id": 5546020187,
+      "linked": true
+    },
+    "T002": {
+      "number": 18,
+      "id": 5546020489,
+      "linked": true
+    },
+    "T003": {
+      "number": 19,
+      "id": 5546020959,
+      "linked": true
+    },
+    "T004": {
+      "number": 20,
+      "id": 5546021267,
+      "linked": true
+    },
+    "T005": {
+      "number": 21,
+      "id": 5546021668,
+      "linked": true
+    },
+    "T006": {
+      "number": 22,
+      "id": 5546022006,
+      "linked": true
+    },
+    "T007": {
+      "number": 23,
+      "id": 5546022458,
+      "linked": true
+    },
+    "T008": {
+      "number": 24,
+      "id": 5546022955,
+      "linked": true
+    },
+    "T009": {
+      "number": 25,
+      "id": 5546023329,
+      "linked": true
+    },
+    "T010": {
+      "number": 26,
+      "id": 5546023744,
+      "linked": true
+    },
+    "T011": {
+      "number": 27,
+      "id": 5546024291,
+      "linked": true
+    },
+    "T012": {
+      "number": 28,
+      "id": 5546024825,
+      "linked": true
+    },
+    "T013": {
+      "number": 29,
+      "id": 5546025085,
+      "linked": true
+    },
+    "T014": {
+      "number": 30,
+      "id": 5546025488,
+      "linked": true
+    },
+    "T015": {
+      "number": 31,
+      "id": 5546025858,
+      "linked": true
+    },
+    "T016": {
+      "number": 32,
+      "id": 5546026161,
+      "linked": true
+    },
+    "T017": {
+      "number": 33,
+      "id": 5546026523,
+      "linked": true
+    },
+    "T018": {
+      "number": 34,
+      "id": 5546027082,
+      "linked": true
+    },
+    "T019": {
+      "number": 35,
+      "id": 5546027597,
+      "linked": true
+    },
+    "T020": {
+      "number": 36,
+      "id": 5546027937,
+      "linked": true
+    },
+    "T021": {
+      "number": 37,
+      "id": 5546028452,
+      "linked": true
+    },
+    "T022": {
+      "number": 38,
+      "id": 5546028853,
+      "linked": true
+    },
+    "T023": {
+      "number": 39,
+      "id": 5546029180,
+      "linked": true
+    },
+    "T024": {
+      "number": 40,
+      "id": 5546029628,
+      "linked": true
+    },
+    "T046": {
+      "number": 41,
+      "id": 5546029942,
+      "linked": true
+    },
+    "T047": {
+      "number": 42,
+      "id": 5546030354,
+      "linked": true
+    },
+    "T025": {
+      "number": 43,
+      "id": 5546030809,
+      "linked": true
+    },
+    "T026": {
+      "number": 44,
+      "id": 5546031077,
+      "linked": true
+    },
+    "T027": {
+      "number": 45,
+      "id": 5546031535,
+      "linked": true
+    },
+    "T028": {
+      "number": 46,
+      "id": 5546032330,
+      "linked": true
+    },
+    "T029": {
+      "number": 47,
+      "id": 5546032639,
+      "linked": true
+    },
+    "T030": {
+      "number": 48,
+      "id": 5546032891,
+      "linked": true
+    },
+    "T031": {
+      "number": 49,
+      "id": 5546033227,
+      "linked": true
+    },
+    "T032": {
+      "number": 50,
+      "id": 5546033770,
+      "linked": true
+    },
+    "T033": {
+      "number": 51,
+      "id": 5546034319,
+      "linked": true
+    },
+    "T034": {
+      "number": 52,
+      "id": 5546034644,
+      "linked": true
+    },
+    "T035": {
+      "number": 53,
+      "id": 5546034983,
+      "linked": true
+    },
+    "T036": {
+      "number": 54,
+      "id": 5546035267,
+      "linked": true
+    },
+    "T037": {
+      "number": 55,
+      "id": 5546035650,
+      "linked": true
+    },
+    "T038": {
+      "number": 56,
+      "id": 5546035965,
+      "linked": true
+    },
+    "T039": {
+      "number": 57,
+      "id": 5546036265,
+      "linked": true
+    },
+    "T040": {
+      "number": 58,
+      "id": 5546036742,
+      "linked": true
+    },
+    "T041": {
+      "number": 59,
+      "id": 5546037089,
+      "linked": true
+    },
+    "T042": {
+      "number": 60,
+      "id": 5546037446,
+      "linked": true
+    },
+    "T043": {
+      "number": 61,
+      "id": 5546037891,
+      "linked": true
+    },
+    "T044": {
+      "number": 62,
+      "id": 5546038224,
+      "linked": true
+    },
+    "T045": {
+      "number": 63,
+      "id": 5546038608,
+      "linked": true
+    },
+    "T048": {
+      "number": 64,
+      "id": 5555442095,
+      "linked": true
+    },
+    "T049": {
+      "number": 65,
+      "id": 5555442619,
+      "linked": true
+    },
+    "T050": {
+      "number": 66,
+      "id": 5555606000,
+      "linked": true
+    },
+    "T051": {
+      "number": 67,
+      "id": 5555606506,
+      "linked": true
+    },
+    "T052": {
+      "number": 68,
+      "id": 5555607003,
+      "linked": true
+    },
+    "T053": {
+      "number": 69,
+      "id": 5555784124,
+      "linked": true
+    },
+    "T054": {
+      "number": 70,
+      "id": 5555784636,
+      "linked": true
+    },
+    "T055": {
+      "number": 71,
+      "id": 5555953123,
+      "linked": true
+    },
+    "T056": {
+      "number": 72,
+      "id": 5555953599,
+      "linked": true
+    }
+  }
+}

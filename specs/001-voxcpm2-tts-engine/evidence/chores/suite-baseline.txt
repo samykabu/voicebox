@@ -1,0 +1,85 @@
+# Real-env full suite baseline after chores A1-A3 (HEAD d6a3a11), 2026-09-23T16:12:19+03:00
+$ env -u VOICEBOX_TEST_ROCM_INSTALL backend/venv/Scripts/python.exe -m pytest backend/tests -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/chores/suite-baseline.xml
+    class EffectPresetResponse(BaseModel):
+
+backend\models.py:919
+  D:\Projects\Personal\voicebox\backend\models.py:919: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+backend\tests\test_rocm_build.py:82
+  D:\Projects\Personal\voicebox\backend\tests\test_rocm_build.py:82: PytestUnknownMarkWarning: Unknown pytest.mark.slow - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.slow()
+
+backend\tests\test_rocm_requirements.py:66
+  D:\Projects\Personal\voicebox\backend\tests\test_rocm_requirements.py:66: PytestUnknownMarkWarning: Unknown pytest.mark.timeout - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.timeout(900)
+
+tests/test_audio_failed_generation.py: 49 warnings
+tests/test_history_bulk_delete.py: 2407 warnings
+tests/test_pronunciation.py: 100 warnings
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\sqlalchemy\sql\schema.py:3627: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+tests/test_audio_preprocess.py::test_validate_accepts_previously_rejected_hot_file
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:16: DeprecationWarning: 'aifc' is deprecated and slated for removal in Python 3.13
+    import aifc
+
+tests/test_audio_preprocess.py::test_validate_accepts_previously_rejected_hot_file
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:17: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+tests/test_audio_preprocess.py::test_validate_accepts_previously_rejected_hot_file
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:19: DeprecationWarning: 'sunau' is deprecated and slated for removal in Python 3.13
+    import sunau
+
+tests/test_model_status_pending_downloads.py::test_errored_download_is_not_pending
+tests/test_model_status_pending_downloads.py::test_retry_after_error_is_pending_again
+tests/test_model_status_pending_downloads.py::test_retry_after_error_is_pending_again
+tests/test_model_status_pending_downloads.py::test_completed_download_is_removed_everywhere
+tests/test_model_status_pending_downloads.py::test_cancel_dismisses_errored_download
+  <string>:5: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+
+tests/test_profile_duplicate_names.py: 9 warnings
+tests/test_pronunciation.py: 3 warnings
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:186: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+tests/test_profile_duplicate_names.py: 9 warnings
+tests/test_pronunciation.py: 3 warnings
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:187: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    updated_at=datetime.utcnow(),
+
+tests/test_profile_duplicate_names.py::test_update_profile_keep_same_name_succeeds
+tests/test_profile_duplicate_names.py::test_update_profile_to_new_unique_name_succeeds
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:406: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    profile.updated_at = datetime.utcnow()
+
+tests/test_progress.py::test_progress_manager_basic
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\_pytest\python.py:171: PytestReturnNotNoneWarning: Test functions should return None, but tests/test_progress.py::test_progress_manager_basic returned <class 'bool'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+tests/test_pronunciation.py::test_replaces_a_term
+  D:\Projects\Personal\voicebox\backend\database\migrations.py:74: SAWarning: Skipped unsupported reflection of expression-based index uq_pronunciation_scope
+    existing = {ix["name"] for ix in inspector.get_indexes("pronunciation_entries")}
+
+tests/test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original
+  D:\Projects\Personal\voicebox\backend\services\history.py:107: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\chores\suite-baseline.xml -
+=========================== short test summary info ===========================
+SKIPPED [1] backend\tests\test_audioop_python313.py:38: Python 3.13+ only
+SKIPPED [1] backend\tests\test_audioop_python313.py:41: Python 3.13+ only
+SKIPPED [1] backend\tests\test_mlx_smoke.py:25: MLX packages are only installed on Apple Silicon macOS
+SKIPPED [1] backend\tests\test_mlx_smoke.py:32: MLX packages are only installed on Apple Silicon macOS
+SKIPPED [1] backend\tests\test_mlx_smoke.py:39: MLX packages are only installed on Apple Silicon macOS
+SKIPPED [1] backend\tests\test_mlx_smoke.py:50: MLX packages are only installed on Apple Silicon macOS
+SKIPPED [1] backend\tests\test_rocm_build.py:95: Set VOICEBOX_TEST_ROCM_INSTALL=1 to run the heavy ROCm build (reinstalls torch in the venv)
+SKIPPED [1] backend\tests\test_rocm_requirements.py:66: Set VOICEBOX_TEST_ROCM_INSTALL=1 to run the heavy install test
+========== 1 failed, 535 passed, 8 skipped, 2612 warnings in 17.66s ===========
+# exit=1
+{'tests': '544', 'failures': '1', 'errors': '0', 'skipped': '8', 'time': '17.642'}
+FAILURE tests.test_progress::test_hf_progress_tracker | AssertionError: Should have captured progress updates assert 0 > 0  +  where 0 = len([])

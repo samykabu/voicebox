@@ -7,7 +7,7 @@ description: "How model downloading, loading, and status tracking works across a
 
 Voicebox manages two categories of models:
 
-**TTS Models** — Seven engines covering zero-shot cloning and preset voices. Each engine may have one or more size variants.
+**TTS Models** — Nine engines (the `TTS_ENGINES` dict) covering zero-shot cloning, preset voices and, with VoxCPM2, voices designed from a written description. Each engine may have one or more size variants.
 
 **ASR Models** — Whisper for transcription. Five sizes, plus MLX-Whisper on Apple Silicon for ~8× faster transcription.
 
@@ -27,8 +27,35 @@ Every model is described by a `ModelConfig` entry in `backend/backends/__init__.
 | **TADA 1B** | `tada` | `HumeAI/tada-1b` | 4 GB | ~4 GB | English |
 | **TADA 3B Multilingual** | `tada` | `HumeAI/tada-3b-ml` | 8 GB | ~8 GB | 10 |
 | **Kokoro 82M** | `kokoro` | `hexgrad/Kokoro-82M` | 350 MB | ~150 MB | 8 |
+| **VoxCPM2** | `voxcpm` | `openbmb/VoxCPM2` | 4961 MB | ~6 GB | 30 |
 
 On Apple Silicon, Qwen TTS uses MLX-optimized repos from `mlx-community` instead of the PyTorch repos. The backend picks automatically via `get_backend_type()`.
+
+### VoxCPM2
+
+VoxCPM2 is the largest single download, so it is the one engine that asks before downloading.
+
+- **Size.** 4961 MB (4,960,733,321 bytes, measured): `model.safetensors` plus `audiovae.pth`. `size_mb=4961` in its `ModelConfig`.
+- **Licence.** Apache-2.0, commercial use allowed.
+- **Package.** `voxcpm==2.0.3`, installed with `--no-deps` by `just setup`. See [TTS Engines](/developer/tts-engines#worked-example-voxcpm2) for why.
+- **Hardware.** CUDA, Apple Silicon (MPS) and CPU (`accelerators=("cuda", "mps", "cpu")`). The probe tested CUDA and CPU; MPS has an upstream code path but has not been tested. Because it declares `cpu`, it stays available on any other accelerator, such as Intel XPU or DirectML. There it runs on the processor, and `warning` says so: "VoxCPM2 (Multilingual, Voice Design) doesn't support Intel XPU here, so it will run on the processor, which is slower."
+- **Memory.** The probe measured about 5.9 GB of GPU memory on short text; longer text may need more. `min_memory_mb=6144`. A CUDA device with less memory gets a warning. The warning is advisory and never blocks the download or generation.
+- **Output.** 48 kHz.
+
+### Download confirmation
+
+An engine whose `ModelConfig` sets `requires_download_confirmation=True` is not downloaded until the user confirms. Only VoxCPM2 sets it.
+
+1. The app reads the engine from `GET /models/engines`.
+2. If `requires_download_confirmation` is true and the model is neither downloaded nor downloading, the app opens a dialog before starting the download.
+3. The dialog shows the size from `size_mb`, the licence from `license_id` and `commercial_use`, and any `warning` (memory or processor fallback). For VoxCPM2 it reads "This downloads about 4.8 GB before it can be used. Licence: Apache-2.0, commercial use allowed." (the dialog divides by 1024).
+4. **Download** starts the usual download with SSE progress. **Cancel** starts nothing.
+
+The dialog opens both from the generate box, when the first generation needs the model, and from Model Management. The confirmation lives in the app only. The backend does not enforce it, so API callers are not affected.
+
+### Offline load
+
+Once the VoxCPM2 snapshot is in the HuggingFace cache, loading makes no network requests. The backend loads inside `force_offline_if_cached()` with `local_files_only=True`, and passes `load_denoiser=False`. Upstream defaults would otherwise check the HuggingFace revision on every load and fetch a denoiser from ModelScope.
 
 ## Available Whisper Models
 
@@ -97,11 +124,41 @@ eventSource.onmessage = (event) => {
 
 The handler iterates `get_all_model_configs()` and calls `check_model_loaded(config)` for each entry, so new engines appear automatically once they're registered in `ModelConfig`.
 
+## Engine Capabilities
+
+`GET /models/engines` returns one entry per engine, built from its `ModelConfig` entries and the hardware detected on this machine. It never loads a model or starts a download. The VoxCPM2 entry on a CUDA machine looks like this:
+
+```json
+{
+  "engine": "voxcpm",
+  "display_name": "VoxCPM2",
+  "available": true,
+  "reason": null,
+  "warning": null,
+  "supported_accelerators": ["cuda", "mps", "cpu"],
+  "detected_accelerator": "cuda",
+  "languages": ["zh", "en", "ar", "..."],
+  "supports_cloning": true,
+  "supports_voice_design": true,
+  "requires_download_confirmation": true,
+  "advanced_settings": [
+    {"name": "cfg_value", "label": "Guidance", "default": 2.0, "min": 1.0, "max": 3.0},
+    {"name": "inference_timesteps", "label": "Quality steps", "default": 10, "min": 4, "max": 30}
+  ],
+  "size_mb": 4961,
+  "license_id": "Apache-2.0",
+  "commercial_use": true
+}
+```
+
+`reason` is set if and only if `available` is false. `warning` is set in two cases. A CUDA device has less memory than the engine's `min_memory_mb`. Or the engine runs on the processor because it does not support the detected accelerator (VoxCPM2 on Intel XPU or DirectML). The existing engines declare no accelerators, so they are always available and never warn. See [TTS Engines](/developer/tts-engines#the-capability-channel) for every field.
+
 ## Manual Model Operations
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/models/status` | Status of every registered model |
+| GET | `/models/engines` | Each engine's capabilities and whether this machine can run it |
 | POST | `/models/load` | Load a TTS model into memory |
 | POST | `/models/unload` | Unload a TTS model from memory |
 | POST | `/models/download` | Trigger a background download |
@@ -183,6 +240,9 @@ Adding a whole new engine is a bigger lift — see [TTS Engines](/developer/tts-
 | Model not found | Corrupt cache | Re-download via `/models/download` |
 | Stuck progress bar in frozen build | `huggingface_hub` tqdm silenced | `HFProgressTracker` force-enables the internal counter |
 | GPU architecture unsupported | PyTorch wheel doesn't target your GPU | See [GPU Acceleration](/overview/gpu-acceleration) |
+| 400 with "can't run on this machine" | The engine declares neither this machine's accelerator nor `cpu`. No registered engine does this today | Use another engine. The `reason` names what the engine needs |
+| VoxCPM2 "will run on the processor" warning | Intel XPU or DirectML machine. VoxCPM2 supports only CUDA, MPS and CPU | Advisory only. Generation works, but more slowly |
+| VoxCPM2 memory warning | CUDA device has less than `min_memory_mb` (6144 MB) | Advisory only. Unload other engines or keep text short |
 
 ## Next Steps
 

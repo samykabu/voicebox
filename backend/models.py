@@ -2,7 +2,7 @@
 Pydantic models for request/response validation.
 """
 
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, Field, StringConstraints, model_validator
 from typing_extensions import Annotated
 from typing import Optional, List
 from datetime import datetime
@@ -19,7 +19,8 @@ class VoiceProfileCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = Field(None, max_length=500)
     language: str = Field(
-        default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$"
+        default="en",
+        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$",
     )
     voice_type: Optional[str] = Field(default="cloned", pattern="^(cloned|preset|designed)$")
     preset_engine: Optional[str] = Field(None, max_length=50)
@@ -77,19 +78,24 @@ class ProfileSampleResponse(BaseModel):
         from_attributes = True
 
 
+# Longest written voice description ``POST /generate`` accepts (a longer one is a 422, not
+# truncated). Generation import applies the same limit to a manifest's voice_description.
+MAX_VOICE_DESCRIPTION_CHARS = 500
+
+
 class GenerationRequest(BaseModel):
     """Request model for voice generation."""
 
     profile_id: str
     text: str = Field(..., min_length=1, max_length=50000)
-    language: str = Field(default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$")
+    language: str = Field(default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$")
     seed: Optional[int] = Field(None, ge=0)
     model_size: Optional[str] = Field(
         default=None,
         pattern="^(1\\.7B|0\\.6B|1B|3B|habibi-(unified|msa|sau|uae|alg|irq|egy|mar))$",
     )
     instruct: Optional[str] = Field(None, max_length=500)
-    engine: Optional[str] = Field(default="qwen", pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$")
+    engine: Optional[str] = Field(default="qwen", pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$")
     personality: bool = Field(
         default=False,
         description="When true and the profile has a personality prompt, the input text is rewritten in-character before TTS.",
@@ -104,6 +110,58 @@ class GenerationRequest(BaseModel):
     effects_chain: Optional[List["EffectConfig"]] = Field(
         None, description="Effects chain to apply after generation (overrides profile default)"
     )
+    voice_description: str | None = Field(
+        None,
+        max_length=MAX_VOICE_DESCRIPTION_CHARS,
+        description="Written voice description for engines that support voice design. Never sent as instruct.",
+    )
+    advanced_settings: dict[str, float] | None = Field(
+        None,
+        description="Advanced generation settings by name. Only names the engine declares, within their bounds.",
+    )
+
+    @model_validator(mode="after")
+    def _check_advanced_settings(self) -> "GenerationRequest":
+        """Reject advanced settings the engine does not declare, or values outside their bounds (422).
+
+        A null ``engine`` names no engine, so the check is left to the route, which runs
+        ``advanced_settings_error`` once it has resolved the engine from the profile.
+        """
+        if self.engine is None:
+            return self
+        error = advanced_settings_error(self.engine, self.advanced_settings)
+        if error:
+            raise ValueError(error)
+        return self
+
+
+def advanced_settings_error(engine: str, advanced_settings: dict[str, float] | None) -> str | None:
+    """Return why *advanced_settings* are invalid for *engine*, or None when they are valid (FR-010).
+
+    Only names the engine's default-size config declares are allowed, within their bounds.
+    Shared by the ``GenerationRequest`` validator and the generation routes, which call it
+    after resolving a null request engine, so both give the same message.
+    """
+    if not advanced_settings:
+        return None
+
+    # lazy: avoid circular import (models.py must not import the backends package at module scope)
+    from .backends import get_default_model_size, get_tts_model_configs
+
+    default_size = get_default_model_size(engine)
+    config = next(
+        (c for c in get_tts_model_configs() if c.engine == engine and c.model_size == default_size),
+        None,
+    )
+    declared = {s.name: s for s in config.advanced_settings} if config else {}
+
+    for name, value in advanced_settings.items():
+        setting = declared.get(name)
+        if setting is None:
+            return f"Engine '{engine}' does not declare an advanced setting named '{name}'"
+        if not setting.min <= value <= setting.max:
+            return f"Advanced setting '{name}' must be between {setting.min} and {setting.max} for engine '{engine}'"
+    return None
 
 
 class GenerationResponse(BaseModel):
@@ -148,7 +206,7 @@ class PronunciationEntryCreate(BaseModel):
     replacement: TrimmedReplacement
     language: Optional[str] = Field(
         None,
-        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$",
+        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$",
         description="Apply only when generating in this language. Omit for all languages.",
     )
     profile_id: Optional[str] = Field(
@@ -164,7 +222,7 @@ class PronunciationEntryUpdate(BaseModel):
     term: Optional[TrimmedTerm] = None
     replacement: Optional[TrimmedReplacement] = None
     language: Optional[str] = Field(
-        None, pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$"
+        None, pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$"
     )
     profile_id: Optional[str] = None
     enabled: Optional[bool] = None
@@ -410,7 +468,7 @@ class MCPClientBindingResponse(BaseModel):
     profile_id: Optional[str] = None
     default_engine: Optional[str] = Field(
         None,
-        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$",
+        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$",
     )
     default_personality: bool = False
     last_seen_at: Optional[datetime] = None
@@ -429,7 +487,7 @@ class MCPClientBindingUpsert(BaseModel):
     profile_id: Optional[str] = None
     default_engine: Optional[str] = Field(
         None,
-        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$",
+        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$",
     )
     default_personality: bool = False
 
@@ -448,7 +506,7 @@ class SpeakRequest(BaseModel):
     )
     engine: Optional[str] = Field(
         None,
-        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$",
+        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$",
     )
     personality: Optional[bool] = Field(
         None,
@@ -456,7 +514,7 @@ class SpeakRequest(BaseModel):
     )
     language: Optional[str] = Field(
         None,
-        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$",
+        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$",
     )
 
 
@@ -578,6 +636,51 @@ class ModelStatusListResponse(BaseModel):
     """Response model for model status list."""
 
     models: List[ModelStatus]
+
+
+class EngineAdvancedSettingResponse(BaseModel):
+    """An advanced generation setting an engine declares (FR-010)."""
+
+    name: str
+    label: str
+    default: float
+    min: float
+    max: float
+
+
+class EngineCapabilityResponse(BaseModel):
+    """One TTS engine's capabilities and whether this machine can run it (FR-004).
+
+    Describes the engine as a whole, aggregated from all of its model variants.
+    See specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md.
+    """
+
+    engine: str
+    display_name: str = Field(..., description="The engine name (not a model variant name).")
+    available: bool
+    reason: str | None = Field(..., description="Non-null if and only if available is false.")
+    warning: str | None = Field(..., description="Advisory only; never blocks.")
+    supported_accelerators: list[str] = Field(
+        ..., description="From the default-size variant. Empty means unconstrained."
+    )
+    detected_accelerator: str
+    languages: list[str] = Field(
+        ...,
+        description="Union across all of the engine's variants, in first-seen order over the variants in registry order.",
+    )
+    supports_cloning: bool
+    supports_voice_design: bool = Field(..., description="From the default-size variant.")
+    requires_download_confirmation: bool = Field(..., description="From the default-size variant.")
+    advanced_settings: list[EngineAdvancedSettingResponse] = Field(..., description="From the default-size variant.")
+    size_mb: int = Field(..., description="Download size of the default-size variant, the one downloaded by default.")
+    license_id: str | None = Field(..., description="Shared by every variant, or null when the variants differ.")
+    commercial_use: bool | None = Field(..., description="Shared by every variant, or null when the variants differ.")
+
+
+class EngineCapabilitiesResponse(BaseModel):
+    """Response model for GET /models/engines."""
+
+    engines: list[EngineCapabilityResponse]
 
 
 class ModelDownloadRequest(BaseModel):

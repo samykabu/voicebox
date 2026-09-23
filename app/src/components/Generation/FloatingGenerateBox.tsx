@@ -1,11 +1,27 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useMatchRoute } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Dices, Loader2, SlidersHorizontal, Sparkles, Wand2 } from 'lucide-react';
+import {
+  Dices,
+  Loader2,
+  Settings2,
+  SlidersHorizontal,
+  Sparkles,
+  UserRoundPen,
+  Wand2,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
@@ -18,6 +34,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api/client';
 import { DEFAULT_HABIBI_MODEL_ID, isHabibiModelId } from '@/lib/constants/habibiModels';
 import { getLanguageOptionsForEngine, type LanguageCode } from '@/lib/constants/languages';
+import { supportsVoiceDesign, voiceDescriptionState } from '@/lib/hooks/engineCapabilityRules';
+import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
 import { useGenerationForm } from '@/lib/hooks/useGenerationForm';
 import { useProfile, useProfiles } from '@/lib/hooks/useProfiles';
 import { useStory } from '@/lib/hooks/useStories';
@@ -25,6 +43,8 @@ import { cn } from '@/lib/utils/cn';
 import { useGenerationStore } from '@/stores/generationStore';
 import { useStoryStore } from '@/stores/storyStore';
 import { useUIStore } from '@/stores/uiStore';
+import { AdvancedSettingsControls } from './AdvancedSettingsControls';
+import { DownloadConfirmDialog } from './DownloadConfirmDialog';
 import { EngineModelSelector } from './EngineModelSelector';
 import { ParalinguisticInput } from './ParalinguisticInput';
 
@@ -45,6 +65,9 @@ export function FloatingGenerateBox({
   const { data: profiles } = useProfiles();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isInstructExpanded, setIsInstructExpanded] = useState(false);
+  const [isAdvancedExpanded, setIsAdvancedExpanded] = useState(false);
+  const [isVoiceDescriptionExpanded, setIsVoiceDescriptionExpanded] = useState(false);
+  const { data: engineCapabilities } = useEngineCapabilities();
   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -79,7 +102,7 @@ export function FloatingGenerateBox({
   // Calculate if track editor is visible (on stories route with items)
   const hasTrackEditor = isStoriesRoute && currentStory && currentStory.items.length > 0;
 
-  const { form, handleSubmit, isPending } = useGenerationForm({
+  const generationForm = useGenerationForm({
     onSuccess: async (generationId) => {
       setIsExpanded(false);
       // Defer the story add until TTS completes -- useGenerationProgress handles it
@@ -98,6 +121,8 @@ export function FloatingGenerateBox({
       return preset?.effects_chain;
     },
   });
+  const { form, handleSubmit, isPending, downloadConfirmation, resolveDownloadConfirmation } =
+    generationForm;
 
   // Click away handler to collapse the box
   useEffect(() => {
@@ -138,6 +163,12 @@ export function FloatingGenerateBox({
 
   // Sync engine selection to global store so ProfileList can filter
   const watchedEngine = form.watch('engine');
+  const selectedCapability = findEngineCapability(engineCapabilities, watchedEngine || 'qwen');
+  const advancedSettings = selectedCapability?.advanced_settings ?? [];
+  // FR-015 / C1Q5 / C1Q6: shown only for engines declaring voice design; unused when the
+  // selected profile has a recording, which wins over the description.
+  const showVoiceDescription = supportsVoiceDesign(selectedCapability);
+  const descriptionState = voiceDescriptionState(selectedCapability, selectedProfile);
   useEffect(() => {
     if (watchedEngine) {
       setSelectedEngine(watchedEngine);
@@ -153,7 +184,8 @@ export function FloatingGenerateBox({
     | 'tada'
     | 'kokoro'
     | 'qwen_custom_voice'
-    | 'f5_tts';
+    | 'f5_tts'
+    | 'voxcpm';
   useEffect(() => {
     if (selectedProfile?.language) {
       form.setValue('language', selectedProfile.language as LanguageCode);
@@ -258,7 +290,7 @@ export function FloatingGenerateBox({
   }, [isExpanded]);
 
   async function onSubmit(data: Parameters<typeof handleSubmit>[0]) {
-    await handleSubmit(data, selectedProfileId);
+    await handleSubmit(data, selectedProfileId, selectedProfile);
   }
 
   return (
@@ -484,6 +516,74 @@ export function FloatingGenerateBox({
                   )}
                 </AnimatePresence>
 
+                {/* Voice description toggle — only for engines declaring voice design (FR-015) */}
+                <AnimatePresence>
+                  {isExpanded && showVoiceDescription && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="group relative">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setIsVoiceDescriptionExpanded((prev) => !prev)}
+                          className={cn(
+                            'h-10 w-10 rounded-full transition-all duration-200',
+                            isVoiceDescriptionExpanded
+                              ? 'bg-accent text-accent-foreground border border-accent hover:bg-accent/90'
+                              : 'bg-card border border-border hover:bg-background/50',
+                          )}
+                          aria-label={t('generation.voiceDescription.label')}
+                          aria-pressed={isVoiceDescriptionExpanded}
+                        >
+                          <UserRoundPen className="h-4 w-4" />
+                        </Button>
+                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded-md bg-popover px-3 py-1.5 text-xs text-popover-foreground border border-border opacity-0 transition-opacity group-hover:opacity-100 z-[9999]">
+                          {t('generation.voiceDescription.label')}
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Advanced settings toggle — only for engines that declare advanced settings */}
+                <AnimatePresence>
+                  {isExpanded && advancedSettings.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="group relative">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setIsAdvancedExpanded((prev) => !prev)}
+                          className={cn(
+                            'h-10 w-10 rounded-full transition-all duration-200',
+                            isAdvancedExpanded
+                              ? 'bg-accent text-accent-foreground border border-accent hover:bg-accent/90'
+                              : 'bg-card border border-border hover:bg-background/50',
+                          )}
+                          aria-label={t('generation.advancedSettings')}
+                          aria-pressed={isAdvancedExpanded}
+                        >
+                          <Settings2 className="h-4 w-4" />
+                        </Button>
+                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded-md bg-popover px-3 py-1.5 text-xs text-popover-foreground border border-border opacity-0 transition-opacity group-hover:opacity-100 z-[9999]">
+                          {t('generation.advancedSettings')}
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <div className="group relative">
                   <Button
                     type="submit"
@@ -547,6 +647,67 @@ export function FloatingGenerateBox({
               )}
             </AnimatePresence>
 
+            {/* Voice description — its own labelled input, never the delivery instructions
+                (FR-015, C1Q5). Sent as voice_description by useGenerationForm. */}
+            <AnimatePresence>
+              {isExpanded && isVoiceDescriptionExpanded && showVoiceDescription && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="overflow-hidden"
+                >
+                  <FormField
+                    control={form.control}
+                    name="voiceDescription"
+                    render={({ field }) => (
+                      <FormItem className="mt-2 space-y-1.5 rounded-2xl border border-accent/20 px-3 py-2">
+                        <FormLabel className="text-xs font-medium">
+                          {t('generation.voiceDescription.label')}
+                        </FormLabel>
+                        <FormDescription className="text-xs">
+                          {t('generation.voiceDescription.help')}
+                        </FormDescription>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            value={field.value ?? ''}
+                            placeholder={t('generation.voiceDescription.placeholder')}
+                            className="resize-none bg-transparent border border-accent/20 focus-visible:ring-1 focus-visible:ring-accent/40 rounded-2xl text-sm placeholder:text-muted-foreground/60 w-full px-3 py-2"
+                            style={{ minHeight: '60px', maxHeight: '160px' }}
+                            maxLength={500}
+                          />
+                        </FormControl>
+                        {/* C1Q6: the recording wins; say so plainly. */}
+                        {descriptionState === 'unused' && (
+                          <p aria-live="polite" className="text-xs text-amber-500">
+                            {t('generation.voiceDescription.unused')}
+                          </p>
+                        )}
+                        <FormMessage className="text-xs" />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Advanced controls rendered from the engine's declared advanced_settings (FR-010) */}
+            <AnimatePresence>
+              {isExpanded && isAdvancedExpanded && advancedSettings.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="overflow-hidden"
+                >
+                  <AdvancedSettingsControls form={form} settings={advancedSettings} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <AnimatePresence>
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
@@ -583,6 +744,7 @@ export function FloatingGenerateBox({
                     render={({ field }) => {
                       const engineLangs = getLanguageOptionsForEngine(
                         form.watch('engine') || 'qwen',
+                        selectedCapability?.languages,
                       );
                       return (
                         <FormItem className="flex-1 space-y-0">
@@ -644,6 +806,11 @@ export function FloatingGenerateBox({
           </form>
         </Form>
       </motion.div>
+      <DownloadConfirmDialog
+        details={downloadConfirmation}
+        onConfirm={() => resolveDownloadConfirmation(true)}
+        onCancel={() => resolveDownloadConfirmation(false)}
+      />
     </motion.div>
   );
 }

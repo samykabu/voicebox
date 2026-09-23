@@ -1,0 +1,1681 @@
+# T010 red run (section 5 written; backend/models.py and backend/routes/models.py not yet changed for T010)
+# timestamp: 2026-09-23T00:30:54Z
+# cwd: /d/Projects/Personal/voicebox
+$ /c/Users/sabus/voicebox-testenv/Scripts/python.exe -m pytest backend/tests/test_engine_capabilities.py -v -p no:cacheprovider
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\sabus\voicebox-testenv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 239 items
+
+backend\tests\test_engine_capabilities.py::test_model_config_capability_fields_default_to_todays_behaviour PASSED [  0%]
+backend\tests\test_engine_capabilities.py::test_model_config_declares_the_new_fields PASSED [  0%]
+backend\tests\test_engine_capabilities.py::test_advanced_setting_carries_contract_shape_and_is_frozen PASSED [  1%]
+backend\tests\test_engine_capabilities.py::test_there_are_existing_tts_configs_to_check PASSED [  1%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-tts-1.7B] PASSED [  2%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-tts-0.6B] PASSED [  2%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-custom-voice-1.7B] PASSED [  2%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-custom-voice-0.6B] PASSED [  3%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[luxtts] PASSED [  3%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[chatterbox-tts] PASSED [  4%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[chatterbox-turbo] PASSED [  4%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[tada-1b] PASSED [  5%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[tada-3b-ml] PASSED [  5%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[kokoro] PASSED [  5%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-msa] PASSED [  6%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-unified] PASSED [  6%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-sau] PASSED [  7%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-uae] PASSED [  7%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-alg] PASSED [  7%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-irq] PASSED [  8%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-egy] PASSED [  8%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-mar] PASSED [  9%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-tts-1.7B] PASSED [  9%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-tts-0.6B] PASSED [ 10%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-custom-voice-1.7B] PASSED [ 10%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-custom-voice-0.6B] PASSED [ 10%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-luxtts] PASSED [ 11%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-chatterbox-tts] PASSED [ 11%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-chatterbox-turbo] PASSED [ 12%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-tada-1b] PASSED [ 12%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-tada-3b-ml] PASSED [ 12%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-kokoro] PASSED [ 13%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-msa] PASSED [ 13%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-unified] PASSED [ 14%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-sau] PASSED [ 14%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-uae] PASSED [ 15%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-alg] PASSED [ 15%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-irq] PASSED [ 15%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-egy] PASSED [ 16%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-mar] PASSED [ 16%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-tts-1.7B] PASSED [ 17%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-tts-0.6B] PASSED [ 17%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-custom-voice-1.7B] PASSED [ 17%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-custom-voice-0.6B] PASSED [ 18%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-luxtts] PASSED [ 18%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-chatterbox-tts] PASSED [ 19%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-chatterbox-turbo] PASSED [ 19%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-tada-1b] PASSED [ 20%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-tada-3b-ml] PASSED [ 20%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-kokoro] PASSED [ 20%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-msa] PASSED [ 21%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-unified] PASSED [ 21%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-sau] PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-uae] PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-alg] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-irq] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-egy] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-mar] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-tts-1.7B] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-tts-0.6B] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-custom-voice-1.7B] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-custom-voice-0.6B] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-luxtts] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-chatterbox-tts] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-chatterbox-turbo] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-tada-1b] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-tada-3b-ml] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-kokoro] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-msa] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-unified] PASSED [ 29%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-sau] PASSED [ 29%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-uae] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-alg] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-irq] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-egy] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-mar] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-tts-1.7B] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-tts-0.6B] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-custom-voice-1.7B] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-custom-voice-0.6B] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-luxtts] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-chatterbox-tts] PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-chatterbox-turbo] PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-tada-1b] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-tada-3b-ml] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-kokoro] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-msa] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-unified] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-sau] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-uae] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-alg] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-irq] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-egy] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-mar] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-tts-1.7B] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-tts-0.6B] PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-custom-voice-1.7B] PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-custom-voice-0.6B] PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-luxtts] PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-chatterbox-tts] PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-chatterbox-turbo] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-tada-1b] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-tada-3b-ml] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-kokoro] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-msa] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-unified] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-sau] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-uae] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-alg] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-irq] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-egy] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-mar] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_empty_accelerators_is_available_with_no_reason PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_in_declared_set_is_available[cuda] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_in_declared_set_is_available[mps] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_in_declared_set_is_available[cpu] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_indexed_cuda_device_counts_as_cuda PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_not_in_set_is_unavailable_with_specific_reason PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_supported_but_marginal_memory_warns_and_never_blocks PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_sufficient_memory_has_no_warning PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_unknown_memory_or_threshold_has_no_warning[None-8192] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_unknown_memory_or_threshold_has_no_warning[4096-None] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_unknown_memory_or_threshold_has_no_warning[None-None] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_unavailable_engine_carries_reason_not_warning_even_with_marginal_memory PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators0] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators1] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators2] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators3] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators0] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators1] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators2] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators3] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators0] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators1] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators2] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators3] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators0] PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators1] PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators2] PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators3] PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators0] PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators1] PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators2] PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators3] PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators0] PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators1] PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators2] PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators3] PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators0] PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators1] PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators2] PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators3] PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators0] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators1] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators2] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators3] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators0] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators1] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators2] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators3] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators0] PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators1] PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators2] PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators3] PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators0] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators1] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators2] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators3] PASSED [ 70%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators0] PASSED [ 70%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators1] PASSED [ 71%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators2] PASSED [ 71%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators3] PASSED [ 71%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators0] PASSED [ 72%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators1] PASSED [ 72%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators2] PASSED [ 73%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators3] PASSED [ 73%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators0] PASSED [ 74%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators1] PASSED [ 74%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators2] PASSED [ 74%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators3] PASSED [ 75%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators0] PASSED [ 75%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators1] PASSED [ 76%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators2] PASSED [ 76%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators3] PASSED [ 76%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators0] PASSED [ 77%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators1] PASSED [ 77%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators2] PASSED [ 78%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators3] PASSED [ 78%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators0] PASSED [ 79%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators1] PASSED [ 79%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators2] PASSED [ 79%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators3] PASSED [ 80%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators0] PASSED [ 80%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators1] PASSED [ 81%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators2] PASSED [ 81%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators3] PASSED [ 82%]
+backend\tests\test_engine_capabilities.py::test_wrapper_detects_mps_and_resolves PASSED [ 82%]
+backend\tests\test_engine_capabilities.py::test_wrapper_reads_cuda_memory_for_the_warning PASSED [ 82%]
+backend\tests\test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field FAILED [ 83%]
+backend\tests\test_engine_capabilities.py::test_engines_route_detects_hardware_once_per_request FAILED [ 83%]
+backend\tests\test_engine_capabilities.py::test_engines_route_existing_engines_keep_todays_behaviour FAILED [ 84%]
+backend\tests\test_engine_capabilities.py::test_engines_route_describes_each_engine_from_its_default_config FAILED [ 84%]
+backend\tests\test_engine_capabilities.py::test_engines_route_engine_ids_match_the_request_engine_pattern FAILED [ 84%]
+backend\tests\test_engine_capabilities.py::test_engines_route_invariants_hold_for_a_constrained_engine FAILED [ 85%]
+backend\tests\test_engine_capabilities.py::test_engines_route_passes_declared_capabilities_through FAILED [ 85%]
+backend\tests\test_engine_capabilities.py::test_engines_route_never_imports_torch FAILED [ 86%]
+backend\tests\test_engine_capabilities.py::test_existing_generation_payloads_still_validate FAILED [ 86%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-None] FAILED [ 87%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-qwen] FAILED [ 87%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-kokoro] FAILED [ 87%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-f5_tts] FAILED [ 88%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-None] FAILED [ 88%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-qwen] FAILED [ 89%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-kokoro] FAILED [ 89%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-f5_tts] FAILED [ 89%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[None] FAILED [ 90%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[qwen] FAILED [ 90%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[luxtts] FAILED [ 91%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[chatterbox] FAILED [ 91%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[tada] FAILED [ 92%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[kokoro] FAILED [ 92%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[f5_tts] FAILED [ 92%]
+backend\tests\test_engine_capabilities.py::test_voice_description_accepts_500_characters_and_rejects_501 FAILED [ 93%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[1.0-qwen] FAILED [ 93%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[1.0-None] FAILED [ 94%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[2.5-qwen] FAILED [ 94%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[2.5-None] FAILED [ 94%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[5.0-qwen] FAILED [ 95%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[5.0-None] FAILED [ 95%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[3-qwen] FAILED [ 96%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[3-None] FAILED [ 96%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[0.99] FAILED [ 97%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[5.01] FAILED [ 97%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[-1.0] FAILED [ 97%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[inf] FAILED [ 98%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[nan] FAILED [ 98%]
+backend\tests\test_engine_capabilities.py::test_undeclared_setting_is_rejected_even_when_the_engine_declares_others FAILED [ 99%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_is_scoped_to_its_engine FAILED [ 99%]
+backend\tests\test_engine_capabilities.py::test_invalid_generation_body_is_a_422_through_fastapi FAILED [100%]
+
+================================== FAILURES ===================================
+____ test_engines_route_returns_every_tts_engine_with_every_contract_field ____
+
+engines_client = <starlette.testclient.TestClient object at 0x000001A95BE15910>
+
+    def test_engines_route_returns_every_tts_engine_with_every_contract_field(engines_client):
+        from backend.backends import TTS_ENGINES
+    
+>       engines = _engines(engines_client)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:363: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+client = <starlette.testclient.TestClient object at 0x000001A95BE15910>
+
+    def _engines(client):
+        response = client.get("/models/engines")
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Method Not Allowed"}
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+backend\tests\test_engine_capabilities.py:356: AssertionError
+____________ test_engines_route_detects_hardware_once_per_request _____________
+
+engines_client = <starlette.testclient.TestClient object at 0x000001A95BE808F0>
+
+    def test_engines_route_detects_hardware_once_per_request(engines_client):
+>       _engines(engines_client)
+
+backend\tests\test_engine_capabilities.py:373: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+client = <starlette.testclient.TestClient object at 0x000001A95BE808F0>
+
+    def _engines(client):
+        response = client.get("/models/engines")
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Method Not Allowed"}
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+backend\tests\test_engine_capabilities.py:356: AssertionError
+__________ test_engines_route_existing_engines_keep_todays_behaviour __________
+
+engines_client = <starlette.testclient.TestClient object at 0x000001A95BE82C60>
+
+    def test_engines_route_existing_engines_keep_todays_behaviour(engines_client):
+>       for entry in _engines(engines_client):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:379: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+client = <starlette.testclient.TestClient object at 0x000001A95BE82C60>
+
+    def _engines(client):
+        response = client.get("/models/engines")
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Method Not Allowed"}
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+backend\tests\test_engine_capabilities.py:356: AssertionError
+______ test_engines_route_describes_each_engine_from_its_default_config _______
+
+engines_client = <starlette.testclient.TestClient object at 0x000001A95BEF9460>
+
+    def test_engines_route_describes_each_engine_from_its_default_config(engines_client):
+        from backend.backends import get_default_model_size, get_tts_model_configs
+    
+        configs = get_tts_model_configs()
+>       for entry in _engines(engines_client):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:394: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+client = <starlette.testclient.TestClient object at 0x000001A95BEF9460>
+
+    def _engines(client):
+        response = client.get("/models/engines")
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Method Not Allowed"}
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+backend\tests\test_engine_capabilities.py:356: AssertionError
+_______ test_engines_route_engine_ids_match_the_request_engine_pattern ________
+
+engines_client = <starlette.testclient.TestClient object at 0x000001A95BEDE5D0>
+
+    def test_engines_route_engine_ids_match_the_request_engine_pattern(engines_client):
+        from backend.models import GenerationRequest
+    
+>       for entry in _engines(engines_client):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:408: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+client = <starlette.testclient.TestClient object at 0x000001A95BEDE5D0>
+
+    def _engines(client):
+        response = client.get("/models/engines")
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Method Not Allowed"}
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+backend\tests\test_engine_capabilities.py:356: AssertionError
+_________ test_engines_route_invariants_hold_for_a_constrained_engine _________
+
+engines_client = <starlette.testclient.TestClient object at 0x000001A95BEF9280>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A95BEFA9C0>
+
+    def test_engines_route_invariants_hold_for_a_constrained_engine(engines_client, monkeypatch):
+        import backend.backends as backends_pkg
+    
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", _constrained_default_qwen(accelerators=("mps",)))
+    
+>       engines = {e["engine"]: e for e in _engines(engines_client)}
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+client = <starlette.testclient.TestClient object at 0x000001A95BEF9280>
+
+    def _engines(client):
+        response = client.get("/models/engines")
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Method Not Allowed"}
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+backend\tests\test_engine_capabilities.py:356: AssertionError
+___________ test_engines_route_passes_declared_capabilities_through ___________
+
+engines_client = <starlette.testclient.TestClient object at 0x000001A95BE832C0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A95BEF9FA0>
+
+    def test_engines_route_passes_declared_capabilities_through(engines_client, monkeypatch):
+        import backend.backends as backends_pkg
+    
+        setting = AdvancedSetting(name="cfg_value", label="Guidance", default=2.0, min=1.0, max=5.0)
+        monkeypatch.setattr(
+            backends_pkg,
+            "get_tts_model_configs",
+            _constrained_default_qwen(
+                accelerators=("cuda", "cpu"),
+                supports_voice_design=True,
+                requires_download_confirmation=True,
+                advanced_settings=(setting,),
+            ),
+        )
+    
+>       qwen = next(e for e in _engines(engines_client) if e["engine"] == "qwen")
+                               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:467: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+client = <starlette.testclient.TestClient object at 0x000001A95BE832C0>
+
+    def _engines(client):
+        response = client.get("/models/engines")
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Method Not Allowed"}
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+backend\tests\test_engine_capabilities.py:356: AssertionError
+___________________ test_engines_route_never_imports_torch ____________________
+
+engines_client = <starlette.testclient.TestClient object at 0x000001A95BEFA240>
+
+    def test_engines_route_never_imports_torch(engines_client):
+        had_torch = "torch" in sys.modules
+    
+>       _engines(engines_client)
+
+backend\tests\test_engine_capabilities.py:483: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+client = <starlette.testclient.TestClient object at 0x000001A95BEFA240>
+
+    def _engines(client):
+        response = client.get("/models/engines")
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"detail":"Method Not Allowed"}
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+backend\tests\test_engine_capabilities.py:356: AssertionError
+______________ test_existing_generation_payloads_still_validate _______________
+
+    def test_existing_generation_payloads_still_validate():
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine="kokoro", language="en", instruct="calm")
+    
+>       assert request.voice_description is None
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:499: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct='calm', engine='kokoro', personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'voice_description'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'voice_description'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+________ test_empty_advanced_settings_pass_for_every_engine[None-None] ________
+
+engine = None, value = None
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "kokoro", "f5_tts"])
+    @pytest.mark.parametrize("value", [None, {}])
+    def test_empty_advanced_settings_pass_for_every_engine(engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings=value)
+    
+>       assert request.advanced_settings == value
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine=None, personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+________ test_empty_advanced_settings_pass_for_every_engine[None-qwen] ________
+
+engine = 'qwen', value = None
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "kokoro", "f5_tts"])
+    @pytest.mark.parametrize("value", [None, {}])
+    def test_empty_advanced_settings_pass_for_every_engine(engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings=value)
+    
+>       assert request.advanced_settings == value
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine='qwen', personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+_______ test_empty_advanced_settings_pass_for_every_engine[None-kokoro] _______
+
+engine = 'kokoro', value = None
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "kokoro", "f5_tts"])
+    @pytest.mark.parametrize("value", [None, {}])
+    def test_empty_advanced_settings_pass_for_every_engine(engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings=value)
+    
+>       assert request.advanced_settings == value
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine='kokoro', personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+_______ test_empty_advanced_settings_pass_for_every_engine[None-f5_tts] _______
+
+engine = 'f5_tts', value = None
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "kokoro", "f5_tts"])
+    @pytest.mark.parametrize("value", [None, {}])
+    def test_empty_advanced_settings_pass_for_every_engine(engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings=value)
+    
+>       assert request.advanced_settings == value
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine='f5_tts', personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+_______ test_empty_advanced_settings_pass_for_every_engine[value1-None] _______
+
+engine = None, value = {}
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "kokoro", "f5_tts"])
+    @pytest.mark.parametrize("value", [None, {}])
+    def test_empty_advanced_settings_pass_for_every_engine(engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings=value)
+    
+>       assert request.advanced_settings == value
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine=None, personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+_______ test_empty_advanced_settings_pass_for_every_engine[value1-qwen] _______
+
+engine = 'qwen', value = {}
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "kokoro", "f5_tts"])
+    @pytest.mark.parametrize("value", [None, {}])
+    def test_empty_advanced_settings_pass_for_every_engine(engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings=value)
+    
+>       assert request.advanced_settings == value
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine='qwen', personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+______ test_empty_advanced_settings_pass_for_every_engine[value1-kokoro] ______
+
+engine = 'kokoro', value = {}
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "kokoro", "f5_tts"])
+    @pytest.mark.parametrize("value", [None, {}])
+    def test_empty_advanced_settings_pass_for_every_engine(engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings=value)
+    
+>       assert request.advanced_settings == value
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine='kokoro', personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+______ test_empty_advanced_settings_pass_for_every_engine[value1-f5_tts] ______
+
+engine = 'f5_tts', value = {}
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "kokoro", "f5_tts"])
+    @pytest.mark.parametrize("value", [None, {}])
+    def test_empty_advanced_settings_pass_for_every_engine(engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings=value)
+    
+>       assert request.advanced_settings == value
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine='f5_tts', personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+___________ test_existing_engines_reject_any_advanced_setting[None] ___________
+
+engine = None
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "luxtts", "chatterbox", "tada", "kokoro", "f5_tts"])
+    def test_existing_engines_reject_any_advanced_setting(engine):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:517: Failed
+___________ test_existing_engines_reject_any_advanced_setting[qwen] ___________
+
+engine = 'qwen'
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "luxtts", "chatterbox", "tada", "kokoro", "f5_tts"])
+    def test_existing_engines_reject_any_advanced_setting(engine):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:517: Failed
+__________ test_existing_engines_reject_any_advanced_setting[luxtts] __________
+
+engine = 'luxtts'
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "luxtts", "chatterbox", "tada", "kokoro", "f5_tts"])
+    def test_existing_engines_reject_any_advanced_setting(engine):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:517: Failed
+________ test_existing_engines_reject_any_advanced_setting[chatterbox] ________
+
+engine = 'chatterbox'
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "luxtts", "chatterbox", "tada", "kokoro", "f5_tts"])
+    def test_existing_engines_reject_any_advanced_setting(engine):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:517: Failed
+___________ test_existing_engines_reject_any_advanced_setting[tada] ___________
+
+engine = 'tada'
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "luxtts", "chatterbox", "tada", "kokoro", "f5_tts"])
+    def test_existing_engines_reject_any_advanced_setting(engine):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:517: Failed
+__________ test_existing_engines_reject_any_advanced_setting[kokoro] __________
+
+engine = 'kokoro'
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "luxtts", "chatterbox", "tada", "kokoro", "f5_tts"])
+    def test_existing_engines_reject_any_advanced_setting(engine):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:517: Failed
+__________ test_existing_engines_reject_any_advanced_setting[f5_tts] __________
+
+engine = 'f5_tts'
+
+    @pytest.mark.parametrize("engine", [None, "qwen", "luxtts", "chatterbox", "tada", "kokoro", "f5_tts"])
+    def test_existing_engines_reject_any_advanced_setting(engine):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:517: Failed
+________ test_voice_description_accepts_500_characters_and_rejects_501 ________
+
+    def test_voice_description_accepts_500_characters_and_rejects_501():
+        from backend.models import GenerationRequest
+    
+>       assert GenerationRequest(**_BASE_REQUEST, voice_description="a" * 500).voice_description == "a" * 500
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:524: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine='qwen', personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'voice_description'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'voice_description'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+____________ test_declared_setting_within_bounds_passes[1.0-qwen] _____________
+
+declared_qwen = None, engine = 'qwen', value = 1.0
+
+    @pytest.mark.parametrize("engine", ["qwen", None])
+    @pytest.mark.parametrize("value", [1.0, 2.5, 5.0, 3])
+    def test_declared_setting_within_bounds_passes(declared_qwen, engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings={"cfg_value": value})
+    
+>       assert request.advanced_settings == {"cfg_value": float(value)}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:545: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine='qwen', personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+____________ test_declared_setting_within_bounds_passes[1.0-None] _____________
+
+declared_qwen = None, engine = None, value = 1.0
+
+    @pytest.mark.parametrize("engine", ["qwen", None])
+    @pytest.mark.parametrize("value", [1.0, 2.5, 5.0, 3])
+    def test_declared_setting_within_bounds_passes(declared_qwen, engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings={"cfg_value": value})
+    
+>       assert request.advanced_settings == {"cfg_value": float(value)}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:545: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine=None, personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+____________ test_declared_setting_within_bounds_passes[2.5-qwen] _____________
+
+declared_qwen = None, engine = 'qwen', value = 2.5
+
+    @pytest.mark.parametrize("engine", ["qwen", None])
+    @pytest.mark.parametrize("value", [1.0, 2.5, 5.0, 3])
+    def test_declared_setting_within_bounds_passes(declared_qwen, engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings={"cfg_value": value})
+    
+>       assert request.advanced_settings == {"cfg_value": float(value)}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:545: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine='qwen', personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+____________ test_declared_setting_within_bounds_passes[2.5-None] _____________
+
+declared_qwen = None, engine = None, value = 2.5
+
+    @pytest.mark.parametrize("engine", ["qwen", None])
+    @pytest.mark.parametrize("value", [1.0, 2.5, 5.0, 3])
+    def test_declared_setting_within_bounds_passes(declared_qwen, engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings={"cfg_value": value})
+    
+>       assert request.advanced_settings == {"cfg_value": float(value)}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:545: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine=None, personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+____________ test_declared_setting_within_bounds_passes[5.0-qwen] _____________
+
+declared_qwen = None, engine = 'qwen', value = 5.0
+
+    @pytest.mark.parametrize("engine", ["qwen", None])
+    @pytest.mark.parametrize("value", [1.0, 2.5, 5.0, 3])
+    def test_declared_setting_within_bounds_passes(declared_qwen, engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings={"cfg_value": value})
+    
+>       assert request.advanced_settings == {"cfg_value": float(value)}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:545: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine='qwen', personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+____________ test_declared_setting_within_bounds_passes[5.0-None] _____________
+
+declared_qwen = None, engine = None, value = 5.0
+
+    @pytest.mark.parametrize("engine", ["qwen", None])
+    @pytest.mark.parametrize("value", [1.0, 2.5, 5.0, 3])
+    def test_declared_setting_within_bounds_passes(declared_qwen, engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings={"cfg_value": value})
+    
+>       assert request.advanced_settings == {"cfg_value": float(value)}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:545: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine=None, personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+_____________ test_declared_setting_within_bounds_passes[3-qwen] ______________
+
+declared_qwen = None, engine = 'qwen', value = 3
+
+    @pytest.mark.parametrize("engine", ["qwen", None])
+    @pytest.mark.parametrize("value", [1.0, 2.5, 5.0, 3])
+    def test_declared_setting_within_bounds_passes(declared_qwen, engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings={"cfg_value": value})
+    
+>       assert request.advanced_settings == {"cfg_value": float(value)}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:545: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine='qwen', personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+_____________ test_declared_setting_within_bounds_passes[3-None] ______________
+
+declared_qwen = None, engine = None, value = 3
+
+    @pytest.mark.parametrize("engine", ["qwen", None])
+    @pytest.mark.parametrize("value", [1.0, 2.5, 5.0, 3])
+    def test_declared_setting_within_bounds_passes(declared_qwen, engine, value):
+        from backend.models import GenerationRequest
+    
+        request = GenerationRequest(**_BASE_REQUEST, engine=engine, advanced_settings={"cfg_value": value})
+    
+>       assert request.advanced_settings == {"cfg_value": float(value)}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:545: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = GenerationRequest(profile_id='p1', text='hello', language='en', seed=None, model_size=None, instruct=None, engine=None, personality=False, max_chunk_chars=800, crossfade_ms=50, normalize=True, effects_chain=None)
+item = 'advanced_settings'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'GenerationRequest' object has no attribute 'advanced_settings'
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+____________ test_declared_setting_out_of_bounds_is_rejected[0.99] ____________
+
+declared_qwen = None, value = 0.99
+
+    @pytest.mark.parametrize("value", [0.99, 5.01, -1.0, float("inf"), float("nan")])
+    def test_declared_setting_out_of_bounds_is_rejected(declared_qwen, value):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:552: Failed
+____________ test_declared_setting_out_of_bounds_is_rejected[5.01] ____________
+
+declared_qwen = None, value = 5.01
+
+    @pytest.mark.parametrize("value", [0.99, 5.01, -1.0, float("inf"), float("nan")])
+    def test_declared_setting_out_of_bounds_is_rejected(declared_qwen, value):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:552: Failed
+____________ test_declared_setting_out_of_bounds_is_rejected[-1.0] ____________
+
+declared_qwen = None, value = -1.0
+
+    @pytest.mark.parametrize("value", [0.99, 5.01, -1.0, float("inf"), float("nan")])
+    def test_declared_setting_out_of_bounds_is_rejected(declared_qwen, value):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:552: Failed
+____________ test_declared_setting_out_of_bounds_is_rejected[inf] _____________
+
+declared_qwen = None, value = inf
+
+    @pytest.mark.parametrize("value", [0.99, 5.01, -1.0, float("inf"), float("nan")])
+    def test_declared_setting_out_of_bounds_is_rejected(declared_qwen, value):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:552: Failed
+____________ test_declared_setting_out_of_bounds_is_rejected[nan] _____________
+
+declared_qwen = None, value = nan
+
+    @pytest.mark.parametrize("value", [0.99, 5.01, -1.0, float("inf"), float("nan")])
+    def test_declared_setting_out_of_bounds_is_rejected(declared_qwen, value):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:552: Failed
+__ test_undeclared_setting_is_rejected_even_when_the_engine_declares_others ___
+
+declared_qwen = None
+
+    def test_undeclared_setting_is_rejected_even_when_the_engine_declares_others(declared_qwen):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="not_a_setting"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:559: Failed
+________________ test_declared_setting_is_scoped_to_its_engine ________________
+
+declared_qwen = None
+
+    def test_declared_setting_is_scoped_to_its_engine(declared_qwen):
+        from backend.models import GenerationRequest
+    
+>       with pytest.raises(ValidationError, match="cfg_value"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+backend\tests\test_engine_capabilities.py:566: Failed
+____________ test_invalid_generation_body_is_a_422_through_fastapi ____________
+
+declared_qwen = None
+
+    def test_invalid_generation_body_is_a_422_through_fastapi(declared_qwen):
+        from backend.models import GenerationRequest
+    
+        app = FastAPI()
+    
+        @app.post("/probe")
+        def probe(request: GenerationRequest):
+            return {"ok": True}
+    
+        client = TestClient(app)
+    
+        assert client.post("/probe", json=_BASE_REQUEST).status_code == 200
+        assert client.post("/probe", json={**_BASE_REQUEST, "advanced_settings": {"cfg_value": 2.0}}).status_code == 200
+        for body in (
+            {**_BASE_REQUEST, "advanced_settings": {"cfg_value": 9.0}},
+            {**_BASE_REQUEST, "advanced_settings": {"unknown": 1.0}},
+            {**_BASE_REQUEST, "engine": "kokoro", "advanced_settings": {"cfg_value": 2.0}},
+            {**_BASE_REQUEST, "voice_description": "a" * 501},
+        ):
+>           assert client.post("/probe", json=body).status_code == 422, body
+E           AssertionError: {'profile_id': 'p1', 'text': 'hello', 'advanced_settings': {'cfg_value': 9.0}}
+E           assert 200 == 422
+E            +  where 200 = <Response [200 OK]>.status_code
+E            +    where <Response [200 OK]> = post('/probe', json={'profile_id': 'p1', 'text': 'hello', 'advanced_settings': {'cfg_value': 9.0}})
+E            +      where post = <starlette.testclient.TestClient object at 0x000001A95B935880>.post
+
+backend\tests\test_engine_capabilities.py:589: AssertionError
+============================== warnings summary ===============================
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\sabus\voicebox-testenv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+C:\Users\sabus\voicebox-testenv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\sabus\voicebox-testenv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:32: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:68: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ProfileSampleResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:109: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:174: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationEntryResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:232: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class HistoryResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:286: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:341: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureSettingsResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:382: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationSettingsResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:403: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class MCPClientBindingResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:638: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioChannelResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:670: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:684: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:716: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:824: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+tests/test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+  D:\Projects\Personal\voicebox\backend\models.py:838: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field
+FAILED backend\tests\test_engine_capabilities.py::test_engines_route_detects_hardware_once_per_request
+FAILED backend\tests\test_engine_capabilities.py::test_engines_route_existing_engines_keep_todays_behaviour
+FAILED backend\tests\test_engine_capabilities.py::test_engines_route_describes_each_engine_from_its_default_config
+FAILED backend\tests\test_engine_capabilities.py::test_engines_route_engine_ids_match_the_request_engine_pattern
+FAILED backend\tests\test_engine_capabilities.py::test_engines_route_invariants_hold_for_a_constrained_engine
+FAILED backend\tests\test_engine_capabilities.py::test_engines_route_passes_declared_capabilities_through
+FAILED backend\tests\test_engine_capabilities.py::test_engines_route_never_imports_torch
+FAILED backend\tests\test_engine_capabilities.py::test_existing_generation_payloads_still_validate
+FAILED backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-None]
+FAILED backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-qwen]
+FAILED backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-kokoro]
+FAILED backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-f5_tts]
+FAILED backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-None]
+FAILED backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-qwen]
+FAILED backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-kokoro]
+FAILED backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-f5_tts]
+FAILED backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[None]
+FAILED backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[qwen]
+FAILED backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[luxtts]
+FAILED backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[chatterbox]
+FAILED backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[tada]
+FAILED backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[kokoro]
+FAILED backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[f5_tts]
+FAILED backend\tests\test_engine_capabilities.py::test_voice_description_accepts_500_characters_and_rejects_501
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[1.0-qwen]
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[1.0-None]
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[2.5-qwen]
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[2.5-None]
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[5.0-qwen]
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[5.0-None]
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[3-qwen]
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[3-None]
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[0.99]
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[5.01]
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[-1.0]
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[inf]
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[nan]
+FAILED backend\tests\test_engine_capabilities.py::test_undeclared_setting_is_rejected_even_when_the_engine_declares_others
+FAILED backend\tests\test_engine_capabilities.py::test_declared_setting_is_scoped_to_its_engine
+FAILED backend\tests\test_engine_capabilities.py::test_invalid_generation_body_is_a_422_through_fastapi
+================= 41 failed, 198 passed, 17 warnings in 1.34s =================
+# exit code: 1

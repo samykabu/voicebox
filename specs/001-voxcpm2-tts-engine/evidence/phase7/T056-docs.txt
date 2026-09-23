@@ -1,0 +1,150 @@
+T056 documentation evidence (plus follow-up fixes to T038-T040 files)
+Feature: specs/001-voxcpm2-tts-engine   Branch: feature/001-voxcpm2-tts-engine
+Date: 2026-09-23   Worker: docs-only subagent. No code edited, nothing staged or committed,
+no tests or servers run. Disclosure facts checked against commit b69d377 (T053/T054).
+
+FILES CHANGED (git diff --numstat, cumulative vs HEAD)
+  docs/PROJECT_STATUS.md                                  +22 -5
+  docs/content/docs/developer/voice-profiles.mdx          +50 -10
+  docs/content/docs/developer/tts-generation.mdx          +84 -5
+  docs/content/docs/overview/creating-voice-profiles.mdx  +40 -8
+  docs/content/docs/overview/generating-speech.mdx        +34 -0
+  docs/content/docs/overview/voice-cloning.mdx            +6 -3
+  docs/content/docs/overview/introduction.mdx             +9 -3
+  backend/README.md                                       +41 -0
+  Follow-up edits to earlier T038-T040 files (totals now):
+  docs/content/docs/developer/tts-engines.mdx             +153 -5
+  CHANGELOG.md                                            +57 -0
+  docs/content/docs/developer/model-management.mdx        unchanged since T039 (+60 -1)
+
+SECTIONS ADDED / CHANGED
+docs/PROJECT_STATUS.md (upstream roadmap file; targeted edits, history kept)
+  - "Fork update (2026-09-23)" callout under the header
+  - Architecture engine list: VoxCPM2 bullet; count removed (fork also has F5-TTS/Habibi)
+  - Key Files table: voxcpm_backend.py row
+  - Backlogged table row: VoxCPM2 shipped in this fork; VoxCPM 1.5 still not integrated
+  - VoxCPM evaluation notes: "Update (2026-09-23, fork): shipped" paragraph with probe facts
+  - TTS Engine Comparison: VoxCPM2 row
+  - Landscape status snapshot row: struck-through backlog row replaced with shipped row
+  - "Adding a New Engine": platform gating now exists (note before the old text)
+  - Bottleneck 6 "No Platform Gating": fork-update callout (partly resolved)
+  - Tier 3 table: VoxCPM2 row says shipped in this fork
+developer/voice-profiles.mdx
+  - Overview: three flavors incl. designed; the three dialog sources
+  - Schema comment: design_prompt no longer "reserved"; validation rules paragraph
+  - Adding Samples snippet: save_audio(..., disclosure=None)
+  - Voice Prompt Creation: preset and designed return shapes; combined reference at
+    24 kHz, no label
+  - Export/Import rewritten: real ZIP layout, manifest 1.1 example, provenance rules
+  - Language Matching: languages depend on engine; new "Responsible Use" subsection
+developer/tts-generation.mdx
+  - Overview: nine engines
+  - Protocol: optional options argument, backend_with_generation_options()
+  - ModelConfig block: license/dialect and five capability fields
+  - TTS_ENGINES: f5_tts, voxcpm
+  - Pattern B: VoxCPM2 keys; designed-profile prompt shape
+  - Device selection: VoxCPM2 MPS allowed, XPU/DirectML unavailable
+  - Generation flow: regex, voice_description, advanced_settings, availability 400 step,
+    persist step mentions label
+  - Instruct Mode: voice description is separate
+  - New sections: Voice Design (table + precedence + retry rule), Advanced Settings,
+    AI-Generated Label (save_audio / wav_bytes / exemptions)
+  - API table: /generate/stream, retry, regenerate; VRAM row; Next-steps card text
+overview/creating-voice-profiles.mdx (user-facing)
+  - Three flavors and the three dialog sources; responsible-use callout with link
+  - Workflow A: F5-TTS and VoxCPM2 in cloning engine list; transcript note
+  - New "Workflow C — Designed Profiles"
+  - Export/Import: corrected (cloned exports include audio samples + text), designed,
+    provenance, older exports import as cloned, personality not exported
+overview/generating-speech.mdx (user-facing)
+  - New "Choosing an Engine" (greyed out with reason; download confirmation; languages)
+  - New "Voice Description", "Advanced Settings", "AI-Generated Label" (with exemptions)
+overview/voice-cloning.mdx (user-facing)
+  - VoxCPM2 row, chooser row, language list; responsible-use link; label note
+overview/introduction.mdx (user-facing)
+  - 7 cloning engines up to 30 languages; voice design bullet; nine engines; F5-TTS/Habibi
+    and VoxCPM2 rows; greyed-out note; tech stack list
+backend/README.md
+  - 400 refusal paragraph
+  - "Profile export manifest" section (1.1 example, rules)
+  - "AI-generated label in WAV files" section (save_audio / wav_bytes / exemptions)
+tts-engines.mdx (follow-up)
+  - Dependencies: release.yml (three jobs) and Dockerfile install voxcpm; Dockerfile still
+    omits f5-tts/habibi-tts (older gap)
+  - Responsible use: T053/T054 wording now states shipped behaviour with helper names
+CHANGELOG.md (follow-up)
+  - VoxCPM2 in release builds and Docker image
+  - INFO chunk bullet: covers saved files, /generate/stream bytes, effects preview;
+    uploaded reference samples stored without it
+
+FACTS VERIFIED (source file:line)
+Disclosure (commit b69d377)
+  - AI_GENERATED_DISCLOSURE = "AI-generated by Voicebox" ........ backend/utils/audio.py:11
+  - _write_wav: ICMT comment + ISFT "Voicebox" only when disclosure not None  audio.py:70-83
+  - wav_bytes(..., disclosure=AI_GENERATED_DISCLOSURE) ........... audio.py:86-103
+  - save_audio(..., disclosure=AI_GENERATED_DISCLOSURE) .......... audio.py:106-142
+  - services/tts.audio_to_wav_bytes -> wav_bytes ................. backend/services/tts.py:27-31
+  - /generate/stream uses audio_to_wav_bytes ..................... backend/routes/generations.py:346, :441
+  - effects preview uses wav_bytes ............................... backend/routes/effects.py:50-53
+  - exempt: reference samples .................................... backend/services/profiles.py:237
+  - exempt: combined reference (24 kHz) .......................... backend/services/profiles.py:625
+  - exempt: transcription re-encode .............................. backend/routes/transcription.py:56
+  - tagged saves: generations/effects versions ................... backend/services/generation.py:336,366,392,495
+  - tagged saves: story export ................................... backend/services/stories.py:969
+  - POST /speak goes through generate_speech (saved) ............. backend/routes/speak.py:72-83
+  - MCP voicebox.speak goes through generate_speech (saved) ...... backend/mcp_server/tools.py:237-264
+Export provenance
+  - manifest 1.1 + PROVENANCE_FIELDS ............................. backend/services/export_import.py:45-55
+  - cloned needs samples; designed/preset may export without ..... export_import.py:78-84
+  - manifest keys written (no personality) ....................... export_import.py:101-113
+  - ZIP layout: samples/{file}, samples.json, avatar.{ext} ........ export_import.py:90-139, :220
+  - import restores provenance, 1.0 imports as cloned ............ export_import.py:193-210
+  - 1.0 manifest keys (version, profile{name,description,language}, has_avatar)
+                                                                   git show 60cd4fe:backend/services/export_import.py
+  - routes GET /profiles/{id}/export, POST /profiles/import ...... backend/routes/profiles.py:281, :45
+Designed profiles
+  - design_prompt max 2000 ....................................... backend/models.py:28
+  - validation rules (designed needs prompt, no preset fields;
+    cloned cannot set design_prompt) ............................. backend/services/profiles.py:79-111
+  - designed voice prompt shape .................................. backend/services/profiles.py:566-572
+  - dialog sources "Clone from audio", "Built-in voice", "Describe a voice";
+    responsible-use line; design hint/note; designPromptHint ..... app/src/i18n/locales/en/translation.json:240-277
+  - RESPONSIBLE_USE_URL .......................................... app/src/components/VoiceProfiles/ProfileForm.tsx:73
+Generation
+  - voice_description / advanced_settings fields, 422 ............ backend/models.py:108-146
+  - engine regex incl. f5_tts|voxcpm ............................. backend/models.py:93
+  - options wrapper ............................................... backend/services/generation.py:120-156
+  - resolve_backend_instruct / profile_design_prompt ............. backend/services/generation.py:70-117
+  - 400 refusal and callers ....................................... backend/routes/generations.py:64-74, :97, :182, :228, :369
+  - retry = failed only; regenerate = completed, new version ...... generations.py:173-180, :216-226
+  - reason text format ............................................ backend/backends/base.py:304-309
+  - "Advanced settings" toggle, sliders .......................... FloatingGenerateBox.tsx:553-580, AdvancedSettingsControls.tsx:2,32
+  - instruct toggle only for qwen_custom_voice ................... FloatingGenerateBox.tsx:481-483
+  - TTS_ENGINES (nine) ............................................ backend/backends/__init__.py:230-241
+  - cloning engines (seven) ....................................... backend/services/profiles.py:27
+Release / Docker (T055, in working tree, not committed)
+  - release.yml voxcpm --no-deps in three jobs .................... .github/workflows/release.yml:135, :344, :421
+  - Dockerfile voxcpm --no-deps ................................... Dockerfile:66
+  - Dockerfile has no f5-tts / habibi-tts ......................... grep: no hits in Dockerfile
+PROJECT_STATUS facts
+  - probe RTF CPU 2.59-2.97, CUDA 0.93-1.18 (no torch.compile) .... evidence/probe.md Q2/Q3 speed table
+  - 4961 MB, Apache-2.0, 30 languages, 48 kHz ..................... backend/backends/__init__.py:498, 510-543
+
+NOT VERIFIED / DISCREPANCIES
+  - The brief says audio_to_wav_bytes is used by "/speak persist=false and MCP speak".
+    The code does not support that. POST /speak (routes/speak.py:74) and MCP voicebox.speak
+    (mcp_server/tools.py:250-263) both call generate_speech, which saves with save_audio,
+    so their audio is labelled anyway, as a saved file. services/generation.py:396
+    generate_audio_sync (docstring: "/profiles/{id}/speak ... persist=false") does return
+    audio_to_wav_bytes output, but I found no caller of it outside tests, and no persist
+    field on any request model. The docs name only /generate/stream and the effects preview
+    for wav_bytes, and say /speak and MCP speak are saved files.
+  - The "workflow-c--designed-profiles" anchor assumes the docs site's slugger turns
+    "Workflow C — Designed Profiles" into that slug (github-slugger behaviour). Not rendered.
+  - User-facing dialog size "about 4.8 GB" is computed from formatDownloadSize, not observed.
+  - "A different seed may give a noticeably different voice from the same description" is
+    based on probe.md Q9 (design steering varies between runs), not a seeded A/B test.
+  - T055 changes are in the working tree from another worker, not yet committed.
+  - Pre-existing inconsistencies left alone: introduction.mdx says Kokoro has 9 languages
+    while other pages say 8; PROJECT_STATUS.md header and other sections are upstream's
+    2026-07-02 snapshot.

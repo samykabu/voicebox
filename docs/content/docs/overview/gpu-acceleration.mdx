@@ -99,13 +99,13 @@ Verify it's working:
 
 ### Engines on XPU
 
-All PyTorch-based engines work on XPU. Performance is generally between CPU and CUDA — expect ~2-3x speedup over CPU for the larger models.
+The PyTorch-based engines work on XPU, except VoxCPM2: it doesn't support XPU, so on an XPU machine it runs on the processor and shows a warning that it will be slower. Performance is generally between CPU and CUDA — expect ~2-3x speedup over CPU for the larger models.
 
 ## DirectML
 
 The fallback for Windows users with non-NVIDIA, non-Intel-Arc GPUs (older AMD discrete, integrated GPUs, etc.). Slower than CUDA and XPU but provides some acceleration over CPU.
 
-Auto-selected when no other GPU backend is available.
+Auto-selected when no other GPU backend is available. VoxCPM2 doesn't support DirectML, so on these machines it runs on the processor and shows a warning that it will be slower.
 
 ## AMD ROCm (Linux)
 

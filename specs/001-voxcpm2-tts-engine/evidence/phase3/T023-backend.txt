@@ -1,0 +1,1813 @@
+=== RED RUN (tests written first; generation.py and routes/generations.py not yet changed) ===
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_generation_advanced_settings.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase3/T023-backend-red.xml
+# cwd: D:/Projects/Personal/voicebox
+# timestamp: 2026-09-23T16:27:46+03:00
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 25 items
+
+backend\tests\test_generation_advanced_settings.py::test_declaring_engine_receives_the_settings_as_options FAILED [  4%]
+backend\tests\test_generation_advanced_settings.py::test_declaring_engine_without_settings_gets_no_options[None] FAILED [  8%]
+backend\tests\test_generation_advanced_settings.py::test_declaring_engine_without_settings_gets_no_options[advanced_settings1] FAILED [ 12%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[qwen] FAILED [ 16%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[qwen_custom_voice] FAILED [ 20%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[luxtts] FAILED [ 24%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[chatterbox] FAILED [ 28%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[chatterbox_turbo] FAILED [ 32%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[tada] FAILED [ 36%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[kokoro] FAILED [ 40%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[f5_tts] FAILED [ 44%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[qwen] FAILED [ 48%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[qwen_custom_voice] FAILED [ 52%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[luxtts] FAILED [ 56%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[chatterbox] FAILED [ 60%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[chatterbox_turbo] FAILED [ 64%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[tada] FAILED [ 68%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[kokoro] FAILED [ 72%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[f5_tts] FAILED [ 76%]
+backend\tests\test_generation_advanced_settings.py::test_backend_is_returned_unwrapped_when_nothing_applies FAILED [ 80%]
+backend\tests\test_generation_advanced_settings.py::test_wrapped_backend_delegates_everything_else FAILED [ 84%]
+backend\tests\test_generation_advanced_settings.py::test_declaration_lookup_reads_the_model_configs FAILED [ 88%]
+backend\tests\test_generation_advanced_settings.py::test_voxcpm_backend_applies_options_with_declared_defaults_as_fallback PASSED [ 92%]
+backend\tests\test_generation_advanced_settings.py::test_generate_route_threads_advanced_settings_to_the_service FAILED [ 96%]
+backend\tests\test_generation_advanced_settings.py::test_stream_route_passes_options_to_a_declaring_engine FAILED [100%]
+
+================================== FAILURES ===================================
+___________ test_declaring_engine_receives_the_settings_as_options ____________
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.OptionsBackend object at 0x0000020AA498B890>, statuses=[])
+
+    @pytest.mark.asyncio
+    async def test_declaring_engine_receives_the_settings_as_options(service) -> None:
+        service.backend = OptionsBackend()
+    
+>       await _run("voxcpm", SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+________ test_declaring_engine_without_settings_gets_no_options[None] _________
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.OptionsBackend object at 0x0000020AA49C38C0>, statuses=[])
+advanced_settings = None
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("advanced_settings", [None, {}])
+    async def test_declaring_engine_without_settings_gets_no_options(service, advanced_settings) -> None:
+        service.backend = OptionsBackend()
+    
+>       await _run("voxcpm", advanced_settings)
+
+backend\tests\test_generation_advanced_settings.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+_ test_declaring_engine_without_settings_gets_no_options[advanced_settings1] __
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.OptionsBackend object at 0x0000020AA49C3890>, statuses=[])
+advanced_settings = {}
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("advanced_settings", [None, {}])
+    async def test_declaring_engine_without_settings_gets_no_options(service, advanced_settings) -> None:
+        service.backend = OptionsBackend()
+    
+>       await _run("voxcpm", advanced_settings)
+
+backend\tests\test_generation_advanced_settings.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm', advanced_settings = {}
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+________ test_existing_engines_never_receive_an_options_keyword[qwen] _________
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F0320>, statuses=[])
+engine = 'qwen'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -> None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+>       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'qwen'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+__ test_existing_engines_never_receive_an_options_keyword[qwen_custom_voice] __
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F3500>, statuses=[])
+engine = 'qwen_custom_voice'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -> None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+>       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'qwen_custom_voice'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+_______ test_existing_engines_never_receive_an_options_keyword[luxtts] ________
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F1A00>, statuses=[])
+engine = 'luxtts'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -> None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+>       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'luxtts'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+_____ test_existing_engines_never_receive_an_options_keyword[chatterbox] ______
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F2780>, statuses=[])
+engine = 'chatterbox'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -> None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+>       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'chatterbox'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+__ test_existing_engines_never_receive_an_options_keyword[chatterbox_turbo] ___
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F3740>, statuses=[])
+engine = 'chatterbox_turbo'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -> None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+>       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'chatterbox_turbo'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+________ test_existing_engines_never_receive_an_options_keyword[tada] _________
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A101A0>, statuses=[])
+engine = 'tada'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -> None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+>       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'tada'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+_______ test_existing_engines_never_receive_an_options_keyword[kokoro] ________
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A10C80>, statuses=[])
+engine = 'kokoro'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -> None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+>       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'kokoro'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+_______ test_existing_engines_never_receive_an_options_keyword[f5_tts] ________
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A11C10>, statuses=[])
+engine = 'f5_tts'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_never_receive_an_options_keyword(service, engine) -> None:
+        # Validation would already reject these settings; the service must not forward them regardless.
+        service.backend = StrictBackend()
+    
+>       await _run(engine, SETTINGS)
+
+backend\tests\test_generation_advanced_settings.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'f5_tts'
+advanced_settings = {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+__ test_existing_engines_are_called_exactly_as_before_without_settings[qwen] __
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A12A80>, statuses=[])
+engine = 'qwen'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -> None:
+        service.backend = StrictBackend()
+    
+>       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'qwen', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+_ test_existing_engines_are_called_exactly_as_before_without_settings[qwen_custom_voice] _
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A13DD0>, statuses=[])
+engine = 'qwen_custom_voice'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -> None:
+        service.backend = StrictBackend()
+    
+>       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'qwen_custom_voice', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+_ test_existing_engines_are_called_exactly_as_before_without_settings[luxtts] _
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A12A20>, statuses=[])
+engine = 'luxtts'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -> None:
+        service.backend = StrictBackend()
+    
+>       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'luxtts', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+_ test_existing_engines_are_called_exactly_as_before_without_settings[chatterbox] _
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA4A10EC0>, statuses=[])
+engine = 'chatterbox'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -> None:
+        service.backend = StrictBackend()
+    
+>       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'chatterbox', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+_ test_existing_engines_are_called_exactly_as_before_without_settings[chatterbox_turbo] _
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA2C8B5F0>, statuses=[])
+engine = 'chatterbox_turbo'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -> None:
+        service.backend = StrictBackend()
+    
+>       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'chatterbox_turbo', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+__ test_existing_engines_are_called_exactly_as_before_without_settings[tada] __
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F3920>, statuses=[])
+engine = 'tada'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -> None:
+        service.backend = StrictBackend()
+    
+>       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'tada', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+_ test_existing_engines_are_called_exactly_as_before_without_settings[kokoro] _
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F0C50>, statuses=[])
+engine = 'kokoro'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -> None:
+        service.backend = StrictBackend()
+    
+>       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'kokoro', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+_ test_existing_engines_are_called_exactly_as_before_without_settings[f5_tts] _
+
+service = namespace(backend=<backend.tests.test_generation_advanced_settings.StrictBackend object at 0x0000020AA49F0410>, statuses=[])
+engine = 'f5_tts'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("engine", PRE_VOXCPM_ENGINES)
+    async def test_existing_engines_are_called_exactly_as_before_without_settings(service, engine) -> None:
+        service.backend = StrictBackend()
+    
+>       await _run(engine, None)
+
+backend\tests\test_generation_advanced_settings.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'f5_tts', advanced_settings = None
+
+    async def _run(engine: str, advanced_settings):
+>       await generation_service.run_generation(
+            generation_id="gen-1",
+            profile_id="profile-1",
+            text="Hello there.",
+            language="en",
+            engine=engine,
+            model_size="default",
+            seed=7,
+            mode="generate",
+            advanced_settings=advanced_settings,
+        )
+E       TypeError: run_generation() got an unexpected keyword argument 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:85: TypeError
+___________ test_backend_is_returned_unwrapped_when_nothing_applies ___________
+
+    def test_backend_is_returned_unwrapped_when_nothing_applies() -> None:
+        backend = StrictBackend()
+    
+>       assert generation_service.backend_with_generation_options(backend, "kokoro", SETTINGS) is backend
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'backend_with_generation_options'
+
+backend\tests\test_generation_advanced_settings.py:149: AttributeError
+_______________ test_wrapped_backend_delegates_everything_else ________________
+
+    @pytest.mark.asyncio
+    async def test_wrapped_backend_delegates_everything_else() -> None:
+        backend = OptionsBackend()
+>       wrapped = generation_service.backend_with_generation_options(backend, "voxcpm", SETTINGS)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'backend_with_generation_options'
+
+backend\tests\test_generation_advanced_settings.py:157: AttributeError
+_______________ test_declaration_lookup_reads_the_model_configs _______________
+
+    def test_declaration_lookup_reads_the_model_configs() -> None:
+>       assert generation_service.engine_declares_advanced_settings("voxcpm") is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'engine_declares_advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:168: AttributeError
+________ test_generate_route_threads_advanced_settings_to_the_service _________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000020AA4A15640>
+
+    @pytest.mark.asyncio
+    async def test_generate_route_threads_advanced_settings_to_the_service(monkeypatch) -> None:
+        from backend.routes import generations as routes_mod
+    
+        captured: dict = {}
+    
+        async def fake_get_profile(*_a, **_k):
+            return SimpleNamespace(default_engine=None, preset_engine=None, personality=None, effects_chain=None)
+    
+        async def fake_create_generation(**kwargs):
+            return SimpleNamespace(id=kwargs["generation_id"])
+    
+        def fake_run_generation(**kwargs):
+            captured.update(kwargs)
+            return "job"
+    
+        class FakeQuery:
+            def filter_by(self, **_k):
+                return self
+    
+            def first(self):
+                return None
+    
+        fake_db = SimpleNamespace(query=lambda *_a: FakeQuery())
+    
+        monkeypatch.setattr(routes_mod.profiles, "get_profile", fake_get_profile)
+        monkeypatch.setattr(routes_mod.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+        monkeypatch.setattr(routes_mod.history, "create_generation", fake_create_generation)
+        monkeypatch.setattr(routes_mod, "run_generation", fake_run_generation)
+        monkeypatch.setattr(routes_mod, "enqueue_generation", lambda *_a, **_k: None)
+    
+        data = models.GenerationRequest(profile_id="p1", text="Hello.", engine="voxcpm", advanced_settings=SETTINGS)
+        await routes_mod.generate_speech(data, db=fake_db)
+    
+        assert captured["engine"] == "voxcpm"
+>       assert captured["advanced_settings"] == SETTINGS
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'advanced_settings'
+
+backend\tests\test_generation_advanced_settings.py:246: KeyError
+___________ test_stream_route_passes_options_to_a_declaring_engine ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000020AA4E17170>
+
+    @pytest.mark.asyncio
+    async def test_stream_route_passes_options_to_a_declaring_engine(monkeypatch) -> None:
+        import backend.backends as backends_pkg
+        from backend.routes import generations as routes_mod
+    
+        backend = OptionsBackend()
+    
+        async def fake_get_profile(*_a, **_k):
+            return SimpleNamespace(default_engine=None, preset_engine=None, personality=None, effects_chain=None)
+    
+        async def noop(*_a, **_k):
+            return None
+    
+        async def fake_voice_prompt(*_a, **_k):
+            return {}
+    
+        monkeypatch.setattr(routes_mod.profiles, "get_profile", fake_get_profile)
+        monkeypatch.setattr(routes_mod.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+        monkeypatch.setattr(routes_mod.profiles, "create_voice_prompt_for_profile", fake_voice_prompt)
+        monkeypatch.setattr(routes_mod.pronunciation, "apply_pronunciations", lambda text, *_a, **_k: (text, []))
+        monkeypatch.setattr(backends_pkg, "get_tts_backend_for_engine", lambda _engine: backend)
+        monkeypatch.setattr(backends_pkg, "ensure_model_cached_or_raise", noop)
+        monkeypatch.setattr(backends_pkg, "load_engine_model", noop)
+    
+        data = models.GenerationRequest(profile_id="p1", text="Hello.", engine="voxcpm", advanced_settings=SETTINGS)
+        await routes_mod.stream_speech(data, db=None)
+    
+>       assert backend.calls[0]["options"] == SETTINGS
+E       AssertionError: assert None == {'cfg_value': 2.5, 'inference_timesteps': 16.0}
+
+backend\tests\test_generation_advanced_settings.py:276: AssertionError
+============================== warnings summary ===============================
+backend\models.py:32
+  D:\Projects\Personal\voicebox\backend\models.py:32: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(BaseModel):
+
+backend\models.py:68
+  D:\Projects\Personal\voicebox\backend\models.py:68: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ProfileSampleResponse(BaseModel):
+
+backend\models.py:145
+  D:\Projects\Personal\voicebox\backend\models.py:145: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationResponse(BaseModel):
+
+backend\models.py:210
+  D:\Projects\Personal\voicebox\backend\models.py:210: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationEntryResponse(BaseModel):
+
+backend\models.py:268
+  D:\Projects\Personal\voicebox\backend\models.py:268: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class HistoryResponse(BaseModel):
+
+backend\models.py:322
+  D:\Projects\Personal\voicebox\backend\models.py:322: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureResponse(BaseModel):
+
+backend\models.py:377
+  D:\Projects\Personal\voicebox\backend\models.py:377: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureSettingsResponse(BaseModel):
+
+backend\models.py:418
+  D:\Projects\Personal\voicebox\backend\models.py:418: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationSettingsResponse(BaseModel):
+
+backend\models.py:439
+  D:\Projects\Personal\voicebox\backend\models.py:439: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class MCPClientBindingResponse(BaseModel):
+
+backend\models.py:719
+  D:\Projects\Personal\voicebox\backend\models.py:719: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioChannelResponse(BaseModel):
+
+backend\models.py:751
+  D:\Projects\Personal\voicebox\backend\models.py:751: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+backend\models.py:765
+  D:\Projects\Personal\voicebox\backend\models.py:765: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+backend\models.py:797
+  D:\Projects\Personal\voicebox\backend\models.py:797: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+backend\models.py:905
+  D:\Projects\Personal\voicebox\backend\models.py:905: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+backend\models.py:919
+  D:\Projects\Personal\voicebox\backend\models.py:919: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+backend\database\models.py:26
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+tests/test_generation_advanced_settings.py::test_generate_route_threads_advanced_settings_to_the_service
+  <string>:6: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase3\T023-backend-red.xml -
+=========================== short test summary info ===========================
+FAILED backend\tests\test_generation_advanced_settings.py::test_declaring_engine_receives_the_settings_as_options
+FAILED backend\tests\test_generation_advanced_settings.py::test_declaring_engine_without_settings_gets_no_options[None]
+FAILED backend\tests\test_generation_advanced_settings.py::test_declaring_engine_without_settings_gets_no_options[advanced_settings1]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[qwen]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[qwen_custom_voice]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[luxtts]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[chatterbox]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[chatterbox_turbo]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[tada]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[kokoro]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[f5_tts]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[qwen]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[qwen_custom_voice]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[luxtts]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[chatterbox]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[chatterbox_turbo]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[tada]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[kokoro]
+FAILED backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[f5_tts]
+FAILED backend\tests\test_generation_advanced_settings.py::test_backend_is_returned_unwrapped_when_nothing_applies
+FAILED backend\tests\test_generation_advanced_settings.py::test_wrapped_backend_delegates_everything_else
+FAILED backend\tests\test_generation_advanced_settings.py::test_declaration_lookup_reads_the_model_configs
+FAILED backend\tests\test_generation_advanced_settings.py::test_generate_route_threads_advanced_settings_to_the_service
+FAILED backend\tests\test_generation_advanced_settings.py::test_stream_route_passes_options_to_a_declaring_engine
+================== 24 failed, 1 passed, 17 warnings in 2.43s ==================
+# exit code: 1
+
+# RED junit: <testsuite name="pytest" errors="0" failures="24" skipped="0" tests="25" time="2.422" timestamp="2026-09-23T16:27:46.572806+03:00" hostname="DevelopmentPC"
+
+=== GREEN RUN (services/generation.py: engine_declares_advanced_settings, backend_with_generation_options, run_generation(advanced_settings=...); routes/generations.py: /generate passes data.advanced_settings, /generate/stream wraps the backend) ===
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_generation_advanced_settings.py backend/tests/test_voxcpm_backend.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase3/T023-backend.xml
+# timestamp: 2026-09-23T16:28:16+03:00
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 80 items
+
+backend\tests\test_generation_advanced_settings.py::test_declaring_engine_receives_the_settings_as_options PASSED [  1%]
+backend\tests\test_generation_advanced_settings.py::test_declaring_engine_without_settings_gets_no_options[None] PASSED [  2%]
+backend\tests\test_generation_advanced_settings.py::test_declaring_engine_without_settings_gets_no_options[advanced_settings1] PASSED [  3%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[qwen] PASSED [  5%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[qwen_custom_voice] PASSED [  6%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[luxtts] PASSED [  7%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[chatterbox] PASSED [  8%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[chatterbox_turbo] PASSED [ 10%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[tada] PASSED [ 11%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[kokoro] PASSED [ 12%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[f5_tts] PASSED [ 13%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[qwen] PASSED [ 15%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[qwen_custom_voice] PASSED [ 16%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[luxtts] PASSED [ 17%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[chatterbox] PASSED [ 18%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[chatterbox_turbo] PASSED [ 20%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[tada] PASSED [ 21%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[kokoro] PASSED [ 22%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[f5_tts] PASSED [ 23%]
+backend\tests\test_generation_advanced_settings.py::test_backend_is_returned_unwrapped_when_nothing_applies PASSED [ 25%]
+backend\tests\test_generation_advanced_settings.py::test_wrapped_backend_delegates_everything_else PASSED [ 26%]
+backend\tests\test_generation_advanced_settings.py::test_declaration_lookup_reads_the_model_configs PASSED [ 27%]
+backend\tests\test_generation_advanced_settings.py::test_voxcpm_backend_applies_options_with_declared_defaults_as_fallback PASSED [ 28%]
+backend\tests\test_generation_advanced_settings.py::test_generate_route_threads_advanced_settings_to_the_service PASSED [ 30%]
+backend\tests\test_generation_advanced_settings.py::test_stream_route_passes_options_to_a_declaring_engine PASSED [ 31%]
+backend\tests\test_voxcpm_backend.py::test_load_model_is_idempotent PASSED [ 32%]
+backend\tests\test_voxcpm_backend.py::test_load_model_disables_the_modelscope_denoiser PASSED [ 33%]
+backend\tests\test_voxcpm_backend.py::test_load_model_passes_an_explicit_device_from_our_policy PASSED [ 35%]
+backend\tests\test_voxcpm_backend.py::test_cached_model_loads_with_local_files_only PASSED [ 36%]
+backend\tests\test_voxcpm_backend.py::test_uncached_model_may_download PASSED [ 37%]
+backend\tests\test_voxcpm_backend.py::test_load_runs_inside_model_load_progress[True] PASSED [ 38%]
+backend\tests\test_voxcpm_backend.py::test_load_runs_inside_model_load_progress[False] PASSED [ 40%]
+backend\tests\test_voxcpm_backend.py::test_generate_returns_the_array_and_the_model_runtime_sample_rate PASSED [ 41%]
+backend\tests\test_voxcpm_backend.py::test_generate_keeps_upstream_normalization_off PASSED [ 42%]
+backend\tests\test_voxcpm_backend.py::test_seed_is_applied_before_the_vendor_call_and_never_forwarded PASSED [ 43%]
+backend\tests\test_voxcpm_backend.py::test_no_seed_means_no_manual_seed PASSED [ 45%]
+backend\tests\test_voxcpm_backend.py::test_generate_passes_the_prompt_pair_together PASSED [ 46%]
+backend\tests\test_voxcpm_backend.py::test_generate_without_reference_passes_neither_prompt_key[None] PASSED [ 47%]
+backend\tests\test_voxcpm_backend.py::test_generate_without_reference_passes_neither_prompt_key[voice_prompt1] PASSED [ 48%]
+backend\tests\test_voxcpm_backend.py::test_generate_rejects_half_a_prompt_pair[voice_prompt0] PASSED [ 50%]
+backend\tests\test_voxcpm_backend.py::test_generate_rejects_half_a_prompt_pair[voice_prompt1] PASSED [ 51%]
+backend\tests\test_voxcpm_backend.py::test_generate_rejects_half_a_prompt_pair[voice_prompt2] PASSED [ 52%]
+backend\tests\test_voxcpm_backend.py::test_generate_uses_declared_defaults_without_options PASSED [ 53%]
+backend\tests\test_voxcpm_backend.py::test_generate_maps_advanced_options PASSED [ 55%]
+backend\tests\test_voxcpm_backend.py::test_generate_partial_options_fall_back_per_setting PASSED [ 56%]
+backend\tests\test_voxcpm_backend.py::test_voice_description_becomes_the_ascii_paren_prefix_without_reference PASSED [ 57%]
+backend\tests\test_voxcpm_backend.py::test_voice_description_is_inactive_when_reference_audio_is_present PASSED [ 58%]
+backend\tests\test_voxcpm_backend.py::test_blank_voice_description_adds_no_prefix[None] PASSED [ 60%]
+backend\tests\test_voxcpm_backend.py::test_blank_voice_description_adds_no_prefix[] PASSED [ 61%]
+backend\tests\test_voxcpm_backend.py::test_blank_voice_description_adds_no_prefix[   ] PASSED [ 62%]
+backend\tests\test_voxcpm_backend.py::test_unload_empties_the_device_cache_and_reports_unloaded PASSED [ 63%]
+backend\tests\test_voxcpm_backend.py::test_unload_when_not_loaded_is_a_no_op PASSED [ 65%]
+backend\tests\test_voxcpm_backend.py::test_reload_after_unload_loads_again PASSED [ 66%]
+backend\tests\test_voxcpm_backend.py::test_model_path_is_the_hf_repo PASSED [ 67%]
+backend\tests\test_voxcpm_backend.py::test_is_model_cached_recognises_pth_weights PASSED [ 68%]
+backend\tests\test_voxcpm_backend.py::test_is_model_cached_recognises_safetensors_weights PASSED [ 70%]
+backend\tests\test_voxcpm_backend.py::test_is_model_cached_rejects_incomplete_downloads PASSED [ 71%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_carries_the_audio_path_and_transcript PASSED [ 72%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_is_served_from_the_engine_scoped_cache PASSED [ 73%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_without_cache_writes_nothing PASSED [ 75%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_requires_a_transcript PASSED [ 76%]
+backend\tests\test_voxcpm_backend.py::test_combine_voice_prompts_delegates_to_the_shared_helper PASSED [ 77%]
+backend\tests\test_voxcpm_backend.py::test_module_has_no_top_level_heavy_import PASSED [ 78%]
+backend\tests\test_voxcpm_backend.py::test_vendor_import_is_marked_lazy PASSED [ 80%]
+backend\tests\test_voxcpm_backend.py::test_importing_and_constructing_the_backend_does_not_import_the_vendor PASSED [ 81%]
+backend\tests\test_voxcpm_backend.py::test_engine_is_registered_by_name PASSED [ 82%]
+backend\tests\test_voxcpm_backend.py::test_model_config_declares_the_data_model_values PASSED [ 83%]
+backend\tests\test_voxcpm_backend.py::test_model_config_declares_the_two_advanced_settings PASSED [ 85%]
+backend\tests\test_voxcpm_backend.py::test_backend_defaults_match_the_declared_settings PASSED [ 86%]
+backend\tests\test_voxcpm_backend.py::test_default_model_size_is_default PASSED [ 87%]
+backend\tests\test_voxcpm_backend.py::test_dispatch_returns_the_voxcpm_backend PASSED [ 88%]
+backend\tests\test_voxcpm_backend.py::test_dispatch_does_not_import_the_vendor PASSED [ 90%]
+backend\tests\test_voxcpm_backend.py::test_all_four_engine_patterns_accept_voxcpm PASSED [ 91%]
+backend\tests\test_voxcpm_backend.py::test_generation_request_accepts_the_declared_advanced_settings PASSED [ 92%]
+backend\tests\test_voxcpm_backend.py::test_cached_load_succeeds_with_the_network_blocked PASSED [ 93%]
+backend\tests\test_voxcpm_backend.py::test_cached_load_runs_inside_force_offline_if_cached PASSED [ 95%]
+backend\tests\test_voxcpm_backend.py::test_cached_load_passes_local_files_only_and_no_denoiser PASSED [ 96%]
+backend\tests\test_voxcpm_backend.py::test_offline_mode_is_restored_after_the_cached_load PASSED [ 97%]
+backend\tests\test_voxcpm_backend.py::test_uncached_load_is_not_forced_offline PASSED [ 98%]
+backend\tests\test_voxcpm_backend.py::test_pronunciation_processed_arabic_reaches_the_vendor_byte_for_byte PASSED [100%]
+
+============================== warnings summary ===============================
+backend\models.py:32
+  D:\Projects\Personal\voicebox\backend\models.py:32: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(BaseModel):
+
+backend\models.py:68
+  D:\Projects\Personal\voicebox\backend\models.py:68: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ProfileSampleResponse(BaseModel):
+
+backend\models.py:145
+  D:\Projects\Personal\voicebox\backend\models.py:145: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationResponse(BaseModel):
+
+backend\models.py:210
+  D:\Projects\Personal\voicebox\backend\models.py:210: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationEntryResponse(BaseModel):
+
+backend\models.py:268
+  D:\Projects\Personal\voicebox\backend\models.py:268: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class HistoryResponse(BaseModel):
+
+backend\models.py:322
+  D:\Projects\Personal\voicebox\backend\models.py:322: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureResponse(BaseModel):
+
+backend\models.py:377
+  D:\Projects\Personal\voicebox\backend\models.py:377: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureSettingsResponse(BaseModel):
+
+backend\models.py:418
+  D:\Projects\Personal\voicebox\backend\models.py:418: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationSettingsResponse(BaseModel):
+
+backend\models.py:439
+  D:\Projects\Personal\voicebox\backend\models.py:439: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class MCPClientBindingResponse(BaseModel):
+
+backend\models.py:719
+  D:\Projects\Personal\voicebox\backend\models.py:719: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioChannelResponse(BaseModel):
+
+backend\models.py:751
+  D:\Projects\Personal\voicebox\backend\models.py:751: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+backend\models.py:765
+  D:\Projects\Personal\voicebox\backend\models.py:765: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+backend\models.py:797
+  D:\Projects\Personal\voicebox\backend\models.py:797: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+backend\models.py:905
+  D:\Projects\Personal\voicebox\backend\models.py:905: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+backend\models.py:919
+  D:\Projects\Personal\voicebox\backend\models.py:919: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+backend\database\models.py:26
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+tests/test_generation_advanced_settings.py::test_generate_route_threads_advanced_settings_to_the_service
+  <string>:6: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase3\T023-backend.xml -
+======================= 80 passed, 17 warnings in 8.38s =======================
+# exit code: 0
+
+=== REGRESSION RUN: pre-existing test files that reference services/generation.py or routes/generations.py (grep over backend/tests for services.generation|run_generation|generate_audio_sync|routes.generations|/generate). Baseline (evidence/chores/suite-baseline.xml) for these files: client_id_middleware 17 pass, generation_download 2 pass, mcp_speak 3 pass, pronunciation 46 pass; all_models_e2e, personality_samples, refinement_samples collect 0 tests. The only baseline failure (test_progress::test_hf_progress_tracker) is not in this set. ===
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_client_id_middleware.py backend/tests/test_generation_download.py backend/tests/test_mcp_speak.py backend/tests/test_pronunciation.py backend/tests/test_all_models_e2e.py backend/tests/test_personality_samples.py backend/tests/test_refinement_samples.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase3/T023-backend-regression.xml
+# timestamp: 2026-09-23T16:28:47+03:00
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 68 items
+
+backend\tests\test_client_id_middleware.py::test_mcp_semantic_paths_are_stamped[/mcp] PASSED [  1%]
+backend\tests\test_client_id_middleware.py::test_mcp_semantic_paths_are_stamped[/mcp/] PASSED [  2%]
+backend\tests\test_client_id_middleware.py::test_mcp_semantic_paths_are_stamped[/mcp/tools/call] PASSED [  4%]
+backend\tests\test_client_id_middleware.py::test_mcp_semantic_paths_are_stamped[/mcp/bindings] PASSED [  5%]
+backend\tests\test_client_id_middleware.py::test_mcp_semantic_paths_are_stamped[/speak] PASSED [  7%]
+backend\tests\test_client_id_middleware.py::test_mcp_semantic_paths_are_stamped[/speak/] PASSED [  8%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/] PASSED [ 10%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/health] PASSED [ 11%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/generate] PASSED [ 13%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/captures] PASSED [ 14%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/profiles] PASSED [ 16%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/profiles/abc/compose] PASSED [ 17%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/events/speak] PASSED [ 19%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/tasks/active] PASSED [ 20%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/llm/generate] PASSED [ 22%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/speakers] PASSED [ 23%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/mcpfoo] PASSED [ 25%]
+backend\tests\test_generation_download.py::test_generation_with_cached_model PASSED [ 26%]
+backend\tests\test_generation_download.py::test_generation_with_fresh_download PASSED [ 27%]
+backend\tests\test_mcp_speak.py::test_speak_forwards_explicit_model_size PASSED [ 29%]
+backend\tests\test_mcp_speak.py::test_speak_omitted_model_size_is_none PASSED [ 30%]
+backend\tests\test_mcp_speak.py::test_speak_rejects_invalid_model_size PASSED [ 32%]
+backend\tests\test_pronunciation.py::test_replaces_a_term PASSED         [ 33%]
+backend\tests\test_pronunciation.py::test_matching_is_case_insensitive_but_capitalisation_survives PASSED [ 35%]
+backend\tests\test_pronunciation.py::test_all_caps_stays_all_caps PASSED [ 36%]
+backend\tests\test_pronunciation.py::test_only_whole_words_match PASSED  [ 38%]
+backend\tests\test_pronunciation.py::test_replacements_do_not_cascade PASSED [ 39%]
+backend\tests\test_pronunciation.py::test_longer_terms_win PASSED        [ 41%]
+backend\tests\test_pronunciation.py::test_paralinguistic_tags_are_left_alone PASSED [ 42%]
+backend\tests\test_pronunciation.py::test_accented_terms_match PASSED    [ 44%]
+backend\tests\test_pronunciation.py::test_reports_what_it_changed PASSED [ 45%]
+backend\tests\test_pronunciation.py::test_arabic_term_matches_with_diacritics PASSED [ 47%]
+backend\tests\test_pronunciation.py::test_arabic_hamza_and_ta_marbuta_spellings_match PASSED [ 48%]
+backend\tests\test_pronunciation.py::test_arabic_prefixes_are_kept_before_an_article_term PASSED [ 50%]
+backend\tests\test_pronunciation.py::test_arabic_contracted_article_after_lam PASSED [ 51%]
+backend\tests\test_pronunciation.py::test_arabic_article_replacement_without_article PASSED [ 52%]
+backend\tests\test_pronunciation.py::test_latin_term_inside_arabic_text PASSED [ 54%]
+backend\tests\test_pronunciation.py::test_arabic_prepositions_before_a_long_term PASSED [ 55%]
+backend\tests\test_pronunciation.py::test_short_arabic_term_is_not_matched_inside_a_prefixed_word PASSED [ 57%]
+backend\tests\test_pronunciation.py::test_arabic_term_does_not_match_inside_a_longer_word PASSED [ 58%]
+backend\tests\test_pronunciation.py::test_arabic_and_latin_entries_together PASSED [ 60%]
+backend\tests\test_pronunciation.py::test_language_scoped_entry_only_applies_to_that_language PASSED [ 61%]
+backend\tests\test_pronunciation.py::test_wildcard_language_applies_everywhere PASSED [ 63%]
+backend\tests\test_pronunciation.py::test_disabled_entries_are_skipped PASSED [ 64%]
+backend\tests\test_pronunciation.py::test_profile_entry_beats_global PASSED [ 66%]
+backend\tests\test_pronunciation.py::test_other_profiles_entries_do_not_leak PASSED [ 67%]
+backend\tests\test_pronunciation.py::test_no_entries_is_a_no_op PASSED   [ 69%]
+backend\tests\test_pronunciation.py::test_blank_text_is_returned_unchanged[] PASSED [ 70%]
+backend\tests\test_pronunciation.py::test_blank_text_is_returned_unchanged[   ] PASSED [ 72%]
+backend\tests\test_pronunciation.py::test_build_pattern_handles_no_usable_terms PASSED [ 73%]
+backend\tests\test_pronunciation.py::test_regex_metacharacters_in_a_term_are_literal PASSED [ 75%]
+backend\tests\test_pronunciation.py::test_crud_roundtrip PASSED          [ 76%]
+backend\tests\test_pronunciation.py::test_duplicate_in_the_same_scope_is_rejected PASSED [ 77%]
+backend\tests\test_pronunciation.py::test_same_term_in_a_different_language_is_allowed PASSED [ 79%]
+backend\tests\test_pronunciation.py::test_unknown_profile_is_rejected PASSED [ 80%]
+backend\tests\test_pronunciation.py::test_preview_shows_the_rewrite PASSED [ 82%]
+backend\tests\test_pronunciation.py::test_missing_entry_404s PASSED      [ 83%]
+backend\tests\test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original PASSED [ 85%]
+backend\tests\test_pronunciation.py::test_preview_is_the_only_way_to_see_the_rewrite PASSED [ 86%]
+backend\tests\test_pronunciation.py::test_sql_wildcards_in_a_term_are_literal PASSED [ 88%]
+backend\tests\test_pronunciation.py::test_untrimmed_term_still_finds_its_duplicate PASSED [ 89%]
+backend\tests\test_pronunciation.py::test_whitespace_only_values_are_rejected[term] PASSED [ 91%]
+backend\tests\test_pronunciation.py::test_whitespace_only_values_are_rejected[replacement] PASSED [ 92%]
+backend\tests\test_pronunciation.py::test_values_are_stored_trimmed PASSED [ 94%]
+backend\tests\test_pronunciation.py::test_preview_rejects_an_unknown_profile PASSED [ 95%]
+backend\tests\test_pronunciation.py::test_the_database_enforces_scope_uniqueness PASSED [ 97%]
+backend\tests\test_pronunciation.py::test_terms_are_not_logged_at_info PASSED [ 98%]
+backend\tests\test_pronunciation.py::test_dedup_migration_keeps_the_oldest_row PASSED [100%]
+
+============================== warnings summary ===============================
+backend\models.py:32
+  D:\Projects\Personal\voicebox\backend\models.py:32: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(BaseModel):
+
+backend\models.py:68
+  D:\Projects\Personal\voicebox\backend\models.py:68: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ProfileSampleResponse(BaseModel):
+
+backend\models.py:145
+  D:\Projects\Personal\voicebox\backend\models.py:145: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationResponse(BaseModel):
+
+backend\models.py:210
+  D:\Projects\Personal\voicebox\backend\models.py:210: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationEntryResponse(BaseModel):
+
+backend\models.py:268
+  D:\Projects\Personal\voicebox\backend\models.py:268: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class HistoryResponse(BaseModel):
+
+backend\models.py:322
+  D:\Projects\Personal\voicebox\backend\models.py:322: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureResponse(BaseModel):
+
+backend\models.py:377
+  D:\Projects\Personal\voicebox\backend\models.py:377: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureSettingsResponse(BaseModel):
+
+backend\models.py:418
+  D:\Projects\Personal\voicebox\backend\models.py:418: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationSettingsResponse(BaseModel):
+
+backend\models.py:439
+  D:\Projects\Personal\voicebox\backend\models.py:439: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class MCPClientBindingResponse(BaseModel):
+
+backend\models.py:719
+  D:\Projects\Personal\voicebox\backend\models.py:719: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioChannelResponse(BaseModel):
+
+backend\models.py:751
+  D:\Projects\Personal\voicebox\backend\models.py:751: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+backend\models.py:765
+  D:\Projects\Personal\voicebox\backend\models.py:765: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+backend\models.py:797
+  D:\Projects\Personal\voicebox\backend\models.py:797: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+backend\models.py:905
+  D:\Projects\Personal\voicebox\backend\models.py:905: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+backend\models.py:919
+  D:\Projects\Personal\voicebox\backend\models.py:919: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+backend\database\models.py:26
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+backend\tests\test_pronunciation.py:25
+  D:\Projects\Personal\voicebox\backend\tests\test_pronunciation.py:25: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient  # noqa: E402
+
+tests/test_pronunciation.py::test_replaces_a_term
+  D:\Projects\Personal\voicebox\backend\database\migrations.py:74: SAWarning: Skipped unsupported reflection of expression-based index uq_pronunciation_scope
+    existing = {ix["name"] for ix in inspector.get_indexes("pronunciation_entries")}
+
+tests/test_pronunciation.py: 100 warnings
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\sqlalchemy\sql\schema.py:3627: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+tests/test_pronunciation.py::test_profile_entry_beats_global
+tests/test_pronunciation.py::test_other_profiles_entries_do_not_leak
+tests/test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:186: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+tests/test_pronunciation.py::test_profile_entry_beats_global
+tests/test_pronunciation.py::test_other_profiles_entries_do_not_leak
+tests/test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:187: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    updated_at=datetime.utcnow(),
+
+tests/test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original
+  D:\Projects\Personal\voicebox\backend\services\history.py:107: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase3\T023-backend-regression.xml -
+====================== 68 passed, 125 warnings in 9.55s =======================
+# exit code: 0
+
+# GREEN RUN junit (overwritten by FINAL RUN): <testsuite name="pytest" errors="0" failures="0" skipped="0" tests="80" time="8.363" timestamp="2026-09-23T16:28:16.620062+03:00" hostname="DevelopmentPC"
+
+=== FINAL RUN after the step-6 lint edits (generation.py annotations, test formatting): every test file touched in stage 1 and 2 plus the generation regression files ===
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_generation_advanced_settings.py backend/tests/test_voxcpm_backend.py backend/tests/test_engine_capabilities.py backend/tests/test_engine_patterns.py backend/tests/test_f5tts_backend.py backend/tests/test_client_id_middleware.py backend/tests/test_generation_download.py backend/tests/test_mcp_speak.py backend/tests/test_pronunciation.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase3/T023-backend.xml
+# timestamp: 2026-09-23T16:32:29+03:00
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 483 items
+
+backend\tests\test_generation_advanced_settings.py::test_declaring_engine_receives_the_settings_as_options PASSED [  0%]
+backend\tests\test_generation_advanced_settings.py::test_declaring_engine_without_settings_gets_no_options[None] PASSED [  0%]
+backend\tests\test_generation_advanced_settings.py::test_declaring_engine_without_settings_gets_no_options[advanced_settings1] PASSED [  0%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[qwen] PASSED [  0%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[qwen_custom_voice] PASSED [  1%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[luxtts] PASSED [  1%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[chatterbox] PASSED [  1%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[chatterbox_turbo] PASSED [  1%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[tada] PASSED [  1%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[kokoro] PASSED [  2%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_never_receive_an_options_keyword[f5_tts] PASSED [  2%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[qwen] PASSED [  2%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[qwen_custom_voice] PASSED [  2%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[luxtts] PASSED [  2%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[chatterbox] PASSED [  3%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[chatterbox_turbo] PASSED [  3%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[tada] PASSED [  3%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[kokoro] PASSED [  3%]
+backend\tests\test_generation_advanced_settings.py::test_existing_engines_are_called_exactly_as_before_without_settings[f5_tts] PASSED [  3%]
+backend\tests\test_generation_advanced_settings.py::test_backend_is_returned_unwrapped_when_nothing_applies PASSED [  4%]
+backend\tests\test_generation_advanced_settings.py::test_wrapped_backend_delegates_everything_else PASSED [  4%]
+backend\tests\test_generation_advanced_settings.py::test_declaration_lookup_reads_the_model_configs PASSED [  4%]
+backend\tests\test_generation_advanced_settings.py::test_voxcpm_backend_applies_options_with_declared_defaults_as_fallback PASSED [  4%]
+backend\tests\test_generation_advanced_settings.py::test_generate_route_threads_advanced_settings_to_the_service PASSED [  4%]
+backend\tests\test_generation_advanced_settings.py::test_stream_route_passes_options_to_a_declaring_engine PASSED [  5%]
+backend\tests\test_voxcpm_backend.py::test_load_model_is_idempotent PASSED [  5%]
+backend\tests\test_voxcpm_backend.py::test_load_model_disables_the_modelscope_denoiser PASSED [  5%]
+backend\tests\test_voxcpm_backend.py::test_load_model_passes_an_explicit_device_from_our_policy PASSED [  5%]
+backend\tests\test_voxcpm_backend.py::test_cached_model_loads_with_local_files_only PASSED [  6%]
+backend\tests\test_voxcpm_backend.py::test_uncached_model_may_download PASSED [  6%]
+backend\tests\test_voxcpm_backend.py::test_load_runs_inside_model_load_progress[True] PASSED [  6%]
+backend\tests\test_voxcpm_backend.py::test_load_runs_inside_model_load_progress[False] PASSED [  6%]
+backend\tests\test_voxcpm_backend.py::test_generate_returns_the_array_and_the_model_runtime_sample_rate PASSED [  6%]
+backend\tests\test_voxcpm_backend.py::test_generate_keeps_upstream_normalization_off PASSED [  7%]
+backend\tests\test_voxcpm_backend.py::test_seed_is_applied_before_the_vendor_call_and_never_forwarded PASSED [  7%]
+backend\tests\test_voxcpm_backend.py::test_no_seed_means_no_manual_seed PASSED [  7%]
+backend\tests\test_voxcpm_backend.py::test_generate_passes_the_prompt_pair_together PASSED [  7%]
+backend\tests\test_voxcpm_backend.py::test_generate_without_reference_passes_neither_prompt_key[None] PASSED [  7%]
+backend\tests\test_voxcpm_backend.py::test_generate_without_reference_passes_neither_prompt_key[voice_prompt1] PASSED [  8%]
+backend\tests\test_voxcpm_backend.py::test_generate_rejects_half_a_prompt_pair[voice_prompt0] PASSED [  8%]
+backend\tests\test_voxcpm_backend.py::test_generate_rejects_half_a_prompt_pair[voice_prompt1] PASSED [  8%]
+backend\tests\test_voxcpm_backend.py::test_generate_rejects_half_a_prompt_pair[voice_prompt2] PASSED [  8%]
+backend\tests\test_voxcpm_backend.py::test_generate_uses_declared_defaults_without_options PASSED [  8%]
+backend\tests\test_voxcpm_backend.py::test_generate_maps_advanced_options PASSED [  9%]
+backend\tests\test_voxcpm_backend.py::test_generate_partial_options_fall_back_per_setting PASSED [  9%]
+backend\tests\test_voxcpm_backend.py::test_voice_description_becomes_the_ascii_paren_prefix_without_reference PASSED [  9%]
+backend\tests\test_voxcpm_backend.py::test_voice_description_is_inactive_when_reference_audio_is_present PASSED [  9%]
+backend\tests\test_voxcpm_backend.py::test_blank_voice_description_adds_no_prefix[None] PASSED [  9%]
+backend\tests\test_voxcpm_backend.py::test_blank_voice_description_adds_no_prefix[] PASSED [ 10%]
+backend\tests\test_voxcpm_backend.py::test_blank_voice_description_adds_no_prefix[   ] PASSED [ 10%]
+backend\tests\test_voxcpm_backend.py::test_unload_empties_the_device_cache_and_reports_unloaded PASSED [ 10%]
+backend\tests\test_voxcpm_backend.py::test_unload_when_not_loaded_is_a_no_op PASSED [ 10%]
+backend\tests\test_voxcpm_backend.py::test_reload_after_unload_loads_again PASSED [ 10%]
+backend\tests\test_voxcpm_backend.py::test_model_path_is_the_hf_repo PASSED [ 11%]
+backend\tests\test_voxcpm_backend.py::test_is_model_cached_recognises_pth_weights PASSED [ 11%]
+backend\tests\test_voxcpm_backend.py::test_is_model_cached_recognises_safetensors_weights PASSED [ 11%]
+backend\tests\test_voxcpm_backend.py::test_is_model_cached_rejects_incomplete_downloads PASSED [ 11%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_carries_the_audio_path_and_transcript PASSED [ 12%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_is_served_from_the_engine_scoped_cache PASSED [ 12%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_without_cache_writes_nothing PASSED [ 12%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_requires_a_transcript PASSED [ 12%]
+backend\tests\test_voxcpm_backend.py::test_combine_voice_prompts_delegates_to_the_shared_helper PASSED [ 12%]
+backend\tests\test_voxcpm_backend.py::test_module_has_no_top_level_heavy_import PASSED [ 13%]
+backend\tests\test_voxcpm_backend.py::test_vendor_import_is_marked_lazy PASSED [ 13%]
+backend\tests\test_voxcpm_backend.py::test_importing_and_constructing_the_backend_does_not_import_the_vendor PASSED [ 13%]
+backend\tests\test_voxcpm_backend.py::test_engine_is_registered_by_name PASSED [ 13%]
+backend\tests\test_voxcpm_backend.py::test_model_config_declares_the_data_model_values PASSED [ 13%]
+backend\tests\test_voxcpm_backend.py::test_model_config_declares_the_two_advanced_settings PASSED [ 14%]
+backend\tests\test_voxcpm_backend.py::test_backend_defaults_match_the_declared_settings PASSED [ 14%]
+backend\tests\test_voxcpm_backend.py::test_default_model_size_is_default PASSED [ 14%]
+backend\tests\test_voxcpm_backend.py::test_dispatch_returns_the_voxcpm_backend PASSED [ 14%]
+backend\tests\test_voxcpm_backend.py::test_dispatch_does_not_import_the_vendor PASSED [ 14%]
+backend\tests\test_voxcpm_backend.py::test_all_four_engine_patterns_accept_voxcpm PASSED [ 15%]
+backend\tests\test_voxcpm_backend.py::test_generation_request_accepts_the_declared_advanced_settings PASSED [ 15%]
+backend\tests\test_voxcpm_backend.py::test_cached_load_succeeds_with_the_network_blocked PASSED [ 15%]
+backend\tests\test_voxcpm_backend.py::test_cached_load_runs_inside_force_offline_if_cached PASSED [ 15%]
+backend\tests\test_voxcpm_backend.py::test_cached_load_passes_local_files_only_and_no_denoiser PASSED [ 15%]
+backend\tests\test_voxcpm_backend.py::test_offline_mode_is_restored_after_the_cached_load PASSED [ 16%]
+backend\tests\test_voxcpm_backend.py::test_uncached_load_is_not_forced_offline PASSED [ 16%]
+backend\tests\test_voxcpm_backend.py::test_pronunciation_processed_arabic_reaches_the_vendor_byte_for_byte PASSED [ 16%]
+backend\tests\test_engine_capabilities.py::test_model_config_capability_fields_default_to_todays_behaviour PASSED [ 16%]
+backend\tests\test_engine_capabilities.py::test_model_config_declares_the_new_fields PASSED [ 16%]
+backend\tests\test_engine_capabilities.py::test_advanced_setting_carries_contract_shape_and_is_frozen PASSED [ 17%]
+backend\tests\test_engine_capabilities.py::test_there_are_existing_tts_configs_to_check PASSED [ 17%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-tts-1.7B] PASSED [ 17%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-tts-0.6B] PASSED [ 17%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-custom-voice-1.7B] PASSED [ 18%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-custom-voice-0.6B] PASSED [ 18%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[luxtts] PASSED [ 18%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[chatterbox-tts] PASSED [ 18%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[chatterbox-turbo] PASSED [ 18%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[tada-1b] PASSED [ 19%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[tada-3b-ml] PASSED [ 19%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[kokoro] PASSED [ 19%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-msa] PASSED [ 19%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-unified] PASSED [ 19%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-sau] PASSED [ 20%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-uae] PASSED [ 20%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-alg] PASSED [ 20%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-irq] PASSED [ 20%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-egy] PASSED [ 20%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-mar] PASSED [ 21%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-tts-1.7B] PASSED [ 21%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-tts-0.6B] PASSED [ 21%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-custom-voice-1.7B] PASSED [ 21%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-custom-voice-0.6B] PASSED [ 21%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-luxtts] PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-chatterbox-tts] PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-chatterbox-turbo] PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-tada-1b] PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-tada-3b-ml] PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-kokoro] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-msa] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-unified] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-sau] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-uae] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-alg] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-irq] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-egy] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-mar] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-tts-1.7B] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-tts-0.6B] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-custom-voice-1.7B] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-custom-voice-0.6B] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-luxtts] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-chatterbox-tts] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-chatterbox-turbo] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-tada-1b] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-tada-3b-ml] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-kokoro] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-msa] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-unified] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-sau] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-uae] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-alg] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-irq] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-egy] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-mar] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-tts-1.7B] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-tts-0.6B] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-custom-voice-1.7B] PASSED [ 29%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-custom-voice-0.6B] PASSED [ 29%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-luxtts] PASSED [ 29%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-chatterbox-tts] PASSED [ 29%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-chatterbox-turbo] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-tada-1b] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-tada-3b-ml] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-kokoro] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-msa] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-unified] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-sau] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-uae] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-alg] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-irq] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-egy] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-mar] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-tts-1.7B] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-tts-0.6B] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-custom-voice-1.7B] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-custom-voice-0.6B] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-luxtts] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-chatterbox-tts] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-chatterbox-turbo] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-tada-1b] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-tada-3b-ml] PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-kokoro] PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-msa] PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-unified] PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-sau] PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-uae] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-alg] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-irq] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-egy] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-mar] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-tts-1.7B] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-tts-0.6B] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-custom-voice-1.7B] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-custom-voice-0.6B] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-luxtts] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-chatterbox-tts] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-chatterbox-turbo] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-tada-1b] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-tada-3b-ml] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-kokoro] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-msa] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-unified] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-sau] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-uae] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-alg] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-irq] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-egy] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-mar] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_empty_accelerators_is_available_with_no_reason PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_in_declared_set_is_available[cuda] PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_in_declared_set_is_available[mps] PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_in_declared_set_is_available[cpu] PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_indexed_cuda_device_counts_as_cuda PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_not_in_set_is_unavailable_with_specific_reason PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_supported_but_marginal_memory_warns_and_never_blocks PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_sufficient_memory_has_no_warning PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_unknown_memory_or_threshold_has_no_warning[None-8192] PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_unknown_memory_or_threshold_has_no_warning[4096-None] PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_unknown_memory_or_threshold_has_no_warning[None-None] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_unavailable_engine_carries_reason_not_warning_even_with_marginal_memory PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators0] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators1] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators2] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators3] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators0] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators1] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators2] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators3] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators0] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators1] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators2] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators3] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators0] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators1] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators2] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators3] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators0] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators1] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators2] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators3] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators0] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators1] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators2] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators3] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators0] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators1] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators2] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators3] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators0] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators1] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators2] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators3] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators0] PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators1] PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators2] PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators3] PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators0] PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators1] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators2] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators3] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators0] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators1] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators2] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators3] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators0] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators1] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators2] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators3] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators0] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators1] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators2] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators3] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators0] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators1] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators2] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators3] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators0] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators1] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators2] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators3] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators0] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators1] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators2] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators3] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators0] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators1] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators2] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators3] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators0] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators1] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators2] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators3] PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_wrapper_detects_mps_and_resolves PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_wrapper_reads_cuda_memory_for_the_warning PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_engines_route_detects_hardware_once_per_request PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_engines_route_existing_engines_keep_todays_behaviour PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_engines_route_describes_each_engine_from_all_of_its_variants PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_engines_route_display_name_is_the_engine_name PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_engines_route_tada_languages_include_the_multilingual_variant PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_engines_route_f5_license_is_null_when_variants_disagree PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_engines_route_returns_the_shared_license_when_variants_agree PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_engines_route_returns_null_license_when_synthetic_variants_disagree PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_current_engine_variants_agree_on_default_variant_fields PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_engine_configs_declare_the_expected_memory_threshold PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_model_config_min_memory_mb_defaults_to_none PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_engines_route_warns_when_memory_is_below_the_declared_threshold PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_engines_route_has_no_warning_without_a_declared_threshold PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_engines_route_uses_the_default_variant_memory_threshold PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_engines_route_engine_ids_match_the_request_engine_pattern PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_engines_route_invariants_hold_for_a_constrained_engine PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_engines_route_passes_declared_capabilities_through PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_engines_route_never_imports_torch PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_existing_generation_payloads_still_validate PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-None] PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-qwen] PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-kokoro] PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-f5_tts] PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-None] PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-qwen] PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-kokoro] PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-f5_tts] PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[None] PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[qwen] PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[luxtts] PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[chatterbox] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[tada] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[kokoro] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[f5_tts] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_voice_description_accepts_500_characters_and_rejects_501 PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[1.0-qwen] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[1.0-None] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[2.5-qwen] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[2.5-None] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[5.0-qwen] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[5.0-None] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[3-qwen] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[3-None] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[0.99] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[5.01] PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[-1.0] PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[inf] PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[nan] PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_undeclared_setting_is_rejected_even_when_the_engine_declares_others PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_is_scoped_to_its_engine PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_invalid_generation_body_is_a_422_through_fastapi PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[6144-cuda] PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[6144-mps] PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[6144-cpu] PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[16384-cuda] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[16384-mps] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[16384-cpu] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[None-cuda] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[None-mps] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[None-cpu] PASSED [ 70%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_warns_but_stays_available_on_a_4gb_gpu PASSED [ 70%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_unavailable_with_a_reason_on_other_accelerators[xpu] PASSED [ 70%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_unavailable_with_a_reason_on_other_accelerators[directml] PASSED [ 70%]
+backend\tests\test_engine_capabilities.py::test_engines_route_describes_voxcpm_from_its_declaration PASSED [ 71%]
+backend\tests\test_engine_patterns.py::test_voxcpm_is_accepted[GenerationRequest.engine] PASSED [ 71%]
+backend\tests\test_engine_patterns.py::test_voxcpm_is_accepted[MCPClientBindingResponse.default_engine] PASSED [ 71%]
+backend\tests\test_engine_patterns.py::test_voxcpm_is_accepted[MCPClientBindingUpsert.default_engine] PASSED [ 71%]
+backend\tests\test_engine_patterns.py::test_voxcpm_is_accepted[SpeakRequest.engine] PASSED [ 71%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[GenerationRequest.engine-qwen] PASSED [ 72%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[GenerationRequest.engine-qwen_custom_voice] PASSED [ 72%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[GenerationRequest.engine-luxtts] PASSED [ 72%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[GenerationRequest.engine-chatterbox] PASSED [ 72%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[GenerationRequest.engine-chatterbox_turbo] PASSED [ 72%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[GenerationRequest.engine-tada] PASSED [ 73%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[GenerationRequest.engine-kokoro] PASSED [ 73%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[GenerationRequest.engine-f5_tts] PASSED [ 73%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-qwen] PASSED [ 73%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-qwen_custom_voice] PASSED [ 73%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-luxtts] PASSED [ 74%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-chatterbox] PASSED [ 74%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-chatterbox_turbo] PASSED [ 74%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-tada] PASSED [ 74%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-kokoro] PASSED [ 74%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingResponse.default_engine-f5_tts] PASSED [ 75%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-qwen] PASSED [ 75%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-qwen_custom_voice] PASSED [ 75%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-luxtts] PASSED [ 75%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-chatterbox] PASSED [ 75%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-chatterbox_turbo] PASSED [ 76%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-tada] PASSED [ 76%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-kokoro] PASSED [ 76%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[MCPClientBindingUpsert.default_engine-f5_tts] PASSED [ 76%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[SpeakRequest.engine-qwen] PASSED [ 77%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[SpeakRequest.engine-qwen_custom_voice] PASSED [ 77%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[SpeakRequest.engine-luxtts] PASSED [ 77%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[SpeakRequest.engine-chatterbox] PASSED [ 77%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[SpeakRequest.engine-chatterbox_turbo] PASSED [ 77%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[SpeakRequest.engine-tada] PASSED [ 78%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[SpeakRequest.engine-kokoro] PASSED [ 78%]
+backend\tests\test_engine_patterns.py::test_existing_engines_still_accepted[SpeakRequest.engine-f5_tts] PASSED [ 78%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[GenerationRequest.engine-not_an_engine] PASSED [ 78%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[GenerationRequest.engine-voxcpm2] PASSED [ 78%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[GenerationRequest.engine-VOXCPM] PASSED [ 79%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[GenerationRequest.engine- voxcpm] PASSED [ 79%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[GenerationRequest.engine-] PASSED [ 79%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[MCPClientBindingResponse.default_engine-not_an_engine] PASSED [ 79%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[MCPClientBindingResponse.default_engine-voxcpm2] PASSED [ 79%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[MCPClientBindingResponse.default_engine-VOXCPM] PASSED [ 80%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[MCPClientBindingResponse.default_engine- voxcpm] PASSED [ 80%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[MCPClientBindingResponse.default_engine-] PASSED [ 80%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[MCPClientBindingUpsert.default_engine-not_an_engine] PASSED [ 80%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[MCPClientBindingUpsert.default_engine-voxcpm2] PASSED [ 80%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[MCPClientBindingUpsert.default_engine-VOXCPM] PASSED [ 81%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[MCPClientBindingUpsert.default_engine- voxcpm] PASSED [ 81%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[MCPClientBindingUpsert.default_engine-] PASSED [ 81%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[SpeakRequest.engine-not_an_engine] PASSED [ 81%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[SpeakRequest.engine-voxcpm2] PASSED [ 81%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[SpeakRequest.engine-VOXCPM] PASSED [ 82%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[SpeakRequest.engine- voxcpm] PASSED [ 82%]
+backend\tests\test_engine_patterns.py::test_unknown_engine_is_rejected[SpeakRequest.engine-] PASSED [ 82%]
+backend\tests\test_engine_patterns.py::test_engine_patterns_are_identical PASSED [ 82%]
+backend\tests\test_f5tts_backend.py::test_arabic_model_registry_has_canonical_ids_and_checkpoint_paths PASSED [ 83%]
+backend\tests\test_f5tts_backend.py::test_model_configs_expose_language_and_license_policy PASSED [ 83%]
+backend\tests\test_f5tts_backend.py::test_shared_repository_cache_status_checks_the_selected_variant PASSED [ 83%]
+backend\tests\test_f5tts_backend.py::test_cache_requires_nested_files_from_the_same_snapshot PASSED [ 83%]
+backend\tests\test_f5tts_backend.py::test_model_management_load_status_and_unload_are_variant_specific PASSED [ 83%]
+backend\tests\test_f5tts_backend.py::test_generation_request_accepts_only_canonical_habibi_model_ids PASSED [ 84%]
+backend\tests\test_f5tts_backend.py::test_omitted_f5_model_resolves_to_specialized_msa PASSED [ 84%]
+backend\tests\test_f5tts_backend.py::test_model_selection_alias_and_switching PASSED [ 84%]
+backend\tests\test_f5tts_backend.py::test_voice_prompt_requires_file_exact_text_and_max_twelve_seconds PASSED [ 84%]
+backend\tests\test_f5tts_backend.py::test_concurrent_requests_keep_model_selection_atomic_and_serialize_inference PASSED [ 84%]
+backend\tests\test_f5tts_backend.py::test_generate_rejects_wrong_language_and_empty_text PASSED [ 85%]
+backend\tests\test_f5tts_backend.py::test_inference_passes_only_unified_dialect_token_and_normalizes_audio PASSED [ 85%]
+backend\tests\test_f5tts_backend.py::test_safe_audio_loader_falls_back_to_pydub PASSED [ 85%]
+backend\tests\test_f5tts_backend.py::test_combining_references_decodes_each_duration_once PASSED [ 85%]
+backend\tests\test_f5tts_backend.py::test_generation_error_releases_inference_lock PASSED [ 85%]
+backend\tests\test_client_id_middleware.py::test_mcp_semantic_paths_are_stamped[/mcp] PASSED [ 86%]
+backend\tests\test_client_id_middleware.py::test_mcp_semantic_paths_are_stamped[/mcp/] PASSED [ 86%]
+backend\tests\test_client_id_middleware.py::test_mcp_semantic_paths_are_stamped[/mcp/tools/call] PASSED [ 86%]
+backend\tests\test_client_id_middleware.py::test_mcp_semantic_paths_are_stamped[/mcp/bindings] PASSED [ 86%]
+backend\tests\test_client_id_middleware.py::test_mcp_semantic_paths_are_stamped[/speak] PASSED [ 86%]
+backend\tests\test_client_id_middleware.py::test_mcp_semantic_paths_are_stamped[/speak/] PASSED [ 87%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/] PASSED [ 87%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/health] PASSED [ 87%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/generate] PASSED [ 87%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/captures] PASSED [ 87%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/profiles] PASSED [ 88%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/profiles/abc/compose] PASSED [ 88%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/events/speak] PASSED [ 88%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/tasks/active] PASSED [ 88%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/llm/generate] PASSED [ 89%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/speakers] PASSED [ 89%]
+backend\tests\test_client_id_middleware.py::test_other_paths_are_not_stamped[/mcpfoo] PASSED [ 89%]
+backend\tests\test_generation_download.py::test_generation_with_cached_model PASSED [ 89%]
+backend\tests\test_generation_download.py::test_generation_with_fresh_download PASSED [ 89%]
+backend\tests\test_mcp_speak.py::test_speak_forwards_explicit_model_size PASSED [ 90%]
+backend\tests\test_mcp_speak.py::test_speak_omitted_model_size_is_none PASSED [ 90%]
+backend\tests\test_mcp_speak.py::test_speak_rejects_invalid_model_size PASSED [ 90%]
+backend\tests\test_pronunciation.py::test_replaces_a_term PASSED         [ 90%]
+backend\tests\test_pronunciation.py::test_matching_is_case_insensitive_but_capitalisation_survives PASSED [ 90%]
+backend\tests\test_pronunciation.py::test_all_caps_stays_all_caps PASSED [ 91%]
+backend\tests\test_pronunciation.py::test_only_whole_words_match PASSED  [ 91%]
+backend\tests\test_pronunciation.py::test_replacements_do_not_cascade PASSED [ 91%]
+backend\tests\test_pronunciation.py::test_longer_terms_win PASSED        [ 91%]
+backend\tests\test_pronunciation.py::test_paralinguistic_tags_are_left_alone PASSED [ 91%]
+backend\tests\test_pronunciation.py::test_accented_terms_match PASSED    [ 92%]
+backend\tests\test_pronunciation.py::test_reports_what_it_changed PASSED [ 92%]
+backend\tests\test_pronunciation.py::test_arabic_term_matches_with_diacritics PASSED [ 92%]
+backend\tests\test_pronunciation.py::test_arabic_hamza_and_ta_marbuta_spellings_match PASSED [ 92%]
+backend\tests\test_pronunciation.py::test_arabic_prefixes_are_kept_before_an_article_term PASSED [ 92%]
+backend\tests\test_pronunciation.py::test_arabic_contracted_article_after_lam PASSED [ 93%]
+backend\tests\test_pronunciation.py::test_arabic_article_replacement_without_article PASSED [ 93%]
+backend\tests\test_pronunciation.py::test_latin_term_inside_arabic_text PASSED [ 93%]
+backend\tests\test_pronunciation.py::test_arabic_prepositions_before_a_long_term PASSED [ 93%]
+backend\tests\test_pronunciation.py::test_short_arabic_term_is_not_matched_inside_a_prefixed_word PASSED [ 93%]
+backend\tests\test_pronunciation.py::test_arabic_term_does_not_match_inside_a_longer_word PASSED [ 94%]
+backend\tests\test_pronunciation.py::test_arabic_and_latin_entries_together PASSED [ 94%]
+backend\tests\test_pronunciation.py::test_language_scoped_entry_only_applies_to_that_language PASSED [ 94%]
+backend\tests\test_pronunciation.py::test_wildcard_language_applies_everywhere PASSED [ 94%]
+backend\tests\test_pronunciation.py::test_disabled_entries_are_skipped PASSED [ 95%]
+backend\tests\test_pronunciation.py::test_profile_entry_beats_global PASSED [ 95%]
+backend\tests\test_pronunciation.py::test_other_profiles_entries_do_not_leak PASSED [ 95%]
+backend\tests\test_pronunciation.py::test_no_entries_is_a_no_op PASSED   [ 95%]
+backend\tests\test_pronunciation.py::test_blank_text_is_returned_unchanged[] PASSED [ 95%]
+backend\tests\test_pronunciation.py::test_blank_text_is_returned_unchanged[   ] PASSED [ 96%]
+backend\tests\test_pronunciation.py::test_build_pattern_handles_no_usable_terms PASSED [ 96%]
+backend\tests\test_pronunciation.py::test_regex_metacharacters_in_a_term_are_literal PASSED [ 96%]
+backend\tests\test_pronunciation.py::test_crud_roundtrip PASSED          [ 96%]
+backend\tests\test_pronunciation.py::test_duplicate_in_the_same_scope_is_rejected PASSED [ 96%]
+backend\tests\test_pronunciation.py::test_same_term_in_a_different_language_is_allowed PASSED [ 97%]
+backend\tests\test_pronunciation.py::test_unknown_profile_is_rejected PASSED [ 97%]
+backend\tests\test_pronunciation.py::test_preview_shows_the_rewrite PASSED [ 97%]
+backend\tests\test_pronunciation.py::test_missing_entry_404s PASSED      [ 97%]
+backend\tests\test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original PASSED [ 97%]
+backend\tests\test_pronunciation.py::test_preview_is_the_only_way_to_see_the_rewrite PASSED [ 98%]
+backend\tests\test_pronunciation.py::test_sql_wildcards_in_a_term_are_literal PASSED [ 98%]
+backend\tests\test_pronunciation.py::test_untrimmed_term_still_finds_its_duplicate PASSED [ 98%]
+backend\tests\test_pronunciation.py::test_whitespace_only_values_are_rejected[term] PASSED [ 98%]
+backend\tests\test_pronunciation.py::test_whitespace_only_values_are_rejected[replacement] PASSED [ 98%]
+backend\tests\test_pronunciation.py::test_values_are_stored_trimmed PASSED [ 99%]
+backend\tests\test_pronunciation.py::test_preview_rejects_an_unknown_profile PASSED [ 99%]
+backend\tests\test_pronunciation.py::test_the_database_enforces_scope_uniqueness PASSED [ 99%]
+backend\tests\test_pronunciation.py::test_terms_are_not_logged_at_info PASSED [ 99%]
+backend\tests\test_pronunciation.py::test_dedup_migration_keeps_the_oldest_row PASSED [100%]
+
+============================== warnings summary ===============================
+backend\models.py:32
+  D:\Projects\Personal\voicebox\backend\models.py:32: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(BaseModel):
+
+backend\models.py:68
+  D:\Projects\Personal\voicebox\backend\models.py:68: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ProfileSampleResponse(BaseModel):
+
+backend\models.py:145
+  D:\Projects\Personal\voicebox\backend\models.py:145: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationResponse(BaseModel):
+
+backend\models.py:210
+  D:\Projects\Personal\voicebox\backend\models.py:210: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationEntryResponse(BaseModel):
+
+backend\models.py:268
+  D:\Projects\Personal\voicebox\backend\models.py:268: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class HistoryResponse(BaseModel):
+
+backend\models.py:322
+  D:\Projects\Personal\voicebox\backend\models.py:322: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureResponse(BaseModel):
+
+backend\models.py:377
+  D:\Projects\Personal\voicebox\backend\models.py:377: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureSettingsResponse(BaseModel):
+
+backend\models.py:418
+  D:\Projects\Personal\voicebox\backend\models.py:418: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationSettingsResponse(BaseModel):
+
+backend\models.py:439
+  D:\Projects\Personal\voicebox\backend\models.py:439: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class MCPClientBindingResponse(BaseModel):
+
+backend\models.py:719
+  D:\Projects\Personal\voicebox\backend\models.py:719: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioChannelResponse(BaseModel):
+
+backend\models.py:751
+  D:\Projects\Personal\voicebox\backend\models.py:751: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+backend\models.py:765
+  D:\Projects\Personal\voicebox\backend\models.py:765: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+backend\models.py:797
+  D:\Projects\Personal\voicebox\backend\models.py:797: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+backend\models.py:905
+  D:\Projects\Personal\voicebox\backend\models.py:905: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+backend\models.py:919
+  D:\Projects\Personal\voicebox\backend\models.py:919: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+backend\database\models.py:26
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+backend\venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_generation_advanced_settings.py::test_generate_route_threads_advanced_settings_to_the_service
+  <string>:6: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+
+tests/test_f5tts_backend.py::test_safe_audio_loader_falls_back_to_pydub
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\pydub\utils.py:14: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+tests/test_pronunciation.py::test_replaces_a_term
+  D:\Projects\Personal\voicebox\backend\database\migrations.py:74: SAWarning: Skipped unsupported reflection of expression-based index uq_pronunciation_scope
+    existing = {ix["name"] for ix in inspector.get_indexes("pronunciation_entries")}
+
+tests/test_pronunciation.py: 100 warnings
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\sqlalchemy\sql\schema.py:3627: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+tests/test_pronunciation.py::test_profile_entry_beats_global
+tests/test_pronunciation.py::test_other_profiles_entries_do_not_leak
+tests/test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:186: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+tests/test_pronunciation.py::test_profile_entry_beats_global
+tests/test_pronunciation.py::test_other_profiles_entries_do_not_leak
+tests/test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:187: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    updated_at=datetime.utcnow(),
+
+tests/test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original
+  D:\Projects\Personal\voicebox\backend\services\history.py:107: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase3\T023-backend.xml -
+===================== 483 passed, 127 warnings in 15.44s ======================
+# exit code: 0

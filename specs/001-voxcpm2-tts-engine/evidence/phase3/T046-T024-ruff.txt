@@ -1,0 +1,94 @@
+# cwd: D:/Projects/Personal/voicebox/backend (config: backend/pyproject.toml)
+# timestamp: 2026-09-23T16:31:51+03:00
+## New files (must be clean)
+$ ruff check backends/voxcpm_backend.py tests/test_voxcpm_backend.py tests/test_generation_advanced_settings.py
+All checks passed!
+# exit code: 0
+$ ruff format --check backends/voxcpm_backend.py tests/test_voxcpm_backend.py tests/test_generation_advanced_settings.py
+unformatted: File would be reformatted
+  --> tests\test_generation_advanced_settings.py:24:23
+   |
+23 |
+   - PRE_VOXCPM_ENGINES = ["qwen", "qwen_custom_voice", "luxtts", "chatterbox", "chatterbox_turbo", "tada", "kokoro", "f5_tts"]
+24 + PRE_VOXCPM_ENGINES = [
+25 +     "qwen",
+26 +     "qwen_custom_voice",
+27 +     "luxtts",
+28 +     "chatterbox",
+29 +     "chatterbox_turbo",
+30 +     "tada",
+31 +     "kokoro",
+32 +     "f5_tts",
+33 + ]
+34 | SETTINGS = {"cfg_value": 2.5, "inference_timesteps": 16.0}
+   |
+
+1 file would be reformatted, 2 files already formatted
+# exit code: 1
+
+## Pre-existing files: findings in the working tree vs HEAD (rule + message, line numbers stripped)
+### backends/__init__.py
+findings: working tree 28, HEAD 28
+$ diff <(ruff check backends/__init__.py) <(git show HEAD:backend/backends/__init__.py | ruff check --stdin-filename backends/__init__.py -)   [rule+message only]
+# diff exit code: 0
+$ ruff format --check backends/__init__.py (working tree) / (HEAD)
+# working tree format --check exit: 1
+# HEAD format --check exit: 1
+### tests/test_engine_capabilities.py
+findings: working tree 0, HEAD 0
+$ diff <(ruff check tests/test_engine_capabilities.py) <(git show HEAD:backend/tests/test_engine_capabilities.py | ruff check --stdin-filename tests/test_engine_capabilities.py -)   [rule+message only]
+# diff exit code: 0
+$ ruff format --check tests/test_engine_capabilities.py (working tree) / (HEAD)
+# working tree format --check exit: 0
+# HEAD format --check exit: 0
+### services/generation.py
+findings: working tree 18, HEAD 16
+$ diff <(ruff check services/generation.py) <(git show HEAD:backend/services/generation.py | ruff check --stdin-filename services/generation.py -)   [rule+message only]
+17,18d16
+< : UP045 [*] Use `X | None` for type annotations
+< : UP045 [*] Use `X | None` for type annotations
+# diff exit code: 1
+$ ruff format --check services/generation.py (working tree) / (HEAD)
+# working tree format --check exit: 1
+# HEAD format --check exit: 1
+### routes/generations.py
+findings: working tree 6, HEAD 6
+$ diff <(ruff check routes/generations.py) <(git show HEAD:backend/routes/generations.py | ruff check --stdin-filename routes/generations.py -)   [rule+message only]
+# diff exit code: 0
+$ ruff format --check routes/generations.py (working tree) / (HEAD)
+# working tree format --check exit: 1
+# HEAD format --check exit: 1
+
+=== RERUN after fixes: ruff format on tests/test_generation_advanced_settings.py; services/generation.py new annotations changed from Optional[dict[str, float]] to dict[str, float] | None ===
+# timestamp: 2026-09-23T16:32:17+03:00
+$ ruff check backends/voxcpm_backend.py tests/test_voxcpm_backend.py tests/test_generation_advanced_settings.py
+All checks passed!
+# exit code: 0
+$ ruff format --check backends/voxcpm_backend.py tests/test_voxcpm_backend.py tests/test_generation_advanced_settings.py
+3 files already formatted
+# exit code: 0
+### backends/__init__.py: ruff check findings working tree 28, HEAD 28
+# rule+message diff exit code: 0 (0 = no new findings)
+# format --diff hunk headers, working tree:
+@@ -211,11 +211,9 @@ @@ -610,7 +608,16 @@ 
+# format --diff hunk headers, HEAD:
+@@ -211,11 +211,9 @@ @@ -549,7 +547,16 @@ 
+### tests/test_engine_capabilities.py: ruff check findings working tree 0, HEAD 0
+# rule+message diff exit code: 0 (0 = no new findings)
+# format --diff hunk headers, working tree:
+
+# format --diff hunk headers, HEAD:
+
+### services/generation.py: ruff check findings working tree 16, HEAD 16
+# rule+message diff exit code: 0 (0 = no new findings)
+# format --diff hunk headers, working tree:
+@@ -121,9 +121,7 @@ @@ -262,10 +260,9 @@ @@ -364,9 +361,7 @@ 
+# format --diff hunk headers, HEAD:
+@@ -81,9 +81,7 @@ @@ -221,10 +219,9 @@ @@ -323,9 +320,7 @@ 
+### routes/generations.py: ruff check findings working tree 6, HEAD 6
+# rule+message diff exit code: 0 (0 = no new findings)
+# format --diff hunk headers, working tree:
+@@ -30,11 +30,7 @@ @@ -141,7 +137,7 @@ @@ -183,7 +179,7 @@ @@ -228,7 +224,7 @@ @@ -368,9 +364,7 @@ 
+# format --diff hunk headers, HEAD:
+@@ -30,11 +30,7 @@ @@ -140,7 +136,7 @@ @@ -182,7 +178,7 @@ @@ -227,7 +223,7 @@ @@ -367,9 +363,7 @@ 
+# format: same number of pre-existing hunks in each pre-existing file (shifted by the inserted lines); none of the new lines appear in a hunk. tests/test_engine_capabilities.py is format-clean.

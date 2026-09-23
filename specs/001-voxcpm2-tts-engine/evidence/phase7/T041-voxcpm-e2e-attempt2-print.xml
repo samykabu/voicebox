@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="4" time="71.607" timestamp="2026-09-23T19:04:26.674644+03:00" hostname="DevelopmentPC"><testcase classname="tests.test_all_models_e2e" name="test_voxcpm2_rows_declared" time="0.001" /><testcase classname="tests.test_all_models_e2e" name="test_voxcpm2_rows_follow_only_and_skip" time="0.000" /><testcase classname="tests.test_all_models_e2e" name="test_voxcpm2_request_bodies" time="0.000" /><testcase classname="tests.test_all_models_e2e" name="test_voxcpm2_frozen_binary_e2e" time="71.440"><failure message="UnicodeEncodeError: 'charmap' codec can't encode character '\u2192' in position 682: character maps to &lt;undefined&gt;">tmp_path = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-64/test_voxcpm2_frozen_binary_e2e0')
+
+    def test_voxcpm2_frozen_binary_e2e(tmp_path):
+        import shlex
+    
+        import pytest
+    
+        if os.environ.get(E2E_OPT_IN_ENV) != "1":
+            pytest.skip(f"frozen-binary E2E is opt-in: set {E2E_OPT_IN_ENV}=1 (and build with backend/build_binary.py)")
+    
+        extra = shlex.split(os.environ.get(E2E_ARGS_ENV, ""), posix=os.name != "nt")
+        extra = [a.strip('"') for a in extra]
+        cmd = [sys.executable, str(Path(__file__).resolve()), "--only", "voxcpm", "--skip-build"]
+        if "--output-dir" not in extra:
+            extra += ["--output-dir", str(tmp_path)]
+        cmd += extra
+        output_dir = Path(extra[extra.index("--output-dir") + 1])
+        before = set(output_dir.glob("e2e-*.json")) if output_dir.exists() else set()
+    
+        print(f"[pytest] {' '.join(cmd)}", flush=True)
+        # UTF-8 pipes: the harness prints non-ASCII ("→"), which a cp1252 pipe on Windows cannot encode.
+        env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
+        proc = subprocess.run(
+            cmd, cwd=str(REPO_ROOT), env=env, capture_output=True, text=True, encoding="utf-8", errors="replace"
+        )
+&gt;       print(proc.stdout)
+
+backend\tests\test_all_models_e2e.py:735: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;encodings.cp1252.IncrementalEncoder object at 0x000002567B0A4050&gt;
+input = '[binary] D:\\Projects\\Personal\\voicebox\\backend\\dist\\voicebox-server.exe\r\n[fixture] reference WAV:  C:\\Users\...0-dd0d-4a44-a944-6b0a6c359932\\scratchpad\\e2e-results\\server-20260923-160426.log\r\n\r\n== 2 passed, 0 failed ==\r\n'
+final = False
+
+    def encode(self, input, final=False):
+&gt;       return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       UnicodeEncodeError: 'charmap' codec can't encode character '\u2192' in position 682: character maps to &lt;undefined&gt;
+
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\encodings\cp1252.py:19: UnicodeEncodeError</failure></testcase></testsuite></testsuites>

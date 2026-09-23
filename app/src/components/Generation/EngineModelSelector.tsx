@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { FormControl } from '@/components/ui/form';
 import {
   Select,
@@ -8,6 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import type { EngineCapabilitiesResponse } from '@/lib/api/models/EngineCapabilitiesResponse';
+import type { EngineCapabilityResponse } from '@/lib/api/models/EngineCapabilityResponse';
 import type { VoiceProfileResponse } from '@/lib/api/types';
 import {
   DEFAULT_HABIBI_MODEL_ID,
@@ -16,7 +19,16 @@ import {
   isHabibiModelId,
 } from '@/lib/constants/habibiModels';
 import { getLanguageOptionsForEngine } from '@/lib/constants/languages';
+import {
+  engineNotice,
+  isEngineSelectable,
+  shouldFallBackFromEngine,
+  supportsCloning,
+  supportsVoiceDesign,
+} from '@/lib/hooks/engineCapabilityRules';
+import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
 import type { GenerationFormValues } from '@/lib/hooks/useGenerationForm';
+import { cn } from '@/lib/utils/cn';
 
 /**
  * Engine/model options and their display metadata.
@@ -33,6 +45,7 @@ const ENGINE_OPTIONS = [
   { value: 'tada:1B', label: 'TADA 1B', engine: 'tada' },
   { value: 'tada:3B', label: 'TADA 3B Multilingual', engine: 'tada' },
   { value: 'kokoro', label: 'Kokoro 82M', engine: 'kokoro' },
+  { value: 'voxcpm', label: 'VoxCPM2', engine: 'voxcpm' },
   ...HABIBI_MODELS.map((model) => ({
     value: `f5_tts:${model.id}`,
     label: `${model.label}${model.commercialUse ? '' : ' — noncommercial'}`,
@@ -49,17 +62,30 @@ const ENGINE_DESCRIPTIONS: Record<string, string> = {
   tada: 'HumeAI, 700s+ coherent audio',
   kokoro: '82M params, CPU realtime, 8 langs',
   f5_tts: 'Arabic F5 voice cloning with MSA and regional Habibi checkpoints',
+  voxcpm: 'OpenBMB, 30 languages incl. Arabic, voice design',
 };
 
 /** Engines that only support English and should force language to 'en' on select. */
 const ENGLISH_ONLY_ENGINES = new Set(['luxtts', 'chatterbox_turbo']);
 
-/** Engines that support cloned (reference audio) profiles. */
+/**
+ * Engines that support cloned (reference audio) profiles without a capability declaration.
+ * Any other engine clones only when it declares `supports_cloning` (see supportsCloning).
+ */
 const CLONING_ENGINES = new Set(['qwen', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'f5_tts']);
 
-function getAvailableOptions(selectedProfile?: VoiceProfileResponse | null) {
+function getAvailableOptions(
+  selectedProfile?: VoiceProfileResponse | null,
+  capabilities?: EngineCapabilitiesResponse,
+) {
   if (!selectedProfile) return ENGINE_OPTIONS;
-  return ENGINE_OPTIONS.filter((opt) => isProfileCompatibleWithEngine(selectedProfile, opt.engine));
+  return ENGINE_OPTIONS.filter((opt) =>
+    isProfileCompatibleWithEngine(
+      selectedProfile,
+      opt.engine,
+      findEngineCapability(capabilities, opt.engine),
+    ),
+  );
 }
 
 function getSelectValue(engine: string, modelSize?: string): string {
@@ -70,7 +96,11 @@ function getSelectValue(engine: string, modelSize?: string): string {
   return engine;
 }
 
-export function applyEngineSelection(form: UseFormReturn<GenerationFormValues>, value: string) {
+export function applyEngineSelection(
+  form: UseFormReturn<GenerationFormValues>,
+  value: string,
+  capabilities?: EngineCapabilitiesResponse,
+) {
   if (value.startsWith('f5_tts:')) {
     const [, requestedModel] = value.split(':');
     const model = getHabibiModel(requestedModel);
@@ -118,7 +148,10 @@ export function applyEngineSelection(form: UseFormReturn<GenerationFormValues>, 
     } else {
       // If current language isn't supported by the new engine, reset to first available
       const currentLang = form.getValues('language');
-      const available = getLanguageOptionsForEngine(value);
+      const available = getLanguageOptionsForEngine(
+        value,
+        findEngineCapability(capabilities, value)?.languages,
+      );
       if (!available.some((l) => l.value === currentLang)) {
         form.setValue('language', available[0]?.value ?? 'en');
       }
@@ -133,12 +166,20 @@ interface EngineModelSelectorProps {
 }
 
 export function EngineModelSelector({ form, compact, selectedProfile }: EngineModelSelectorProps) {
+  const { t } = useTranslation();
   const engine = form.watch('engine') || 'qwen';
   const modelSize = form.watch('modelSize');
   const language = form.watch('language');
   const selectValue = getSelectValue(engine, modelSize);
-  const availableOptions = getAvailableOptions(selectedProfile);
+  const { data: capabilities, isSuccess: capabilitiesLoaded } = useEngineCapabilities();
+  const availableOptions = getAvailableOptions(selectedProfile, capabilities);
   const selectedHabibiModel = engine === 'f5_tts' ? getHabibiModel(modelSize) : null;
+  const selectedCapability = findEngineCapability(capabilities, engine);
+  // FR-003 / C1Q3: an engine this machine cannot run stays listed, greyed out, with the
+  // backend's reason. A warning is advisory only and never disables anything. An engine
+  // that was selected and has since become unavailable stays selected with its reason;
+  // generating with it is refused with that reason (useGenerationForm).
+  const selectedNotice = engineNotice(selectedCapability, t)?.text;
 
   const currentEngineAvailable = availableOptions.some((opt) => opt.value === selectValue);
 
@@ -154,10 +195,26 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
   }, [engine, form, language, modelSize]);
 
   useEffect(() => {
-    if (!currentEngineAvailable && availableOptions.length > 0) {
-      applyEngineSelection(form, availableOptions[0].value);
+    // Before GET /models/engines loads, only an app-side engine's compatibility is known, so a
+    // capability-declared engine (for example a cloned profile's cloning engine) is not
+    // switched away on a cold start (the same guard as ProfileForm's default engine).
+    if (
+      shouldFallBackFromEngine({
+        engine,
+        currentEngineAvailable,
+        optionCount: availableOptions.length,
+        capabilitiesLoaded,
+        appSideEngines: CLONING_ENGINES,
+      })
+    ) {
+      // Prefer an engine this machine can run; the list order is otherwise kept.
+      const fallback =
+        availableOptions.find((opt) =>
+          isEngineSelectable(findEngineCapability(capabilities, opt.engine)),
+        ) ?? availableOptions[0];
+      applyEngineSelection(form, fallback.value, capabilities);
     }
-  }, [availableOptions, currentEngineAvailable, form]);
+  }, [availableOptions, currentEngineAvailable, form, capabilities, capabilitiesLoaded, engine]);
 
   const itemClass = compact ? 'text-xs text-muted-foreground' : undefined;
   const triggerClass = compact
@@ -166,20 +223,57 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
 
   return (
     <div className="space-y-1">
-      <Select value={selectValue} onValueChange={(v) => applyEngineSelection(form, v)}>
+      <Select
+        value={selectValue}
+        onValueChange={(v) => applyEngineSelection(form, v, capabilities)}
+      >
         <FormControl>
           <SelectTrigger className={triggerClass}>
             <SelectValue />
           </SelectTrigger>
         </FormControl>
         <SelectContent side={compact ? 'top' : undefined}>
-          {availableOptions.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value} className={itemClass}>
-              {opt.label}
-            </SelectItem>
-          ))}
+          {availableOptions.map((opt) => {
+            const capability = findEngineCapability(capabilities, opt.engine);
+            const selectable = isEngineSelectable(capability);
+            const notice = engineNotice(capability, t);
+            return (
+              <SelectItem
+                key={opt.value}
+                value={opt.value}
+                // Only the label is greyed out, so a disabled engine's reason stays readable.
+                className={cn(itemClass, 'data-[disabled]:opacity-100')}
+                disabled={!selectable}
+              >
+                <span className={selectable ? undefined : 'opacity-50'}>{opt.label}</span>
+                {notice ? (
+                  <span
+                    className={cn(
+                      'block text-[10px]',
+                      notice.kind === 'reason'
+                        ? 'text-muted-foreground'
+                        : 'text-amber-600 dark:text-amber-400',
+                    )}
+                  >
+                    {notice.text}
+                  </span>
+                ) : null}
+              </SelectItem>
+            );
+          })}
         </SelectContent>
       </Select>
+      {selectedNotice ? (
+        <p
+          className={
+            compact
+              ? 'px-2 text-[10px] text-amber-600 dark:text-amber-400'
+              : 'text-xs text-amber-600 dark:text-amber-400'
+          }
+        >
+          {selectedNotice}
+        </p>
+      ) : null}
       {selectedHabibiModel && !selectedHabibiModel.commercialUse ? (
         <p
           className={
@@ -207,9 +301,14 @@ export function getEngineDescription(engine: string): string {
 export function isProfileCompatibleWithEngine(
   profile: VoiceProfileResponse,
   engine: string,
+  capability?: EngineCapabilityResponse,
 ): boolean {
   const voiceType = profile.voice_type || 'cloned';
   if (voiceType === 'preset') return profile.preset_engine === engine;
-  if (voiceType === 'cloned') return CLONING_ENGINES.has(engine);
-  return true; // designed — future
+  // Engines outside the app-side set clone only when their capability declares it.
+  if (voiceType === 'cloned') {
+    return supportsCloning(engine, capability, CLONING_ENGINES);
+  }
+  // Designed profiles fit only engines whose capability declares voice design (FR-015a).
+  return supportsVoiceDesign(capability);
 }

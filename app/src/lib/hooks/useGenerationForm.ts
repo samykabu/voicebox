@@ -1,20 +1,37 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api/client';
-import type { EffectConfig } from '@/lib/api/types';
+import type { EffectConfig, VoiceProfileResponse } from '@/lib/api/types';
 import {
   DEFAULT_HABIBI_MODEL_ID,
   getHabibiModel,
   HABIBI_MODEL_IDS,
 } from '@/lib/constants/habibiModels';
 import { LANGUAGE_CODES, type LanguageCode } from '@/lib/constants/languages';
+import {
+  buildAdvancedSettingsPayload,
+  buildVoiceDescriptionPayload,
+  type DownloadConfirmationDetails,
+  downloadConfirmationDetails,
+  downloadDecision,
+  isEngineSelectable,
+  PRE_CAPABILITY_ENGINES,
+} from '@/lib/hooks/engineCapabilityRules';
+import {
+  findEngineCapability,
+  loadEngineCapabilities,
+  useEngineCapabilities,
+} from '@/lib/hooks/useEngineCapabilities';
 import { useGeneration } from '@/lib/hooks/useGeneration';
 import { useModelDownloadToast } from '@/lib/hooks/useModelDownloadToast';
 import { useGenerationSettings } from '@/lib/hooks/useSettings';
 import { useGenerationStore } from '@/stores/generationStore';
+import { useServerStore } from '@/stores/serverStore';
 import { useUIStore } from '@/stores/uiStore';
 
 const generationSchema = z.object({
@@ -33,9 +50,14 @@ const generationSchema = z.object({
       'tada',
       'kokoro',
       'f5_tts',
+      'voxcpm',
     ])
     .optional(),
   personality: z.boolean().optional(),
+  /** Values for the selected engine's declared advanced settings, keyed by setting name. */
+  advancedSettings: z.record(z.number()).optional(),
+  /** A written description of the voice to create, for engines with voice design (FR-015). */
+  voiceDescription: z.string().max(500).optional(),
 });
 
 export type GenerationFormValues = z.infer<typeof generationSchema>;
@@ -47,7 +69,10 @@ interface UseGenerationFormOptions {
 }
 
 export function useGenerationForm(options: UseGenerationFormOptions = {}) {
+  const { t } = useTranslation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const serverUrl = useServerStore((state) => state.serverUrl);
   const generation = useGeneration();
   const addPendingGeneration = useGenerationStore((state) => state.addPendingGeneration);
   const { settings: genSettings } = useGenerationSettings();
@@ -57,6 +82,19 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
   const selectedEngine = useUIStore((state) => state.selectedEngine);
   const [downloadingModelName, setDownloadingModelName] = useState<string | null>(null);
   const [downloadingDisplayName, setDownloadingDisplayName] = useState<string | null>(null);
+  const { data: engineCapabilities } = useEngineCapabilities();
+  const [downloadConfirmation, setDownloadConfirmation] = useState<
+    (DownloadConfirmationDetails & { resolve: (confirmed: boolean) => void }) | null
+  >(null);
+
+  function requestDownloadConfirmation(details: DownloadConfirmationDetails): Promise<boolean> {
+    return new Promise((resolve) => setDownloadConfirmation({ ...details, resolve }));
+  }
+
+  function resolveDownloadConfirmation(confirmed: boolean) {
+    downloadConfirmation?.resolve(confirmed);
+    setDownloadConfirmation(null);
+  }
 
   useModelDownloadToast({
     modelName: downloadingModelName || '',
@@ -81,6 +119,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
   async function handleSubmit(
     data: GenerationFormValues,
     selectedProfileId: string | null,
+    selectedProfile?: Pick<VoiceProfileResponse, 'voice_type'>,
   ): Promise<void> {
     if (!selectedProfileId) {
       toast({
@@ -91,8 +130,23 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
       return;
     }
 
+    const engine = data.engine || 'qwen';
+    // Decide from the capability, not from its absence: on a cold start the list may not have
+    // loaded yet, so load it through the same query before deciding (FR-003, FR-018).
+    const capability =
+      findEngineCapability(engineCapabilities, engine) ??
+      findEngineCapability(await loadEngineCapabilities(queryClient, serverUrl), engine);
+    // FR-003: an engine this machine cannot run must not lead to a failed generation.
+    if (!isEngineSelectable(capability)) {
+      toast({
+        title: t('engines.unavailableTitle', { name: capability?.display_name ?? engine }),
+        description: capability?.reason ?? undefined,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     try {
-      const engine = data.engine || 'qwen';
       const selectedModelSize =
         engine === 'f5_tts' ? getHabibiModel(data.modelSize).id : data.modelSize;
       const modelName =
@@ -112,7 +166,9 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
                     ? getHabibiModel(selectedModelSize).id
                     : engine === 'qwen_custom_voice'
                       ? `qwen-custom-voice-${data.modelSize}`
-                      : `qwen-tts-${data.modelSize}`;
+                      : engine === 'voxcpm'
+                        ? 'voxcpm2'
+                        : `qwen-tts-${data.modelSize}`;
       const displayName =
         engine === 'luxtts'
           ? 'LuxTTS'
@@ -132,21 +188,43 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
                       ? data.modelSize === '1.7B'
                         ? 'Qwen CustomVoice 1.7B'
                         : 'Qwen CustomVoice 0.6B'
-                      : data.modelSize === '1.7B'
-                        ? 'Qwen TTS 1.7B'
-                        : 'Qwen TTS 0.6B';
+                      : engine === 'voxcpm'
+                        ? 'VoxCPM2'
+                        : data.modelSize === '1.7B'
+                          ? 'Qwen TTS 1.7B'
+                          : 'Qwen TTS 0.6B';
 
       // Check if model needs downloading
+      let model: { downloaded: boolean; downloading?: boolean } | undefined;
       try {
         const modelStatus = await apiClient.getModelStatus();
-        const model = modelStatus.models.find((m) => m.model_name === modelName);
-
-        if (model && !model.downloaded) {
-          setDownloadingModelName(modelName);
-          setDownloadingDisplayName(displayName);
-        }
+        model = modelStatus.models.find((m) => m.model_name === modelName);
       } catch (error) {
         console.error('Failed to check model status:', error);
+      }
+
+      // FR-018 / C1Q7: /generate starts the download itself, so ask first when the engine's
+      // capability requires it; declining cancels this generation. It fails closed: without
+      // a capability for an engine that depends on one, the download is not started.
+      const decision = downloadDecision(engine, capability, model, PRE_CAPABILITY_ENGINES);
+      if (decision === 'refuse') {
+        toast({
+          title: t('engines.detailsUnavailable.title'),
+          description: t('engines.detailsUnavailable.description', { name: displayName }),
+          variant: 'destructive',
+        });
+        return;
+      }
+      if (decision === 'confirm' && capability) {
+        const confirmed = await requestDownloadConfirmation(
+          downloadConfirmationDetails(capability, displayName),
+        );
+        if (!confirmed) return;
+      }
+
+      if (model && !model.downloaded) {
+        setDownloadingModelName(modelName);
+        setDownloadingDisplayName(displayName);
       }
 
       const hasModelSizes =
@@ -172,6 +250,15 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
         crossfade_ms: crossfadeMs,
         normalize: normalizeAudio,
         effects_chain: effectsChain?.length ? effectsChain : undefined,
+        // FR-010: only engines that declare advanced settings receive them.
+        advanced_settings: buildAdvancedSettingsPayload(capability, data.advancedSettings),
+        // FR-015 / C1Q5: its own field, never `instruct`; omitted unless the engine declares
+        // voice design and the profile has no recording that would win over it (C1Q6).
+        voice_description: buildVoiceDescriptionPayload(
+          capability,
+          selectedProfile,
+          data.voiceDescription,
+        ),
       });
 
       // Track this generation for SSE status updates
@@ -186,6 +273,9 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
         instruct: '',
         engine: data.engine,
         personality: data.personality,
+        advancedSettings: data.advancedSettings,
+        // Kept so the next text can be generated with the same designed voice.
+        voiceDescription: data.voiceDescription,
       });
       options.onSuccess?.(result.id);
     } catch (error) {
@@ -204,5 +294,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
     form,
     handleSubmit,
     isPending: generation.isPending,
+    downloadConfirmation,
+    resolveDownloadConfirmation,
   };
 }

@@ -1,0 +1,713 @@
+# T010b contract diff
+# timestamp: 2026-09-23T02:42:08Z
+# cwd: /d/Projects/Personal/voicebox
+# backend/backends/__init__.py also carries the T009 capability fields (another worker); this task added only ModelConfig.min_memory_mb.
+# backend/models.py also carries the T007 |voxcpm change.
+
+$ git diff backend/models.py backend/routes/models.py backend/backends/__init__.py
+diff --git a/backend/backends/__init__.py b/backend/backends/__init__.py
+index 88c1428..02d9b92 100644
+--- a/backend/backends/__init__.py
++++ b/backend/backends/__init__.py
+@@ -45,6 +45,17 @@ WHISPER_HF_REPOS = {
+ }
+ 
+ 
++@dataclass(frozen=True)
++class AdvancedSetting:
++    """A generation setting the app may expose as an advanced control (FR-010)."""
++
++    name: str  # e.g. "cfg_value"
++    label: str  # e.g. "Guidance"
++    default: float
++    min: float
++    max: float
++
++
+ @dataclass
+ class ModelConfig:
+     """Declarative config for a downloadable model variant."""
+@@ -62,6 +73,12 @@ class ModelConfig:
+     license_id: Optional[str] = None
+     commercial_use: Optional[bool] = None
+     dialect: Optional[str] = None
++    # Capability declarations (FR-002, FR-004). Every default preserves today's behaviour.
++    accelerators: tuple[str, ...] = ()  # empty = unconstrained, e.g. ("cuda", "mps", "cpu")
++    supports_voice_design: bool = False  # accepts a written voice description (FR-015)
++    requires_download_confirmation: bool = False  # confirm before downloading (FR-018)
++    advanced_settings: tuple[AdvancedSetting, ...] = ()  # advanced controls (FR-010)
++    min_memory_mb: int | None = None  # usual memory needed; below it the engine stays available but warns (C1Q4)
+ 
+ 
+ @runtime_checkable
+diff --git a/backend/models.py b/backend/models.py
+index eef08a2..1f2a522 100644
+--- a/backend/models.py
++++ b/backend/models.py
+@@ -2,7 +2,7 @@
+ Pydantic models for request/response validation.
+ """
+ 
+-from pydantic import BaseModel, Field, StringConstraints
++from pydantic import BaseModel, Field, StringConstraints, model_validator
+ from typing_extensions import Annotated
+ from typing import Optional, List
+ from datetime import datetime
+@@ -89,7 +89,7 @@ class GenerationRequest(BaseModel):
+         pattern="^(1\\.7B|0\\.6B|1B|3B|habibi-(unified|msa|sau|uae|alg|irq|egy|mar))$",
+     )
+     instruct: Optional[str] = Field(None, max_length=500)
+-    engine: Optional[str] = Field(default="qwen", pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$")
++    engine: Optional[str] = Field(default="qwen", pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$")
+     personality: bool = Field(
+         default=False,
+         description="When true and the profile has a personality prompt, the input text is rewritten in-character before TTS.",
+@@ -104,6 +104,42 @@ class GenerationRequest(BaseModel):
+     effects_chain: Optional[List["EffectConfig"]] = Field(
+         None, description="Effects chain to apply after generation (overrides profile default)"
+     )
++    voice_description: str | None = Field(
++        None,
++        max_length=500,
++        description="Written voice description for engines that support voice design. Never sent as instruct.",
++    )
++    advanced_settings: dict[str, float] | None = Field(
++        None,
++        description="Advanced generation settings by name. Only names the engine declares, within their bounds.",
++    )
++
++    @model_validator(mode="after")
++    def _check_advanced_settings(self) -> "GenerationRequest":
++        """Reject advanced settings the engine does not declare, or values outside their bounds (422)."""
++        if not self.advanced_settings:
++            return self
++
++        # lazy: avoid circular import (models.py must not import the backends package at module scope)
++        from .backends import get_default_model_size, get_tts_model_configs
++
++        engine = self.engine or "qwen"
++        default_size = get_default_model_size(engine)
++        config = next(
++            (c for c in get_tts_model_configs() if c.engine == engine and c.model_size == default_size),
++            None,
++        )
++        declared = {s.name: s for s in config.advanced_settings} if config else {}
++
++        for name, value in self.advanced_settings.items():
++            setting = declared.get(name)
++            if setting is None:
++                raise ValueError(f"Engine '{engine}' does not declare an advanced setting named '{name}'")
++            if not setting.min <= value <= setting.max:
++                raise ValueError(
++                    f"Advanced setting '{name}' must be between {setting.min} and {setting.max} for engine '{engine}'"
++                )
++        return self
+ 
+ 
+ class GenerationResponse(BaseModel):
+@@ -410,7 +446,7 @@ class MCPClientBindingResponse(BaseModel):
+     profile_id: Optional[str] = None
+     default_engine: Optional[str] = Field(
+         None,
+-        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$",
++        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$",
+     )
+     default_personality: bool = False
+     last_seen_at: Optional[datetime] = None
+@@ -429,7 +465,7 @@ class MCPClientBindingUpsert(BaseModel):
+     profile_id: Optional[str] = None
+     default_engine: Optional[str] = Field(
+         None,
+-        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$",
++        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$",
+     )
+     default_personality: bool = False
+ 
+@@ -448,7 +484,7 @@ class SpeakRequest(BaseModel):
+     )
+     engine: Optional[str] = Field(
+         None,
+-        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$",
++        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$",
+     )
+     personality: Optional[bool] = Field(
+         None,
+@@ -580,6 +616,51 @@ class ModelStatusListResponse(BaseModel):
+     models: List[ModelStatus]
+ 
+ 
++class EngineAdvancedSettingResponse(BaseModel):
++    """An advanced generation setting an engine declares (FR-010)."""
++
++    name: str
++    label: str
++    default: float
++    min: float
++    max: float
++
++
++class EngineCapabilityResponse(BaseModel):
++    """One TTS engine's capabilities and whether this machine can run it (FR-004).
++
++    Describes the engine as a whole, aggregated from all of its model variants.
++    See specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md.
++    """
++
++    engine: str
++    display_name: str = Field(..., description="The engine name (not a model variant name).")
++    available: bool
++    reason: str | None = Field(..., description="Non-null if and only if available is false.")
++    warning: str | None = Field(..., description="Advisory only; never blocks.")
++    supported_accelerators: list[str] = Field(
++        ..., description="From the default-size variant. Empty means unconstrained."
++    )
++    detected_accelerator: str
++    languages: list[str] = Field(
++        ...,
++        description="Union across all of the engine's variants, in first-seen order over the variants in registry order.",
++    )
++    supports_cloning: bool
++    supports_voice_design: bool = Field(..., description="From the default-size variant.")
++    requires_download_confirmation: bool = Field(..., description="From the default-size variant.")
++    advanced_settings: list[EngineAdvancedSettingResponse] = Field(..., description="From the default-size variant.")
++    size_mb: int = Field(..., description="Download size of the default-size variant, the one downloaded by default.")
++    license_id: str | None = Field(..., description="Shared by every variant, or null when the variants differ.")
++    commercial_use: bool | None = Field(..., description="Shared by every variant, or null when the variants differ.")
++
++
++class EngineCapabilitiesResponse(BaseModel):
++    """Response model for GET /models/engines."""
++
++    engines: list[EngineCapabilityResponse]
++
++
+ class ModelDownloadRequest(BaseModel):
+     """Request model for triggering model download."""
+ 
+diff --git a/backend/routes/models.py b/backend/routes/models.py
+index a691bff..d88e6bb 100644
+--- a/backend/routes/models.py
++++ b/backend/routes/models.py
+@@ -400,6 +400,65 @@ async def get_model_status():
+     return models.ModelStatusListResponse(models=statuses)
+ 
+ 
++@router.get("/models/engines", response_model=models.EngineCapabilitiesResponse)
++async def get_engine_capabilities():
++    """Report each TTS engine's capabilities and whether this machine can run it.
++
++    One entry per engine, aggregated from all of its model variants: languages are the
++    union, license fields are the shared value or null, and the download size, capability
++    flags, accelerators and memory threshold come from the default-size variant. Hardware is
++    detected once per request. Never loads a model, starts a download or imports torch at
++    module scope (contracts/engine-capabilities.md, invariant 4).
++    """
++    from ..backends import TTS_ENGINES, get_default_model_size, get_tts_model_configs
++    from ..backends.base import detect_accelerator_and_memory, resolve_engine_availability
++    from ..services.profiles import CLONING_ENGINES  # lazy: services.profiles pulls in torch
++
++    accelerator, memory_mb = detect_accelerator_and_memory()
++    configs = get_tts_model_configs()
++
++    def _shared(values):
++        distinct = set(values)
++        return distinct.pop() if len(distinct) == 1 else None
++
++    engines = []
++    for engine, engine_name in TTS_ENGINES.items():
++        variants = [c for c in configs if c.engine == engine]
++        if not variants:
++            continue
++        default_size = get_default_model_size(engine)
++        default = next((c for c in variants if c.model_size == default_size), variants[0])
++        availability = resolve_engine_availability(
++            default, accelerator, memory_mb=memory_mb, min_memory_mb=default.min_memory_mb
++        )
++        engines.append(
++            models.EngineCapabilityResponse(
++                engine=engine,
++                display_name=engine_name,
++                available=availability.available,
++                reason=availability.reason,
++                warning=availability.warning,
++                supported_accelerators=availability.supported_accelerators,
++                detected_accelerator=availability.detected_accelerator,
++                languages=list(dict.fromkeys(lang for c in variants for lang in c.languages)),
++                supports_cloning=engine in CLONING_ENGINES,
++                supports_voice_design=default.supports_voice_design,
++                requires_download_confirmation=default.requires_download_confirmation,
++                advanced_settings=[
++                    models.EngineAdvancedSettingResponse(
++                        name=s.name, label=s.label, default=s.default, min=s.min, max=s.max
++                    )
++                    for s in default.advanced_settings
++                ],
++                size_mb=default.size_mb,
++                license_id=_shared(c.license_id for c in variants),
++                commercial_use=_shared(c.commercial_use for c in variants),
++            )
++        )
++
++    return models.EngineCapabilitiesResponse(engines=engines)
++
++
+ @router.post("/models/download")
+ async def trigger_model_download(request: models.ModelDownloadRequest):
+     """Trigger download of a specific model."""
+
+$ PYTHONPATH=. /c/Users/sabus/voicebox-testenv/Scripts/python.exe <scratchpad>/schema_dump_b.py   (mounts only backend.routes.models.router)
+# script:
+#   import ast
+#   import json
+#   import sys
+#   from pathlib import Path
+#   from types import SimpleNamespace
+#   
+#   from fastapi import FastAPI
+#   from fastapi.testclient import TestClient
+#   
+#   # services.profiles imports torch via utils.cache; serve its real CLONING_ENGINES (read with ast) instead.
+#   src = Path("backend/services/profiles.py").read_text(encoding="utf-8")
+#   cloning = next(
+#       ast.literal_eval(n.value)
+#       for n in ast.parse(src).body
+#       if isinstance(n, ast.Assign) and getattr(n.targets[0], "id", "") == "CLONING_ENGINES"
+#   )
+#   sys.modules["backend.services.profiles"] = SimpleNamespace(CLONING_ENGINES=cloning)
+#   
+#   import backend.backends.base as base  # noqa: E402
+#   import backend.routes.models as routes_mod  # noqa: E402
+#   
+#   base.detect_accelerator_and_memory = lambda: ("cpu", None)  # fixed hardware for a reproducible sample
+#   
+#   app = FastAPI()
+#   app.include_router(routes_mod.router)
+#   spec = app.openapi()
+#   print("=== OpenAPI: paths['/models/engines'] ===")
+#   print(json.dumps(spec["paths"]["/models/engines"], indent=2))
+#   names = ["EngineCapabilitiesResponse", "EngineCapabilityResponse", "EngineAdvancedSettingResponse"]
+#   print("=== OpenAPI: components.schemas for " + ", ".join(names) + " ===")
+#   print(json.dumps({n: spec["components"]["schemas"][n] for n in names}, indent=2))
+#   print("=== Sample GET /models/engines response (detected accelerator patched to cpu, memory unknown) ===")
+#   print(json.dumps(TestClient(app).get("/models/engines").json(), indent=2))
+
+=== OpenAPI: paths['/models/engines'] ===
+{
+  "get": {
+    "summary": "Get Engine Capabilities",
+    "description": "Report each TTS engine's capabilities and whether this machine can run it.\n\nOne entry per engine, aggregated from all of its model variants: languages are the\nunion, license fields are the shared value or null, and the download size, capability\nflags, accelerators and memory threshold come from the default-size variant. Hardware is\ndetected once per request. Never loads a model, starts a download or imports torch at\nmodule scope (contracts/engine-capabilities.md, invariant 4).",
+    "operationId": "get_engine_capabilities_models_engines_get",
+    "responses": {
+      "200": {
+        "description": "Successful Response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/EngineCapabilitiesResponse"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+=== OpenAPI: components.schemas for EngineCapabilitiesResponse, EngineCapabilityResponse, EngineAdvancedSettingResponse ===
+{
+  "EngineCapabilitiesResponse": {
+    "properties": {
+      "engines": {
+        "items": {
+          "$ref": "#/components/schemas/EngineCapabilityResponse"
+        },
+        "type": "array",
+        "title": "Engines"
+      }
+    },
+    "type": "object",
+    "required": [
+      "engines"
+    ],
+    "title": "EngineCapabilitiesResponse",
+    "description": "Response model for GET /models/engines."
+  },
+  "EngineCapabilityResponse": {
+    "properties": {
+      "engine": {
+        "type": "string",
+        "title": "Engine"
+      },
+      "display_name": {
+        "type": "string",
+        "title": "Display Name",
+        "description": "The engine name (not a model variant name)."
+      },
+      "available": {
+        "type": "boolean",
+        "title": "Available"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Reason",
+        "description": "Non-null if and only if available is false."
+      },
+      "warning": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Warning",
+        "description": "Advisory only; never blocks."
+      },
+      "supported_accelerators": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Supported Accelerators",
+        "description": "From the default-size variant. Empty means unconstrained."
+      },
+      "detected_accelerator": {
+        "type": "string",
+        "title": "Detected Accelerator"
+      },
+      "languages": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Languages",
+        "description": "Union across all of the engine's variants, in first-seen order over the variants in registry order."
+      },
+      "supports_cloning": {
+        "type": "boolean",
+        "title": "Supports Cloning"
+      },
+      "supports_voice_design": {
+        "type": "boolean",
+        "title": "Supports Voice Design",
+        "description": "From the default-size variant."
+      },
+      "requires_download_confirmation": {
+        "type": "boolean",
+        "title": "Requires Download Confirmation",
+        "description": "From the default-size variant."
+      },
+      "advanced_settings": {
+        "items": {
+          "$ref": "#/components/schemas/EngineAdvancedSettingResponse"
+        },
+        "type": "array",
+        "title": "Advanced Settings",
+        "description": "From the default-size variant."
+      },
+      "size_mb": {
+        "type": "integer",
+        "title": "Size Mb",
+        "description": "Download size of the default-size variant, the one downloaded by default."
+      },
+      "license_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "License Id",
+        "description": "Shared by every variant, or null when the variants differ."
+      },
+      "commercial_use": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Commercial Use",
+        "description": "Shared by every variant, or null when the variants differ."
+      }
+    },
+    "type": "object",
+    "required": [
+      "engine",
+      "display_name",
+      "available",
+      "reason",
+      "warning",
+      "supported_accelerators",
+      "detected_accelerator",
+      "languages",
+      "supports_cloning",
+      "supports_voice_design",
+      "requires_download_confirmation",
+      "advanced_settings",
+      "size_mb",
+      "license_id",
+      "commercial_use"
+    ],
+    "title": "EngineCapabilityResponse",
+    "description": "One TTS engine's capabilities and whether this machine can run it (FR-004).\n\nDescribes the engine as a whole, aggregated from all of its model variants.\nSee specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md."
+  },
+  "EngineAdvancedSettingResponse": {
+    "properties": {
+      "name": {
+        "type": "string",
+        "title": "Name"
+      },
+      "label": {
+        "type": "string",
+        "title": "Label"
+      },
+      "default": {
+        "type": "number",
+        "title": "Default"
+      },
+      "min": {
+        "type": "number",
+        "title": "Min"
+      },
+      "max": {
+        "type": "number",
+        "title": "Max"
+      }
+    },
+    "type": "object",
+    "required": [
+      "name",
+      "label",
+      "default",
+      "min",
+      "max"
+    ],
+    "title": "EngineAdvancedSettingResponse",
+    "description": "An advanced generation setting an engine declares (FR-010)."
+  }
+}
+=== Sample GET /models/engines response (detected accelerator patched to cpu, memory unknown) ===
+{
+  "engines": [
+    {
+      "engine": "qwen",
+      "display_name": "Qwen TTS",
+      "available": true,
+      "reason": null,
+      "warning": null,
+      "supported_accelerators": [],
+      "detected_accelerator": "cpu",
+      "languages": [
+        "zh",
+        "en",
+        "ja",
+        "ko",
+        "de",
+        "fr",
+        "ru",
+        "pt",
+        "es",
+        "it"
+      ],
+      "supports_cloning": true,
+      "supports_voice_design": false,
+      "requires_download_confirmation": false,
+      "advanced_settings": [],
+      "size_mb": 3500,
+      "license_id": null,
+      "commercial_use": null
+    },
+    {
+      "engine": "qwen_custom_voice",
+      "display_name": "Qwen CustomVoice",
+      "available": true,
+      "reason": null,
+      "warning": null,
+      "supported_accelerators": [],
+      "detected_accelerator": "cpu",
+      "languages": [
+        "zh",
+        "en",
+        "ja",
+        "ko",
+        "de",
+        "fr",
+        "ru",
+        "pt",
+        "es",
+        "it"
+      ],
+      "supports_cloning": false,
+      "supports_voice_design": false,
+      "requires_download_confirmation": false,
+      "advanced_settings": [],
+      "size_mb": 3500,
+      "license_id": null,
+      "commercial_use": null
+    },
+    {
+      "engine": "luxtts",
+      "display_name": "LuxTTS",
+      "available": true,
+      "reason": null,
+      "warning": null,
+      "supported_accelerators": [],
+      "detected_accelerator": "cpu",
+      "languages": [
+        "en"
+      ],
+      "supports_cloning": true,
+      "supports_voice_design": false,
+      "requires_download_confirmation": false,
+      "advanced_settings": [],
+      "size_mb": 300,
+      "license_id": null,
+      "commercial_use": null
+    },
+    {
+      "engine": "chatterbox",
+      "display_name": "Chatterbox TTS",
+      "available": true,
+      "reason": null,
+      "warning": null,
+      "supported_accelerators": [],
+      "detected_accelerator": "cpu",
+      "languages": [
+        "zh",
+        "en",
+        "ja",
+        "ko",
+        "de",
+        "fr",
+        "ru",
+        "pt",
+        "es",
+        "it",
+        "he",
+        "ar",
+        "da",
+        "el",
+        "fi",
+        "hi",
+        "ms",
+        "nl",
+        "no",
+        "pl",
+        "sv",
+        "sw",
+        "tr"
+      ],
+      "supports_cloning": true,
+      "supports_voice_design": false,
+      "requires_download_confirmation": false,
+      "advanced_settings": [],
+      "size_mb": 3200,
+      "license_id": null,
+      "commercial_use": null
+    },
+    {
+      "engine": "chatterbox_turbo",
+      "display_name": "Chatterbox Turbo",
+      "available": true,
+      "reason": null,
+      "warning": null,
+      "supported_accelerators": [],
+      "detected_accelerator": "cpu",
+      "languages": [
+        "en"
+      ],
+      "supports_cloning": true,
+      "supports_voice_design": false,
+      "requires_download_confirmation": false,
+      "advanced_settings": [],
+      "size_mb": 1500,
+      "license_id": null,
+      "commercial_use": null
+    },
+    {
+      "engine": "tada",
+      "display_name": "TADA",
+      "available": true,
+      "reason": null,
+      "warning": null,
+      "supported_accelerators": [],
+      "detected_accelerator": "cpu",
+      "languages": [
+        "en",
+        "ar",
+        "zh",
+        "de",
+        "es",
+        "fr",
+        "it",
+        "ja",
+        "pl",
+        "pt"
+      ],
+      "supports_cloning": true,
+      "supports_voice_design": false,
+      "requires_download_confirmation": false,
+      "advanced_settings": [],
+      "size_mb": 4000,
+      "license_id": null,
+      "commercial_use": null
+    },
+    {
+      "engine": "kokoro",
+      "display_name": "Kokoro",
+      "available": true,
+      "reason": null,
+      "warning": null,
+      "supported_accelerators": [],
+      "detected_accelerator": "cpu",
+      "languages": [
+        "en",
+        "es",
+        "fr",
+        "hi",
+        "it",
+        "pt",
+        "ja",
+        "zh"
+      ],
+      "supports_cloning": false,
+      "supports_voice_design": false,
+      "requires_download_confirmation": false,
+      "advanced_settings": [],
+      "size_mb": 350,
+      "license_id": null,
+      "commercial_use": null
+    },
+    {
+      "engine": "f5_tts",
+      "display_name": "F5-TTS",
+      "available": true,
+      "reason": null,
+      "warning": null,
+      "supported_accelerators": [],
+      "detected_accelerator": "cpu",
+      "languages": [
+        "ar"
+      ],
+      "supports_cloning": true,
+      "supports_voice_design": false,
+      "requires_download_confirmation": false,
+      "advanced_settings": [],
+      "size_mb": 1300,
+      "license_id": null,
+      "commercial_use": null
+    }
+  ]
+}
+# exit code: 0
