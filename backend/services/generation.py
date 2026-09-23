@@ -26,6 +26,45 @@ from ..database import get_db
 from ..utils.tasks import get_task_manager
 
 
+def engine_declares_advanced_settings(engine: str) -> bool:
+    """Whether any model config of *engine* declares advanced settings (FR-010)."""
+    from ..backends import get_tts_model_configs
+
+    return any(c.advanced_settings for c in get_tts_model_configs() if c.engine == engine)
+
+
+class _BackendWithOptions:
+    """Forwards ``options`` to ``generate()`` and delegates everything else.
+
+    ``generate_chunked`` calls ``backend.generate(text, voice_prompt, language,
+    seed, instruct)``; wrapping the backend adds the additive ``options`` keyword
+    without changing that call for any other engine.
+    """
+
+    def __init__(self, backend, options: dict[str, float]) -> None:
+        self._backend = backend
+        self._options = options
+
+    async def generate(self, *args, **kwargs):
+        return await self._backend.generate(*args, options=self._options, **kwargs)
+
+    def __getattr__(self, name: str):
+        return getattr(self._backend, name)
+
+
+def backend_with_generation_options(backend, engine: str, advanced_settings: dict[str, float] | None):
+    """Return *backend*, wrapped to receive ``options`` only when that applies.
+
+    Settings go only to engines whose ``ModelConfig.advanced_settings`` is
+    non-empty (VoxCPM2). Every other engine gets the backend unwrapped, so it is
+    never called with an ``options`` keyword. The request was already validated
+    against the declared names and bounds in ``models.GenerationRequest``.
+    """
+    if not advanced_settings or not engine_declares_advanced_settings(engine):
+        return backend
+    return _BackendWithOptions(backend, dict(advanced_settings))
+
+
 async def run_generation(
     *,
     generation_id: str,
@@ -42,6 +81,7 @@ async def run_generation(
     max_chunk_chars: Optional[int] = None,
     crossfade_ms: Optional[int] = None,
     version_id: Optional[str] = None,
+    advanced_settings: dict[str, float] | None = None,
 ) -> None:
     """Execute TTS inference and persist the result.
 
@@ -100,7 +140,8 @@ async def run_generation(
         if crossfade_ms is not None:
             gen_kwargs["crossfade_ms"] = crossfade_ms
 
-        audio, sample_rate = await generate_chunked(tts_model, text, voice_prompt, **gen_kwargs)
+        generating_model = backend_with_generation_options(tts_model, engine, advanced_settings)
+        audio, sample_rate = await generate_chunked(generating_model, text, voice_prompt, **gen_kwargs)
 
         # --- Normalize (generate and regenerate always; retry skips) -----
         if normalize or mode == "regenerate":

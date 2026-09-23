@@ -1,3 +1,194 @@
+# T018 evidence - app/src/lib/api/types.ts ('voxcpm' in the engine union)
+# timestamp: 2026-09-23T16:18:31.0465975+03:00
+
+$ grep -n "engine\|chatterbox\|luxtts\|voice_description\|advanced_settings" app/src/lib/api/types.ts   (union sites / GenerationRequest fields)
+13:   preset_engine?: string;
+16:   default_engine?: string;
+29:   preset_engine?: string;
+32:   default_engine?: string;
+76:   engine?:
+79:     | 'luxtts'
+80:     | 'chatterbox'
+81:     | 'chatterbox_turbo'
+115:   engine?: string;
+426:   engine?: string;
+538:   default_engine: string | null;
+549:   default_engine?: string | null;
+
+$ bun run typecheck
+$ bunx tsc -p app/tsconfig.json --noEmit && cd web && bunx tsc --noEmit
+
+exit=0
+
+$ bunx biome check app/src/lib/api/types.ts
+app\src\lib\api\types.ts format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+      1     │ - //·API·Types·matching·backend·Pydantic·models␍
+      2     │ - ␍
+      3     │ - import·type·{·HabibiModelId·}·from·'@/lib/constants/habibiModels';␍
+      4     │ - import·type·{·LanguageCode·}·from·'@/lib/constants/languages';␍
+      5     │ - ␍
+      6     │ - export·type·VoiceType·=·'cloned'·|·'preset'·|·'designed';␍
+      7     │ - ␍
+      8     │ - export·interface·VoiceProfileCreate·{␍
+      9     │ - ··name:·string;␍
+     10     │ - ··description?:·string;␍
+     11     │ - ··language:·LanguageCode;␍
+     12     │ - ··voice_type?:·VoiceType;␍
+     13     │ - ··preset_engine?:·string;␍
+     14     │ - ··preset_voice_id?:·string;␍
+     15     │ - ··design_prompt?:·string;␍
+     16     │ - ··default_engine?:·string;␍
+     17     │ - ··/**·Free-form·character·prompt·used·by·compose·and·the·`/generate`·personality-rewrite·path.·*/␍
+     18     │ - ··personality?:·string;␍
+     19     │ - }␍
+     20     │ - ␍
+     21     │ - export·interface·VoiceProfileResponse·{␍
+     22     │ - ··id:·string;␍
+     23     │ - ··name:·string;␍
+     24     │ - ··description?:·string;␍
+     25     │ - ··language:·string;␍
+     26     │ - ··avatar_path?:·string;␍
+     27     │ - ··effects_chain?:·EffectConfig[];␍
+     28     │ - ··voice_type:·VoiceType;␍
+     29     │ - ··preset_engine?:·string;␍
+     30     │ - ··preset_voice_id?:·string;␍
+     31     │ - ··design_prompt?:·string;␍
+     32     │ - ··default_engine?:·string;␍
+     33     │ - ··personality?:·string·|·null;␍
+     34     │ - ··generation_count:·number;␍
+     35     │ - ··sample_count:·number;␍
+     36     │ - ··created_at:·string;␍
+     37     │ - ··updated_at:·string;␍
+     38     │ - }␍
+     39     │ - ␍
+     40     │ - /**·Response·returned·by·/profiles/{id}/compose.·*/␍
+     41     │ - export·interface·PersonalityTextResponse·{␍
+     42     │ - ··text:·string;␍
+     43     │ - ··model_size:·string;␍
+     44     │ - }␍
+     45     │ - ␍
+     46     │ - export·interface·PresetVoice·{␍
+     47     │ - ··voice_id:·string;␍
+     48     │ - ··name:·string;␍
+     49     │ - ··gender:·'male'·|·'female';␍
+     50     │ - ··language:·string;␍
+     51     │ - }␍
+     52     │ - ␍
+     53     │ - export·interface·ProfileSampleCreate·{␍
+     54     │ - ··reference_text:·string;␍
+     55     │ - }␍
+     56     │ - ␍
+     57     │ - export·interface·ProfileSampleResponse·{␍
+     58     │ - ··id:·string;␍
+     59     │ - ··profile_id:·string;␍
+     60     │ - ··audio_path:·string;␍
+     61     │ - ··reference_text:·string;␍
+     62     │ - }␍
+     63     │ - ␍
+     64     │ - export·interface·EffectConfig·{␍
+     65     │ - ··type:·string;␍
+     66     │ - ··enabled:·boolean;␍
+     67     │ - ··params:·Record<string,·number>;␍
+     68     │ - }␍
+     69     │ - ␍
+     70     │ - export·interface·GenerationRequest·{␍
+     71     │ - ··profile_id:·string;␍
+     72     │ - ··text:·string;␍
+     73     │ - ··language:·LanguageCode;␍
+     74     │ - ··seed?:·number;␍
+     75     │ - ··model_size?:·'1.7B'·|·'0.6B'·|·'1B'·|·'3B'·|·HabibiModelId;␍
+     76     │ - ··engine?:␍
+     77     │ - ····|·'qwen'␍
+     78     │ - ····|·'qwen_custom_voice'␍
+     79     │ - ····|·'luxtts'␍
+     80     │ - ····|·'chatterbox'␍
+     81     │ - ····|·'chatterbox_turbo'␍
+     82     │ - ····|·'tada'␍
+     83     │ - ····|·'kokoro'␍
+     84     │ - ····|·'f5_tts'␍
+     85     │ - ····|·'voxcpm';␍
+     86     │ - ··instruct?:·string;␍
+     87     │ - ··/**·When·true·and·the·profile·has·a·personality·prompt,·input·text·is·rewritten·in-character·before·TTS.·*/␍
+     88     │ - ··personality?:·boolean;␍
+     89     │ - ··max_chunk_chars?:·number;␍
+     90     │ - ··crossfade_ms?:·number;␍
+     91     │ - ··normalize?:·boolean;␍
+     92     │ - ··effects_chain?:·EffectConfig[];␍
+     93     │ - }␍
+     94     │ - ␍
+     95     │ - export·interface·GenerationVersionResponse·{␍
+     96     │ - ··id:·string;␍
+     97     │ - ··generation_id:·string;␍
+     98     │ - ··label:·string;␍
+     99     │ - ··audio_path:·string;␍
+    100     │ - ··effects_chain?:·EffectConfig[];␍
+    101     │ - ··source_version_id?:·string;␍
+    102     │ - ··is_default:·boolean;␍
+    103     │ - ··created_at:·string;␍
+    104     │ - }␍
+    105     │ - ␍
+    106     │ - export·interface·GenerationResponse·{␍
+    107     │ - ··id:·string;␍
+    108     │ - ··profile_id:·string;␍
+    109     │ - ··text:·string;␍
+    110     │ - ··language:·string;␍
+    111     │ - ··audio_path?:·string;␍
+    112     │ - ··duration?:·number;␍
+    113     │ - ··seed?:·number;␍
+    114     │ - ··instruct?:·string;␍
+    115     │ - ··engine?:·string;␍
+    116     │ - ··model_size?:·string;␍
+    117     │ - ··status:·'loading_model'·|·'generating'·|·'completed'·|·'failed';␍
+    118     │ - ··error?:·string;␍
+    119     │ - ··is_favorited?:·boolean;␍
+    120     │ - ··created_at:·string;␍
+    121     │ - ··versions?:·GenerationVersionResponse[];␍
+    122     │ - ··active_version_id?:·string;␍
+    123     │ - }␍
+    124     │ - ␍
+    125     │ - export·interface·HistoryQuery·{␍
+    126     │ - ··profile_id?:·string;␍
+    127     │ - ··search?:·string;␍
+    128     │ - ··limit?:·number;␍
+    129     │ - ··offset?:·number;␍
+    130     │ - }␍
+    131     │ - ␍
+    132     │ - export·interface·HistoryResponse·extends·GenerationResponse·{␍
+    133     │ - ··profile_name:·string;␍
+    134     │ - ··versions?:·GenerationVersionResponse[];␍
+    135     │ - ··active_version_id?:·string;␍
+    136     │ - }␍
+    137     │ - ␍
+    138     │ - export·interface·HistoryListResponse·{␍
+    139     │ - ··items:·HistoryResponse[];␍
+    140     │ - ··total:·number;␍
+    141     │ - }␍
+    142     │ - ␍
+    143     │ - export·type·WhisperModelSize·=·'base'·|·'small'·|·'medium'·|·'large'·|·'turbo';␍
+    144     │ - ␍
+    145     │ - export·type·Qwen3ModelSize·=·'0.6B'·|·'1.7B'·|·'4B';␍
+    146     │ - ␍
+    147     │ - export·type·CaptureSource·=·'dictation'·|·'recording'·|·'file';␍
+    148     │ - ␍
+    149     │ - /**␍
+    150     │ - ·*·Snapshot·of·the·accessibility-focused·UI·element·at·chord-start.·Emitted␍
+  991 more lines truncated
+  
+
+Checked 1 file in 6ms. No fixes applied.
+Found 1 error.
+check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.
+  
+
+
+exit=1
+
+$ git show HEAD:app/src/lib/api/types.ts | bunx biome check --stdin-file-path=app/src/lib/api/types.ts   (pre-existing baseline)
 // API Types matching backend Pydantic models
 
 import type { HabibiModelId } from '@/lib/constants/habibiModels';
@@ -81,8 +272,7 @@ export interface GenerationRequest {
     | 'chatterbox_turbo'
     | 'tada'
     | 'kokoro'
-    | 'f5_tts'
-    | 'voxcpm';
+    | 'f5_tts';
   instruct?: string;
   /** When true and the profile has a personality prompt, input text is rewritten in-character before TTS. */
   personality?: boolean;
@@ -90,10 +280,6 @@ export interface GenerationRequest {
   crossfade_ms?: number;
   normalize?: boolean;
   effects_chain?: EffectConfig[];
-  /** Written voice description for engines that support voice design. Never sent as instruct. */
-  voice_description?: string | null;
-  /** Advanced generation settings by name; only names the engine declares, within their bounds. */
-  advanced_settings?: Record<string, number> | null;
 }
 
 export interface GenerationVersionResponse {
@@ -572,3 +758,46 @@ export interface CloudStatus {
   connected_at: string | null;
   dashboard_url: string;
 }
+stdin ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × The contents aren't fixed. Use the `--write` flag to fix them.
+  
+
+
+exit=1
+
+$ git diff -- app/src/lib/api/types.ts
+diff --git a/app/src/lib/api/types.ts b/app/src/lib/api/types.ts
+index cc312a3..6c86c9d 100644
+--- a/app/src/lib/api/types.ts
++++ b/app/src/lib/api/types.ts
+@@ -81,7 +81,8 @@ export interface GenerationRequest {
+     | 'chatterbox_turbo'
+     | 'tada'
+     | 'kokoro'
+-    | 'f5_tts';
++    | 'f5_tts'
++    | 'voxcpm';
+   instruct?: string;
+   /** When true and the profile has a personality prompt, input text is rewritten in-character before TTS. */
+   personality?: boolean;
+
+
+## line-ending check (the Biome error is the whole-file CRLF formatter diff) — 2026-09-23T16:18:48+03:00
+$ HEAD vs working tree: total lines / CRLF lines
+
+## line-ending check (the Biome error is the whole-file CRLF formatter diff) - 2026-09-23T16:18:54+03:00
+HEAD:    569 lines, 0 CRLF-terminated
+working: 570 lines, 0 CRLF-terminated
+$ sed -n 84,85p app/src/lib/api/types.ts | od -c
+0000000                   |       '   f   5   _   t   t   s   '  \n    
+0000020               |       '   v   o   x   c   p   m   '   ;  \n
+0000037
+$ git ls-files --eol app/src/lib/api/types.ts
+i/lf    w/crlf  attr/                 	app/src/lib/api/types.ts
+$ backend/venv/Scripts/python.exe -c "<count raw CRLF/LF bytes in working file and HEAD blob>"
+working CRLF= 570 bare LF= 0
+HEAD blob CRLF= 0 bare LF= 569
+voxcpm line bytes: b"\r\n    | 'voxcpm';\r\n "
+# HEAD blob is LF (i/lf); the working copy is CRLF (w/crlf) via checkout conversion, so Biome's formatter flags
+# every line. Same single pre-existing format error before and after; my added line uses CRLF like its neighbours.

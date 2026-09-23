@@ -237,6 +237,7 @@ TTS_ENGINES = {
     "tada": "TADA",
     "kokoro": "Kokoro",
     "f5_tts": "F5-TTS",
+    "voxcpm": "VoxCPM2",
 }
 
 LLM_ENGINES = {
@@ -487,6 +488,66 @@ def _get_non_qwen_tts_configs() -> list[ModelConfig]:
             license_id="Apache-2.0",
             commercial_use=True,
             dialect="MAR",
+        ),
+        ModelConfig(
+            model_name="voxcpm2",
+            display_name="VoxCPM2 (Multilingual, Voice Design)",
+            engine="voxcpm",
+            hf_repo_id="openbmb/VoxCPM2",
+            model_size="default",
+            size_mb=4961,
+            needs_trim=False,  # the vendor trims silence internally
+            retries_runaway=True,  # the vendor retries runaway output itself (retry_badcase=True)
+            supports_instruct=False,
+            supports_voice_design=True,
+            requires_download_confirmation=True,
+            accelerators=("cuda", "mps", "cpu"),
+            # The probe measured about 5.9 GB of GPU memory on short text (nvidia-smi delta
+            # 5885 MiB; torch reserved 5692 MB): evidence/probe.md Q8, probe/11b and probe/12.
+            # 6 GiB is that figure rounded up; longer texts may need more.
+            min_memory_mb=6144,
+            # Model card front-matter order, evidence/probe/15-language-list.txt.
+            languages=[
+                "zh",
+                "en",
+                "ar",
+                "my",
+                "da",
+                "nl",
+                "fi",
+                "fr",
+                "de",
+                "el",
+                "he",
+                "hi",
+                "id",
+                "it",
+                "ja",
+                "km",
+                "ko",
+                "lo",
+                "ms",
+                "no",
+                "pl",
+                "pt",
+                "ru",
+                "es",
+                "sw",
+                "sv",
+                "tl",
+                "th",
+                "tr",
+                "vi",
+            ],
+            license_id="Apache-2.0",
+            commercial_use=True,
+            dialect=None,
+            # Bounds are the "recommended" ranges in voxcpm 2.0.3 cli.py --help, inside the
+            # hard limits its validate_ranges() enforces (cfg 0.1-10.0, steps 1-100).
+            advanced_settings=(
+                AdvancedSetting("cfg_value", "Guidance", 2.0, 1.0, 3.0),
+                AdvancedSetting("inference_timesteps", "Quality steps", 10, 4, 30),
+            ),
         ),
     ]
 
@@ -868,6 +929,10 @@ def get_tts_backend_for_engine(engine: str) -> TTSBackend:
             from .f5tts_backend import F5TTSBackend
 
             backend = F5TTSBackend()
+        elif engine == "voxcpm":
+            from .voxcpm_backend import VoxCPMBackend
+
+            backend = VoxCPMBackend()
         elif engine == "qwen_custom_voice":
             from .qwen_custom_voice_backend import QwenCustomVoiceBackend
 

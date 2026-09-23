@@ -2,56 +2,14 @@
   "dry_run": false,
   "changes": [
     {
-      "task": "T003",
-      "number": 19,
+      "task": "T011",
+      "number": 27,
       "from": "open",
       "to": "closed"
     },
     {
-      "task": "T004",
-      "number": 20,
-      "from": "open",
-      "to": "closed"
-    },
-    {
-      "task": "T005",
-      "number": 21,
-      "from": "open",
-      "to": "closed"
-    },
-    {
-      "task": "T006",
-      "number": 22,
-      "from": "open",
-      "to": "closed"
-    },
-    {
-      "task": "T007",
-      "number": 23,
-      "from": "open",
-      "to": "closed"
-    },
-    {
-      "task": "T008",
-      "number": 24,
-      "from": "open",
-      "to": "closed"
-    },
-    {
-      "task": "T009",
-      "number": 25,
-      "from": "open",
-      "to": "closed"
-    },
-    {
-      "task": "T010",
-      "number": 26,
-      "from": "open",
-      "to": "closed"
-    },
-    {
-      "task": "T012",
-      "number": 28,
+      "task": "T013",
+      "number": 29,
       "from": "open",
       "to": "closed"
     }

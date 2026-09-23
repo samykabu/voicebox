@@ -322,6 +322,47 @@ def build_server(cuda=False, rocm=False):
             "pypinyin",
             "--hidden-import",
             "loguru",
+            # VoxCPM2 — tokenizer-free multilingual TTS (openbmb/VoxCPM2).
+            # The backend module is lazily imported by the engine dispatcher,
+            # so PyInstaller cannot see it without a hidden import.
+            "--hidden-import",
+            "backend.backends.voxcpm_backend",
+            # collect-all (not hidden-import) because voxcpm's audio VAE
+            # modules decorate `snake` with @torch.jit.script at import time,
+            # and TorchScript calls inspect.getsource(), which needs the .py
+            # source files in the bundle (same failure as the DAC shim note).
+            # The package ships no non-.py data; the model config and
+            # tokenizer come from the HF snapshot at runtime.
+            "--collect-all",
+            "voxcpm",
+            # collect-all also lists voxcpm.training, which imports argbind
+            # and datasets (training only). Voicebox only runs inference.
+            "--exclude-module",
+            "voxcpm.training",
+            # Runtime-unneeded voxcpm deps (dependency probe Q11): the
+            # ModelScope denoiser (Voicebox loads with load_denoiser=False),
+            # FunASR, HF Spaces, argbind and wetext (normalize=True only).
+            # None is installed with the --no-deps setup; excluding them
+            # keeps a venv that has them from dragging them in. gradio and
+            # datasets are left alone because other engines' packages pull
+            # them in.
+            "--exclude-module",
+            "modelscope",
+            "--exclude-module",
+            "funasr",
+            "--exclude-module",
+            "spaces",
+            "--exclude-module",
+            "argbind",
+            "--exclude-module",
+            "wetext",
+            # torchcodec: VoxCPM2 never calls it (reference audio loads via
+            # librosa), the other engines already bypass torchaudio.load, and
+            # it needs FFmpeg "full-shared" DLLs that the app does not ship.
+            # Exclude it so a build venv that has it cannot bundle a codec
+            # that fails to load at runtime.
+            "--exclude-module",
+            "torchcodec",
             # MCP server — Streamable-HTTP endpoint and the 4 voicebox.* tools.
             # FastMCP pulls in a chain of deps (mcp, cyclopts, openapi-pydantic,
             # etc.) that don't auto-discover cleanly under PyInstaller, so we
@@ -737,6 +778,8 @@ def build_shim():
         "tada",
         "--exclude-module",
         "kokoro",
+        "--exclude-module",
+        "voxcpm",
         "--exclude-module",
         "misaki",
         "--exclude-module",

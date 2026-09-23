@@ -113,3 +113,35 @@ Inspect git status before continuing; do not discard uncommitted files.
   - The venv now has torch 2.9.1+rocm7.2.1 and CUDA is unavailable.
   - It needs a reinstall of cu128 torch, torchaudio and torchvision and removal of the rocm packages. The commands are in `evidence/phase2/realenv-suite.txt`.
   - This is assigned to the dispatcher; the orchestrator has not repaired it.
+- Phase 2 completion commit `0c35cabce63ac9bb93537343bb77ca7cf4f9f4b7`: 193 files, pushed as `cd42d4c..0c35cab`. `git ls-remote` returns the same SHA. No hooks are installed. Phase 2 is marked complete in the report.
+- Chores committed and pushed:
+  - A1 `e94d457`: gates the ROCm E2E test behind `VOICEBOX_TEST_ROCM_INSTALL`.
+  - A2 `ef5fe32`: switches the duplicate-names test to `backend.` imports and adds `engine.dispose()`.
+  - A3 `d6a3a11`: Biome now excludes the generated client (core, models, schemas, services, index.ts).
+  - The remote matches `d6a3a11`.
+- New real-env suite baseline (JUnit): tests=544, failures=1, errors=0, skipped=8. The failure is `tests.test_progress::test_hf_progress_tracker` ("Should have captured progress updates"). Evidence: `evidence/chores/suite-baseline.*`.
+- Phase 3, batch 1:
+  - `a9197df34d3ed7487` (backend) owns T014, T015 and T016: `test_voxcpm_backend.py`, `voxcpm_backend.py` and the registry sites in `__init__.py`. It stays the single writer of `voxcpm_backend.py` for T046, T047, T024 and the T023 backend part.
+  - `a97468ba17891381a` owns T017 (`build_binary.py`) and T018 (`types.ts`, which is handed to the frontend worker afterwards).
+- Phase 3, batch 1 reviewed:
+  - T014 and T015 are done. T017 and T018 are done.
+  - T017 incident: the worker's evidence script called `build_server()`, which ran `pip --force-reinstall` for CPU torch and then cu128 torch in `backend/venv` (16:16–16:17 +03:00). The orchestrator verified torch is back at 2.11.0+cu128 with CUDA available.
+  - T016's registry is accepted. The capability tests are handed over to the backend worker.
+- Phase 3, batch 2:
+  - `a9197df34d3ed7487` owns the caps-test fix, T046, T047, the T024 test and the T023 backend part. That covers `test_engine_capabilities.py` (handover), `generation.py` and `routes/generations.py`. It also does the real-model Arabic and offline runs.
+  - `a9505a747d4388a3b` owns T019–T022 and the T023 frontend part, with `types.ts` handed over from `a97468ba17891381a`.
+  - Open for the dispatcher: `COMBINE_SAMPLE_RATE` is 24000, matching the `profiles.py` save, but the contract says to use the encode rate (16 kHz).
+- Phase 3 reviewed:
+  - T014–T024, T046 and T047 are done.
+  - Full suite (JUnit): tests=637, failures=1, errors=0, skipped=8. The one failure is the baseline `test_hf_progress_tracker`.
+  - Real Arabic run on CUDA: 6.40 s of audio at 48 kHz, peak 5464 MiB. The WAV is outside the repo and still needs a human listen to judge intelligibility.
+  - Real offline run: 0 HuggingFace and 0 ModelScope requests, both with and without the env vars.
+- Open items for the dispatcher and user:
+  1. `COMBINE_SAMPLE_RATE` is 24000, but the contract specifies the 16 kHz encode rate.
+  2. Seven VoxCPM2 languages (my, id, km, lo, tl, th, vi) are rejected by the backend language regexes. The app filters them out.
+  3. VoxCPM2 is not offered for cloned profiles until Phase 4 adds cloning (`supports_cloning` is false).
+  4. Retry, regenerate and `/speak` do not carry `advanced_settings`.
+  5. `run_generation` still sends `instruct` to every engine. The mapping from `voice_description` belongs to US4.
+  6. There is no frontend test runner. The capability-logic tests were run from the scratchpad (16 tests, 0 failures) and are not committed.
+  7. Suggest adding `step` to the `advanced_settings` contract.
+  8. During T017 the worker accidentally swapped torch in the venv; it was restored.

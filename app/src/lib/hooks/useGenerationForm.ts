@@ -11,6 +11,14 @@ import {
   HABIBI_MODEL_IDS,
 } from '@/lib/constants/habibiModels';
 import { LANGUAGE_CODES, type LanguageCode } from '@/lib/constants/languages';
+import {
+  buildAdvancedSettingsPayload,
+  type DownloadConfirmationDetails,
+  downloadConfirmationDetails,
+  isEngineSelectable,
+  needsDownloadConfirmation,
+} from '@/lib/hooks/engineCapabilityRules';
+import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
 import { useGeneration } from '@/lib/hooks/useGeneration';
 import { useModelDownloadToast } from '@/lib/hooks/useModelDownloadToast';
 import { useGenerationSettings } from '@/lib/hooks/useSettings';
@@ -33,9 +41,12 @@ const generationSchema = z.object({
       'tada',
       'kokoro',
       'f5_tts',
+      'voxcpm',
     ])
     .optional(),
   personality: z.boolean().optional(),
+  /** Values for the selected engine's declared advanced settings, keyed by setting name. */
+  advancedSettings: z.record(z.number()).optional(),
 });
 
 export type GenerationFormValues = z.infer<typeof generationSchema>;
@@ -57,6 +68,19 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
   const selectedEngine = useUIStore((state) => state.selectedEngine);
   const [downloadingModelName, setDownloadingModelName] = useState<string | null>(null);
   const [downloadingDisplayName, setDownloadingDisplayName] = useState<string | null>(null);
+  const { data: engineCapabilities } = useEngineCapabilities();
+  const [downloadConfirmation, setDownloadConfirmation] = useState<
+    (DownloadConfirmationDetails & { resolve: (confirmed: boolean) => void }) | null
+  >(null);
+
+  function requestDownloadConfirmation(details: DownloadConfirmationDetails): Promise<boolean> {
+    return new Promise((resolve) => setDownloadConfirmation({ ...details, resolve }));
+  }
+
+  function resolveDownloadConfirmation(confirmed: boolean) {
+    downloadConfirmation?.resolve(confirmed);
+    setDownloadConfirmation(null);
+  }
 
   useModelDownloadToast({
     modelName: downloadingModelName || '',
@@ -91,8 +115,19 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
       return;
     }
 
+    const engine = data.engine || 'qwen';
+    const capability = findEngineCapability(engineCapabilities, engine);
+    // FR-003: an engine this machine cannot run must not lead to a failed generation.
+    if (!isEngineSelectable(capability)) {
+      toast({
+        title: `${capability?.display_name ?? engine} is unavailable`,
+        description: capability?.reason ?? undefined,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     try {
-      const engine = data.engine || 'qwen';
       const selectedModelSize =
         engine === 'f5_tts' ? getHabibiModel(data.modelSize).id : data.modelSize;
       const modelName =
@@ -112,7 +147,9 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
                     ? getHabibiModel(selectedModelSize).id
                     : engine === 'qwen_custom_voice'
                       ? `qwen-custom-voice-${data.modelSize}`
-                      : `qwen-tts-${data.modelSize}`;
+                      : engine === 'voxcpm'
+                        ? 'voxcpm2'
+                        : `qwen-tts-${data.modelSize}`;
       const displayName =
         engine === 'luxtts'
           ? 'LuxTTS'
@@ -132,14 +169,25 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
                       ? data.modelSize === '1.7B'
                         ? 'Qwen CustomVoice 1.7B'
                         : 'Qwen CustomVoice 0.6B'
-                      : data.modelSize === '1.7B'
-                        ? 'Qwen TTS 1.7B'
-                        : 'Qwen TTS 0.6B';
+                      : engine === 'voxcpm'
+                        ? 'VoxCPM2'
+                        : data.modelSize === '1.7B'
+                          ? 'Qwen TTS 1.7B'
+                          : 'Qwen TTS 0.6B';
 
       // Check if model needs downloading
       try {
         const modelStatus = await apiClient.getModelStatus();
         const model = modelStatus.models.find((m) => m.model_name === modelName);
+
+        // FR-018 / C1Q7: /generate starts the download itself, so ask first when the
+        // engine's capability requires it. Declining cancels this generation.
+        if (capability && needsDownloadConfirmation(capability, model)) {
+          const confirmed = await requestDownloadConfirmation(
+            downloadConfirmationDetails(capability, displayName),
+          );
+          if (!confirmed) return;
+        }
 
         if (model && !model.downloaded) {
           setDownloadingModelName(modelName);
@@ -172,6 +220,8 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
         crossfade_ms: crossfadeMs,
         normalize: normalizeAudio,
         effects_chain: effectsChain?.length ? effectsChain : undefined,
+        // FR-010: only engines that declare advanced settings receive them.
+        advanced_settings: buildAdvancedSettingsPayload(capability, data.advancedSettings),
       });
 
       // Track this generation for SSE status updates
@@ -186,6 +236,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
         instruct: '',
         engine: data.engine,
         personality: data.personality,
+        advancedSettings: data.advancedSettings,
       });
       options.onSuccess?.(result.id);
     } catch (error) {
@@ -204,5 +255,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
     form,
     handleSubmit,
     isPending: generation.isPending,
+    downloadConfirmation,
+    resolveDownloadConfirmation,
   };
 }

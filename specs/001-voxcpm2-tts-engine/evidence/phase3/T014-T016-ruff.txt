@@ -1,0 +1,478 @@
+# cwd: D:/Projects/Personal/voicebox/backend (config: backend/pyproject.toml)
+# timestamp: 2026-09-23T16:19:04+03:00
+$ ruff check backends/voxcpm_backend.py tests/test_voxcpm_backend.py
+I001 [*] Import block is un-sorted or un-formatted
+  --> backends\voxcpm_backend.py:16:1
+   |
+14 |   """
+15 |
+16 | / import asyncio
+17 | | import logging
+18 | | from typing import Optional, Tuple
+19 | |
+20 | | import numpy as np
+21 | |
+22 | | from .base import (
+23 | |     is_model_cached,
+24 | |     get_torch_device,
+25 | |     empty_device_cache,
+26 | |     manual_seed,
+27 | |     combine_voice_prompts as _combine_voice_prompts,
+28 | |     model_load_progress,
+29 | | )
+30 | | from ..utils.cache import get_cache_key, get_cached_voice_prompt, cache_voice_prompt
+   | |____________________________________________________________________________________^
+31 |
+32 |   logger = logging.getLogger(__name__)
+   |
+help: Organize imports
+   |
+21 |
+22 + from ..utils.cache import cache_voice_prompt, get_cache_key, get_cached_voice_prompt
+23 | from .base import (
+24 +     combine_voice_prompts as _combine_voice_prompts,
+25 +     empty_device_cache,
+26 +     get_torch_device,
+27 |     is_model_cached,
+   -     get_torch_device,
+   -     empty_device_cache,
+28 |     manual_seed,
+   -     combine_voice_prompts as _combine_voice_prompts,
+29 |     model_load_progress,
+30 | )
+   - from ..utils.cache import get_cache_key, get_cached_voice_prompt, cache_voice_prompt
+31 |
+   |
+
+UP035 `typing.Tuple` is deprecated, use `tuple` instead
+  --> backends\voxcpm_backend.py:18:1
+   |
+16 | import asyncio
+17 | import logging
+18 | from typing import Optional, Tuple
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+19 |
+20 | import numpy as np
+   |
+
+UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+   --> backends\voxcpm_backend.py:131:10
+    |
+129 |         reference_text: str,
+130 |         use_cache: bool = True,
+131 |     ) -> Tuple[dict, bool]:
+    |          ^^^^^
+132 |         """
+133 |         Create a voice prompt from reference audio.
+    |
+help: Replace with `tuple`
+    |
+130 |         use_cache: bool = True,
+    -     ) -> Tuple[dict, bool]:
+131 +     ) -> tuple[dict, bool]:
+132 |         """
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> backends\voxcpm_backend.py:166:15
+    |
+164 |         voice_prompt: dict,
+165 |         language: str = "en",
+166 |         seed: Optional[int] = None,
+    |               ^^^^^^^^^^^^^
+167 |         instruct: Optional[str] = None,
+168 |         options: Optional[dict[str, float]] = None,
+    |
+help: Convert to `X | None`
+    |
+165 |         language: str = "en",
+    -         seed: Optional[int] = None,
+166 +         seed: int | None = None,
+167 |         instruct: Optional[str] = None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> backends\voxcpm_backend.py:167:19
+    |
+165 |         language: str = "en",
+166 |         seed: Optional[int] = None,
+167 |         instruct: Optional[str] = None,
+    |                   ^^^^^^^^^^^^^
+168 |         options: Optional[dict[str, float]] = None,
+169 |     ) -> Tuple[np.ndarray, int]:
+    |
+help: Convert to `X | None`
+    |
+166 |         seed: Optional[int] = None,
+    -         instruct: Optional[str] = None,
+167 +         instruct: str | None = None,
+168 |         options: Optional[dict[str, float]] = None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> backends\voxcpm_backend.py:168:18
+    |
+166 |         seed: Optional[int] = None,
+167 |         instruct: Optional[str] = None,
+168 |         options: Optional[dict[str, float]] = None,
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+169 |     ) -> Tuple[np.ndarray, int]:
+170 |         """
+    |
+help: Convert to `X | None`
+    |
+167 |         instruct: Optional[str] = None,
+    -         options: Optional[dict[str, float]] = None,
+168 +         options: dict[str, float] | None = None,
+169 |     ) -> Tuple[np.ndarray, int]:
+    |
+
+UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+   --> backends\voxcpm_backend.py:169:10
+    |
+167 |         instruct: Optional[str] = None,
+168 |         options: Optional[dict[str, float]] = None,
+169 |     ) -> Tuple[np.ndarray, int]:
+    |          ^^^^^
+170 |         """
+171 |         Generate audio from text using VoxCPM2.
+    |
+help: Replace with `tuple`
+    |
+168 |         options: Optional[dict[str, float]] = None,
+    -     ) -> Tuple[np.ndarray, int]:
+169 +     ) -> tuple[np.ndarray, int]:
+170 |         """
+    |
+
+RUF046 Value being cast to `int` is already an integer
+   --> backends\voxcpm_backend.py:193:31
+    |
+191 |         settings = options or {}
+192 |         cfg_value = float(settings.get("cfg_value", DEFAULT_CFG_VALUE))
+193 |         inference_timesteps = int(round(settings.get("inference_timesteps", DEFAULT_INFERENCE_TIMESTEPS)))
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+194 |
+195 |         await self.load_model()
+    |
+help: Remove unnecessary `int` call
+
+UP045 [*] Use `X | None` for type annotations
+   --> backends\voxcpm_backend.py:218:32
+    |
+218 | def _prompt_pair(voice_prompt: Optional[dict]) -> Tuple[Optional[str], Optional[str]]:
+    |                                ^^^^^^^^^^^^^^
+219 |     """Return (prompt_wav_path, prompt_text): both set, or both None."""
+220 |     if not voice_prompt:
+    |
+help: Convert to `X | None`
+    |
+217 |
+    - def _prompt_pair(voice_prompt: Optional[dict]) -> Tuple[Optional[str], Optional[str]]:
+218 + def _prompt_pair(voice_prompt: dict | None) -> Tuple[Optional[str], Optional[str]]:
+219 |     """Return (prompt_wav_path, prompt_text): both set, or both None."""
+    |
+
+UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+   --> backends\voxcpm_backend.py:218:51
+    |
+218 | def _prompt_pair(voice_prompt: Optional[dict]) -> Tuple[Optional[str], Optional[str]]:
+    |                                                   ^^^^^
+219 |     """Return (prompt_wav_path, prompt_text): both set, or both None."""
+220 |     if not voice_prompt:
+    |
+help: Replace with `tuple`
+    |
+217 |
+    - def _prompt_pair(voice_prompt: Optional[dict]) -> Tuple[Optional[str], Optional[str]]:
+218 + def _prompt_pair(voice_prompt: Optional[dict]) -> tuple[Optional[str], Optional[str]]:
+219 |     """Return (prompt_wav_path, prompt_text): both set, or both None."""
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> backends\voxcpm_backend.py:218:57
+    |
+218 | def _prompt_pair(voice_prompt: Optional[dict]) -> Tuple[Optional[str], Optional[str]]:
+    |                                                         ^^^^^^^^^^^^^
+219 |     """Return (prompt_wav_path, prompt_text): both set, or both None."""
+220 |     if not voice_prompt:
+    |
+help: Convert to `X | None`
+    |
+217 |
+    - def _prompt_pair(voice_prompt: Optional[dict]) -> Tuple[Optional[str], Optional[str]]:
+218 + def _prompt_pair(voice_prompt: Optional[dict]) -> Tuple[str | None, Optional[str]]:
+219 |     """Return (prompt_wav_path, prompt_text): both set, or both None."""
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> backends\voxcpm_backend.py:218:72
+    |
+218 | def _prompt_pair(voice_prompt: Optional[dict]) -> Tuple[Optional[str], Optional[str]]:
+    |                                                                        ^^^^^^^^^^^^^
+219 |     """Return (prompt_wav_path, prompt_text): both set, or both None."""
+220 |     if not voice_prompt:
+    |
+help: Convert to `X | None`
+    |
+217 |
+    - def _prompt_pair(voice_prompt: Optional[dict]) -> Tuple[Optional[str], Optional[str]]:
+218 + def _prompt_pair(voice_prompt: Optional[dict]) -> Tuple[Optional[str], str | None]:
+219 |     """Return (prompt_wav_path, prompt_text): both set, or both None."""
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> backends\voxcpm_backend.py:235:51
+    |
+235 | def _apply_voice_description(text: str, instruct: Optional[str], *, has_reference: bool) -> str:
+    |                                                   ^^^^^^^^^^^^^
+236 |     """Prefix the voice description as "(description)text" (probe Q9), unless cloning."""
+237 |     description = (instruct or "").strip()
+    |
+help: Convert to `X | None`
+    |
+234 |
+    - def _apply_voice_description(text: str, instruct: Optional[str], *, has_reference: bool) -> str:
+235 + def _apply_voice_description(text: str, instruct: str | None, *, has_reference: bool) -> str:
+236 |     """Prefix the voice description as "(description)text" (probe Q9), unless cloning."""
+    |
+
+PT018 Assertion should be broken down into multiple parts
+   --> tests\test_voxcpm_backend.py:473:5
+    |
+471 |     assert prompt == {"prompt_wav_path": str(reference_file), "prompt_text": "The reference transcript."}
+472 |     assert was_cached is False
+473 |     assert list(recorder.cache) and all(key.startswith("voxcpm_") for key in recorder.cache)
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Break down assertion into multiple parts
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> tests\test_voxcpm_backend.py:541:13
+    |
+539 |               if isinstance(sub, ast.Import):
+540 |                   offenders += [a.name for a in sub.names if a.name.split(".")[0] in _HEAVY_ROOTS]
+541 | /             elif isinstance(sub, ast.ImportFrom) and sub.module and sub.level == 0:
+542 | |                 if sub.module.split(".")[0] in _HEAVY_ROOTS:
+    | |____________________________________________________________^
+543 |                       offenders.append(sub.module)
+544 |       assert offenders == []
+    |
+help: Combine `if` statements using `and`
+
+PT018 Assertion should be broken down into multiple parts
+   --> tests\test_voxcpm_backend.py:631:5
+    |
+629 |         assert setting.min < setting.max
+630 |     # Within the hard ranges voxcpm 2.0.3's CLI enforces (cli.py validate_ranges).
+631 |     assert 0.1 <= settings["cfg_value"].min and settings["cfg_value"].max <= 10.0
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+632 |     assert 1 <= settings["inference_timesteps"].min and settings["inference_timesteps"].max <= 100
+    |
+help: Break down assertion into multiple parts
+
+SIM300 [*] Yoda condition detected
+   --> tests\test_voxcpm_backend.py:631:12
+    |
+629 |         assert setting.min < setting.max
+630 |     # Within the hard ranges voxcpm 2.0.3's CLI enforces (cli.py validate_ranges).
+631 |     assert 0.1 <= settings["cfg_value"].min and settings["cfg_value"].max <= 10.0
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+632 |     assert 1 <= settings["inference_timesteps"].min and settings["inference_timesteps"].max <= 100
+    |
+help: Rewrite as `settings["cfg_value"].min >= 0.1`
+    |
+630 |     # Within the hard ranges voxcpm 2.0.3's CLI enforces (cli.py validate_ranges).
+    -     assert 0.1 <= settings["cfg_value"].min and settings["cfg_value"].max <= 10.0
+631 +     assert settings["cfg_value"].min >= 0.1 and settings["cfg_value"].max <= 10.0
+632 |     assert 1 <= settings["inference_timesteps"].min and settings["inference_timesteps"].max <= 100
+    |
+
+PT018 Assertion should be broken down into multiple parts
+   --> tests\test_voxcpm_backend.py:632:5
+    |
+630 |     # Within the hard ranges voxcpm 2.0.3's CLI enforces (cli.py validate_ranges).
+631 |     assert 0.1 <= settings["cfg_value"].min and settings["cfg_value"].max <= 10.0
+632 |     assert 1 <= settings["inference_timesteps"].min and settings["inference_timesteps"].max <= 100
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Break down assertion into multiple parts
+
+SIM300 [*] Yoda condition detected
+   --> tests\test_voxcpm_backend.py:632:12
+    |
+630 |     # Within the hard ranges voxcpm 2.0.3's CLI enforces (cli.py validate_ranges).
+631 |     assert 0.1 <= settings["cfg_value"].min and settings["cfg_value"].max <= 10.0
+632 |     assert 1 <= settings["inference_timesteps"].min and settings["inference_timesteps"].max <= 100
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Rewrite as `settings["inference_timesteps"].min >= 1`
+    |
+631 |     assert 0.1 <= settings["cfg_value"].min and settings["cfg_value"].max <= 10.0
+    -     assert 1 <= settings["inference_timesteps"].min and settings["inference_timesteps"].max <= 100
+632 +     assert settings["inference_timesteps"].min >= 1 and settings["inference_timesteps"].max <= 100
+633 |
+    |
+
+SIM300 [*] Yoda condition detected
+   --> tests\test_voxcpm_backend.py:639:12
+    |
+637 |     settings = {s.name: s.default for s in config.advanced_settings}
+638 |
+639 |     assert vb.DEFAULT_CFG_VALUE == settings["cfg_value"]
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+640 |     assert vb.DEFAULT_INFERENCE_TIMESTEPS == settings["inference_timesteps"]
+    |
+help: Rewrite as `settings["cfg_value"] == vb.DEFAULT_CFG_VALUE`
+    |
+638 |
+    -     assert vb.DEFAULT_CFG_VALUE == settings["cfg_value"]
+639 +     assert settings["cfg_value"] == vb.DEFAULT_CFG_VALUE
+640 |     assert vb.DEFAULT_INFERENCE_TIMESTEPS == settings["inference_timesteps"]
+    |
+
+SIM300 [*] Yoda condition detected
+   --> tests\test_voxcpm_backend.py:640:12
+    |
+639 |     assert vb.DEFAULT_CFG_VALUE == settings["cfg_value"]
+640 |     assert vb.DEFAULT_INFERENCE_TIMESTEPS == settings["inference_timesteps"]
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+639 |     assert vb.DEFAULT_CFG_VALUE == settings["cfg_value"]
+    -     assert vb.DEFAULT_INFERENCE_TIMESTEPS == settings["inference_timesteps"]
+640 +     assert settings["inference_timesteps"] == vb.DEFAULT_INFERENCE_TIMESTEPS
+641 |
+    |
+
+Found 21 errors.
+[*] 15 fixable with the `--fix` option (4 hidden fixes can be enabled with the `--unsafe-fixes` option).
+# exit code: 1
+$ ruff format --check backends/voxcpm_backend.py tests/test_voxcpm_backend.py
+unformatted: File would be reformatted
+   --> tests\test_voxcpm_backend.py:356:83
+    |
+355 | @pytest.mark.asyncio
+    - async def test_voice_description_becomes_the_ascii_paren_prefix_without_reference(
+    -     backend, recorder: _Recorder
+    - ) -> None:
+356 + async def test_voice_description_becomes_the_ascii_paren_prefix_without_reference(backend, recorder: _Recorder) -> None:
+357 |     await backend.generate("Hello there.", {}, instruct="  A young woman, gentle and sweet voice  ")
+--------------------------------------------------------------------------------
+672 |     assert (
+    -         MCPClientBindingResponse(
+    -             client_id="c1", created_at=now, updated_at=now, default_engine="voxcpm"
+    -         ).default_engine
+673 +         MCPClientBindingResponse(client_id="c1", created_at=now, updated_at=now, default_engine="voxcpm").default_engine
+674 |         == "voxcpm"
+    |
+
+1 file would be reformatted, 1 file already formatted
+# exit code: 1
+
+## backend/backends/__init__.py: working tree vs HEAD
+$ ruff check backends/__init__.py
+backends\__init__.py:13:1: I001 [*] Import block is un-sorted or un-formatted
+backends\__init__.py:13:39: RUF100 [*] Unused `noqa` directive (non-enabled: `F401`)
+backends\__init__.py:17:1: UP035 `typing.Tuple` is deprecated, use `tuple` instead
+backends\__init__.py:17:1: UP035 `typing.List` is deprecated, use `list` instead
+backends\__init__.py:24:1: E402 Module level import not at top of file
+backends\__init__.py:73:17: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:74:21: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:75:14: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:89:5: ERA001 Found commented-out code
+backends\__init__.py:100:10: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backends\__init__.py:111:22: UP006 [*] Use `list` instead of `List` for type annotation
+backends\__init__.py:112:26: UP006 [*] Use `list` instead of `List` for type annotation
+backends\__init__.py:113:10: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backends\__init__.py:127:15: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:128:19: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:129:10: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backends\__init__.py:167:19: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:168:21: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:198:17: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:201:21: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:202:19: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:222:15: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:225:15: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:676:42: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:756:5: I001 [*] Import block is un-sorted or un-formatted
+backends\__init__.py:800:5: I001 [*] Import block is un-sorted or un-formatted
+backends\__init__.py:829:48: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:848:5: I001 [*] Import block is un-sorted or un-formatted
+Found 28 errors.
+[*] 24 fixable with the `--fix` option.
+# exit code: 1
+$ git show HEAD:backend/backends/__init__.py | ruff check --stdin-filename backends/__init__.py --output-format concise -
+backends\__init__.py:13:1: I001 [*] Import block is un-sorted or un-formatted
+backends\__init__.py:13:39: RUF100 [*] Unused `noqa` directive (non-enabled: `F401`)
+backends\__init__.py:17:1: UP035 `typing.Tuple` is deprecated, use `tuple` instead
+backends\__init__.py:17:1: UP035 `typing.List` is deprecated, use `list` instead
+backends\__init__.py:24:1: E402 Module level import not at top of file
+backends\__init__.py:73:17: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:74:21: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:75:14: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:89:5: ERA001 Found commented-out code
+backends\__init__.py:100:10: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backends\__init__.py:111:22: UP006 [*] Use `list` instead of `List` for type annotation
+backends\__init__.py:112:26: UP006 [*] Use `list` instead of `List` for type annotation
+backends\__init__.py:113:10: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backends\__init__.py:127:15: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:128:19: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:129:10: UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+backends\__init__.py:167:19: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:168:21: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:198:17: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:201:21: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:202:19: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:222:15: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:225:15: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:615:42: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:695:5: I001 [*] Import block is un-sorted or un-formatted
+backends\__init__.py:739:5: I001 [*] Import block is un-sorted or un-formatted
+backends\__init__.py:768:48: UP045 [*] Use `X | None` for type annotations
+backends\__init__.py:787:5: I001 [*] Import block is un-sorted or un-formatted
+Found 28 errors.
+[*] 24 fixable with the `--fix` option.
+# exit code: 1
+$ ruff format --check backends/__init__.py
+unformatted: File would be reformatted
+   --> backends\__init__.py:214:36
+    |
+213 |
+    -     def unload_model(self) -> None:
+    -         ...
+214 +     def unload_model(self) -> None: ...
+215 |
+    -     def is_loaded(self) -> bool:
+    -         ...
+216 +     def is_loaded(self) -> bool: ...
+217 |
+--------------------------------------------------------------------------------
+610 |     common_languages = [
+    -         "en", "zh", "ja", "ko", "de", "fr", "ru", "pt", "es", "it",
+611 +         "en",
+612 +         "zh",
+613 +         "ja",
+614 +         "ko",
+615 +         "de",
+616 +         "fr",
+617 +         "ru",
+618 +         "pt",
+619 +         "es",
+620 +         "it",
+621 |     ]
+    |
+
+1 file would be reformatted
+# exit code: 1
+$ git show HEAD:backend/backends/__init__.py | ruff format --check --stdin-filename backends/__init__.py -
+# exit code: 1
+
+=== RERUN after fixes (ruff check --fix and ruff format applied to the two new files only, then manual PT018/SIM102/RUF046 fixes) ===
+# timestamp: 2026-09-23T16:20:03+03:00
+$ ruff check backends/voxcpm_backend.py tests/test_voxcpm_backend.py
+All checks passed!
+# exit code: 0
+$ ruff format --check backends/voxcpm_backend.py tests/test_voxcpm_backend.py
+2 files already formatted
+# exit code: 0
+$ diff of ruff check findings on backends/__init__.py, working tree vs HEAD (rule + message, line numbers stripped)
+# diff empty: no new findings in __init__.py (28 working tree vs 28 HEAD)
+# ruff format --check fails on __init__.py both at HEAD and in the working tree (pre-existing hunks at the TTSBackend protocol stubs and common_languages; none in the T016 lines)

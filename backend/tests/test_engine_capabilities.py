@@ -87,11 +87,18 @@ def test_advanced_setting_carries_contract_shape_and_is_frozen():
 # ---------------------------------------------------------------------------
 
 
-EXISTING_TTS_CONFIGS = get_tts_model_configs()
+# The eight engines registered before VoxCPM2. Their "unchanged" assertions are pinned to
+# this explicit set; engines that declare capabilities (VoxCPM2) get their own tests below.
+PRE_VOXCPM_ENGINES = frozenset(
+    {"qwen", "qwen_custom_voice", "luxtts", "chatterbox", "chatterbox_turbo", "tada", "kokoro", "f5_tts"}
+)
+
+EXISTING_TTS_CONFIGS = [c for c in get_tts_model_configs() if c.engine in PRE_VOXCPM_ENGINES]
 
 
 def test_there_are_existing_tts_configs_to_check():
     assert EXISTING_TTS_CONFIGS
+    assert {c.engine for c in EXISTING_TTS_CONFIGS} == PRE_VOXCPM_ENGINES
 
 
 @pytest.mark.parametrize("config", EXISTING_TTS_CONFIGS, ids=lambda c: c.model_name)
@@ -376,7 +383,9 @@ def test_engines_route_detects_hardware_once_per_request(engines_client):
 
 
 def test_engines_route_existing_engines_keep_todays_behaviour(engines_client):
-    for entry in _engines(engines_client):
+    entries = [e for e in _engines(engines_client) if e["engine"] in PRE_VOXCPM_ENGINES]
+    assert {e["engine"] for e in entries} == PRE_VOXCPM_ENGINES
+    for entry in entries:
         assert entry["supported_accelerators"] == []
         assert entry["available"] is True
         assert entry["reason"] is None
@@ -521,11 +530,17 @@ def test_current_engine_variants_agree_on_default_variant_fields():
             assert len(values) == 1, f"{engine}.{field_name} differs across variants: {values}"
 
 
-def test_current_engine_configs_declare_no_memory_threshold():
+def test_engine_configs_declare_the_expected_memory_threshold():
+    """Pre-VoxCPM2 engines declare none; VoxCPM2 declares 6144 MB (probe Q8, about 5.9 GB)."""
     from backend.backends import get_tts_model_configs
 
     for config in get_tts_model_configs():
-        assert config.min_memory_mb is None, config.model_name
+        if config.engine in PRE_VOXCPM_ENGINES:
+            assert config.min_memory_mb is None, config.model_name
+        elif config.engine == "voxcpm":
+            assert config.min_memory_mb == 6144, config.model_name
+        else:
+            raise AssertionError(f"unexpected engine {config.engine!r}: add an explicit expectation")
 
 
 def test_model_config_min_memory_mb_defaults_to_none():
@@ -773,3 +788,72 @@ def test_invalid_generation_body_is_a_422_through_fastapi(declared_qwen):
         {**_BASE_REQUEST, "voice_description": "a" * 501},
     ):
         assert client.post("/probe", json=body).status_code == 422, body
+
+
+# --- VoxCPM2: the first engine that declares capabilities (T016) ----------------------------
+
+
+VOXCPM_ACCELERATORS = ["cuda", "mps", "cpu"]
+
+
+def _voxcpm_config():
+    (config,) = [c for c in get_tts_model_configs() if c.engine == "voxcpm"]
+    return config
+
+
+@pytest.mark.parametrize("detected", VOXCPM_ACCELERATORS)
+@pytest.mark.parametrize("memory_mb", [6144, 16384, None])
+def test_voxcpm_is_available_without_warning_on_its_accelerators(detected, memory_mb):
+    config = _voxcpm_config()
+
+    result = resolve_engine_availability(config, detected, memory_mb=memory_mb, min_memory_mb=config.min_memory_mb)
+
+    assert result.available is True
+    assert result.reason is None
+    assert result.warning is None
+    assert result.supported_accelerators == VOXCPM_ACCELERATORS
+
+
+def test_voxcpm_warns_but_stays_available_on_a_4gb_gpu():
+    config = _voxcpm_config()
+
+    result = resolve_engine_availability(config, "cuda", memory_mb=4096, min_memory_mb=config.min_memory_mb)
+
+    assert result.available is True
+    assert result.reason is None
+    assert result.warning
+    assert "VoxCPM2" in result.warning
+
+
+@pytest.mark.parametrize("detected", ["xpu", "directml"])
+def test_voxcpm_is_unavailable_with_a_reason_on_other_accelerators(detected):
+    config = _voxcpm_config()
+
+    result = resolve_engine_availability(config, detected, memory_mb=16384, min_memory_mb=config.min_memory_mb)
+
+    assert result.available is False
+    assert result.reason is not None
+    assert result.warning is None
+
+
+def test_engines_route_describes_voxcpm_from_its_declaration(engines_client):
+    voxcpm = next(e for e in _engines(engines_client) if e["engine"] == "voxcpm")
+
+    assert voxcpm["display_name"] == "VoxCPM2"
+    assert voxcpm["supported_accelerators"] == VOXCPM_ACCELERATORS
+    assert voxcpm["detected_accelerator"] == "cuda"
+    # The fixture's machine has exactly 6144 MB, which meets the declared threshold.
+    assert voxcpm["available"] is True
+    assert voxcpm["reason"] is None
+    assert voxcpm["warning"] is None
+    assert voxcpm["requires_download_confirmation"] is True
+    assert voxcpm["supports_voice_design"] is True
+    assert voxcpm["advanced_settings"] == [
+        {"name": "cfg_value", "label": "Guidance", "default": 2.0, "min": 1.0, "max": 3.0},
+        {"name": "inference_timesteps", "label": "Quality steps", "default": 10, "min": 4, "max": 30},
+    ]
+    assert voxcpm["size_mb"] == 4961
+    assert voxcpm["license_id"] == "Apache-2.0"
+    assert voxcpm["commercial_use"] is True
+    assert len(voxcpm["languages"]) == 30
+    assert "ar" in voxcpm["languages"]

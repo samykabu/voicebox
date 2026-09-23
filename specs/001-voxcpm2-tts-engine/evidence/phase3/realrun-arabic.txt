@@ -1,0 +1,58 @@
+# Real-model Arabic run (T024 manual part) driving VoxCPMBackend directly; no server.
+# script: C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/realrun.py (outside the repo); cwd: C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/realrun-cwd
+# timestamp: 2026-09-23T16:29:38+03:00
+$ env -u HF_HUB_OFFLINE -u TRANSFORMERS_OFFLINE PYTHONIOENCODING=utf-8 VOICEBOX_DATA_DIR=C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/realrun-data REALRUN_TAG=arabic D:/Projects/Personal/voicebox/backend/venv/Scripts/python.exe C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/realrun.py arabic
+mode: arabic | deny non-loopback: False
+env HF_HUB_OFFLINE=None
+env TRANSFORMERS_OFFLINE=None
+env HF_HOME=None
+env HF_HUB_CACHE=None
+env MODELSCOPE_CACHE=None
+env HTTP_PROXY=None
+env HTTPS_PROXY=None
+python: 3.12.14 D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+torch: 2.11.0+cu128 cuda available: True
+gpu: NVIDIA GeForce RTX 5070
+NET 2026-09-23T16:29:40.112 connect ('127.0.0.1', 62934)
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+The class this function is called from is 'LlamaTokenizerFast'.
+D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cuda, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Warning: torch.compile disabled - triton is not installed
+Loaded VoxCPM2Model
+Warm up VoxCPMModel...
+backend: VoxCPMBackend | _is_model_cached(): True
+modelscope imported before load: False
+  0%|          | 0/10 [00:00<?, ?it/s] 10%|█         | 1/10 [00:00<00:03,  2.79it/s] 20%|██        | 2/10 [00:00<00:02,  3.97it/s] 30%|███       | 3/10 [00:00<00:01,  4.59it/s] 40%|████      | 4/10 [00:00<00:01,  4.83it/s] 50%|█████     | 5/10 [00:01<00:01,  4.98it/s] 60%|██████    | 6/10 [00:01<00:00,  5.11it/s] 70%|███████   | 7/10 [00:01<00:00,  5.22it/s] 80%|████████  | 8/10 [00:01<00:00,  5.33it/s] 90%|█████████ | 9/10 [00:01<00:00,  5.38it/s]100%|██████████| 10/10 [00:01<00:00,  5.47it/s]100%|██████████| 10/10 [00:01<00:00,  5.00it/s]
+device: cuda
+load_model wall time: 29.68 s
+modelscope imported after load: False
+text: مَرْحَبًا، هَذَا اخْتِبَارٌ قَصِيرٌ لِلصَّوْتِ الْعَرَبِيِّ بِاسْتِخْدَامِ نَمُوذَجِ فوكس.
+text utf-8 sha256: 119267508fb01c7b9fbd5dc9d2960057722e760be5c61a643da4056c8d4ad636
+  0%|          | 0/754 [00:00<?, ?it/s]  0%|          | 1/754 [00:00<02:24,  5.23it/s]  0%|          | 2/754 [00:00<02:22,  5.27it/s]  0%|          | 3/754 [00:00<02:21,  5.29it/s]  1%|          | 4/754 [00:00<02:20,  5.34it/s]  1%|          | 5/754 [00:00<02:20,  5.34it/s]  1%|          | 6/754 [00:01<02:22,  5.25it/s]  1%|          | 7/754 [00:01<02:20,  5.30it/s]  1%|          | 8/754 [00:01<02:19,  5.35it/s]  1%|          | 9/754 [00:01<02:18,  5.39it/s]  1%|▏         | 10/754 [00:01<02:16,  5.46it/s]  1%|▏         | 11/754 [00:02<02:14,  5.53it/s]  2%|▏         | 12/754 [00:02<02:13,  5.55it/s]  2%|▏         | 13/754 [00:02<02:14,  5.53it/s]  2%|▏         | 14/754 [00:02<02:15,  5.46it/s]  2%|▏         | 15/754 [00:02<02:15,  5.47it/s]  2%|▏         | 16/754 [00:02<02:15,  5.45it/s]  2%|▏         | 17/754 [00:03<02:15,  5.46it/s]  2%|▏         | 18/754 [00:03<02:13,  5.53it/s]  3%|▎         | 19/754 [00:03<02:13,  5.52it/s]  3%|▎         | 20/754 [00:03<02:12,  5.54it/s]  3%|▎         | 21/754 [00:03<02:12,  5.54it/s]  3%|▎         | 22/754 [00:04<02:11,  5.55it/s]  3%|▎         | 23/754 [00:04<02:11,  5.55it/s]  3%|▎         | 24/754 [00:04<02:11,  5.57it/s]  3%|▎         | 25/754 [00:04<02:10,  5.59it/s]  3%|▎         | 26/754 [00:04<02:08,  5.66it/s]  4%|▎         | 27/754 [00:04<02:07,  5.69it/s]  4%|▎         | 28/754 [00:05<02:07,  5.69it/s]  4%|▍         | 29/754 [00:05<02:08,  5.64it/s]  4%|▍         | 30/754 [00:05<02:08,  5.64it/s]  4%|▍         | 31/754 [00:05<02:08,  5.63it/s]  4%|▍         | 32/754 [00:05<02:07,  5.64it/s]  4%|▍         | 33/754 [00:05<02:08,  5.60it/s]  5%|▍         | 34/754 [00:06<02:10,  5.53it/s]  5%|▍         | 35/754 [00:06<02:09,  5.54it/s]  5%|▍         | 36/754 [00:06<02:09,  5.53it/s]  5%|▍         | 37/754 [00:06<02:09,  5.53it/s]  5%|▌         | 38/754 [00:06<02:09,  5.53it/s]  5%|▌         | 39/754 [00:07<02:09,  5.54it/s]  5%|▌         | 39/754 [00:07<02:12,  5.41it/s]
+generate wall time: 7.34 s
+audio: dtype=float32 shape=(307200,) sample_rate=48000 duration=6.40 s
+RTF (wall/audio): 1.15
+audio peak abs: 0.3221
+peak torch.cuda.max_memory_allocated: 5464 MiB
+peak torch.cuda.max_memory_reserved: 5698 MiB
+wav: C:\Users\sabus\voxcpm-probe-out\phase3\arabic-arabic.wav
+wav sha256: f2b27adfb1bafd2a7d03cb52c9b353afdbff77783ccea969d058b496864095ff
+wav readback: samplerate=48000 frames=307200 duration=6.40 s
+unloaded; is_loaded(): False
+
+=== NETWORK SUMMARY ===
+total events: 1
+getaddrinfo: 0 (non-loopback: 0 ) []
+connect: 1 (non-loopback: 0 )
+BLOCKED: 0 []
+HuggingFace lookups/connects: 0 []
+ModelScope lookups/connects: 0 []
+modelscope in sys.modules at exit: False
+# exit code: 0
+# NOTE: intelligibility requires a human listen; not judged by the agent.

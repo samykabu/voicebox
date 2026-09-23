@@ -13,7 +13,7 @@ from .. import config, models
 from ..backends import get_default_model_size
 from ..services import history, personality, profiles, pronunciation, tts
 from ..database import Generation as DBGeneration, VoiceProfile as DBVoiceProfile, get_db
-from ..services.generation import run_generation
+from ..services.generation import backend_with_generation_options, run_generation
 from ..services.task_queue import cancel_generation as cancel_generation_job, enqueue_generation
 from ..utils.audio import load_audio
 from ..utils.tasks import get_task_manager
@@ -140,6 +140,7 @@ async def generate_speech(
             mode="generate",
             max_chunk_chars=data.max_chunk_chars,
             crossfade_ms=data.crossfade_ms,
+            advanced_settings=data.advanced_settings,
         )
     )
 
@@ -372,7 +373,7 @@ async def stream_speech(
     )
 
     audio, sample_rate = await generate_chunked(
-        tts_model,
+        backend_with_generation_options(tts_model, engine, data.advanced_settings),
         stream_text,
         voice_prompt,
         language=data.language,

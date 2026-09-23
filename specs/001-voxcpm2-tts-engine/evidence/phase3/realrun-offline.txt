@@ -1,0 +1,116 @@
+# Real-model offline runs (T047 manual confirmation) driving VoxCPMBackend directly; no server.
+# Hook: socket.getaddrinfo, socket.socket.connect and connect_ex; every call logged as 'NET ...'; non-loopback refused (probe_run.py approach). Limitation (as in the probe): the native Rust hf-xet client would bypass a Python hook; it is used only for real file transfers, which cannot occur for a complete cached snapshot.
+
+=== RUN A: HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 + network hook blocking ===
+# timestamp: 2026-09-23T16:30:30+03:00
+$ env HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 PYTHONIOENCODING=utf-8 VOICEBOX_DATA_DIR=C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/realrun-data REALRUN_TAG=envvars D:/Projects/Personal/voicebox/backend/venv/Scripts/python.exe C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/realrun.py offline
+mode: offline | deny non-loopback: True
+env HF_HUB_OFFLINE='1'
+env TRANSFORMERS_OFFLINE='1'
+env HF_HOME=None
+env HF_HUB_CACHE=None
+env MODELSCOPE_CACHE=None
+env HTTP_PROXY=None
+env HTTPS_PROXY=None
+python: 3.12.14 D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+torch: 2.11.0+cu128 cuda available: True
+gpu: NVIDIA GeForce RTX 5070
+NET 2026-09-23T16:30:32.143 connect ('127.0.0.1', 61717)
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+The class this function is called from is 'LlamaTokenizerFast'.
+D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cuda, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Warning: torch.compile disabled - triton is not installed
+Loaded VoxCPM2Model
+Warm up VoxCPMModel...
+backend: VoxCPMBackend | _is_model_cached(): True
+modelscope imported before load: False
+  0%|          | 0/10 [00:00<?, ?it/s] 10%|█         | 1/10 [00:00<00:02,  3.55it/s] 20%|██        | 2/10 [00:00<00:01,  4.40it/s] 30%|███       | 3/10 [00:00<00:01,  4.87it/s] 40%|████      | 4/10 [00:00<00:01,  5.13it/s] 50%|█████     | 5/10 [00:01<00:00,  5.23it/s] 60%|██████    | 6/10 [00:01<00:00,  5.22it/s] 70%|███████   | 7/10 [00:01<00:00,  5.29it/s] 80%|████████  | 8/10 [00:01<00:00,  5.28it/s] 90%|█████████ | 9/10 [00:01<00:00,  5.35it/s]100%|██████████| 10/10 [00:01<00:00,  5.36it/s]100%|██████████| 10/10 [00:01<00:00,  5.14it/s]
+device: cuda
+load_model wall time: 27.60 s
+modelscope imported after load: False
+text: This is an offline load test of the VoxCPM2 backend.
+text utf-8 sha256: 56dde765036860e344d191c8dccc480e453c0bf2d120abbf65fe0b0675433596
+  0%|          | 0/100 [00:00<?, ?it/s]  1%|          | 1/100 [00:00<00:18,  5.49it/s]  2%|▏         | 2/100 [00:00<00:18,  5.36it/s]  3%|▎         | 3/100 [00:00<00:18,  5.27it/s]  4%|▍         | 4/100 [00:00<00:18,  5.30it/s]  5%|▌         | 5/100 [00:00<00:18,  5.26it/s]  6%|▌         | 6/100 [00:01<00:17,  5.23it/s]  7%|▋         | 7/100 [00:01<00:17,  5.29it/s]  8%|▊         | 8/100 [00:01<00:17,  5.31it/s]  9%|▉         | 9/100 [00:01<00:17,  5.31it/s] 10%|█         | 10/100 [00:01<00:17,  5.26it/s] 11%|█         | 11/100 [00:02<00:16,  5.36it/s] 12%|█▏        | 12/100 [00:02<00:16,  5.37it/s] 13%|█▎        | 13/100 [00:02<00:16,  5.39it/s] 14%|█▍        | 14/100 [00:02<00:15,  5.49it/s] 15%|█▌        | 15/100 [00:02<00:15,  5.50it/s] 16%|█▌        | 16/100 [00:02<00:15,  5.34it/s] 17%|█▋        | 17/100 [00:03<00:15,  5.23it/s] 18%|█▊        | 18/100 [00:03<00:15,  5.21it/s] 19%|█▉        | 19/100 [00:03<00:15,  5.13it/s] 20%|██        | 20/100 [00:03<00:15,  5.16it/s] 20%|██        | 20/100 [00:03<00:15,  5.09it/s]
+generate wall time: 4.00 s
+audio: dtype=float32 shape=(161280,) sample_rate=48000 duration=3.36 s
+RTF (wall/audio): 1.19
+audio peak abs: 0.9939
+peak torch.cuda.max_memory_allocated: 5457 MiB
+peak torch.cuda.max_memory_reserved: 5688 MiB
+wav: C:\Users\sabus\voxcpm-probe-out\phase3\offline-envvars.wav
+wav sha256: d6e463a838ba104b1a087554ea70cb344e8cf845ac8d747f65b7086eefeb7b92
+wav readback: samplerate=48000 frames=161280 duration=3.36 s
+unloaded; is_loaded(): False
+
+=== NETWORK SUMMARY ===
+total events: 1
+getaddrinfo: 0 (non-loopback: 0 ) []
+connect: 1 (non-loopback: 0 )
+BLOCKED: 0 []
+HuggingFace lookups/connects: 0 []
+ModelScope lookups/connects: 0 []
+modelscope in sys.modules at exit: False
+# exit code: 0
+
+=== RUN B: NO offline env vars (unset) + network hook blocking; only the T047 wrapper (force_offline_if_cached + local_files_only=True) keeps it offline ===
+# timestamp: 2026-09-23T16:31:05+03:00
+$ env -u HF_HUB_OFFLINE -u TRANSFORMERS_OFFLINE PYTHONIOENCODING=utf-8 VOICEBOX_DATA_DIR=C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/realrun-data REALRUN_TAG=wrapper-only D:/Projects/Personal/voicebox/backend/venv/Scripts/python.exe C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/realrun.py offline
+mode: offline | deny non-loopback: True
+env HF_HUB_OFFLINE=None
+env TRANSFORMERS_OFFLINE=None
+env HF_HOME=None
+env HF_HUB_CACHE=None
+env MODELSCOPE_CACHE=None
+env HTTP_PROXY=None
+env HTTPS_PROXY=None
+python: 3.12.14 D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+torch: 2.11.0+cu128 cuda available: True
+gpu: NVIDIA GeForce RTX 5070
+NET 2026-09-23T16:31:07.253 connect ('127.0.0.1', 62020)
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+The class this function is called from is 'LlamaTokenizerFast'.
+D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cuda, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Warning: torch.compile disabled - triton is not installed
+Loaded VoxCPM2Model
+Warm up VoxCPMModel...
+backend: VoxCPMBackend | _is_model_cached(): True
+modelscope imported before load: False
+  0%|          | 0/10 [00:00<?, ?it/s] 10%|█         | 1/10 [00:03<00:33,  3.68s/it] 20%|██        | 2/10 [00:03<00:12,  1.62s/it] 30%|███       | 3/10 [00:04<00:06,  1.04it/s] 40%|████      | 4/10 [00:04<00:03,  1.54it/s] 50%|█████     | 5/10 [00:04<00:02,  2.08it/s] 60%|██████    | 6/10 [00:04<00:01,  2.64it/s] 70%|███████   | 7/10 [00:04<00:00,  3.21it/s] 80%|████████  | 8/10 [00:04<00:00,  3.73it/s] 90%|█████████ | 9/10 [00:05<00:00,  4.19it/s]100%|██████████| 10/10 [00:05<00:00,  4.53it/s]100%|██████████| 10/10 [00:05<00:00,  1.90it/s]
+device: cuda
+load_model wall time: 27.68 s
+modelscope imported after load: False
+text: This is an offline load test of the VoxCPM2 backend.
+text utf-8 sha256: 56dde765036860e344d191c8dccc480e453c0bf2d120abbf65fe0b0675433596
+  0%|          | 0/100 [00:00<?, ?it/s]  1%|          | 1/100 [00:00<00:16,  5.89it/s]  2%|▏         | 2/100 [00:00<00:17,  5.69it/s]  3%|▎         | 3/100 [00:00<00:17,  5.64it/s]  4%|▍         | 4/100 [00:00<00:16,  5.67it/s]  5%|▌         | 5/100 [00:00<00:16,  5.67it/s]  6%|▌         | 6/100 [00:01<00:16,  5.67it/s]  7%|▋         | 7/100 [00:01<00:16,  5.69it/s]  8%|▊         | 8/100 [00:01<00:16,  5.62it/s]  9%|▉         | 9/100 [00:01<00:16,  5.59it/s] 10%|█         | 10/100 [00:01<00:16,  5.61it/s] 11%|█         | 11/100 [00:01<00:15,  5.60it/s] 12%|█▏        | 12/100 [00:02<00:15,  5.61it/s] 13%|█▎        | 13/100 [00:02<00:15,  5.61it/s] 14%|█▍        | 14/100 [00:02<00:15,  5.63it/s] 15%|█▌        | 15/100 [00:02<00:15,  5.64it/s] 16%|█▌        | 16/100 [00:02<00:14,  5.62it/s] 17%|█▋        | 17/100 [00:03<00:14,  5.65it/s] 18%|█▊        | 18/100 [00:03<00:14,  5.68it/s] 19%|█▉        | 19/100 [00:03<00:14,  5.68it/s] 20%|██        | 20/100 [00:03<00:14,  5.69it/s] 20%|██        | 20/100 [00:03<00:14,  5.44it/s]
+generate wall time: 3.75 s
+audio: dtype=float32 shape=(161280,) sample_rate=48000 duration=3.36 s
+RTF (wall/audio): 1.12
+audio peak abs: 0.9939
+peak torch.cuda.max_memory_allocated: 5457 MiB
+peak torch.cuda.max_memory_reserved: 5688 MiB
+wav: C:\Users\sabus\voxcpm-probe-out\phase3\offline-wrapper-only.wav
+wav sha256: d6e463a838ba104b1a087554ea70cb344e8cf845ac8d747f65b7086eefeb7b92
+wav readback: samplerate=48000 frames=161280 duration=3.36 s
+unloaded; is_loaded(): False
+
+=== NETWORK SUMMARY ===
+total events: 1
+getaddrinfo: 0 (non-loopback: 0 ) []
+connect: 1 (non-loopback: 0 )
+BLOCKED: 0 []
+HuggingFace lookups/connects: 0 []
+ModelScope lookups/connects: 0 []
+modelscope in sys.modules at exit: False
+# exit code: 0

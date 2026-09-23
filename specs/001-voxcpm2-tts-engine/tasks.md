@@ -67,11 +67,11 @@ beneath it.
   - Add `accelerators: tuple[str, ...] = ()`, `supports_voice_design: bool = False`, `requires_download_confirmation: bool = False` and `advanced_settings: tuple[AdvancedSetting, ...] = ()` to `ModelConfig` in `backend/backends/__init__.py` per [data-model.md](./data-model.md) §1, and implement the availability resolver in `backend/backends/base.py` with torch imported lazily (`# lazy: heavy import`). Every default preserves today's behaviour, so all seven existing engines are unchanged. T008 passes. **Covers**: FR-002, FR-004, FR-024.
 - [x] T010 [REVIEW] Add GET /models/engines and the optional GenerationRequest fields
   - Add the Pydantic response models to `backend/models.py` and `GET /models/engines` to `backend/routes/models.py`, per [contracts/engine-capabilities.md](./contracts/engine-capabilities.md). Add the two optional `GenerationRequest` fields from the contract, `voice_description` and `advanced_settings`, both defaulting to `None`, with 422 validation against the engine's declared bounds. Extend `test_engine_capabilities.py` with a route test and a validation test. The endpoint must never load a model or trigger a download. **Review the contract shape before T011** — it is a public surface under Principle V and plan.md Human Checkpoint 2. **Covers**: FR-004, FR-024.
-- [ ] T011 Regenerate the TypeScript client with bun run generate:api
+- [x] T011 Regenerate the TypeScript client with bun run generate:api
   - Regenerate the TypeScript client with `bun run generate:api`. Never hand-edit the generated directories `app/src/lib/api/models/`, `app/src/lib/api/services/` or `app/src/lib/api/core/`. (Note: `app/src/lib/api/types.ts` is hand-written — see Notes.) **Covers**: FR-024.
 - [x] T012 [P] Document GET /models/engines in backend/README.md
   - Document `GET /models/engines` in `backend/README.md` (Principle V). **Covers**: FR-024.
-- [ ] T013 [P] Add the useEngineCapabilities hook in app/src/lib/hooks/useEngineCapabilities.ts
+- [x] T013 [P] Add the useEngineCapabilities hook in app/src/lib/hooks/useEngineCapabilities.ts
   - Create `app/src/lib/hooks/useEngineCapabilities.ts`, a query hook over the regenerated client, following the `cuda-status` query pattern in `app/src/components/ServerSettings/GpuAcceleration.tsx`. **Covers**: FR-004, FR-024.
 
 **Checkpoint**: `just test` green for the new tests; `/models/engines` returns all engines, with every existing engine reporting `supported_accelerators: []` and `available: true`.

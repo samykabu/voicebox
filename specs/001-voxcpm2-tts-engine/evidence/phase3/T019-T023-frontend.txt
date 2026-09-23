@@ -1,0 +1,1217 @@
+# T019-T023 frontend evidence (Phase 3, US1). Generated 2026-09-23T16:36:09+03:00
+
+## 1. Language-code analysis (T020)
+VoxCPM2 declared languages (backend/backends/__init__.py voxcpm2 ModelConfig) vs app ALL_LANGUAGES vs backend GenerationRequest.language pattern (backend/models.py)
+app ALL_LANGUAGES: ar da de el en es fi fr he hi it ja ko ms nl no pl pt ru sv sw tr zh 
+backend GenerationRequest.language accepts: zh en ja ko de fr ru pt es it he ar da el fi hi ms nl no pl sv sw tr
+  zh app=yes backend=yes
+  en app=yes backend=yes
+  ar app=yes backend=yes
+  my app=no backend=no
+  da app=yes backend=yes
+  nl app=yes backend=yes
+  fi app=yes backend=yes
+  fr app=yes backend=yes
+  de app=yes backend=yes
+  el app=yes backend=yes
+  he app=yes backend=yes
+  hi app=yes backend=yes
+  id app=no backend=no
+  it app=yes backend=yes
+  ja app=yes backend=yes
+  km app=no backend=no
+  ko app=yes backend=yes
+  lo app=no backend=no
+  ms app=yes backend=yes
+  no app=yes backend=yes
+  pl app=yes backend=yes
+  pt app=yes backend=yes
+  ru app=yes backend=yes
+  es app=yes backend=yes
+  sw app=yes backend=yes
+  sv app=yes backend=yes
+  tl app=no backend=no
+  th app=no backend=no
+  tr app=yes backend=yes
+  vi app=no backend=no
+=> 23 of 30 codes usable; my id km lo tl th vi are in neither list and are filtered out by getLanguageOptionsForEngine.
+## 2. Every added line containing 'voxcpm' in app/ (git diff -U0 -- app, CR stripped; line numbers are diff-output lines)
+4:+++ b/app/src/components/Generation/EngineModelSelector.tsx
+12:+  { value: 'voxcpm', label: 'VoxCPM2', engine: 'voxcpm' },
+14:+  voxcpm: 'OpenBMB, 30 languages incl. Arabic, voice design',
+116:+++ b/app/src/components/Generation/FloatingGenerateBox.tsx
+140:+    | 'voxcpm';
+203:+++ b/app/src/components/ServerSettings/ModelManagement.tsx
+214:+  voxcpm2:
+223:+  voxcpm2: 'voxcpm',
+253:+        m.model_name.startsWith('voxcpm'),
+289:+++ b/app/src/lib/api/types.ts
+293:+    | 'voxcpm';
+302:+++ b/app/src/lib/constants/languages.ts
+328:+++ b/app/src/lib/hooks/useGenerationForm.ts
+339:+      'voxcpm',
+374:+                      : engine === 'voxcpm'
+375:+                        ? 'voxcpm2'
+381:+                      : engine === 'voxcpm'
+407:+++ b/app/src/lib/utils/format.ts
+409:+  voxcpm: 'VoxCPM2',
+(new untracked files engineCapabilityRules.ts, DownloadConfirmDialog.tsx, AdvancedSettingsControls.tsx: grep -i voxcpm -> no hits)
+
+## 3. Ad-hoc capability-logic tests (bun's built-in runner, run from the session scratchpad; the app has no test runner)
+### 3a. Test source: <scratchpad>/fe-tests/capability-logic.test.ts
+// Ad-hoc tests for the capability-driven frontend logic (T020, T022, T023).
+// The app has no frontend test runner, so these run with bun's built-in runner from the
+// session scratchpad and import the real app modules by absolute path.
+import { describe, expect, test } from 'bun:test';
+import {
+  ENGINE_LANGUAGES,
+  getLanguageOptionsForEngine,
+} from 'D:/Projects/Personal/voicebox/app/src/lib/constants/languages';
+import {
+  advancedSettingStep,
+  buildAdvancedSettingsPayload,
+  isEngineSelectable,
+  needsDownloadConfirmation,
+} from 'D:/Projects/Personal/voicebox/app/src/lib/hooks/engineCapabilityRules';
+
+// Mirrors the live GET /models/engines entry for voxcpm (backend/backends/__init__.py).
+const VOXCPM_LANGS = [
+  'zh', 'en', 'ar', 'my', 'da', 'nl', 'fi', 'fr', 'de', 'el', 'he', 'hi', 'id', 'it', 'ja',
+  'km', 'ko', 'lo', 'ms', 'no', 'pl', 'pt', 'ru', 'es', 'sw', 'sv', 'tl', 'th', 'tr', 'vi',
+];
+const capability = (overrides: Record<string, unknown> = {}) =>
+  ({
+    engine: 'engine-under-test',
+    display_name: 'Engine Under Test',
+    available: true,
+    reason: null,
+    warning: null,
+    supported_accelerators: ['cuda', 'mps', 'cpu'],
+    detected_accelerator: 'cuda',
+    languages: VOXCPM_LANGS,
+    supports_cloning: false,
+    supports_voice_design: true,
+    requires_download_confirmation: true,
+    advanced_settings: [
+      { name: 'cfg_value', label: 'Guidance', default: 2.0, min: 1.0, max: 3.0 },
+      { name: 'inference_timesteps', label: 'Quality steps', default: 10, min: 4, max: 30 },
+    ],
+    size_mb: 4961,
+    license_id: 'Apache-2.0',
+    commercial_use: true,
+    ...overrides,
+  }) as never;
+
+describe('T020 getLanguageOptionsForEngine', () => {
+  test('an engine without an app-side list uses its declared languages, in declared order', () => {
+    const codes = getLanguageOptionsForEngine('engine-under-test', VOXCPM_LANGS).map((o) => o.value);
+    expect(codes[0]).toBe('zh');
+    expect(codes).toContain('ar');
+    expect(codes).toHaveLength(23);
+  });
+
+  test('declared codes the app cannot name or the backend cannot accept are filtered out', () => {
+    const codes = getLanguageOptionsForEngine('engine-under-test', VOXCPM_LANGS).map((o) => o.value);
+    for (const unknown of ['my', 'id', 'km', 'lo', 'tl', 'th', 'vi']) {
+      expect(codes).not.toContain(unknown);
+    }
+  });
+
+  test('every option has a human label', () => {
+    for (const opt of getLanguageOptionsForEngine('engine-under-test', VOXCPM_LANGS)) {
+      expect(typeof opt.label).toBe('string');
+      expect(opt.label.length).toBeGreaterThan(0);
+    }
+  });
+
+  test('the eight unmigrated engines keep their hardcoded list even when a declaration is passed', () => {
+    for (const engine of Object.keys(ENGINE_LANGUAGES)) {
+      const withDeclared = getLanguageOptionsForEngine(engine, ['en']).map((o) => o.value);
+      expect(withDeclared).toEqual([...ENGINE_LANGUAGES[engine]]);
+    }
+  });
+
+  test('no declaration and no app-side list falls back to the previous default list', () => {
+    const codes = getLanguageOptionsForEngine('engine-under-test').map((o) => o.value);
+    expect(codes).toEqual([...ENGINE_LANGUAGES.qwen]);
+    expect(getLanguageOptionsForEngine('engine-under-test', []).map((o) => o.value)).toEqual([
+      ...ENGINE_LANGUAGES.qwen,
+    ]);
+  });
+});
+
+describe('T019 isEngineSelectable', () => {
+  test('available engine is selectable; unavailable is not; unknown capability stays selectable', () => {
+    expect(isEngineSelectable(capability())).toBe(true);
+    expect(isEngineSelectable(capability({ available: false, reason: 'No GPU' }))).toBe(false);
+    expect(isEngineSelectable(undefined)).toBe(true);
+  });
+
+  test('a warning never makes an engine unselectable', () => {
+    expect(isEngineSelectable(capability({ warning: 'Low memory' }))).toBe(true);
+  });
+});
+
+describe('T022 needsDownloadConfirmation', () => {
+  test('confirmation is required when the capability says so and the model is not downloaded', () => {
+    expect(needsDownloadConfirmation(capability(), { downloaded: false })).toBe(true);
+  });
+
+  test('no confirmation when the capability does not require it', () => {
+    expect(
+      needsDownloadConfirmation(capability({ requires_download_confirmation: false }), {
+        downloaded: false,
+      }),
+    ).toBe(false);
+    expect(needsDownloadConfirmation(undefined, { downloaded: false })).toBe(false);
+  });
+
+  test('no confirmation when the model is already downloaded or already downloading', () => {
+    expect(needsDownloadConfirmation(capability(), { downloaded: true })).toBe(false);
+    expect(needsDownloadConfirmation(capability(), { downloaded: false, downloading: true })).toBe(
+      false,
+    );
+  });
+});
+
+describe('T023 buildAdvancedSettingsPayload', () => {
+  test('sends every declared default when the user changed nothing', () => {
+    expect(buildAdvancedSettingsPayload(capability(), undefined)).toEqual({
+      cfg_value: 2.0,
+      inference_timesteps: 10,
+    });
+  });
+
+  test('sends user values, clamped to the declared bounds', () => {
+    expect(
+      buildAdvancedSettingsPayload(capability(), { cfg_value: 2.5, inference_timesteps: 99 }),
+    ).toEqual({ cfg_value: 2.5, inference_timesteps: 30 });
+    expect(buildAdvancedSettingsPayload(capability(), { cfg_value: 0 })).toEqual({
+      cfg_value: 1.0,
+      inference_timesteps: 10,
+    });
+  });
+
+  test('drops names the engine does not declare', () => {
+    expect(buildAdvancedSettingsPayload(capability(), { other_engine_knob: 7 })).toEqual({
+      cfg_value: 2.0,
+      inference_timesteps: 10,
+    });
+  });
+
+  test('sends nothing for an engine that declares no settings, or with no capability', () => {
+    expect(buildAdvancedSettingsPayload(capability({ advanced_settings: [] }), { cfg_value: 2 })).toBe(
+      undefined,
+    );
+    expect(buildAdvancedSettingsPayload(undefined, { cfg_value: 2 })).toBe(undefined);
+  });
+
+  test('non-finite user values fall back to the default', () => {
+    expect(buildAdvancedSettingsPayload(capability(), { cfg_value: Number.NaN })).toEqual({
+      cfg_value: 2.0,
+      inference_timesteps: 10,
+    });
+  });
+});
+
+describe('T023 advancedSettingStep', () => {
+  test('integer declarations with a wide range step by 1; narrow or fractional ones by 0.1', () => {
+    expect(advancedSettingStep({ name: 'n', label: 'n', default: 10, min: 4, max: 30 })).toBe(1);
+    expect(advancedSettingStep({ name: 'c', label: 'c', default: 2.0, min: 1.0, max: 3.0 })).toBe(
+      0.1,
+    );
+    expect(advancedSettingStep({ name: 'c', label: 'c', default: 2.5, min: 1.0, max: 30 })).toBe(
+      0.1,
+    );
+  });
+});
+
+### 3b. RED run (before engineCapabilityRules.ts / the languages.ts parameter existed)
+$ cd <scratchpad>/fe-tests; bun test ./capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/fe-tests/red.xml
+timestamp 2026-09-23T16:28:40.6747011+03:00, exit=1 (no JUnit file written: the module failed to load before any test ran)
+bun test v1.4.2 (744846f84)
+
+capability-logic.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+error: Cannot find module 'D:/Projects/Personal/voicebox/app/src/lib/hooks/engineCapabilityRules' from 'C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\fe-tests\capability-logic.test.ts'
+-------------------------------
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [18.00ms]
+
+### 3c. GREEN run (final, after all edits)
+$ cd <scratchpad>/fe-tests; bun test ./capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/fe-tests/green-final.xml
+timestamp 2026-09-23T16:35:07.9077187+03:00, exit=0; console: 16 pass, 0 fail, 85 expect() calls
+JUnit XML:
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="16" assertions="85" failures="0" skipped="0" time="0.0124062">
+  <testsuite name="capability-logic.test.ts" file="capability-logic.test.ts" tests="16" assertions="85" failures="0" skipped="0" time="0.0038204" hostname="">
+    <testsuite name="T020 getLanguageOptionsForEngine" file="capability-logic.test.ts" line="44" tests="5" assertions="66" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="an engine without an app-side list uses its declared languages, in declared order" classname="T020 getLanguageOptionsForEngine" time="0.000119" file="capability-logic.test.ts" line="45" assertions="3" />
+      <testcase name="declared codes the app cannot name or the backend cannot accept are filtered out" classname="T020 getLanguageOptionsForEngine" time="0.000608" file="capability-logic.test.ts" line="52" assertions="7" />
+      <testcase name="every option has a human label" classname="T020 getLanguageOptionsForEngine" time="0.000131" file="capability-logic.test.ts" line="59" assertions="46" />
+      <testcase name="the eight unmigrated engines keep their hardcoded list even when a declaration is passed" classname="T020 getLanguageOptionsForEngine" time="0.0001" file="capability-logic.test.ts" line="66" assertions="8" />
+      <testcase name="no declaration and no app-side list falls back to the previous default list" classname="T020 getLanguageOptionsForEngine" time="0.000033" file="capability-logic.test.ts" line="73" assertions="2" />
+    </testsuite>
+    <testsuite name="T019 isEngineSelectable" file="capability-logic.test.ts" line="82" tests="2" assertions="4" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="available engine is selectable; unavailable is not; unknown capability stays selectable" classname="T019 isEngineSelectable" time="0.000065" file="capability-logic.test.ts" line="83" assertions="3" />
+      <testcase name="a warning never makes an engine unselectable" classname="T019 isEngineSelectable" time="0.000007" file="capability-logic.test.ts" line="89" assertions="1" />
+    </testsuite>
+    <testsuite name="T022 needsDownloadConfirmation" file="capability-logic.test.ts" line="94" tests="3" assertions="5" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="confirmation is required when the capability says so and the model is not downloaded" classname="T022 needsDownloadConfirmation" time="0.000018" file="capability-logic.test.ts" line="95" assertions="1" />
+      <testcase name="no confirmation when the capability does not require it" classname="T022 needsDownloadConfirmation" time="0.000011" file="capability-logic.test.ts" line="99" assertions="2" />
+      <testcase name="no confirmation when the model is already downloaded or already downloading" classname="T022 needsDownloadConfirmation" time="0.000009" file="capability-logic.test.ts" line="108" assertions="2" />
+    </testsuite>
+    <testsuite name="T023 buildAdvancedSettingsPayload" file="capability-logic.test.ts" line="116" tests="5" assertions="7" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="sends every declared default when the user changed nothing" classname="T023 buildAdvancedSettingsPayload" time="0.00011" file="capability-logic.test.ts" line="117" assertions="1" />
+      <testcase name="sends user values, clamped to the declared bounds" classname="T023 buildAdvancedSettingsPayload" time="0.000034" file="capability-logic.test.ts" line="124" assertions="2" />
+      <testcase name="drops names the engine does not declare" classname="T023 buildAdvancedSettingsPayload" time="0.000008" file="capability-logic.test.ts" line="134" assertions="1" />
+      <testcase name="sends nothing for an engine that declares no settings, or with no capability" classname="T023 buildAdvancedSettingsPayload" time="0.000011" file="capability-logic.test.ts" line="141" assertions="2" />
+      <testcase name="non-finite user values fall back to the default" classname="T023 buildAdvancedSettingsPayload" time="0.000008" file="capability-logic.test.ts" line="148" assertions="1" />
+    </testsuite>
+    <testsuite name="T023 advancedSettingStep" file="capability-logic.test.ts" line="156" tests="1" assertions="3" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="integer declarations with a wide range step by 1; narrow or fractional ones by 0.1" classname="T023 advancedSettingStep" time="0.000056" file="capability-logic.test.ts" line="157" assertions="3" />
+    </testsuite>
+  </testsuite>
+</testsuites>
+
+
+## 4. Diff of tracked app files (git diff -- app, CR stripped)
+diff --git a/app/src/components/Generation/EngineModelSelector.tsx b/app/src/components/Generation/EngineModelSelector.tsx
+index 1b8179d..09615f0 100644
+--- a/app/src/components/Generation/EngineModelSelector.tsx
++++ b/app/src/components/Generation/EngineModelSelector.tsx
+@@ -8,6 +8,8 @@ import {
+   SelectTrigger,
+   SelectValue,
+ } from '@/components/ui/select';
++import type { EngineCapabilitiesResponse } from '@/lib/api/models/EngineCapabilitiesResponse';
++import type { EngineCapabilityResponse } from '@/lib/api/models/EngineCapabilityResponse';
+ import type { VoiceProfileResponse } from '@/lib/api/types';
+ import {
+   DEFAULT_HABIBI_MODEL_ID,
+@@ -16,6 +18,8 @@ import {
+   isHabibiModelId,
+ } from '@/lib/constants/habibiModels';
+ import { getLanguageOptionsForEngine } from '@/lib/constants/languages';
++import { isEngineSelectable } from '@/lib/hooks/engineCapabilityRules';
++import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
+ import type { GenerationFormValues } from '@/lib/hooks/useGenerationForm';
+ 
+ /**
+@@ -33,6 +37,7 @@ const ENGINE_OPTIONS = [
+   { value: 'tada:1B', label: 'TADA 1B', engine: 'tada' },
+   { value: 'tada:3B', label: 'TADA 3B Multilingual', engine: 'tada' },
+   { value: 'kokoro', label: 'Kokoro 82M', engine: 'kokoro' },
++  { value: 'voxcpm', label: 'VoxCPM2', engine: 'voxcpm' },
+   ...HABIBI_MODELS.map((model) => ({
+     value: `f5_tts:${model.id}`,
+     label: `${model.label}${model.commercialUse ? '' : ' — noncommercial'}`,
+@@ -49,6 +54,7 @@ const ENGINE_DESCRIPTIONS: Record<string, string> = {
+   tada: 'HumeAI, 700s+ coherent audio',
+   kokoro: '82M params, CPU realtime, 8 langs',
+   f5_tts: 'Arabic F5 voice cloning with MSA and regional Habibi checkpoints',
++  voxcpm: 'OpenBMB, 30 languages incl. Arabic, voice design',
+ };
+ 
+ /** Engines that only support English and should force language to 'en' on select. */
+@@ -57,9 +63,18 @@ const ENGLISH_ONLY_ENGINES = new Set(['luxtts', 'chatterbox_turbo']);
+ /** Engines that support cloned (reference audio) profiles. */
+ const CLONING_ENGINES = new Set(['qwen', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'f5_tts']);
+ 
+-function getAvailableOptions(selectedProfile?: VoiceProfileResponse | null) {
++function getAvailableOptions(
++  selectedProfile?: VoiceProfileResponse | null,
++  capabilities?: EngineCapabilitiesResponse,
++) {
+   if (!selectedProfile) return ENGINE_OPTIONS;
+-  return ENGINE_OPTIONS.filter((opt) => isProfileCompatibleWithEngine(selectedProfile, opt.engine));
++  return ENGINE_OPTIONS.filter((opt) =>
++    isProfileCompatibleWithEngine(
++      selectedProfile,
++      opt.engine,
++      findEngineCapability(capabilities, opt.engine),
++    ),
++  );
+ }
+ 
+ function getSelectValue(engine: string, modelSize?: string): string {
+@@ -70,7 +85,11 @@ function getSelectValue(engine: string, modelSize?: string): string {
+   return engine;
+ }
+ 
+-export function applyEngineSelection(form: UseFormReturn<GenerationFormValues>, value: string) {
++export function applyEngineSelection(
++  form: UseFormReturn<GenerationFormValues>,
++  value: string,
++  capabilities?: EngineCapabilitiesResponse,
++) {
+   if (value.startsWith('f5_tts:')) {
+     const [, requestedModel] = value.split(':');
+     const model = getHabibiModel(requestedModel);
+@@ -118,7 +137,10 @@ export function applyEngineSelection(form: UseFormReturn<GenerationFormValues>,
+     } else {
+       // If current language isn't supported by the new engine, reset to first available
+       const currentLang = form.getValues('language');
+-      const available = getLanguageOptionsForEngine(value);
++      const available = getLanguageOptionsForEngine(
++        value,
++        findEngineCapability(capabilities, value)?.languages,
++      );
+       if (!available.some((l) => l.value === currentLang)) {
+         form.setValue('language', available[0]?.value ?? 'en');
+       }
+@@ -137,8 +159,17 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
+   const modelSize = form.watch('modelSize');
+   const language = form.watch('language');
+   const selectValue = getSelectValue(engine, modelSize);
+-  const availableOptions = getAvailableOptions(selectedProfile);
++  const { data: capabilities } = useEngineCapabilities();
++  const availableOptions = getAvailableOptions(selectedProfile, capabilities);
+   const selectedHabibiModel = engine === 'f5_tts' ? getHabibiModel(modelSize) : null;
++  const selectedCapability = findEngineCapability(capabilities, engine);
++  // FR-003 / C1Q3: an engine this machine cannot run stays listed, greyed out, with the
++  // backend's reason. A warning is advisory only and never disables anything.
++  const selectedNotice = selectedCapability
++    ? !isEngineSelectable(selectedCapability)
++      ? selectedCapability.reason
++      : selectedCapability.warning
++    : null;
+ 
+   const currentEngineAvailable = availableOptions.some((opt) => opt.value === selectValue);
+ 
+@@ -155,9 +186,9 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
+ 
+   useEffect(() => {
+     if (!currentEngineAvailable && availableOptions.length > 0) {
+-      applyEngineSelection(form, availableOptions[0].value);
++      applyEngineSelection(form, availableOptions[0].value, capabilities);
+     }
+-  }, [availableOptions, currentEngineAvailable, form]);
++  }, [availableOptions, currentEngineAvailable, form, capabilities]);
+ 
+   const itemClass = compact ? 'text-xs text-muted-foreground' : undefined;
+   const triggerClass = compact
+@@ -166,20 +197,48 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
+ 
+   return (
+     <div className="space-y-1">
+-      <Select value={selectValue} onValueChange={(v) => applyEngineSelection(form, v)}>
++      <Select
++        value={selectValue}
++        onValueChange={(v) => applyEngineSelection(form, v, capabilities)}
++      >
+         <FormControl>
+           <SelectTrigger className={triggerClass}>
+             <SelectValue />
+           </SelectTrigger>
+         </FormControl>
+         <SelectContent side={compact ? 'top' : undefined}>
+-          {availableOptions.map((opt) => (
+-            <SelectItem key={opt.value} value={opt.value} className={itemClass}>
+-              {opt.label}
+-            </SelectItem>
+-          ))}
++          {availableOptions.map((opt) => {
++            const capability = findEngineCapability(capabilities, opt.engine);
++            const selectable = isEngineSelectable(capability);
++            return (
++              <SelectItem
++                key={opt.value}
++                value={opt.value}
++                className={itemClass}
++                disabled={!selectable}
++              >
++                {opt.label}
++                {!selectable && capability?.reason ? (
++                  <span className="block text-[10px] text-muted-foreground">
++                    {capability.reason}
++                  </span>
++                ) : null}
++              </SelectItem>
++            );
++          })}
+         </SelectContent>
+       </Select>
++      {selectedNotice ? (
++        <p
++          className={
++            compact
++              ? 'px-2 text-[10px] text-amber-600 dark:text-amber-400'
++              : 'text-xs text-amber-600 dark:text-amber-400'
++          }
++        >
++          {selectedNotice}
++        </p>
++      ) : null}
+       {selectedHabibiModel && !selectedHabibiModel.commercialUse ? (
+         <p
+           className={
+@@ -207,9 +266,13 @@ export function getEngineDescription(engine: string): string {
+ export function isProfileCompatibleWithEngine(
+   profile: VoiceProfileResponse,
+   engine: string,
++  capability?: EngineCapabilityResponse,
+ ): boolean {
+   const voiceType = profile.voice_type || 'cloned';
+   if (voiceType === 'preset') return profile.preset_engine === engine;
+-  if (voiceType === 'cloned') return CLONING_ENGINES.has(engine);
++  // Engines outside the app-side list count as cloning engines only when they declare it.
++  if (voiceType === 'cloned') {
++    return CLONING_ENGINES.has(engine) || capability?.supports_cloning === true;
++  }
+   return true; // designed — future
+ }
+diff --git a/app/src/components/Generation/FloatingGenerateBox.tsx b/app/src/components/Generation/FloatingGenerateBox.tsx
+index 7dd254c..85e264a 100644
+--- a/app/src/components/Generation/FloatingGenerateBox.tsx
++++ b/app/src/components/Generation/FloatingGenerateBox.tsx
+@@ -1,7 +1,7 @@
+ import { useMutation, useQuery } from '@tanstack/react-query';
+ import { useMatchRoute } from '@tanstack/react-router';
+ import { AnimatePresence, motion } from 'framer-motion';
+-import { Dices, Loader2, SlidersHorizontal, Sparkles, Wand2 } from 'lucide-react';
++import { Dices, Loader2, Settings2, SlidersHorizontal, Sparkles, Wand2 } from 'lucide-react';
+ import { useEffect, useRef, useState } from 'react';
+ import { useTranslation } from 'react-i18next';
+ import { Button } from '@/components/ui/button';
+@@ -18,6 +18,7 @@ import { useToast } from '@/components/ui/use-toast';
+ import { apiClient } from '@/lib/api/client';
+ import { DEFAULT_HABIBI_MODEL_ID, isHabibiModelId } from '@/lib/constants/habibiModels';
+ import { getLanguageOptionsForEngine, type LanguageCode } from '@/lib/constants/languages';
++import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
+ import { useGenerationForm } from '@/lib/hooks/useGenerationForm';
+ import { useProfile, useProfiles } from '@/lib/hooks/useProfiles';
+ import { useStory } from '@/lib/hooks/useStories';
+@@ -25,6 +26,8 @@ import { cn } from '@/lib/utils/cn';
+ import { useGenerationStore } from '@/stores/generationStore';
+ import { useStoryStore } from '@/stores/storyStore';
+ import { useUIStore } from '@/stores/uiStore';
++import { AdvancedSettingsControls } from './AdvancedSettingsControls';
++import { DownloadConfirmDialog } from './DownloadConfirmDialog';
+ import { EngineModelSelector } from './EngineModelSelector';
+ import { ParalinguisticInput } from './ParalinguisticInput';
+ 
+@@ -45,6 +48,8 @@ export function FloatingGenerateBox({
+   const { data: profiles } = useProfiles();
+   const [isExpanded, setIsExpanded] = useState(false);
+   const [isInstructExpanded, setIsInstructExpanded] = useState(false);
++  const [isAdvancedExpanded, setIsAdvancedExpanded] = useState(false);
++  const { data: engineCapabilities } = useEngineCapabilities();
+   const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
+   const containerRef = useRef<HTMLDivElement>(null);
+   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+@@ -79,7 +84,7 @@ export function FloatingGenerateBox({
+   // Calculate if track editor is visible (on stories route with items)
+   const hasTrackEditor = isStoriesRoute && currentStory && currentStory.items.length > 0;
+ 
+-  const { form, handleSubmit, isPending } = useGenerationForm({
++  const generationForm = useGenerationForm({
+     onSuccess: async (generationId) => {
+       setIsExpanded(false);
+       // Defer the story add until TTS completes -- useGenerationProgress handles it
+@@ -98,6 +103,8 @@ export function FloatingGenerateBox({
+       return preset?.effects_chain;
+     },
+   });
++  const { form, handleSubmit, isPending, downloadConfirmation, resolveDownloadConfirmation } =
++    generationForm;
+ 
+   // Click away handler to collapse the box
+   useEffect(() => {
+@@ -138,6 +145,8 @@ export function FloatingGenerateBox({
+ 
+   // Sync engine selection to global store so ProfileList can filter
+   const watchedEngine = form.watch('engine');
++  const selectedCapability = findEngineCapability(engineCapabilities, watchedEngine || 'qwen');
++  const advancedSettings = selectedCapability?.advanced_settings ?? [];
+   useEffect(() => {
+     if (watchedEngine) {
+       setSelectedEngine(watchedEngine);
+@@ -153,7 +162,8 @@ export function FloatingGenerateBox({
+     | 'tada'
+     | 'kokoro'
+     | 'qwen_custom_voice'
+-    | 'f5_tts';
++    | 'f5_tts'
++    | 'voxcpm';
+   useEffect(() => {
+     if (selectedProfile?.language) {
+       form.setValue('language', selectedProfile.language as LanguageCode);
+@@ -484,6 +494,40 @@ export function FloatingGenerateBox({
+                   )}
+                 </AnimatePresence>
+ 
++                {/* Advanced settings toggle — only for engines that declare advanced settings */}
++                <AnimatePresence>
++                  {isExpanded && advancedSettings.length > 0 && (
++                    <motion.div
++                      initial={{ opacity: 0, scale: 0.8 }}
++                      animate={{ opacity: 1, scale: 1 }}
++                      exit={{ opacity: 0, scale: 0.8 }}
++                      transition={{ duration: 0.2 }}
++                    >
++                      <div className="group relative">
++                        <Button
++                          type="button"
++                          variant="ghost"
++                          size="icon"
++                          onClick={() => setIsAdvancedExpanded((prev) => !prev)}
++                          className={cn(
++                            'h-10 w-10 rounded-full transition-all duration-200',
++                            isAdvancedExpanded
++                              ? 'bg-accent text-accent-foreground border border-accent hover:bg-accent/90'
++                              : 'bg-card border border-border hover:bg-background/50',
++                          )}
++                          aria-label="Advanced settings"
++                          aria-pressed={isAdvancedExpanded}
++                        >
++                          <Settings2 className="h-4 w-4" />
++                        </Button>
++                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded-md bg-popover px-3 py-1.5 text-xs text-popover-foreground border border-border opacity-0 transition-opacity group-hover:opacity-100 z-[9999]">
++                          Advanced settings
++                        </span>
++                      </div>
++                    </motion.div>
++                  )}
++                </AnimatePresence>
++
+                 <div className="group relative">
+                   <Button
+                     type="submit"
+@@ -547,6 +591,21 @@ export function FloatingGenerateBox({
+               )}
+             </AnimatePresence>
+ 
++            {/* Advanced controls rendered from the engine's declared advanced_settings (FR-010) */}
++            <AnimatePresence>
++              {isExpanded && isAdvancedExpanded && advancedSettings.length > 0 && (
++                <motion.div
++                  initial={{ opacity: 0, height: 0 }}
++                  animate={{ opacity: 1, height: 'auto' }}
++                  exit={{ opacity: 0, height: 0 }}
++                  transition={{ duration: 0.2, ease: 'easeOut' }}
++                  className="overflow-hidden"
++                >
++                  <AdvancedSettingsControls form={form} settings={advancedSettings} />
++                </motion.div>
++              )}
++            </AnimatePresence>
++
+             <AnimatePresence>
+               <motion.div
+                 initial={{ height: 0, opacity: 0 }}
+@@ -583,6 +642,7 @@ export function FloatingGenerateBox({
+                     render={({ field }) => {
+                       const engineLangs = getLanguageOptionsForEngine(
+                         form.watch('engine') || 'qwen',
++                        selectedCapability?.languages,
+                       );
+                       return (
+                         <FormItem className="flex-1 space-y-0">
+@@ -644,6 +704,11 @@ export function FloatingGenerateBox({
+           </form>
+         </Form>
+       </motion.div>
++      <DownloadConfirmDialog
++        details={downloadConfirmation}
++        onConfirm={() => resolveDownloadConfirmation(true)}
++        onCancel={() => resolveDownloadConfirmation(false)}
++      />
+     </motion.div>
+   );
+ }
+diff --git a/app/src/components/ServerSettings/ModelManagement.tsx b/app/src/components/ServerSettings/ModelManagement.tsx
+index b3d3920..f71714b 100644
+--- a/app/src/components/ServerSettings/ModelManagement.tsx
++++ b/app/src/components/ServerSettings/ModelManagement.tsx
+@@ -19,6 +19,7 @@ import {
+ } from 'lucide-react';
+ import { useCallback, useMemo, useState } from 'react';
+ import { Trans, useTranslation } from 'react-i18next';
++import { DownloadConfirmDialog } from '@/components/Generation/DownloadConfirmDialog';
+ import {
+   AlertDialog,
+   AlertDialogAction,
+@@ -47,6 +48,12 @@ import {
+   HABIBI_MODELS,
+   isHabibiModelId,
+ } from '@/lib/constants/habibiModels';
++import {
++  type DownloadConfirmationDetails,
++  downloadConfirmationDetails,
++  needsDownloadConfirmation,
++} from '@/lib/hooks/engineCapabilityRules';
++import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
+ import { useModelDownloadToast } from '@/lib/hooks/useModelDownloadToast';
+ import { usePlatform } from '@/platform/PlatformContext';
+ import { useServerStore } from '@/stores/serverStore';
+@@ -78,6 +85,8 @@ const MODEL_DESCRIPTIONS: Record<string, string> = {
+     'Qwen3-TTS CustomVoice 1.7B by Alibaba. 9 premium preset voices with instruct-based style control for tone, emotion, and prosody. Supports 10 languages.',
+   'qwen-custom-voice-0.6B':
+     'Qwen3-TTS CustomVoice 0.6B by Alibaba. Lightweight version with the same 9 preset voices and instruct control. Faster inference for lower-end hardware.',
++  voxcpm2:
++    'VoxCPM2 by OpenBMB. Multilingual TTS covering 30 languages including Arabic, with voice design from a written description. Apache-2.0 licensed; commercial use allowed.',
+   'whisper-base':
+     'Smallest Whisper model (74M parameters). Fast transcription with moderate accuracy.',
+   'whisper-small':
+@@ -100,6 +109,15 @@ for (const model of HABIBI_MODELS) {
+   MODEL_DESCRIPTIONS[model.id] = model.description;
+ }
+ 
++/**
++ * Engine of each model whose engine the app reads from GET /models/engines. Registration
++ * only: what the UI does with the model (confirmation, size, licence) comes from the
++ * engine's capability, never from this name.
++ */
++const MODEL_ENGINES: Record<string, string> = {
++  voxcpm2: 'voxcpm',
++};
++
+ function formatDownloads(n: number): string {
+   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
+@@ -266,7 +284,28 @@ export function ModelManagement() {
+     sizeMb?: number;
+   } | null>(null);
+ 
+-  const handleDownload = async (modelName: string) => {
++  const { data: engineCapabilities } = useEngineCapabilities();
++  const getModelCapability = (modelName: string) =>
++    findEngineCapability(engineCapabilities, MODEL_ENGINES[modelName]);
++  const [pendingDownload, setPendingDownload] = useState<
++    (DownloadConfirmationDetails & { modelName: string }) | null
++  >(null);
++
++  // FR-018 / C1Q7: engines whose capability requires it are confirmed before downloading.
++  const handleDownload = (modelName: string) => {
++    const capability = getModelCapability(modelName);
++    const model = modelStatus?.models.find((m) => m.model_name === modelName);
++    if (capability && needsDownloadConfirmation(capability, model)) {
++      setPendingDownload({
++        ...downloadConfirmationDetails(capability, model?.display_name),
++        modelName,
++      });
++      return;
++    }
++    void startDownload(modelName);
++  };
++
++  const startDownload = async (modelName: string) => {
+     setDismissedErrors((prev) => {
+       const next = new Set(prev);
+       next.delete(modelName);
+@@ -426,7 +465,8 @@ export function ModelManagement() {
+         m.model_name.startsWith('tada') ||
+         m.model_name.startsWith('kokoro') ||
+         m.model_name.startsWith('f5-tts') ||
+-        m.model_name.startsWith('habibi-'),
++        m.model_name.startsWith('habibi-') ||
++        m.model_name.startsWith('voxcpm'),
+     ) ?? [];
+   const whisperModels = modelStatus?.models.filter((m) => m.model_name.startsWith('whisper')) ?? [];
+   const llmModels = modelStatus?.models.filter((m) => m.model_name.startsWith('qwen3-')) ?? [];
+@@ -459,6 +499,9 @@ export function ModelManagement() {
+   const selectedLicense = freshSelectedModel?.license_id ?? selectedHabibiModel?.license;
+   const selectedCommercialUse =
+     freshSelectedModel?.commercial_use ?? selectedHabibiModel?.commercialUse;
++  const selectedCapability = freshSelectedModel
++    ? getModelCapability(freshSelectedModel.model_name)
++    : undefined;
+ 
+   return (
+     <div className="flex flex-col h-full">
+@@ -730,7 +773,7 @@ export function ModelManagement() {
+                       {t('common.error')}
+                     </Badge>
+                   )}
+-                  {selectedHabibiModel && (
++                  {selectedLicense && (
+                     <Badge
+                       variant="outline"
+                       className={
+@@ -830,6 +873,19 @@ export function ModelManagement() {
+                   </div>
+                 )}
+ 
++                {/* Declared download size (FR-018) */}
++                {!freshSelectedModel.downloaded && selectedCapability && (
++                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
++                    <Download className="h-3.5 w-3.5" />
++                    <span>
++                      {t('models.detail.downloadSize', {
++                        size: formatSize(selectedCapability.size_mb),
++                        defaultValue: 'Download size: {{size}}',
++                      })}
++                    </span>
++                  </div>
++                )}
++
+                 {/* Disk size */}
+                 {freshSelectedModel.downloaded && freshSelectedModel.size_mb && (
+                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
+@@ -965,6 +1021,16 @@ export function ModelManagement() {
+         </DialogContent>
+       </Dialog>
+ 
++      {/* Download confirmation for engines that require it (FR-018, C1Q7) */}
++      <DownloadConfirmDialog
++        details={pendingDownload}
++        onConfirm={() => {
++          if (pendingDownload) void startDownload(pendingDownload.modelName);
++          setPendingDownload(null);
++        }}
++        onCancel={() => setPendingDownload(null)}
++      />
++
+       {/* Delete Confirmation Dialog */}
+       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+         <AlertDialogContent>
+diff --git a/app/src/lib/api/types.ts b/app/src/lib/api/types.ts
+index cc312a3..7d43609 100644
+--- a/app/src/lib/api/types.ts
++++ b/app/src/lib/api/types.ts
+@@ -81,7 +81,8 @@ export interface GenerationRequest {
+     | 'chatterbox_turbo'
+     | 'tada'
+     | 'kokoro'
+-    | 'f5_tts';
++    | 'f5_tts'
++    | 'voxcpm';
+   instruct?: string;
+   /** When true and the profile has a personality prompt, input text is rewritten in-character before TTS. */
+   personality?: boolean;
+@@ -89,6 +90,10 @@ export interface GenerationRequest {
+   crossfade_ms?: number;
+   normalize?: boolean;
+   effects_chain?: EffectConfig[];
++  /** Written voice description for engines that support voice design. Never sent as instruct. */
++  voice_description?: string | null;
++  /** Advanced generation settings by name; only names the engine declares, within their bounds. */
++  advanced_settings?: Record<string, number> | null;
+ }
+ 
+ export interface GenerationVersionResponse {
+diff --git a/app/src/lib/constants/languages.ts b/app/src/lib/constants/languages.ts
+index 00671dd..8c81352 100644
+--- a/app/src/lib/constants/languages.ts
++++ b/app/src/lib/constants/languages.ts
+@@ -73,9 +73,24 @@ export const ENGINE_LANGUAGES: Record<string, readonly LanguageCode[]> = {
+   f5_tts: ['ar'],
+ } as const;
+ 
+-/** Helper: get language options for a given engine. */
+-export function getLanguageOptionsForEngine(engine: string) {
+-  const codes = ENGINE_LANGUAGES[engine] ?? ENGINE_LANGUAGES.qwen;
++function isLanguageCode(code: string): code is LanguageCode {
++  return (Object.keys(ALL_LANGUAGES) as string[]).includes(code);
++}
++
++/**
++ * Helper: get language options for a given engine.
++ *
++ * `declaredLanguages` is the engine's `languages` from `useEngineCapabilities` (FR-007,
++ * FR-024). It is used for any engine without an app-side list above; the engines listed in
++ * `ENGINE_LANGUAGES` are not migrated to the capability channel yet and keep their list
++ * (contracts/engine-capabilities.md, "Scope boundary"). Declared codes missing from
++ * `ALL_LANGUAGES` are dropped: the app has no name for them and the backend's
++ * `GenerationRequest.language` pattern would reject them.
++ */
++export function getLanguageOptionsForEngine(engine: string, declaredLanguages?: readonly string[]) {
++  const declared = declaredLanguages?.filter(isLanguageCode) ?? [];
++  const codes =
++    ENGINE_LANGUAGES[engine] ?? (declared.length > 0 ? declared : ENGINE_LANGUAGES.qwen);
+   return codes.map((code) => ({
+     value: code,
+     label: ALL_LANGUAGES[code],
+diff --git a/app/src/lib/hooks/useGenerationForm.ts b/app/src/lib/hooks/useGenerationForm.ts
+index 23f84f4..31ac003 100644
+--- a/app/src/lib/hooks/useGenerationForm.ts
++++ b/app/src/lib/hooks/useGenerationForm.ts
+@@ -11,6 +11,14 @@ import {
+   HABIBI_MODEL_IDS,
+ } from '@/lib/constants/habibiModels';
+ import { LANGUAGE_CODES, type LanguageCode } from '@/lib/constants/languages';
++import {
++  buildAdvancedSettingsPayload,
++  type DownloadConfirmationDetails,
++  downloadConfirmationDetails,
++  isEngineSelectable,
++  needsDownloadConfirmation,
++} from '@/lib/hooks/engineCapabilityRules';
++import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
+ import { useGeneration } from '@/lib/hooks/useGeneration';
+ import { useModelDownloadToast } from '@/lib/hooks/useModelDownloadToast';
+ import { useGenerationSettings } from '@/lib/hooks/useSettings';
+@@ -33,9 +41,12 @@ const generationSchema = z.object({
+       'tada',
+       'kokoro',
+       'f5_tts',
++      'voxcpm',
+     ])
+     .optional(),
+   personality: z.boolean().optional(),
++  /** Values for the selected engine's declared advanced settings, keyed by setting name. */
++  advancedSettings: z.record(z.number()).optional(),
+ });
+ 
+ export type GenerationFormValues = z.infer<typeof generationSchema>;
+@@ -57,6 +68,19 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
+   const selectedEngine = useUIStore((state) => state.selectedEngine);
+   const [downloadingModelName, setDownloadingModelName] = useState<string | null>(null);
+   const [downloadingDisplayName, setDownloadingDisplayName] = useState<string | null>(null);
++  const { data: engineCapabilities } = useEngineCapabilities();
++  const [downloadConfirmation, setDownloadConfirmation] = useState<
++    (DownloadConfirmationDetails & { resolve: (confirmed: boolean) => void }) | null
++  >(null);
++
++  function requestDownloadConfirmation(details: DownloadConfirmationDetails): Promise<boolean> {
++    return new Promise((resolve) => setDownloadConfirmation({ ...details, resolve }));
++  }
++
++  function resolveDownloadConfirmation(confirmed: boolean) {
++    downloadConfirmation?.resolve(confirmed);
++    setDownloadConfirmation(null);
++  }
+ 
+   useModelDownloadToast({
+     modelName: downloadingModelName || '',
+@@ -91,8 +115,19 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
+       return;
+     }
+ 
++    const engine = data.engine || 'qwen';
++    const capability = findEngineCapability(engineCapabilities, engine);
++    // FR-003: an engine this machine cannot run must not lead to a failed generation.
++    if (!isEngineSelectable(capability)) {
++      toast({
++        title: `${capability?.display_name ?? engine} is unavailable`,
++        description: capability?.reason ?? undefined,
++        variant: 'destructive',
++      });
++      return;
++    }
++
+     try {
+-      const engine = data.engine || 'qwen';
+       const selectedModelSize =
+         engine === 'f5_tts' ? getHabibiModel(data.modelSize).id : data.modelSize;
+       const modelName =
+@@ -112,7 +147,9 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
+                     ? getHabibiModel(selectedModelSize).id
+                     : engine === 'qwen_custom_voice'
+                       ? `qwen-custom-voice-${data.modelSize}`
+-                      : `qwen-tts-${data.modelSize}`;
++                      : engine === 'voxcpm'
++                        ? 'voxcpm2'
++                        : `qwen-tts-${data.modelSize}`;
+       const displayName =
+         engine === 'luxtts'
+           ? 'LuxTTS'
+@@ -132,15 +169,26 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
+                       ? data.modelSize === '1.7B'
+                         ? 'Qwen CustomVoice 1.7B'
+                         : 'Qwen CustomVoice 0.6B'
+-                      : data.modelSize === '1.7B'
+-                        ? 'Qwen TTS 1.7B'
+-                        : 'Qwen TTS 0.6B';
++                      : engine === 'voxcpm'
++                        ? 'VoxCPM2'
++                        : data.modelSize === '1.7B'
++                          ? 'Qwen TTS 1.7B'
++                          : 'Qwen TTS 0.6B';
+ 
+       // Check if model needs downloading
+       try {
+         const modelStatus = await apiClient.getModelStatus();
+         const model = modelStatus.models.find((m) => m.model_name === modelName);
+ 
++        // FR-018 / C1Q7: /generate starts the download itself, so ask first when the
++        // engine's capability requires it. Declining cancels this generation.
++        if (capability && needsDownloadConfirmation(capability, model)) {
++          const confirmed = await requestDownloadConfirmation(
++            downloadConfirmationDetails(capability, displayName),
++          );
++          if (!confirmed) return;
++        }
++
+         if (model && !model.downloaded) {
+           setDownloadingModelName(modelName);
+           setDownloadingDisplayName(displayName);
+@@ -172,6 +220,8 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
+         crossfade_ms: crossfadeMs,
+         normalize: normalizeAudio,
+         effects_chain: effectsChain?.length ? effectsChain : undefined,
++        // FR-010: only engines that declare advanced settings receive them.
++        advanced_settings: buildAdvancedSettingsPayload(capability, data.advancedSettings),
+       });
+ 
+       // Track this generation for SSE status updates
+@@ -186,6 +236,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
+         instruct: '',
+         engine: data.engine,
+         personality: data.personality,
++        advancedSettings: data.advancedSettings,
+       });
+       options.onSuccess?.(result.id);
+     } catch (error) {
+@@ -204,5 +255,7 @@ export function useGenerationForm(options: UseGenerationFormOptions = {}) {
+     form,
+     handleSubmit,
+     isPending: generation.isPending,
++    downloadConfirmation,
++    resolveDownloadConfirmation,
+   };
+ }
+diff --git a/app/src/lib/utils/format.ts b/app/src/lib/utils/format.ts
+index 1600005..3b5c50c 100644
+--- a/app/src/lib/utils/format.ts
++++ b/app/src/lib/utils/format.ts
+@@ -62,6 +62,7 @@ const ENGINE_DISPLAY_NAMES: Record<string, string> = {
+   chatterbox: 'Chatterbox',
+   chatterbox_turbo: 'Chatterbox Turbo',
+   f5_tts: 'Arabic F5 / Habibi',
++  voxcpm: 'VoxCPM2',
+ };
+ 
+ export function formatEngineName(engine?: string, modelSize?: string): string {
+
+## 5. New files
+### app/src/lib/hooks/engineCapabilityRules.ts
+import type { EngineAdvancedSettingResponse } from '@/lib/api/models/EngineAdvancedSettingResponse';
+import type { EngineCapabilityResponse } from '@/lib/api/models/EngineCapabilityResponse';
+
+/**
+ * Pure decisions the UI derives from an engine's declared capabilities
+ * (contracts/engine-capabilities.md, "Consumption rules for the app").
+ *
+ * Each rule reads capability data only, never an engine name (FR-004). An engine the
+ * backend does not report (capability `undefined`) keeps today's behaviour.
+ */
+
+/** An engine can be picked unless the backend says this machine cannot run it (FR-003). */
+export function isEngineSelectable(capability: EngineCapabilityResponse | undefined): boolean {
+  return capability ? capability.available : true;
+}
+
+/**
+ * Whether starting this engine's model download must be confirmed first (FR-018, C1Q7).
+ * A model that is already downloaded, or already downloading, needs no confirmation.
+ */
+export function needsDownloadConfirmation(
+  capability: EngineCapabilityResponse | undefined,
+  model: { downloaded: boolean; downloading?: boolean } | undefined,
+): boolean {
+  if (!capability?.requires_download_confirmation || !model) return false;
+  return !model.downloaded && !model.downloading;
+}
+
+/** What a download confirmation shows, filled from the engine's capability declaration. */
+export interface DownloadConfirmationDetails {
+  displayName: string;
+  sizeMb: number;
+  licenseId?: string | null;
+  commercialUse?: boolean | null;
+}
+
+/** Confirmation details for an engine's default download (FR-018: size, FR-005: licence). */
+export function downloadConfirmationDetails(
+  capability: EngineCapabilityResponse,
+  displayName?: string,
+): DownloadConfirmationDetails {
+  return {
+    displayName: displayName || capability.display_name,
+    sizeMb: capability.size_mb,
+    licenseId: capability.license_id,
+    commercialUse: capability.commercial_use,
+  };
+}
+
+function clamp(value: number, setting: EngineAdvancedSettingResponse): number {
+  return Math.min(setting.max, Math.max(setting.min, value));
+}
+
+/**
+ * The request's `advanced_settings` for the selected engine (FR-010, C1Q8).
+ *
+ * Only settings the engine declares are sent, each clamped to its declared bounds and
+ * falling back to its declared default. Engines that declare none get `undefined`, so the
+ * field is omitted and existing engines' requests are unchanged.
+ */
+export function buildAdvancedSettingsPayload(
+  capability: EngineCapabilityResponse | undefined,
+  values: Record<string, number> | undefined,
+): Record<string, number> | undefined {
+  const declared = capability?.advanced_settings ?? [];
+  if (declared.length === 0) return undefined;
+  const payload: Record<string, number> = {};
+  for (const setting of declared) {
+    const chosen = values?.[setting.name];
+    payload[setting.name] = clamp(
+      typeof chosen === 'number' && Number.isFinite(chosen) ? chosen : setting.default,
+      setting,
+    );
+  }
+  return payload;
+}
+
+/**
+ * Slider step for a declared setting. The declaration carries no type or step, so an
+ * all-integer setting with a wide range (for example a step count) moves in whole numbers
+ * and anything else in tenths.
+ */
+export function advancedSettingStep(setting: EngineAdvancedSettingResponse): number {
+  const integral = [setting.default, setting.min, setting.max].every(Number.isInteger);
+  return integral && setting.max - setting.min >= 10 ? 1 : 0.1;
+}
+
+### app/src/components/Generation/DownloadConfirmDialog.tsx
+import { useRef } from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import type { DownloadConfirmationDetails } from '@/lib/hooks/engineCapabilityRules';
+
+function formatDownloadSize(sizeMb: number): string {
+  return sizeMb >= 1024 ? `${(sizeMb / 1024).toFixed(1)} GB` : `${Math.round(sizeMb)} MB`;
+}
+
+interface DownloadConfirmDialogProps {
+  details: DownloadConfirmationDetails | null;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+/**
+ * Asks before starting a model download for engines whose capability sets
+ * `requires_download_confirmation` (FR-018, C1Q7), showing the declared download size.
+ */
+export function DownloadConfirmDialog({
+  details,
+  onConfirm,
+  onCancel,
+}: DownloadConfirmDialogProps) {
+  // Every way of closing (Download, Cancel, Escape, overlay) goes through onOpenChange once;
+  // the ref records whether that close was the Download button.
+  const confirmedRef = useRef(false);
+  return (
+    <AlertDialog
+      open={!!details}
+      onOpenChange={(open) => {
+        if (open) return;
+        const confirmed = confirmedRef.current;
+        confirmedRef.current = false;
+        if (confirmed) onConfirm();
+        else onCancel();
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Download {details?.displayName}?</AlertDialogTitle>
+          <AlertDialogDescription>
+            {details
+              ? `This downloads about ${formatDownloadSize(details.sizeMb)} before it can be used.`
+              : null}
+            {details?.licenseId
+              ? ` Licence: ${details.licenseId}${
+                  details.commercialUse === true
+                    ? ', commercial use allowed.'
+                    : details.commercialUse === false
+                      ? ', noncommercial use only.'
+                      : '.'
+                }`
+              : null}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              confirmedRef.current = true;
+            }}
+          >
+            Download
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+### app/src/components/Generation/AdvancedSettingsControls.tsx
+import type { UseFormReturn } from 'react-hook-form';
+import { Slider } from '@/components/ui/slider';
+import type { EngineAdvancedSettingResponse } from '@/lib/api/models/EngineAdvancedSettingResponse';
+import { advancedSettingStep } from '@/lib/hooks/engineCapabilityRules';
+import type { GenerationFormValues } from '@/lib/hooks/useGenerationForm';
+
+interface AdvancedSettingsControlsProps {
+  form: UseFormReturn<GenerationFormValues>;
+  /** The selected engine's declared `advanced_settings` (FR-010, C1Q8). */
+  settings: readonly EngineAdvancedSettingResponse[];
+}
+
+/**
+ * One slider per declared advanced setting, preselected at its declared default and bounded
+ * by its declared min and max. Values land in the form's `advancedSettings`, which
+ * useGenerationForm sends as the request's `advanced_settings`.
+ */
+export function AdvancedSettingsControls({ form, settings }: AdvancedSettingsControlsProps) {
+  const values = form.watch('advancedSettings');
+
+  return (
+    <div className="mt-2 grid gap-3 rounded-2xl border border-accent/20 px-3 py-2">
+      {settings.map((setting) => {
+        const value = values?.[setting.name] ?? setting.default;
+        const inputId = `advanced-setting-${setting.name}`;
+        return (
+          <div key={setting.name} className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <label htmlFor={inputId}>{setting.label}</label>
+              <span className="tabular-nums">{value}</span>
+            </div>
+            <Slider
+              id={inputId}
+              min={setting.min}
+              max={setting.max}
+              step={advancedSettingStep(setting)}
+              value={[value]}
+              onValueChange={([next]) =>
+                form.setValue('advancedSettings', {
+                  ...form.getValues('advancedSettings'),
+                  [setting.name]: Math.round(next * 100) / 100,
+                })
+              }
+              aria-label={setting.label}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+
+## 6. Justification of each 'voxcpm' hit (FR-004: registration only, no capability branching)
+- EngineModelSelector.tsx ENGINE_OPTIONS entry {value:'voxcpm', label:'VoxCPM2', engine:'voxcpm'}: picker registration (the one line T019 allows).
+- EngineModelSelector.tsx ENGINE_DESCRIPTIONS voxcpm label: registration (description text).
+- FloatingGenerateBox.tsx EngineValue union | 'voxcpm': type registration so a profile's default_engine can be set.
+- ModelManagement.tsx MODEL_DESCRIPTIONS voxcpm2 entry: description-map registration (FR-005 licence text).
+- ModelManagement.tsx MODEL_ENGINES {voxcpm2:'voxcpm'}: registration linking the model to its engine, because ModelStatus carries no engine field; every decision made with it (confirmation, size, licence) reads the capability.
+- ModelManagement.tsx voiceModels filter startsWith('voxcpm'): list registration; without it the model is not listed in the Voice section at all.
+- types.ts engine union | 'voxcpm': added by the T018 worker, not in this change.
+- useGenerationForm.ts zod engine enum 'voxcpm': type registration.
+- useGenerationForm.ts engine === 'voxcpm' ? 'voxcpm2' (modelName) and ? 'VoxCPM2' (displayName): engine-to-model-name registration in the existing per-engine mapping chain that every engine has; it decides no availability, capability, language, confirmation or setting.
+- format.ts ENGINE_DISPLAY_NAMES voxcpm: display-label registration.
+No `engine === 'voxcpm'` drives availability, languages, confirmation, cloning, or advanced settings; those read useEngineCapabilities data via engineCapabilityRules.ts, getLanguageOptionsForEngine(engine, capability.languages) and isProfileCompatibleWithEngine(..., capability).
