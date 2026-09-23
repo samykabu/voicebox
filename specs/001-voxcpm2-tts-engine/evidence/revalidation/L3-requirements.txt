@@ -1,0 +1,56 @@
+# L3: torchaudio floor in backend/requirements.txt (nothing installed; venv untouched)
+torchaudio was already listed (unpinned, line 58, TADA sub-dependencies block), so only the floor was set:
+-torchaudio
++torchaudio>=2.5.0
+torch line (unchanged): 11:torch>=2.5.0
+
+## pip check BEFORE the edit (HEAD requirements.txt)
+f5-tts 1.1.21 requires bitsandbytes, which is not installed.
+f5-tts 1.1.21 requires tomli, which is not installed.
+f5-tts 1.1.21 requires torchcodec, which is not installed.
+hume-tada 0.1.9 requires descript-audio-codec, which is not installed.
+voxcpm 2.0.3 requires argbind, which is not installed.
+voxcpm 2.0.3 requires funasr, which is not installed.
+voxcpm 2.0.3 requires modelscope, which is not installed.
+voxcpm 2.0.3 requires simplejson, which is not installed.
+voxcpm 2.0.3 requires spaces, which is not installed.
+voxcpm 2.0.3 requires torchcodec, which is not installed.
+voxcpm 2.0.3 requires wetext, which is not installed.
+chatterbox-tts 0.1.7 has requirement diffusers==0.29.0, but you have diffusers 0.39.0.
+chatterbox-tts 0.1.7 has requirement gradio==6.8.0, but you have gradio 6.17.3.
+chatterbox-tts 0.1.7 has requirement safetensors==0.5.3, but you have safetensors 0.8.0.
+chatterbox-tts 0.1.7 has requirement torch==2.6.0; python_version < "3.14", but you have torch 2.11.0+cu128.
+chatterbox-tts 0.1.7 has requirement torchaudio==2.6.0; python_version < "3.14", but you have torchaudio 2.11.0+cu128.
+chatterbox-tts 0.1.7 has requirement transformers==5.2.0, but you have transformers 4.57.3.
+habibi-tts 0.1.1 has requirement torch<2.9.0,>=2.4.0, but you have torch 2.11.0+cu128.
+voxcpm 2.0.3 has requirement datasets<4,>=3, but you have datasets 5.0.1.
+exit=1
+
+## pip check AFTER the edit
+f5-tts 1.1.21 requires bitsandbytes, which is not installed.
+f5-tts 1.1.21 requires tomli, which is not installed.
+f5-tts 1.1.21 requires torchcodec, which is not installed.
+hume-tada 0.1.9 requires descript-audio-codec, which is not installed.
+voxcpm 2.0.3 requires argbind, which is not installed.
+voxcpm 2.0.3 requires funasr, which is not installed.
+voxcpm 2.0.3 requires modelscope, which is not installed.
+voxcpm 2.0.3 requires simplejson, which is not installed.
+voxcpm 2.0.3 requires spaces, which is not installed.
+voxcpm 2.0.3 requires torchcodec, which is not installed.
+voxcpm 2.0.3 requires wetext, which is not installed.
+chatterbox-tts 0.1.7 has requirement diffusers==0.29.0, but you have diffusers 0.39.0.
+chatterbox-tts 0.1.7 has requirement gradio==6.8.0, but you have gradio 6.17.3.
+chatterbox-tts 0.1.7 has requirement safetensors==0.5.3, but you have safetensors 0.8.0.
+chatterbox-tts 0.1.7 has requirement torch==2.6.0; python_version < "3.14", but you have torch 2.11.0+cu128.
+chatterbox-tts 0.1.7 has requirement torchaudio==2.6.0; python_version < "3.14", but you have torchaudio 2.11.0+cu128.
+chatterbox-tts 0.1.7 has requirement transformers==5.2.0, but you have transformers 4.57.3.
+habibi-tts 0.1.1 has requirement torch<2.9.0,>=2.4.0, but you have torch 2.11.0+cu128.
+voxcpm 2.0.3 has requirement datasets<4,>=3, but you have datasets 5.0.1.
+exit=1
+
+## Diff of pip check before vs after (empty = identical; editing requirements.txt does not change the venv)
+diff-exit=0
+
+## import torch, torchaudio
+2.11.0+cu128 2.11.0+cu128 True
+installed torchaudio 2.11.0+cu128 satisfies >=2.5.0

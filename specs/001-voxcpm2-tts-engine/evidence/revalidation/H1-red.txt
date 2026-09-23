@@ -1,0 +1,678 @@
+# H1 RED: new/updated tests vs the UNMODIFIED resolver (backend/backends/base.py = git show HEAD:backend/backends/base.py, HEAD d211d1d)
+# Run from an isolated copy of backend/ (venv/build/dist excluded) so the working tree, which already has the fix, was not touched.
+# Tests are byte-identical copies of the working-tree test_cpu_fallback.py and test_engine_capabilities.py.
+# timestamp: 2026-09-23T20:32:04+03:00
+# cwd: C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/redcopy
+# command: /d/Projects/Personal/voicebox/backend/venv/Scripts/python.exe -m pytest backend/tests/test_cpu_fallback.py backend/tests/test_engine_capabilities.py -q -p no:cacheprovider --junitxml=/d/Projects/Personal/voicebox/specs/001-voxcpm2-tts-engine/evidence/revalidation/H1-red.xml
+
+FFFFFFF......F....F........FF...FF.........FF..FFFFFFFFFFFFF............ [ 17%]
+........................................................................ [ 35%]
+........................................................................ [ 53%]
+........................................................................ [ 71%]
+................................FF...................................... [ 89%]
+..........................................                               [100%]
+================================== FAILURES ===================================
+____ test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml[None-xpu] ____
+
+detected = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("memory_mb", [None, 1024, 16384])
+    def test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml(detected, memory_mb):
+        config = _voxcpm_config()
+    
+        result = resolve_engine_availability(config, detected, memory_mb=memory_mb, min_memory_mb=config.min_memory_mb)
+    
+>       assert result.available is True
+E       assert False is True
+E        +  where False = EngineAvailability(engine='voxcpm', available=False, reason="VoxCPM2 (Multilingual, Voice Design) can't run on this ma... machine is using Intel XPU.", warning=None, supported_accelerators=['cuda', 'mps', 'cpu'], detected_accelerator='xpu').available
+
+backend\tests\test_cpu_fallback.py:60: AssertionError
+_ test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml[None-directml] __
+
+detected = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("memory_mb", [None, 1024, 16384])
+    def test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml(detected, memory_mb):
+        config = _voxcpm_config()
+    
+        result = resolve_engine_availability(config, detected, memory_mb=memory_mb, min_memory_mb=config.min_memory_mb)
+    
+>       assert result.available is True
+E       assert False is True
+E        +  where False = EngineAvailability(engine='voxcpm', available=False, reason="VoxCPM2 (Multilingual, Voice Design) can't run on this ma...hine is using DirectML.", warning=None, supported_accelerators=['cuda', 'mps', 'cpu'], detected_accelerator='directml').available
+
+backend\tests\test_cpu_fallback.py:60: AssertionError
+____ test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml[1024-xpu] ____
+
+detected = 'xpu', memory_mb = 1024
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("memory_mb", [None, 1024, 16384])
+    def test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml(detected, memory_mb):
+        config = _voxcpm_config()
+    
+        result = resolve_engine_availability(config, detected, memory_mb=memory_mb, min_memory_mb=config.min_memory_mb)
+    
+>       assert result.available is True
+E       assert False is True
+E        +  where False = EngineAvailability(engine='voxcpm', available=False, reason="VoxCPM2 (Multilingual, Voice Design) can't run on this ma... machine is using Intel XPU.", warning=None, supported_accelerators=['cuda', 'mps', 'cpu'], detected_accelerator='xpu').available
+
+backend\tests\test_cpu_fallback.py:60: AssertionError
+_ test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml[1024-directml] __
+
+detected = 'directml', memory_mb = 1024
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("memory_mb", [None, 1024, 16384])
+    def test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml(detected, memory_mb):
+        config = _voxcpm_config()
+    
+        result = resolve_engine_availability(config, detected, memory_mb=memory_mb, min_memory_mb=config.min_memory_mb)
+    
+>       assert result.available is True
+E       assert False is True
+E        +  where False = EngineAvailability(engine='voxcpm', available=False, reason="VoxCPM2 (Multilingual, Voice Design) can't run on this ma...hine is using DirectML.", warning=None, supported_accelerators=['cuda', 'mps', 'cpu'], detected_accelerator='directml').available
+
+backend\tests\test_cpu_fallback.py:60: AssertionError
+___ test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml[16384-xpu] ____
+
+detected = 'xpu', memory_mb = 16384
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("memory_mb", [None, 1024, 16384])
+    def test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml(detected, memory_mb):
+        config = _voxcpm_config()
+    
+        result = resolve_engine_availability(config, detected, memory_mb=memory_mb, min_memory_mb=config.min_memory_mb)
+    
+>       assert result.available is True
+E       assert False is True
+E        +  where False = EngineAvailability(engine='voxcpm', available=False, reason="VoxCPM2 (Multilingual, Voice Design) can't run on this ma... machine is using Intel XPU.", warning=None, supported_accelerators=['cuda', 'mps', 'cpu'], detected_accelerator='xpu').available
+
+backend\tests\test_cpu_fallback.py:60: AssertionError
+_ test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml[16384-directml] _
+
+detected = 'directml', memory_mb = 16384
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("memory_mb", [None, 1024, 16384])
+    def test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml(detected, memory_mb):
+        config = _voxcpm_config()
+    
+        result = resolve_engine_availability(config, detected, memory_mb=memory_mb, min_memory_mb=config.min_memory_mb)
+    
+>       assert result.available is True
+E       assert False is True
+E        +  where False = EngineAvailability(engine='voxcpm', available=False, reason="VoxCPM2 (Multilingual, Voice Design) can't run on this ma...hine is using DirectML.", warning=None, supported_accelerators=['cuda', 'mps', 'cpu'], detected_accelerator='directml').available
+
+backend\tests\test_cpu_fallback.py:60: AssertionError
+_______ test_fallback_applies_to_any_engine_that_declares_the_processor _______
+
+    def test_fallback_applies_to_any_engine_that_declares_the_processor():
+        result = resolve_engine_availability(_config(accelerators=("cuda", "cpu")), "mps")
+    
+>       assert result.available is True
+E       assert False is True
+E        +  where False = EngineAvailability(engine='testengine', available=False, reason="Test Engine can't run on this machine: it needs CUDA ...chine is using Apple Silicon (MPS).", warning=None, supported_accelerators=['cuda', 'cpu'], detected_accelerator='mps').available
+
+backend\tests\test_cpu_fallback.py:72: AssertionError
+_ test_an_unavailable_reason_never_lists_what_the_machine_has[cuda-accelerators4] _
+
+accelerators = ('cpu',), detected = 'cuda'
+
+    @pytest.mark.parametrize("accelerators", [("cuda",), ("cuda", "mps"), ("mps",), ("cuda", "mps", "cpu"), ("cpu",)])
+    @pytest.mark.parametrize("detected", ["cuda", "mps", "cpu", "xpu", "directml"])
+    def test_an_unavailable_reason_never_lists_what_the_machine_has(accelerators, detected):
+        result = resolve_engine_availability(_config(accelerators=accelerators), detected)
+    
+        if "cpu" in accelerators or detected in accelerators:
+>           assert result.available is True
+E           assert False is True
+E            +  where False = EngineAvailability(engine='testengine', available=False, reason="Test Engine can't run on this machine: it needs CPU, but this machine is using CUDA.", warning=None, supported_accelerators=['cpu'], detected_accelerator='cuda').available
+
+backend\tests\test_cpu_fallback.py:102: AssertionError
+_ test_an_unavailable_reason_never_lists_what_the_machine_has[mps-accelerators4] _
+
+accelerators = ('cpu',), detected = 'mps'
+
+    @pytest.mark.parametrize("accelerators", [("cuda",), ("cuda", "mps"), ("mps",), ("cuda", "mps", "cpu"), ("cpu",)])
+    @pytest.mark.parametrize("detected", ["cuda", "mps", "cpu", "xpu", "directml"])
+    def test_an_unavailable_reason_never_lists_what_the_machine_has(accelerators, detected):
+        result = resolve_engine_availability(_config(accelerators=accelerators), detected)
+    
+        if "cpu" in accelerators or detected in accelerators:
+>           assert result.available is True
+E           assert False is True
+E            +  where False = EngineAvailability(engine='testengine', available=False, reason="Test Engine can't run on this machine: it needs CPU, but this machine is using Apple Silicon (MPS).", warning=None, supported_accelerators=['cpu'], detected_accelerator='mps').available
+
+backend\tests\test_cpu_fallback.py:102: AssertionError
+_ test_an_unavailable_reason_never_lists_what_the_machine_has[xpu-accelerators3] _
+
+accelerators = ('cuda', 'mps', 'cpu'), detected = 'xpu'
+
+    @pytest.mark.parametrize("accelerators", [("cuda",), ("cuda", "mps"), ("mps",), ("cuda", "mps", "cpu"), ("cpu",)])
+    @pytest.mark.parametrize("detected", ["cuda", "mps", "cpu", "xpu", "directml"])
+    def test_an_unavailable_reason_never_lists_what_the_machine_has(accelerators, detected):
+        result = resolve_engine_availability(_config(accelerators=accelerators), detected)
+    
+        if "cpu" in accelerators or detected in accelerators:
+>           assert result.available is True
+E           assert False is True
+E            +  where False = EngineAvailability(engine='testengine', available=False, reason="Test Engine can't run on this machine: it needs CUDA,... machine is using Intel XPU.", warning=None, supported_accelerators=['cuda', 'mps', 'cpu'], detected_accelerator='xpu').available
+
+backend\tests\test_cpu_fallback.py:102: AssertionError
+_ test_an_unavailable_reason_never_lists_what_the_machine_has[xpu-accelerators4] _
+
+accelerators = ('cpu',), detected = 'xpu'
+
+    @pytest.mark.parametrize("accelerators", [("cuda",), ("cuda", "mps"), ("mps",), ("cuda", "mps", "cpu"), ("cpu",)])
+    @pytest.mark.parametrize("detected", ["cuda", "mps", "cpu", "xpu", "directml"])
+    def test_an_unavailable_reason_never_lists_what_the_machine_has(accelerators, detected):
+        result = resolve_engine_availability(_config(accelerators=accelerators), detected)
+    
+        if "cpu" in accelerators or detected in accelerators:
+>           assert result.available is True
+E           assert False is True
+E            +  where False = EngineAvailability(engine='testengine', available=False, reason="Test Engine can't run on this machine: it needs CPU, but this machine is using Intel XPU.", warning=None, supported_accelerators=['cpu'], detected_accelerator='xpu').available
+
+backend\tests\test_cpu_fallback.py:102: AssertionError
+_ test_an_unavailable_reason_never_lists_what_the_machine_has[directml-accelerators3] _
+
+accelerators = ('cuda', 'mps', 'cpu'), detected = 'directml'
+
+    @pytest.mark.parametrize("accelerators", [("cuda",), ("cuda", "mps"), ("mps",), ("cuda", "mps", "cpu"), ("cpu",)])
+    @pytest.mark.parametrize("detected", ["cuda", "mps", "cpu", "xpu", "directml"])
+    def test_an_unavailable_reason_never_lists_what_the_machine_has(accelerators, detected):
+        result = resolve_engine_availability(_config(accelerators=accelerators), detected)
+    
+        if "cpu" in accelerators or detected in accelerators:
+>           assert result.available is True
+E           assert False is True
+E            +  where False = EngineAvailability(engine='testengine', available=False, reason="Test Engine can't run on this machine: it needs CUDA,...hine is using DirectML.", warning=None, supported_accelerators=['cuda', 'mps', 'cpu'], detected_accelerator='directml').available
+
+backend\tests\test_cpu_fallback.py:102: AssertionError
+_ test_an_unavailable_reason_never_lists_what_the_machine_has[directml-accelerators4] _
+
+accelerators = ('cpu',), detected = 'directml'
+
+    @pytest.mark.parametrize("accelerators", [("cuda",), ("cuda", "mps"), ("mps",), ("cuda", "mps", "cpu"), ("cpu",)])
+    @pytest.mark.parametrize("detected", ["cuda", "mps", "cpu", "xpu", "directml"])
+    def test_an_unavailable_reason_never_lists_what_the_machine_has(accelerators, detected):
+        result = resolve_engine_availability(_config(accelerators=accelerators), detected)
+    
+        if "cpu" in accelerators or detected in accelerators:
+>           assert result.available is True
+E           assert False is True
+E            +  where False = EngineAvailability(engine='testengine', available=False, reason="Test Engine can't run on this machine: it needs CPU, but this machine is using DirectML.", warning=None, supported_accelerators=['cpu'], detected_accelerator='directml').available
+
+backend\tests\test_cpu_fallback.py:102: AssertionError
+_____ test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu] _____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000016D0EC86CF0>
+detected = 'xpu'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    def test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml(monkeypatch, detected):
+        import backend.backends.base as base_mod
+        from backend.services import generation as generation_service
+    
+        monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", lambda: (detected, None))
+    
+>       generation_service.ensure_engine_available("voxcpm")  # must not raise
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_cpu_fallback.py:154: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm'
+
+    def ensure_engine_available(engine: str) -> None:
+        """Refuse *engine* when the availability resolver marks it unavailable here (FR-003).
+    
+        Generic: reads the accelerators declared by the engine's default-size config and
+        resolves them against the detected hardware, the same rule ``GET /models/engines``
+        reports. Engines that declare no accelerators (every pre-existing engine) are
+        unconstrained, so hardware is not probed for them and they proceed as before; unknown
+        engines are left to the existing lookups. Detection reads device state only: it never
+        loads a model or starts a download, and torch is imported lazily inside it.
+    
+        Raises:
+            EngineUnavailableError: carrying the resolver's ``reason``.
+        """
+        from ..backends import get_default_model_size, get_tts_model_configs
+        from ..backends.base import detect_engine_availability
+    
+        variants = [c for c in get_tts_model_configs() if c.engine == engine]
+        if not variants:
+            return
+        default_size = get_default_model_size(engine)
+        config = next((c for c in variants if c.model_size == default_size), variants[0])
+        if not config.accelerators:
+            return
+    
+        availability = detect_engine_availability(config, min_memory_mb=config.min_memory_mb)
+        if not availability.available:
+>           raise EngineUnavailableError(engine, availability.reason or f"{config.display_name} is unavailable.")
+E           backend.services.generation.EngineUnavailableError: VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using Intel XPU.
+
+backend\services\generation.py:67: EngineUnavailableError
+__ test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[directml] ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000016D109731A0>
+detected = 'directml'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    def test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml(monkeypatch, detected):
+        import backend.backends.base as base_mod
+        from backend.services import generation as generation_service
+    
+        monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", lambda: (detected, None))
+    
+>       generation_service.ensure_engine_available("voxcpm")  # must not raise
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_cpu_fallback.py:154: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+engine = 'voxcpm'
+
+    def ensure_engine_available(engine: str) -> None:
+        """Refuse *engine* when the availability resolver marks it unavailable here (FR-003).
+    
+        Generic: reads the accelerators declared by the engine's default-size config and
+        resolves them against the detected hardware, the same rule ``GET /models/engines``
+        reports. Engines that declare no accelerators (every pre-existing engine) are
+        unconstrained, so hardware is not probed for them and they proceed as before; unknown
+        engines are left to the existing lookups. Detection reads device state only: it never
+        loads a model or starts a download, and torch is imported lazily inside it.
+    
+        Raises:
+            EngineUnavailableError: carrying the resolver's ``reason``.
+        """
+        from ..backends import get_default_model_size, get_tts_model_configs
+        from ..backends.base import detect_engine_availability
+    
+        variants = [c for c in get_tts_model_configs() if c.engine == engine]
+        if not variants:
+            return
+        default_size = get_default_model_size(engine)
+        config = next((c for c in variants if c.model_size == default_size), variants[0])
+        if not config.accelerators:
+            return
+    
+        availability = detect_engine_availability(config, min_memory_mb=config.min_memory_mb)
+        if not availability.available:
+>           raise EngineUnavailableError(engine, availability.reason or f"{config.display_name} is unavailable.")
+E           backend.services.generation.EngineUnavailableError: VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using DirectML.
+
+backend\services\generation.py:67: EngineUnavailableError
+___ test_engines_route_offers_voxcpm_on_directml_with_the_fallback_warning ____
+
+engines_client = <starlette.testclient.TestClient object at 0x0000016D10AEAE10>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000016D109718E0>
+
+    def test_engines_route_offers_voxcpm_on_directml_with_the_fallback_warning(engines_client, monkeypatch):
+        import backend.backends.base as base_mod
+    
+        monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", lambda: ("directml", None))
+    
+        engines = {e["engine"]: e for e in _engines(engines_client)}
+    
+        voxcpm = engines["voxcpm"]
+>       assert voxcpm["available"] is True
+E       assert False is True
+
+backend\tests\test_cpu_fallback.py:184: AssertionError
+____ test_generation_proceeds_for_voxcpm_on_xpu_and_directml[generate-xpu] ____
+
+generation_app = namespace(forbid=False, calls=[], detect_calls=1, hardware=('xpu', None), row=None, hit=<function generation_app.<loca...n_app.<locals>.<lambda> at 0x0000016D11D591C0>), client=<starlette.testclient.TestClient object at 0x0000016D11D2B470>)
+entry_point = 'generate', detected = 'xpu'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("entry_point", ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"])
+    async def test_generation_proceeds_for_voxcpm_on_xpu_and_directml(generation_app, entry_point, detected):
+        generation_app.forbid = False
+        generation_app.hardware = (detected, None)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 200, (status_code, detail)
+E       AssertionError: (400, "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using Intel XPU.")
+E       assert 400 == 200
+
+backend\tests\test_cpu_fallback.py:201: AssertionError
+_ test_generation_proceeds_for_voxcpm_on_xpu_and_directml[generate-directml] __
+
+generation_app = namespace(forbid=False, calls=[], detect_calls=1, hardware=('directml', None), row=None, hit=<function generation_app....n_app.<locals>.<lambda> at 0x0000016D11D5A2A0>), client=<starlette.testclient.TestClient object at 0x0000016D11D7C590>)
+entry_point = 'generate', detected = 'directml'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("entry_point", ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"])
+    async def test_generation_proceeds_for_voxcpm_on_xpu_and_directml(generation_app, entry_point, detected):
+        generation_app.forbid = False
+        generation_app.hardware = (detected, None)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 200, (status_code, detail)
+E       AssertionError: (400, "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using DirectML.")
+E       assert 400 == 200
+
+backend\tests\test_cpu_fallback.py:201: AssertionError
+_____ test_generation_proceeds_for_voxcpm_on_xpu_and_directml[stream-xpu] _____
+
+generation_app = namespace(forbid=False, calls=[], detect_calls=1, hardware=('xpu', None), row=None, hit=<function generation_app.<loca...n_app.<locals>.<lambda> at 0x0000016D11D5BB00>), client=<starlette.testclient.TestClient object at 0x0000016D11D7F560>)
+entry_point = 'stream', detected = 'xpu'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("entry_point", ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"])
+    async def test_generation_proceeds_for_voxcpm_on_xpu_and_directml(generation_app, entry_point, detected):
+        generation_app.forbid = False
+        generation_app.hardware = (detected, None)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 200, (status_code, detail)
+E       AssertionError: (400, "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using Intel XPU.")
+E       assert 400 == 200
+
+backend\tests\test_cpu_fallback.py:201: AssertionError
+__ test_generation_proceeds_for_voxcpm_on_xpu_and_directml[stream-directml] ___
+
+generation_app = namespace(forbid=False, calls=[], detect_calls=1, hardware=('directml', None), row=None, hit=<function generation_app....n_app.<locals>.<lambda> at 0x0000016D11DD4F40>), client=<starlette.testclient.TestClient object at 0x0000016D11DD1B80>)
+entry_point = 'stream', detected = 'directml'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("entry_point", ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"])
+    async def test_generation_proceeds_for_voxcpm_on_xpu_and_directml(generation_app, entry_point, detected):
+        generation_app.forbid = False
+        generation_app.hardware = (detected, None)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 200, (status_code, detail)
+E       AssertionError: (400, "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using DirectML.")
+E       assert 400 == 200
+
+backend\tests\test_cpu_fallback.py:201: AssertionError
+_____ test_generation_proceeds_for_voxcpm_on_xpu_and_directml[retry-xpu] ______
+
+generation_app = namespace(forbid=False, calls=[], detect_calls=1, hardware=('xpu', None), row=namespace(id='gen-1', profile_id='p1', t...n_app.<locals>.<lambda> at 0x0000016D11DD63E0>), client=<starlette.testclient.TestClient object at 0x0000016D11E243E0>)
+entry_point = 'retry', detected = 'xpu'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("entry_point", ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"])
+    async def test_generation_proceeds_for_voxcpm_on_xpu_and_directml(generation_app, entry_point, detected):
+        generation_app.forbid = False
+        generation_app.hardware = (detected, None)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 200, (status_code, detail)
+E       AssertionError: (400, "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using Intel XPU.")
+E       assert 400 == 200
+
+backend\tests\test_cpu_fallback.py:201: AssertionError
+___ test_generation_proceeds_for_voxcpm_on_xpu_and_directml[retry-directml] ___
+
+generation_app = namespace(forbid=False, calls=[], detect_calls=1, hardware=('directml', None), row=namespace(id='gen-1', profile_id='p...n_app.<locals>.<lambda> at 0x0000016D11DD7560>), client=<starlette.testclient.TestClient object at 0x0000016D11E26CC0>)
+entry_point = 'retry', detected = 'directml'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("entry_point", ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"])
+    async def test_generation_proceeds_for_voxcpm_on_xpu_and_directml(generation_app, entry_point, detected):
+        generation_app.forbid = False
+        generation_app.hardware = (detected, None)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 200, (status_code, detail)
+E       AssertionError: (400, "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using DirectML.")
+E       assert 400 == 200
+
+backend\tests\test_cpu_fallback.py:201: AssertionError
+___ test_generation_proceeds_for_voxcpm_on_xpu_and_directml[regenerate-xpu] ___
+
+generation_app = namespace(forbid=False, calls=[], detect_calls=1, hardware=('xpu', None), row=namespace(id='gen-1', profile_id='p1', t...n_app.<locals>.<lambda> at 0x0000016D11E64860>), client=<starlette.testclient.TestClient object at 0x0000016D11D7ED20>)
+entry_point = 'regenerate', detected = 'xpu'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("entry_point", ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"])
+    async def test_generation_proceeds_for_voxcpm_on_xpu_and_directml(generation_app, entry_point, detected):
+        generation_app.forbid = False
+        generation_app.hardware = (detected, None)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 200, (status_code, detail)
+E       AssertionError: (400, "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using Intel XPU.")
+E       assert 400 == 200
+
+backend\tests\test_cpu_fallback.py:201: AssertionError
+_ test_generation_proceeds_for_voxcpm_on_xpu_and_directml[regenerate-directml] _
+
+generation_app = namespace(forbid=False, calls=[], detect_calls=1, hardware=('directml', None), row=namespace(id='gen-1', profile_id='p...n_app.<locals>.<lambda> at 0x0000016D11E65D00>), client=<starlette.testclient.TestClient object at 0x0000016D11E3B7A0>)
+entry_point = 'regenerate', detected = 'directml'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("entry_point", ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"])
+    async def test_generation_proceeds_for_voxcpm_on_xpu_and_directml(generation_app, entry_point, detected):
+        generation_app.forbid = False
+        generation_app.hardware = (detected, None)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 200, (status_code, detail)
+E       AssertionError: (400, "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using DirectML.")
+E       assert 400 == 200
+
+backend\tests\test_cpu_fallback.py:201: AssertionError
+_____ test_generation_proceeds_for_voxcpm_on_xpu_and_directml[speak-xpu] ______
+
+generation_app = namespace(forbid=False, calls=[], detect_calls=1, hardware=('xpu', None), row=None, hit=<function generation_app.<loca...n_app.<locals>.<lambda> at 0x0000016D11E66E80>), client=<starlette.testclient.TestClient object at 0x0000016D11ECA5D0>)
+entry_point = 'speak', detected = 'xpu'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("entry_point", ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"])
+    async def test_generation_proceeds_for_voxcpm_on_xpu_and_directml(generation_app, entry_point, detected):
+        generation_app.forbid = False
+        generation_app.hardware = (detected, None)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 200, (status_code, detail)
+E       AssertionError: (400, "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using Intel XPU.")
+E       assert 400 == 200
+
+backend\tests\test_cpu_fallback.py:201: AssertionError
+___ test_generation_proceeds_for_voxcpm_on_xpu_and_directml[speak-directml] ___
+
+generation_app = namespace(forbid=False, calls=[], detect_calls=1, hardware=('directml', None), row=None, hit=<function generation_app....n_app.<locals>.<lambda> at 0x0000016D11E676A0>), client=<starlette.testclient.TestClient object at 0x0000016D11E24950>)
+entry_point = 'speak', detected = 'directml'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("entry_point", ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"])
+    async def test_generation_proceeds_for_voxcpm_on_xpu_and_directml(generation_app, entry_point, detected):
+        generation_app.forbid = False
+        generation_app.hardware = (detected, None)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 200, (status_code, detail)
+E       AssertionError: (400, "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using DirectML.")
+E       assert 400 == 200
+
+backend\tests\test_cpu_fallback.py:201: AssertionError
+___ test_generation_proceeds_for_voxcpm_on_xpu_and_directml[mcp_speak-xpu] ____
+
+generation_app = namespace(forbid=False, calls=[], detect_calls=1, hardware=('xpu', None), row=None, hit=<function generation_app.<loca...n_app.<locals>.<lambda> at 0x0000016D11F10AE0>), client=<starlette.testclient.TestClient object at 0x0000016D11F084D0>)
+entry_point = 'mcp_speak', detected = 'xpu'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("entry_point", ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"])
+    async def test_generation_proceeds_for_voxcpm_on_xpu_and_directml(generation_app, entry_point, detected):
+        generation_app.forbid = False
+        generation_app.hardware = (detected, None)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 200, (status_code, detail)
+E       AssertionError: (400, "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using Intel XPU.")
+E       assert 400 == 200
+
+backend\tests\test_cpu_fallback.py:201: AssertionError
+_ test_generation_proceeds_for_voxcpm_on_xpu_and_directml[mcp_speak-directml] _
+
+generation_app = namespace(forbid=False, calls=[], detect_calls=1, hardware=('directml', None), row=None, hit=<function generation_app....n_app.<locals>.<lambda> at 0x0000016D11F12340>), client=<starlette.testclient.TestClient object at 0x0000016D12EFC200>)
+entry_point = 'mcp_speak', detected = 'directml'
+
+    @pytest.mark.parametrize("detected", FALLBACK_HARDWARE)
+    @pytest.mark.parametrize("entry_point", ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"])
+    async def test_generation_proceeds_for_voxcpm_on_xpu_and_directml(generation_app, entry_point, detected):
+        generation_app.forbid = False
+        generation_app.hardware = (detected, None)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+>       assert status_code == 200, (status_code, detail)
+E       AssertionError: (400, "VoxCPM2 (Multilingual, Voice Design) can't run on this machine: it needs CUDA, Apple Silicon (MPS) or CPU, but this machine is using DirectML.")
+E       assert 400 == 200
+
+backend\tests\test_cpu_fallback.py:201: AssertionError
+_____ test_voxcpm_falls_back_to_the_processor_on_other_accelerators[xpu] ______
+
+detected = 'xpu'
+
+    @pytest.mark.parametrize("detected", ["xpu", "directml"])
+    def test_voxcpm_falls_back_to_the_processor_on_other_accelerators(detected):
+        """FR-023: VoxCPM2 declares the processor, so XPU/DirectML machines run it there (warning only)."""
+        config = _voxcpm_config()
+    
+        result = resolve_engine_availability(config, detected, memory_mb=16384, min_memory_mb=config.min_memory_mb)
+    
+>       assert result.available is True
+E       assert False is True
+E        +  where False = EngineAvailability(engine='voxcpm', available=False, reason="VoxCPM2 (Multilingual, Voice Design) can't run on this ma... machine is using Intel XPU.", warning=None, supported_accelerators=['cuda', 'mps', 'cpu'], detected_accelerator='xpu').available
+
+backend\tests\test_engine_capabilities.py:835: AssertionError
+___ test_voxcpm_falls_back_to_the_processor_on_other_accelerators[directml] ___
+
+detected = 'directml'
+
+    @pytest.mark.parametrize("detected", ["xpu", "directml"])
+    def test_voxcpm_falls_back_to_the_processor_on_other_accelerators(detected):
+        """FR-023: VoxCPM2 declares the processor, so XPU/DirectML machines run it there (warning only)."""
+        config = _voxcpm_config()
+    
+        result = resolve_engine_availability(config, detected, memory_mb=16384, min_memory_mb=config.min_memory_mb)
+    
+>       assert result.available is True
+E       assert False is True
+E        +  where False = EngineAvailability(engine='voxcpm', available=False, reason="VoxCPM2 (Multilingual, Voice Design) can't run on this ma...hine is using DirectML.", warning=None, supported_accelerators=['cuda', 'mps', 'cpu'], detected_accelerator='directml').available
+
+backend\tests\test_engine_capabilities.py:835: AssertionError
+============================== warnings summary ===============================
+D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:33: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:69: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class ProfileSampleResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:146: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:211: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationEntryResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:269: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class HistoryResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:378: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class CaptureSettingsResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:419: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationSettingsResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:440: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class MCPClientBindingResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:720: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioChannelResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:752: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:766: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:798: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:906: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\models.py:920: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+tests/test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+  C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\redcopy\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\test_cpu_fallback.py::test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml[None-xpu]
+FAILED backend\tests\test_cpu_fallback.py::test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml[None-directml]
+FAILED backend\tests\test_cpu_fallback.py::test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml[1024-xpu]
+FAILED backend\tests\test_cpu_fallback.py::test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml[1024-directml]
+FAILED backend\tests\test_cpu_fallback.py::test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml[16384-xpu]
+FAILED backend\tests\test_cpu_fallback.py::test_voxcpm_falls_back_to_the_processor_on_xpu_and_directml[16384-directml]
+FAILED backend\tests\test_cpu_fallback.py::test_fallback_applies_to_any_engine_that_declares_the_processor
+FAILED backend\tests\test_cpu_fallback.py::test_an_unavailable_reason_never_lists_what_the_machine_has[cuda-accelerators4]
+FAILED backend\tests\test_cpu_fallback.py::test_an_unavailable_reason_never_lists_what_the_machine_has[mps-accelerators4]
+FAILED backend\tests\test_cpu_fallback.py::test_an_unavailable_reason_never_lists_what_the_machine_has[xpu-accelerators3]
+FAILED backend\tests\test_cpu_fallback.py::test_an_unavailable_reason_never_lists_what_the_machine_has[xpu-accelerators4]
+FAILED backend\tests\test_cpu_fallback.py::test_an_unavailable_reason_never_lists_what_the_machine_has[directml-accelerators3]
+FAILED backend\tests\test_cpu_fallback.py::test_an_unavailable_reason_never_lists_what_the_machine_has[directml-accelerators4]
+FAILED backend\tests\test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[xpu]
+FAILED backend\tests\test_cpu_fallback.py::test_ensure_engine_available_allows_voxcpm_on_xpu_and_directml[directml]
+FAILED backend\tests\test_cpu_fallback.py::test_engines_route_offers_voxcpm_on_directml_with_the_fallback_warning
+FAILED backend\tests\test_cpu_fallback.py::test_generation_proceeds_for_voxcpm_on_xpu_and_directml[generate-xpu]
+FAILED backend\tests\test_cpu_fallback.py::test_generation_proceeds_for_voxcpm_on_xpu_and_directml[generate-directml]
+FAILED backend\tests\test_cpu_fallback.py::test_generation_proceeds_for_voxcpm_on_xpu_and_directml[stream-xpu]
+FAILED backend\tests\test_cpu_fallback.py::test_generation_proceeds_for_voxcpm_on_xpu_and_directml[stream-directml]
+FAILED backend\tests\test_cpu_fallback.py::test_generation_proceeds_for_voxcpm_on_xpu_and_directml[retry-xpu]
+FAILED backend\tests\test_cpu_fallback.py::test_generation_proceeds_for_voxcpm_on_xpu_and_directml[retry-directml]
+FAILED backend\tests\test_cpu_fallback.py::test_generation_proceeds_for_voxcpm_on_xpu_and_directml[regenerate-xpu]
+FAILED backend\tests\test_cpu_fallback.py::test_generation_proceeds_for_voxcpm_on_xpu_and_directml[regenerate-directml]
+FAILED backend\tests\test_cpu_fallback.py::test_generation_proceeds_for_voxcpm_on_xpu_and_directml[speak-xpu]
+FAILED backend\tests\test_cpu_fallback.py::test_generation_proceeds_for_voxcpm_on_xpu_and_directml[speak-directml]
+FAILED backend\tests\test_cpu_fallback.py::test_generation_proceeds_for_voxcpm_on_xpu_and_directml[mcp_speak-xpu]
+FAILED backend\tests\test_cpu_fallback.py::test_generation_proceeds_for_voxcpm_on_xpu_and_directml[mcp_speak-directml]
+FAILED backend\tests\test_engine_capabilities.py::test_voxcpm_falls_back_to_the_processor_on_other_accelerators[xpu]
+FAILED backend\tests\test_engine_capabilities.py::test_voxcpm_falls_back_to_the_processor_on_other_accelerators[directml]
+30 failed, 372 passed, 17 warnings in 3.96s
+exit=1

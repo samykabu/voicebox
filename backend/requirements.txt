@@ -55,7 +55,7 @@ pyloudnorm
 # descript-audio-codec is NOT installed — it pulls onnx/tensorboard
 # via descript-audiotools.  A lightweight shim in utils/dac_shim.py
 # provides the only class TADA uses: Snake1d.)
-torchaudio
+torchaudio>=2.5.0
 
 # VoxCPM2 sub-dependencies (voxcpm itself is installed --no-deps in setup
 # because it pulls gradio>=6, datasets>=3, funasr and modelscope, none of

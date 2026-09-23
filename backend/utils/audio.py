@@ -92,8 +92,8 @@ def wav_bytes(
     """Encode *audio* as in-memory WAV bytes carrying the FR-026 disclosure.
 
     The in-memory counterpart of :func:`save_audio`, for generated audio that is
-    streamed rather than saved (``/generate/stream``, non-persisted ``/speak``,
-    the effects preview). Samples and subtype are those of
+    streamed rather than saved: ``/generate/stream`` and the effects preview.
+    (``/speak`` and MCP speak save through :func:`save_audio`.) Samples and subtype are those of
     ``sf.write(buf, audio, sample_rate, format='WAV')``.
     """
     import io

@@ -826,14 +826,17 @@ def test_voxcpm_warns_but_stays_available_on_a_4gb_gpu():
 
 
 @pytest.mark.parametrize("detected", ["xpu", "directml"])
-def test_voxcpm_is_unavailable_with_a_reason_on_other_accelerators(detected):
+def test_voxcpm_falls_back_to_the_processor_on_other_accelerators(detected):
+    """FR-023: VoxCPM2 declares the processor, so XPU/DirectML machines run it there (warning only)."""
     config = _voxcpm_config()
 
     result = resolve_engine_availability(config, detected, memory_mb=16384, min_memory_mb=config.min_memory_mb)
 
-    assert result.available is False
-    assert result.reason is not None
-    assert result.warning is None
+    assert result.available is True
+    assert result.reason is None
+    assert result.warning is not None
+    assert "processor" in result.warning
+    assert result.detected_accelerator == detected
 
 
 def test_engines_route_describes_voxcpm_from_its_declaration(engines_client):
@@ -868,7 +871,8 @@ def test_engines_route_describes_voxcpm_from_its_declaration(engines_client):
 # patched to raise while a refusal is expected, so a refusal that comes too late fails
 # loudly. Hardware is injected through the resolver's detection function, never by name.
 
-# Detected hardware outside VoxCPM2's declared ("cuda", "mps", "cpu") set.
+# Detected hardware outside VoxCPM2's declared ("cuda", "mps", "cpu") set. VoxCPM2 falls back
+# to the processor there (FR-023); an engine that does not declare "cpu" is refused.
 UNSUPPORTED_HARDWARE = [("xpu", None), ("directml", None)]
 SUPPORTED_HARDWARE = ("cuda", 16 * 1024)
 
@@ -1090,13 +1094,17 @@ def _expected_reason(config, accelerator):
 
 @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
 @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
-async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
-    generation_app, entry_point, accelerator, memory_mb
+async def test_generation_refuses_an_engine_without_the_processor_with_the_resolver_reason(
+    generation_app, entry_point, accelerator, memory_mb, monkeypatch
 ):
-    generation_app.hardware = (accelerator, memory_mb)
-    expected = _expected_reason(_voxcpm_config(), accelerator)
+    import backend.backends as backends_pkg
 
-    status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    configs = _constrained_default_qwen(accelerators=("cuda", "mps"))
+    monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+    generation_app.hardware = (accelerator, memory_mb)
+    expected = _expected_reason(configs()[0], accelerator)
+
+    status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
 
     assert status_code == 400, (status_code, detail)
     assert detail == expected
@@ -1150,10 +1158,15 @@ async def test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware(g
 
 
 @pytest.mark.parametrize("entry_point", ["retry", "regenerate"])
-async def test_refused_retry_leaves_the_stored_row_untouched(generation_app, entry_point):
+async def test_refused_retry_leaves_the_stored_row_untouched(generation_app, entry_point, monkeypatch):
+    import backend.backends as backends_pkg
+
+    monkeypatch.setattr(backends_pkg, "get_tts_model_configs", _constrained_default_qwen(accelerators=("cuda",)))
     generation_app.hardware = ("xpu", None)
 
-    await _call_entry_point(generation_app, entry_point, "voxcpm")
+    status_code, _detail = await _call_entry_point(generation_app, entry_point, "qwen")
+
+    assert status_code == 400
 
     row = generation_app.row
     assert row.status == ("failed" if entry_point == "retry" else "completed")
@@ -1162,15 +1175,18 @@ async def test_refused_retry_leaves_the_stored_row_untouched(generation_app, ent
 
 
 def test_availability_helper_raises_the_resolver_reason(monkeypatch):
+    import backend.backends as backends_pkg
     import backend.backends.base as base_mod
     from backend.services import generation as generation_service
 
+    configs = _constrained_default_qwen(accelerators=("cuda", "mps"))
+    monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
     monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", lambda: ("directml", None))
 
     with pytest.raises(generation_service.EngineUnavailableError) as excinfo:
-        generation_service.ensure_engine_available("voxcpm")
+        generation_service.ensure_engine_available("qwen")
 
-    assert str(excinfo.value) == _expected_reason(_voxcpm_config(), "directml")
+    assert str(excinfo.value) == _expected_reason(configs()[0], "directml")
     assert excinfo.value.reason == str(excinfo.value)
 
 
@@ -1203,14 +1219,15 @@ async def test_in_memory_generation_service_refuses_before_loading(monkeypatch):
     import backend.backends.base as base_mod
     from backend.services import generation as generation_service
 
+    monkeypatch.setattr(backends_pkg, "get_tts_model_configs", _constrained_default_qwen(accelerators=("cuda",)))
     monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", lambda: ("xpu", None))
     for name in ("load_engine_model", "get_tts_backend_for_engine"):
         monkeypatch.setattr(backends_pkg, name, _forbid(name))
     monkeypatch.setattr(generation_service, "get_db", _forbid("get_db"))
 
-    with pytest.raises(generation_service.EngineUnavailableError, match="VoxCPM2"):
+    with pytest.raises(generation_service.EngineUnavailableError, match="Qwen Test"):
         await generation_service.generate_audio_sync(
-            profile_id="p1", text="Hello.", language="en", engine="voxcpm", model_size="default"
+            profile_id="p1", text="Hello.", language="en", engine="qwen", model_size="default"
         )
 
 

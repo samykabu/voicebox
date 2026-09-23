@@ -301,7 +301,26 @@ def resolve_engine_availability(
             detected_accelerator=detected,
         )
 
+    if detected not in supported and "cpu" in supported:
+        # FR-023: the engine resolves its own device and falls back to the processor when the
+        # detected accelerator is not one it supports (e.g. Intel XPU or DirectML), so it is
+        # offered with an advisory warning. The memory warning describes the detected
+        # accelerator's memory, which the engine will not use, so it does not apply here.
+        return EngineAvailability(
+            engine=config.engine,
+            available=True,
+            reason=None,
+            warning=(
+                f"{name} doesn't support {_accelerator_label(detected)} here, "
+                "so it will run on the processor, which is slower."
+            ),
+            supported_accelerators=supported,
+            detected_accelerator=detected,
+        )
+
     if detected not in supported:
+        # "cpu" is not declared here (handled above), so the list never names the processor
+        # every machine has, nor the detected accelerator.
         needed = _join_labels([_accelerator_label(a) for a in supported])
         reason = (
             f"{name} can't run on this machine: it needs {needed}, "
