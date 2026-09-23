@@ -199,25 +199,25 @@ beneath it.
 
 ## Phase 7: Polish & Cross-Cutting
 
-- [ ] T038 [P] [SUBAGENT] Document VoxCPM2 in tts-engines.mdx
+- [x] T038 [P] [SUBAGENT] Document VoxCPM2 in tts-engines.mdx
   - Add VoxCPM2 to `docs/content/docs/developer/tts-engines.mdx`, following its own new-engine guidance (FR-021). **Covers**: FR-021.
-- [ ] T039 [P] [SUBAGENT] Document VoxCPM2 in model-management.mdx
+- [x] T039 [P] [SUBAGENT] Document VoxCPM2 in model-management.mdx
   - Add VoxCPM2 to `docs/content/docs/developer/model-management.mdx`, including the ~4961 MB size and the confirmation step (FR-021). **Covers**: FR-021.
-- [ ] T040 [P] [SUBAGENT] Record VoxCPM2 in CHANGELOG.md
+- [x] T040 [P] [SUBAGENT] Record VoxCPM2 in CHANGELOG.md
   - Record the user-visible addition in `CHANGELOG.md` (FR-022). **Covers**: FR-022.
-- [ ] T041 Add a VoxCPM2 case to backend/tests/test_all_models_e2e.py
+- [x] T041 Add a VoxCPM2 case to backend/tests/test_all_models_e2e.py
   - Add a VoxCPM2 case to `backend/tests/test_all_models_e2e.py`, respecting its existing opt-in/skip behaviour for models that download. **Covers**: FR-006, FR-011.
-- [ ] T042 Build the frozen desktop backend and confirm VoxCPM2 is registered
+- [x] T042 Build the frozen desktop backend and confirm VoxCPM2 is registered
   - Build the frozen desktop backend with `python backend/build_binary.py` and confirm it starts with VoxCPM2 registered (FR-020, SC-008). Record output in `specs/001-voxcpm2-tts-engine/evidence/`. **Covers**: FR-020.
-- [ ] T043 Run all constitution quality gates and keep the output as evidence
+- [x] T043 Run all constitution quality gates and keep the output as evidence
   - Run every constitution quality gate and keep the output as evidence: `just check-js`, `bun run typecheck`, `just check-python`, `just test`, `bun run build:web`. **Covers**: constitution quality gates.
-- [ ] T044 Run quickstart Steps 1-8 on Windows and Linux
+- [x] T044 Run quickstart Steps 1-8 on Windows and Linux
   - Run [quickstart.md](./quickstart.md) Steps 1–8, including `just setup` from a clean checkout on Windows **and** Linux, and confirm every pre-existing engine still generates (SC-007). Record results in `specs/001-voxcpm2-tts-engine/evidence/`. **Covers**: FR-019, SC-001–SC-009.
-- [ ] T055 [P] Install VoxCPM2 in the release builds and the Docker image
+- [x] T055 [P] Install VoxCPM2 in the release builds and the Docker image
   - Add `pip install --no-deps 'voxcpm==2.0.3'` next to the existing `habibi-tts` install in each of the three build jobs in `.github/workflows/release.yml` (about lines 134, 342 and 418), and add the matching `--no-deps` install to `Dockerfile` (after the `hume-tada` line, about line 65). Change install steps only: `runs-on`, triggers and job structure stay as they are, so the runner policy and the red README exception are unaffected. Verify with `actionlint` if available, a YAML parse, and a local Docker build if Docker is available; otherwise say so. **Covers**: FR-019, FR-020. Added 2026-09-23 by user decision.
-- [ ] T056 [P] Update the remaining documentation for VoxCPM2
+- [x] T056 [P] Update the remaining documentation for VoxCPM2
   - Update `docs/PROJECT_STATUS.md` (VoxCPM2 is shipped, not backlogged), the developer voice-profiles and tts-generation pages under `docs/content/docs/developer/`, the user-facing docs that cover engines, profiles and generation, and `backend/README.md` (profile export manifest 1.1 and the AI-disclosure metadata in generated WAVs). Plain, human English. **Covers**: FR-021. Added 2026-09-23 by user decision.
-- [ ] T045 [HUMAN-REVIEW] Final review against the spec before merge
+- [x] T045 [HUMAN-REVIEW] Final review against the spec before merge
   - Final review against the spec before merge (plan.md Human Checkpoint 4). The PR must state that `just test` was run locally. **Covers**: all.
 
 ---

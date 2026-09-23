@@ -259,3 +259,4 @@ Follow-ups (pre-existing, not fixed here):
   - C:\Users\sabus\voicebox-setupcheck-win (6.9 GB)
   - WSL ~/voicebox-setupcheck (8.9 GB), ~/tc (1.6 GB), ~/.cache/pip (3.7 GB)
   - backend/dist/voicebox-server.exe (gitignored)
+- Phase 7 commit `2b1aa153590ad3d4eedfdb077f7272fb3b68cbb5`, pushed `b69d377..2b1aa15`; ls-remote matches. The scratch worktree was removed. Final torch check: 2.11.0+cu128, CUDA True. Stopped before T045.
