@@ -18,7 +18,7 @@ import {
   isHabibiModelId,
 } from '@/lib/constants/habibiModels';
 import { getLanguageOptionsForEngine } from '@/lib/constants/languages';
-import { isEngineSelectable } from '@/lib/hooks/engineCapabilityRules';
+import { isEngineSelectable, supportsCloning } from '@/lib/hooks/engineCapabilityRules';
 import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
 import type { GenerationFormValues } from '@/lib/hooks/useGenerationForm';
 
@@ -60,7 +60,10 @@ const ENGINE_DESCRIPTIONS: Record<string, string> = {
 /** Engines that only support English and should force language to 'en' on select. */
 const ENGLISH_ONLY_ENGINES = new Set(['luxtts', 'chatterbox_turbo']);
 
-/** Engines that support cloned (reference audio) profiles. */
+/**
+ * Engines that support cloned (reference audio) profiles without a capability declaration.
+ * Any other engine clones only when it declares `supports_cloning` (see supportsCloning).
+ */
 const CLONING_ENGINES = new Set(['qwen', 'luxtts', 'chatterbox', 'chatterbox_turbo', 'tada', 'f5_tts']);
 
 function getAvailableOptions(
@@ -270,9 +273,9 @@ export function isProfileCompatibleWithEngine(
 ): boolean {
   const voiceType = profile.voice_type || 'cloned';
   if (voiceType === 'preset') return profile.preset_engine === engine;
-  // Engines outside the app-side list count as cloning engines only when they declare it.
+  // Engines outside the app-side set clone only when their capability declares it.
   if (voiceType === 'cloned') {
-    return CLONING_ENGINES.has(engine) || capability?.supports_cloning === true;
+    return supportsCloning(engine, capability, CLONING_ENGINES);
   }
   return true; // designed — future
 }

@@ -1,4 +1,5 @@
 import type { EngineAdvancedSettingResponse } from '@/lib/api/models/EngineAdvancedSettingResponse';
+import type { EngineCapabilitiesResponse } from '@/lib/api/models/EngineCapabilitiesResponse';
 import type { EngineCapabilityResponse } from '@/lib/api/models/EngineCapabilityResponse';
 
 /**
@@ -12,6 +13,35 @@ import type { EngineCapabilityResponse } from '@/lib/api/models/EngineCapability
 /** An engine can be picked unless the backend says this machine cannot run it (FR-003). */
 export function isEngineSelectable(capability: EngineCapabilityResponse | undefined): boolean {
   return capability ? capability.available : true;
+}
+
+/**
+ * Whether a cloned (reference-audio) profile can be used with this engine (FR-011, FR-014).
+ *
+ * Engines in `appSideCloningEngines` are not migrated to the capability channel yet and keep
+ * cloning whether or not the backend reports them (the same scope boundary as languages);
+ * any other engine clones only when its capability declares `supports_cloning`.
+ */
+export function supportsCloning(
+  engine: string,
+  capability: EngineCapabilityResponse | undefined,
+  appSideCloningEngines: ReadonlySet<string>,
+): boolean {
+  return appSideCloningEngines.has(engine) || capability?.supports_cloning === true;
+}
+
+/**
+ * Cloning-capable engines the backend reports that an app-side option list does not name,
+ * as options labelled with each engine's declared `display_name`. An unavailable engine is
+ * still offered: availability is shown when generating (FR-003), not hidden here.
+ */
+export function declaredCloningEngineOptions(
+  capabilities: EngineCapabilitiesResponse | undefined,
+  listedEngines: ReadonlySet<string>,
+): { value: string; label: string }[] {
+  return (capabilities?.engines ?? [])
+    .filter((entry) => entry.supports_cloning && !listedEngines.has(entry.engine))
+    .map((entry) => ({ value: entry.engine, label: entry.display_name }));
 }
 
 /**

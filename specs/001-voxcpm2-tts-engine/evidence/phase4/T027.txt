@@ -1,0 +1,464 @@
+## T027 run 1 (before editing profiles.py; XML kept in scratchpad as T027-red.xml, its testsuite line is quoted below)
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_voxcpm_backend.py -v -p no:cacheprovider -k "voxcpm_is_a_cloning_engine or cloned_profile_with_voxcpm" --junitxml=/c/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/T027-red.xml
+# 2026-09-23T17:30:27+03:00
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 75 items / 73 deselected / 2 selected
+backend\tests\test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine FAILED [ 50%]
+backend\tests\test_voxcpm_backend.py::test_cloned_profile_with_voxcpm_passes_profile_validation FAILED [100%]
+================================== FAILURES ===================================
+_______________________ test_voxcpm_is_a_cloning_engine _______________________
+    def test_voxcpm_is_a_cloning_engine() -> None:
+        from backend.services.profiles import CLONING_ENGINES
+    
+>       assert "voxcpm" in CLONING_ENGINES
+E       AssertionError: assert 'voxcpm' in {'chatterbox', 'chatterbox_turbo', 'f5_tts', 'luxtts', 'qwen', 'tada'}
+backend\tests\test_voxcpm_backend.py:770: AssertionError
+__________ test_cloned_profile_with_voxcpm_passes_profile_validation __________
+    def test_cloned_profile_with_voxcpm_passes_profile_validation() -> None:
+        from types import SimpleNamespace
+    
+        from backend.services.profiles import _validate_profile_fields, validate_profile_engine
+    
+>       assert (
+            _validate_profile_fields(
+                voice_type="cloned",
+                preset_engine=None,
+                preset_voice_id=None,
+                design_prompt=None,
+                default_engine="voxcpm",
+            )
+            is None
+        )
+E       assert "Cloned profiles cannot use default engine 'voxcpm'" is None
+E        +  where "Cloned profiles cannot use default engine 'voxcpm'" = <function _validate_profile_fields at 0x000002A9126E6660>(voice_type='cloned', preset_engine=None, preset_voice_id=None, design_prompt=None, default_engine='voxcpm')
+backend\tests\test_voxcpm_backend.py:778: AssertionError
+============================== warnings summary ===============================
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\T027-red.xml -
+=========================== short test summary info ===========================
+FAILED backend\tests\test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+FAILED backend\tests\test_voxcpm_backend.py::test_cloned_profile_with_voxcpm_passes_profile_validation
+================ 2 failed, 73 deselected, 16 warnings in 1.38s ================
+# exit: 1
+# red XML: <testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="1.379" timestamp="2026-09-23T17:30:28.310068+03:00" hostname="DevelopmentPC">
+
+## T027 run 2 (after adding "voxcpm" to CLONING_ENGINES; whole test_voxcpm_backend.py plus test_engine_capabilities.py, run read-only to check supports_cloning fallout)
+$ git diff -- backend/services/profiles.py
+diff --git a/backend/services/profiles.py b/backend/services/profiles.py
+index e166d00..d66d405 100644
+--- a/backend/services/profiles.py
++++ b/backend/services/profiles.py
+@@ -24,7 +24,7 @@ from ..utils.images import process_avatar, validate_image
+ 
+ logger = logging.getLogger(__name__)
+ 
+-CLONING_ENGINES = {"qwen", "luxtts", "chatterbox", "chatterbox_turbo", "tada", "f5_tts"}
++CLONING_ENGINES = {"qwen", "luxtts", "chatterbox", "chatterbox_turbo", "tada", "f5_tts", "voxcpm"}
+ 
+ 
+ def _profile_to_response(
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_voxcpm_backend.py backend/tests/test_engine_capabilities.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase4/T027.xml
+# 2026-09-23T17:30:40+03:00
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 338 items
+backend\tests\test_voxcpm_backend.py::test_load_model_is_idempotent PASSED [  0%]
+backend\tests\test_voxcpm_backend.py::test_load_model_disables_the_modelscope_denoiser PASSED [  0%]
+backend\tests\test_voxcpm_backend.py::test_load_model_passes_an_explicit_device_from_our_policy PASSED [  0%]
+backend\tests\test_voxcpm_backend.py::test_cached_model_loads_with_local_files_only PASSED [  1%]
+backend\tests\test_voxcpm_backend.py::test_uncached_model_may_download PASSED [  1%]
+backend\tests\test_voxcpm_backend.py::test_load_runs_inside_model_load_progress[True] PASSED [  1%]
+backend\tests\test_voxcpm_backend.py::test_load_runs_inside_model_load_progress[False] PASSED [  2%]
+backend\tests\test_voxcpm_backend.py::test_generate_returns_the_array_and_the_model_runtime_sample_rate PASSED [  2%]
+backend\tests\test_voxcpm_backend.py::test_generate_keeps_upstream_normalization_off PASSED [  2%]
+backend\tests\test_voxcpm_backend.py::test_seed_is_applied_before_the_vendor_call_and_never_forwarded PASSED [  2%]
+backend\tests\test_voxcpm_backend.py::test_no_seed_means_no_manual_seed PASSED [  3%]
+backend\tests\test_voxcpm_backend.py::test_generate_passes_the_prompt_pair_together PASSED [  3%]
+backend\tests\test_voxcpm_backend.py::test_generate_without_reference_passes_neither_prompt_key[None] PASSED [  3%]
+backend\tests\test_voxcpm_backend.py::test_generate_without_reference_passes_neither_prompt_key[voice_prompt1] PASSED [  4%]
+backend\tests\test_voxcpm_backend.py::test_generate_rejects_half_a_prompt_pair[voice_prompt0] PASSED [  4%]
+backend\tests\test_voxcpm_backend.py::test_generate_rejects_half_a_prompt_pair[voice_prompt1] PASSED [  4%]
+backend\tests\test_voxcpm_backend.py::test_generate_rejects_half_a_prompt_pair[voice_prompt2] PASSED [  5%]
+backend\tests\test_voxcpm_backend.py::test_generate_uses_declared_defaults_without_options PASSED [  5%]
+backend\tests\test_voxcpm_backend.py::test_generate_maps_advanced_options PASSED [  5%]
+backend\tests\test_voxcpm_backend.py::test_generate_partial_options_fall_back_per_setting PASSED [  5%]
+backend\tests\test_voxcpm_backend.py::test_voice_description_becomes_the_ascii_paren_prefix_without_reference PASSED [  6%]
+backend\tests\test_voxcpm_backend.py::test_voice_description_is_inactive_when_reference_audio_is_present PASSED [  6%]
+backend\tests\test_voxcpm_backend.py::test_blank_voice_description_adds_no_prefix[None] PASSED [  6%]
+backend\tests\test_voxcpm_backend.py::test_blank_voice_description_adds_no_prefix[] PASSED [  7%]
+backend\tests\test_voxcpm_backend.py::test_blank_voice_description_adds_no_prefix[   ] PASSED [  7%]
+backend\tests\test_voxcpm_backend.py::test_unload_empties_the_device_cache_and_reports_unloaded PASSED [  7%]
+backend\tests\test_voxcpm_backend.py::test_unload_when_not_loaded_is_a_no_op PASSED [  7%]
+backend\tests\test_voxcpm_backend.py::test_reload_after_unload_loads_again PASSED [  8%]
+backend\tests\test_voxcpm_backend.py::test_model_path_is_the_hf_repo PASSED [  8%]
+backend\tests\test_voxcpm_backend.py::test_is_model_cached_recognises_pth_weights PASSED [  8%]
+backend\tests\test_voxcpm_backend.py::test_is_model_cached_recognises_safetensors_weights PASSED [  9%]
+backend\tests\test_voxcpm_backend.py::test_is_model_cached_rejects_incomplete_downloads PASSED [  9%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_carries_the_audio_path_and_transcript PASSED [  9%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_is_served_from_the_engine_scoped_cache PASSED [ 10%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_without_cache_writes_nothing PASSED [ 10%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_requires_a_transcript PASSED [ 10%]
+backend\tests\test_voxcpm_backend.py::test_combine_voice_prompts_delegates_to_the_shared_helper PASSED [ 10%]
+backend\tests\test_voxcpm_backend.py::test_voice_prompt_key_is_the_prefixed_shared_cache_key PASSED [ 11%]
+backend\tests\test_voxcpm_backend.py::test_real_cache_returns_the_pair_and_reports_cached_on_the_second_call PASSED [ 11%]
+backend\tests\test_voxcpm_backend.py::test_real_cache_does_not_serve_another_engines_entry PASSED [ 11%]
+backend\tests\test_voxcpm_backend.py::test_vendor_never_receives_exactly_one_of_the_pair[None] PASSED [ 12%]
+backend\tests\test_voxcpm_backend.py::test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt1] PASSED [ 12%]
+backend\tests\test_voxcpm_backend.py::test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt2] PASSED [ 12%]
+backend\tests\test_voxcpm_backend.py::test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt3] PASSED [ 13%]
+backend\tests\test_voxcpm_backend.py::test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt4] PASSED [ 13%]
+backend\tests\test_voxcpm_backend.py::test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt5] PASSED [ 13%]
+backend\tests\test_voxcpm_backend.py::test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt6] PASSED [ 13%]
+backend\tests\test_voxcpm_backend.py::test_vendor_never_receives_exactly_one_of_the_pair[voice_prompt7] PASSED [ 14%]
+backend\tests\test_voxcpm_backend.py::test_a_created_prompt_reaches_the_vendor_as_a_complete_pair PASSED [ 14%]
+backend\tests\test_voxcpm_backend.py::test_combine_rate_is_the_profiles_save_rate PASSED [ 14%]
+backend\tests\test_voxcpm_backend.py::test_combine_passes_the_named_constant_not_a_literal PASSED [ 15%]
+backend\tests\test_voxcpm_backend.py::test_combine_delegate_is_the_shared_base_helper PASSED [ 15%]
+backend\tests\test_voxcpm_backend.py::test_multi_clip_prompt_is_combined_and_then_used_by_generate PASSED [ 15%]
+backend\tests\test_voxcpm_backend.py::test_same_seed_gives_identical_output PASSED [ 15%]
+backend\tests\test_voxcpm_backend.py::test_different_seed_gives_different_output PASSED [ 16%]
+backend\tests\test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine PASSED [ 16%]
+backend\tests\test_voxcpm_backend.py::test_cloned_profile_with_voxcpm_passes_profile_validation PASSED [ 16%]
+backend\tests\test_voxcpm_backend.py::test_module_has_no_top_level_heavy_import PASSED [ 17%]
+backend\tests\test_voxcpm_backend.py::test_vendor_import_is_marked_lazy PASSED [ 17%]
+backend\tests\test_voxcpm_backend.py::test_importing_and_constructing_the_backend_does_not_import_the_vendor PASSED [ 17%]
+backend\tests\test_voxcpm_backend.py::test_engine_is_registered_by_name PASSED [ 18%]
+backend\tests\test_voxcpm_backend.py::test_model_config_declares_the_data_model_values PASSED [ 18%]
+backend\tests\test_voxcpm_backend.py::test_model_config_declares_the_two_advanced_settings PASSED [ 18%]
+backend\tests\test_voxcpm_backend.py::test_backend_defaults_match_the_declared_settings PASSED [ 18%]
+backend\tests\test_voxcpm_backend.py::test_default_model_size_is_default PASSED [ 19%]
+backend\tests\test_voxcpm_backend.py::test_dispatch_returns_the_voxcpm_backend PASSED [ 19%]
+backend\tests\test_voxcpm_backend.py::test_dispatch_does_not_import_the_vendor PASSED [ 19%]
+backend\tests\test_voxcpm_backend.py::test_all_four_engine_patterns_accept_voxcpm PASSED [ 20%]
+backend\tests\test_voxcpm_backend.py::test_generation_request_accepts_the_declared_advanced_settings PASSED [ 20%]
+backend\tests\test_voxcpm_backend.py::test_cached_load_succeeds_with_the_network_blocked PASSED [ 20%]
+backend\tests\test_voxcpm_backend.py::test_cached_load_runs_inside_force_offline_if_cached PASSED [ 21%]
+backend\tests\test_voxcpm_backend.py::test_cached_load_passes_local_files_only_and_no_denoiser PASSED [ 21%]
+backend\tests\test_voxcpm_backend.py::test_offline_mode_is_restored_after_the_cached_load PASSED [ 21%]
+backend\tests\test_voxcpm_backend.py::test_uncached_load_is_not_forced_offline PASSED [ 21%]
+backend\tests\test_voxcpm_backend.py::test_pronunciation_processed_arabic_reaches_the_vendor_byte_for_byte PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_model_config_capability_fields_default_to_todays_behaviour PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_model_config_declares_the_new_fields PASSED [ 22%]
+backend\tests\test_engine_capabilities.py::test_advanced_setting_carries_contract_shape_and_is_frozen PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_there_are_existing_tts_configs_to_check PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-tts-1.7B] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-tts-0.6B] PASSED [ 23%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-custom-voice-1.7B] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[qwen-custom-voice-0.6B] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[luxtts] PASSED [ 24%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[chatterbox-tts] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[chatterbox-turbo] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[tada-1b] PASSED [ 25%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[tada-3b-ml] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[kokoro] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-msa] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-unified] PASSED [ 26%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-sau] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-uae] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-alg] PASSED [ 27%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-irq] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-egy] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_keeps_default_capabilities[habibi-mar] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-tts-1.7B] PASSED [ 28%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-tts-0.6B] PASSED [ 29%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-custom-voice-1.7B] PASSED [ 29%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-qwen-custom-voice-0.6B] PASSED [ 29%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-luxtts] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-chatterbox-tts] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-chatterbox-turbo] PASSED [ 30%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-tada-1b] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-tada-3b-ml] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-kokoro] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-msa] PASSED [ 31%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-unified] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-sau] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-uae] PASSED [ 32%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-alg] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-irq] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-egy] PASSED [ 33%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cuda-habibi-mar] PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-tts-1.7B] PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-tts-0.6B] PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-custom-voice-1.7B] PASSED [ 34%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-qwen-custom-voice-0.6B] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-luxtts] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-chatterbox-tts] PASSED [ 35%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-chatterbox-turbo] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-tada-1b] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-tada-3b-ml] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-kokoro] PASSED [ 36%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-msa] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-unified] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-sau] PASSED [ 37%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-uae] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-alg] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-irq] PASSED [ 38%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-egy] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[mps-habibi-mar] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-tts-1.7B] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-tts-0.6B] PASSED [ 39%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-custom-voice-1.7B] PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-qwen-custom-voice-0.6B] PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-luxtts] PASSED [ 40%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-chatterbox-tts] PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-chatterbox-turbo] PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-tada-1b] PASSED [ 41%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-tada-3b-ml] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-kokoro] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-msa] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-unified] PASSED [ 42%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-sau] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-uae] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-alg] PASSED [ 43%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-irq] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-egy] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[cpu-habibi-mar] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-tts-1.7B] PASSED [ 44%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-tts-0.6B] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-custom-voice-1.7B] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-qwen-custom-voice-0.6B] PASSED [ 45%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-luxtts] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-chatterbox-tts] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-chatterbox-turbo] PASSED [ 46%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-tada-1b] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-tada-3b-ml] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-kokoro] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-msa] PASSED [ 47%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-unified] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-sau] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-uae] PASSED [ 48%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-alg] PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-irq] PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-egy] PASSED [ 49%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[xpu-habibi-mar] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-tts-1.7B] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-tts-0.6B] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-custom-voice-1.7B] PASSED [ 50%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-qwen-custom-voice-0.6B] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-luxtts] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-chatterbox-tts] PASSED [ 51%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-chatterbox-turbo] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-tada-1b] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-tada-3b-ml] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-kokoro] PASSED [ 52%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-msa] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-unified] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-sau] PASSED [ 53%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-uae] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-alg] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-irq] PASSED [ 54%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-egy] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_existing_tts_config_is_always_available[directml-habibi-mar] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_empty_accelerators_is_available_with_no_reason PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_in_declared_set_is_available[cuda] PASSED [ 55%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_in_declared_set_is_available[mps] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_in_declared_set_is_available[cpu] PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_indexed_cuda_device_counts_as_cuda PASSED [ 56%]
+backend\tests\test_engine_capabilities.py::test_detected_accelerator_not_in_set_is_unavailable_with_specific_reason PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_supported_but_marginal_memory_warns_and_never_blocks PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_sufficient_memory_has_no_warning PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_unknown_memory_or_threshold_has_no_warning[None-8192] PASSED [ 57%]
+backend\tests\test_engine_capabilities.py::test_unknown_memory_or_threshold_has_no_warning[4096-None] PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_unknown_memory_or_threshold_has_no_warning[None-None] PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_unavailable_engine_carries_reason_not_warning_even_with_marginal_memory PASSED [ 58%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators0] PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators1] PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators2] PASSED [ 59%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda-accelerators3] PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators0] PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators1] PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators2] PASSED [ 60%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators3] PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators0] PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators1] PASSED [ 61%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators2] PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-mps-accelerators3] PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators0] PASSED [ 62%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators1] PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators2] PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-cpu-accelerators3] PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators0] PASSED [ 63%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators1] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators2] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-xpu-accelerators3] PASSED [ 64%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators0] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators1] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators2] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[None-None-directml-accelerators3] PASSED [ 65%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators0] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators1] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators2] PASSED [ 66%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators3] PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators0] PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators1] PASSED [ 67%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators2] PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators3] PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators0] PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators1] PASSED [ 68%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators2] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators3] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators0] PASSED [ 69%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators1] PASSED [ 70%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators2] PASSED [ 70%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators3] PASSED [ 70%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators0] PASSED [ 71%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators1] PASSED [ 71%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators2] PASSED [ 71%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators3] PASSED [ 71%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators0] PASSED [ 72%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators1] PASSED [ 72%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators2] PASSED [ 72%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators3] PASSED [ 73%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators0] PASSED [ 73%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators1] PASSED [ 73%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators2] PASSED [ 73%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators3] PASSED [ 74%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators0] PASSED [ 74%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators1] PASSED [ 74%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators2] PASSED [ 75%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators3] PASSED [ 75%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators0] PASSED [ 75%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators1] PASSED [ 76%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators2] PASSED [ 76%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators3] PASSED [ 76%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators0] PASSED [ 76%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators1] PASSED [ 77%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators2] PASSED [ 77%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators3] PASSED [ 77%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators0] PASSED [ 78%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators1] PASSED [ 78%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators2] PASSED [ 78%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators3] PASSED [ 78%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators0] PASSED [ 79%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators1] PASSED [ 79%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators2] PASSED [ 79%]
+backend\tests\test_engine_capabilities.py::test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators3] PASSED [ 80%]
+backend\tests\test_engine_capabilities.py::test_wrapper_detects_mps_and_resolves PASSED [ 80%]
+backend\tests\test_engine_capabilities.py::test_wrapper_reads_cuda_memory_for_the_warning PASSED [ 80%]
+backend\tests\test_engine_capabilities.py::test_engines_route_returns_every_tts_engine_with_every_contract_field PASSED [ 81%]
+backend\tests\test_engine_capabilities.py::test_engines_route_detects_hardware_once_per_request PASSED [ 81%]
+backend\tests\test_engine_capabilities.py::test_engines_route_existing_engines_keep_todays_behaviour PASSED [ 81%]
+backend\tests\test_engine_capabilities.py::test_engines_route_describes_each_engine_from_all_of_its_variants PASSED [ 81%]
+backend\tests\test_engine_capabilities.py::test_engines_route_display_name_is_the_engine_name PASSED [ 82%]
+backend\tests\test_engine_capabilities.py::test_engines_route_tada_languages_include_the_multilingual_variant PASSED [ 82%]
+backend\tests\test_engine_capabilities.py::test_engines_route_f5_license_is_null_when_variants_disagree PASSED [ 82%]
+backend\tests\test_engine_capabilities.py::test_engines_route_returns_the_shared_license_when_variants_agree PASSED [ 83%]
+backend\tests\test_engine_capabilities.py::test_engines_route_returns_null_license_when_synthetic_variants_disagree PASSED [ 83%]
+backend\tests\test_engine_capabilities.py::test_current_engine_variants_agree_on_default_variant_fields PASSED [ 83%]
+backend\tests\test_engine_capabilities.py::test_engine_configs_declare_the_expected_memory_threshold PASSED [ 84%]
+backend\tests\test_engine_capabilities.py::test_model_config_min_memory_mb_defaults_to_none PASSED [ 84%]
+backend\tests\test_engine_capabilities.py::test_engines_route_warns_when_memory_is_below_the_declared_threshold PASSED [ 84%]
+backend\tests\test_engine_capabilities.py::test_engines_route_has_no_warning_without_a_declared_threshold PASSED [ 84%]
+backend\tests\test_engine_capabilities.py::test_engines_route_uses_the_default_variant_memory_threshold PASSED [ 85%]
+backend\tests\test_engine_capabilities.py::test_engines_route_engine_ids_match_the_request_engine_pattern PASSED [ 85%]
+backend\tests\test_engine_capabilities.py::test_engines_route_invariants_hold_for_a_constrained_engine PASSED [ 85%]
+backend\tests\test_engine_capabilities.py::test_engines_route_passes_declared_capabilities_through PASSED [ 86%]
+backend\tests\test_engine_capabilities.py::test_engines_route_never_imports_torch PASSED [ 86%]
+backend\tests\test_engine_capabilities.py::test_existing_generation_payloads_still_validate PASSED [ 86%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-None] PASSED [ 86%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-qwen] PASSED [ 87%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-kokoro] PASSED [ 87%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[None-f5_tts] PASSED [ 87%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-None] PASSED [ 88%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-qwen] PASSED [ 88%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-kokoro] PASSED [ 88%]
+backend\tests\test_engine_capabilities.py::test_empty_advanced_settings_pass_for_every_engine[value1-f5_tts] PASSED [ 89%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[None] PASSED [ 89%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[qwen] PASSED [ 89%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[luxtts] PASSED [ 89%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[chatterbox] PASSED [ 90%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[tada] PASSED [ 90%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[kokoro] PASSED [ 90%]
+backend\tests\test_engine_capabilities.py::test_existing_engines_reject_any_advanced_setting[f5_tts] PASSED [ 91%]
+backend\tests\test_engine_capabilities.py::test_voice_description_accepts_500_characters_and_rejects_501 PASSED [ 91%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[1.0-qwen] PASSED [ 91%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[1.0-None] PASSED [ 92%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[2.5-qwen] PASSED [ 92%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[2.5-None] PASSED [ 92%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[5.0-qwen] PASSED [ 92%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[5.0-None] PASSED [ 93%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[3-qwen] PASSED [ 93%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_within_bounds_passes[3-None] PASSED [ 93%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[0.99] PASSED [ 94%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[5.01] PASSED [ 94%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[-1.0] PASSED [ 94%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[inf] PASSED [ 94%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_out_of_bounds_is_rejected[nan] PASSED [ 95%]
+backend\tests\test_engine_capabilities.py::test_undeclared_setting_is_rejected_even_when_the_engine_declares_others PASSED [ 95%]
+backend\tests\test_engine_capabilities.py::test_declared_setting_is_scoped_to_its_engine PASSED [ 95%]
+backend\tests\test_engine_capabilities.py::test_invalid_generation_body_is_a_422_through_fastapi PASSED [ 96%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[6144-cuda] PASSED [ 96%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[6144-mps] PASSED [ 96%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[6144-cpu] PASSED [ 97%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[16384-cuda] PASSED [ 97%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[16384-mps] PASSED [ 97%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[16384-cpu] PASSED [ 97%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[None-cuda] PASSED [ 98%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[None-mps] PASSED [ 98%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_available_without_warning_on_its_accelerators[None-cpu] PASSED [ 98%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_warns_but_stays_available_on_a_4gb_gpu PASSED [ 99%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_unavailable_with_a_reason_on_other_accelerators[xpu] PASSED [ 99%]
+backend\tests\test_engine_capabilities.py::test_voxcpm_is_unavailable_with_a_reason_on_other_accelerators[directml] PASSED [ 99%]
+backend\tests\test_engine_capabilities.py::test_engines_route_describes_voxcpm_from_its_declaration PASSED [100%]
+============================== warnings summary ===============================
+backend\venv\Lib\site-packages\fastapi\testclient.py:1
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+tests/test_voxcpm_backend.py::test_multi_clip_prompt_is_combined_and_then_used_by_generate
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:16: DeprecationWarning: 'aifc' is deprecated and slated for removal in Python 3.13
+    import aifc
+tests/test_voxcpm_backend.py::test_multi_clip_prompt_is_combined_and_then_used_by_generate
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:17: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+tests/test_voxcpm_backend.py::test_multi_clip_prompt_is_combined_and_then_used_by_generate
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\audioread\rawread.py:19: DeprecationWarning: 'sunau' is deprecated and slated for removal in Python 3.13
+    import sunau
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+tests/test_voxcpm_backend.py::test_voxcpm_is_a_cloning_engine
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase4\T027.xml -
+====================== 338 passed, 20 warnings in 9.62s =======================
+# exit: 0

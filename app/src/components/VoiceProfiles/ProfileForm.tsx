@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
 import { Edit2, Mic, Monitor, Music, Upload, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
@@ -38,8 +38,10 @@ import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api/client';
 import type { EffectConfig, PresetVoice, VoiceType } from '@/lib/api/types';
 import { LANGUAGE_CODES, LANGUAGE_OPTIONS, type LanguageCode } from '@/lib/constants/languages';
+import { declaredCloningEngineOptions } from '@/lib/hooks/engineCapabilityRules';
 import { useAudioPlayer } from '@/lib/hooks/useAudioPlayer';
 import { useAudioRecording } from '@/lib/hooks/useAudioRecording';
+import { useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
 import {
   useAddSample,
   useCreateProfile,
@@ -72,6 +74,9 @@ const DEFAULT_ENGINE_OPTIONS = [
   { value: 'kokoro', label: 'Kokoro 82M' },
   { value: 'f5_tts', label: 'Arabic F5 / Habibi' },
 ] as const;
+const LISTED_DEFAULT_ENGINES: ReadonlySet<string> = new Set(
+  DEFAULT_ENGINE_OPTIONS.map((option) => option.value),
+);
 
 function makeProfileSchema(t: (key: string) => string) {
   const baseProfileSchema = z.object({
@@ -290,8 +295,17 @@ export function ProfileForm() {
   const isSampleBasedProfile = isCreating
     ? voiceSource === 'clone'
     : editingProfile?.voice_type !== 'preset';
-  const availableDefaultEngines = DEFAULT_ENGINE_OPTIONS.filter(
-    (option) => !isSampleBasedProfile || !PRESET_ONLY_ENGINES.has(option.value),
+  const { data: engineCapabilities, isSuccess: engineCapabilitiesLoaded } = useEngineCapabilities();
+  // Engines not listed above are offered when the backend declares `supports_cloning`
+  // (FR-011, FR-014), labelled with the declared display name.
+  const availableDefaultEngines = useMemo<{ value: string; label: string }[]>(
+    () => [
+      ...DEFAULT_ENGINE_OPTIONS.filter(
+        (option) => !isSampleBasedProfile || !PRESET_ONLY_ENGINES.has(option.value),
+      ),
+      ...declaredCloningEngineOptions(engineCapabilities, LISTED_DEFAULT_ENGINES),
+    ],
+    [isSampleBasedProfile, engineCapabilities],
   );
 
   // Show recording errors
@@ -387,11 +401,13 @@ export function ProfileForm() {
   useEffect(() => {
     if (
       defaultEngine &&
-      !availableDefaultEngines.some((option) => option.value === defaultEngine)
+      !availableDefaultEngines.some((option) => option.value === defaultEngine) &&
+      // A saved engine that only the capability list names is unknown until it loads.
+      (LISTED_DEFAULT_ENGINES.has(defaultEngine) || engineCapabilitiesLoaded)
     ) {
       setDefaultEngine('');
     }
-  }, [availableDefaultEngines, defaultEngine]);
+  }, [availableDefaultEngines, defaultEngine, engineCapabilitiesLoaded]);
 
   useEffect(() => {
     if (!selectedPresetVoiceId) {

@@ -1,0 +1,63 @@
+# Phase 4 real cloning run (quickstart Step 4), VoxCPMBackend direct, backend/venv, CUDA, no server, nothing installed.
+# Scripts (outside the repo): <scratchpad>/phase4_realrun.py, <scratchpad>/phase4_crossproc.py; outputs under C:\Users\sabus\voxcpm-probe-out\phase4\ (prompt cache + combined WAV in ...\phase4\data\cache via config.set_data_dir).
+# Reference clip transcript from evidence/probe/11b-cuda-generate-and-design-rerun.txt (the last run that wrote cuda_plain.wav).
+# Multi-clip: clip 1 = probe cuda_plain.wav, clip 2 = this run's single-clip clone output (same target speaker, known text).
+# Speaker similarity (SC-002, 4 of 5 blind attempts) needs a human listen; not judged here.
+# tqdm progress-bar lines removed; everything else verbatim.
+
+$ cd <scratchpad> && D:/Projects/Personal/voicebox/backend/venv/Scripts/python.exe phase4_realrun.py
+# 2026-09-23T17:32:21+03:00
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+The class this function is called from is 'LlamaTokenizerFast'.
+D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cuda, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Warning: torch.compile disabled - triton is not installed
+Loaded VoxCPM2Model
+Warm up VoxCPMModel...
+# 2026-09-23T17:32:23
+torch=2.11.0+cu128 cuda_available=True device0=NVIDIA GeForce RTX 5070
+'voxcpm' in CLONING_ENGINES: True
+reference=C:\Users\sabus\voxcpm-probe-out\cuda_plain.wav sha256=16f1c4d9c4db65eaafa6108b5f716c9c3a2f15634476df81cd85472cbfe0c99a info=48000Hz 5.600s transcript='Hello, this is a short test of the VoxCPM two speech engine, running locally.'
+device=cuda cached=True
+load_s=23.48 output_rate=48000
+create_voice_prompt #1 was_cached=False (2.6 ms) prompt={'prompt_wav_path': 'C:\\Users\\sabus\\voxcpm-probe-out\\cuda_plain.wav', 'prompt_text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+create_voice_prompt #2 was_cached=True (0.8 ms) same=True
+cache files: ['voxcpm_e0d247f2e9dae7e6ad64a27d13608c80.prompt']
+single_clip_seed1234: wall_s=12.02 samples=291840 returned_sr=48000 file_sr=48000 duration_s=6.080 dtype=float32 rms=0.1452 file=C:\Users\sabus\voxcpm-probe-out\phase4\single_clip_seed1234.wav sha256=520cb51b123ec0fe3a88f06451a917d7b452385057d00cde25b7360d671d2064
+determinism_a_seed1234: wall_s=6.95 samples=291840 returned_sr=48000 file_sr=48000 duration_s=6.080 dtype=float32 rms=0.1452 file=C:\Users\sabus\voxcpm-probe-out\phase4\determinism_a_seed1234.wav sha256=520cb51b123ec0fe3a88f06451a917d7b452385057d00cde25b7360d671d2064
+determinism_b_seed1234: wall_s=7.03 samples=291840 returned_sr=48000 file_sr=48000 duration_s=6.080 dtype=float32 rms=0.1452 file=C:\Users\sabus\voxcpm-probe-out\phase4\determinism_b_seed1234.wav sha256=520cb51b123ec0fe3a88f06451a917d7b452385057d00cde25b7360d671d2064
+DETERMINISM identical_files=True {'single_clip_seed1234.wav': '520cb51b123ec0fe3a88f06451a917d7b452385057d00cde25b7360d671d2064', 'determinism_a_seed1234.wav': '520cb51b123ec0fe3a88f06451a917d7b452385057d00cde25b7360d671d2064', 'determinism_b_seed1234.wav': '520cb51b123ec0fe3a88f06451a917d7b452385057d00cde25b7360d671d2064'}
+DETERMINISM same_length=True max_abs_diff=0
+different_seed_4321: wall_s=6.88 samples=276480 returned_sr=48000 file_sr=48000 duration_s=5.760 dtype=float32 rms=0.1347 file=C:\Users\sabus\voxcpm-probe-out\phase4\different_seed_4321.wav sha256=ca06eeb799e318caa8bab775802544fa281d9443e0f0908abbc65295420bf67a
+different seed differs: True
+combine: 14.8 ms samples=280320 combined_file_sr=24000 duration_s=11.680 text='Hello, this is a short test of the VoxCPM two speech engine, running locally. The quick brown fox jumps over the lazy dog, and then it takes a well earned nap in the sun.' was_cached=False
+multi_clip_seed1234: wall_s=4.95 samples=207360 returned_sr=48000 file_sr=48000 duration_s=4.320 dtype=float32 rms=0.0908 file=C:\Users\sabus\voxcpm-probe-out\phase4\multi_clip_seed1234.wav sha256=3541d31e16800363a71b7b0b0e2f0d69741d489a127d6c13a530eb11235b6077
+peak_cuda_allocated_mb=5893 peak_cuda_reserved_mb=6466
+unloaded is_loaded=False allocated_after_mb=9
+final torch=2.11.0+cu128 cu128=True cuda=True
+# exit: 0
+
+$ cd <scratchpad> && D:/Projects/Personal/voicebox/backend/venv/Scripts/python.exe phase4_crossproc.py
+# 2026-09-23T17:33:38+03:00
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+The class this function is called from is 'LlamaTokenizerFast'.
+D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cuda, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Warning: torch.compile disabled - triton is not installed
+Loaded VoxCPM2Model
+Warm up VoxCPMModel...
+new process: create_voice_prompt was_cached=True (served from the on-disk prompt cache)
+determinism_c_seed1234_newprocess.wav sha256=520cb51b123ec0fe3a88f06451a917d7b452385057d00cde25b7360d671d2064 duration_s=6.080
+CROSS-PROCESS DETERMINISM identical_to_determinism_a=True
+torch=2.11.0+cu128 cuda=True
+# exit: 0

@@ -11,6 +11,7 @@ replaced on the backend module, following ``test_f5tts_backend.py``.
 from __future__ import annotations
 
 import ast
+import contextlib
 import importlib
 import subprocess
 import sys
@@ -519,6 +520,271 @@ async def test_combine_voice_prompts_delegates_to_the_shared_helper(
     # services/profiles.py writes the combined reference with save_audio(..., 24000);
     # combining at any other rate would mislabel the WAV and change its speed and pitch.
     assert seen["sample_rate"] == 24_000
+
+
+# ---------------------------------------------------------------------------
+# T025: voice prompt caching, pairing, multi-clip combining and seeding (US2)
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def real_prompt_cache(vb, recorder: _Recorder, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Put the real utils.cache helpers back, pointed at an empty tmp cache dir.
+
+    The recorder fixture swaps them for a dict; these tests want the real
+    memory + disk (torch.save / torch.load) round trip instead.
+    """
+    from backend import config
+    from backend.utils import cache as cache_mod
+
+    cache_dir = tmp_path / "prompt-cache"
+    cache_dir.mkdir()
+    monkeypatch.setattr(config, "get_cache_dir", lambda: cache_dir)
+    monkeypatch.setattr(cache_mod, "_memory_cache", {})
+    monkeypatch.setattr(vb, "get_cached_voice_prompt", cache_mod.get_cached_voice_prompt)
+    monkeypatch.setattr(vb, "cache_voice_prompt", cache_mod.cache_voice_prompt)
+    return cache_dir
+
+
+def _speech_like_wav(path: Path, *, seconds: float, freq: float, sample_rate: int) -> Path:
+    import soundfile as sf
+
+    t = np.arange(int(seconds * sample_rate), dtype=np.float32) / sample_rate
+    sf.write(str(path), (0.3 * np.sin(2 * np.pi * freq * t)).astype(np.float32), sample_rate)
+    return path
+
+
+@pytest.mark.asyncio
+async def test_voice_prompt_key_is_the_prefixed_shared_cache_key(
+    vb, backend, recorder: _Recorder, reference_file: Path
+) -> None:
+    from backend.utils.cache import get_cache_key
+
+    await backend.create_voice_prompt(str(reference_file), "The reference transcript.")
+
+    assert list(recorder.cache) == ["voxcpm_" + get_cache_key(str(reference_file), "The reference transcript.")]
+
+
+@pytest.mark.asyncio
+async def test_real_cache_returns_the_pair_and_reports_cached_on_the_second_call(
+    backend, real_prompt_cache: Path, reference_file: Path
+) -> None:
+    from backend.utils import cache as cache_mod
+
+    first, first_cached = await backend.create_voice_prompt(str(reference_file), "The reference transcript.")
+    second, second_cached = await backend.create_voice_prompt(str(reference_file), "The reference transcript.")
+
+    assert set(first) == {"prompt_wav_path", "prompt_text"}
+    assert first == {"prompt_wav_path": str(reference_file), "prompt_text": "The reference transcript."}
+    assert (first_cached, second_cached) == (False, True)
+    assert second == first
+
+    files = sorted(p.name for p in real_prompt_cache.glob("*.prompt"))
+    assert len(files) == 1
+    assert files[0].startswith("voxcpm_")
+
+    # A fresh process (empty memory cache) still gets the prompt from disk, as cached.
+    cache_mod._memory_cache.clear()
+    third, third_cached = await backend.create_voice_prompt(str(reference_file), "The reference transcript.")
+    assert third_cached is True
+    assert third == first
+
+
+@pytest.mark.asyncio
+async def test_real_cache_does_not_serve_another_engines_entry(
+    backend, real_prompt_cache: Path, reference_file: Path
+) -> None:
+    """An unprefixed entry for the same audio and text (another engine's) must never be reused."""
+    from backend.utils.cache import cache_voice_prompt, get_cache_key
+
+    cache_voice_prompt(get_cache_key(str(reference_file), "The reference transcript."), {"other": "engine"})
+
+    prompt, was_cached = await backend.create_voice_prompt(str(reference_file), "The reference transcript.")
+
+    assert was_cached is False
+    assert prompt == {"prompt_wav_path": str(reference_file), "prompt_text": "The reference transcript."}
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "voice_prompt",
+    [
+        None,
+        {},
+        {"prompt_wav_path": "ref.wav", "prompt_text": "Text."},
+        {"prompt_wav_path": "ref.wav"},
+        {"prompt_text": "Text."},
+        {"prompt_wav_path": "", "prompt_text": "Text."},
+        {"prompt_wav_path": "ref.wav", "prompt_text": ""},
+        {"prompt_wav_path": None, "prompt_text": "Text."},
+    ],
+)
+async def test_vendor_never_receives_exactly_one_of_the_pair(backend, recorder: _Recorder, voice_prompt) -> None:
+    with contextlib.suppress(ValueError):  # a half pair is refused before the vendor call
+        await backend.generate("Hello there.", voice_prompt)
+
+    for kwargs in recorder.generate_calls:
+        has_wav = kwargs.get("prompt_wav_path") is not None
+        has_text = kwargs.get("prompt_text") is not None
+        assert has_wav == has_text, kwargs
+
+
+@pytest.mark.asyncio
+async def test_a_created_prompt_reaches_the_vendor_as_a_complete_pair(
+    backend, recorder: _Recorder, reference_file: Path
+) -> None:
+    prompt, _ = await backend.create_voice_prompt(str(reference_file), "The reference transcript.")
+
+    await backend.generate("Something else entirely.", prompt)
+
+    kwargs = recorder.generate_calls[0]
+    assert kwargs["prompt_wav_path"] == str(reference_file)
+    assert kwargs["prompt_text"] == "The reference transcript."
+
+
+def test_combine_rate_is_the_profiles_save_rate(vb) -> None:
+    # services/profiles.py saves the combined reference with save_audio(..., 24000).
+    assert vb.COMBINE_SAMPLE_RATE == 24_000
+
+
+def test_combine_passes_the_named_constant_not_a_literal() -> None:
+    tree = ast.parse(MODULE_FILE.read_text(encoding="utf-8"))
+    method = next(
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.AsyncFunctionDef) and node.name == "combine_voice_prompts"
+    )
+    calls = [
+        node
+        for node in ast.walk(method)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "_combine_voice_prompts"
+    ]
+    assert len(calls) == 1, "combine_voice_prompts must delegate to base.combine_voice_prompts exactly once"
+    rate = {kw.arg: kw.value for kw in calls[0].keywords}.get("sample_rate")
+    assert isinstance(rate, ast.Name), "the rate must be passed by name, not as a literal"
+    assert rate.id == "COMBINE_SAMPLE_RATE"
+
+
+def test_combine_delegate_is_the_shared_base_helper(vb) -> None:
+    from backend.backends import base
+
+    assert vb._combine_voice_prompts is base.combine_voice_prompts
+
+
+@pytest.mark.asyncio
+async def test_multi_clip_prompt_is_combined_and_then_used_by_generate(
+    vb, backend, recorder: _Recorder, real_prompt_cache: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The services/profiles.py multi-clip flow, with the real shared combine helper.
+
+    combine -> save_audio(..., 24000) -> create_voice_prompt(combined) -> generate.
+    """
+    from backend.backends import base
+    from backend.utils.audio import save_audio
+
+    rates_seen: list = []
+    real_combine = base.combine_voice_prompts
+
+    async def spy_combine(audio_paths, reference_texts, *, sample_rate=None):
+        rates_seen.append(sample_rate)
+        return await real_combine(audio_paths, reference_texts, sample_rate=sample_rate)
+
+    monkeypatch.setattr(vb, "_combine_voice_prompts", spy_combine)
+
+    clip_a = _speech_like_wav(tmp_path / "a.wav", seconds=1.0, freq=220.0, sample_rate=48_000)
+    clip_b = _speech_like_wav(tmp_path / "b.wav", seconds=0.5, freq=330.0, sample_rate=16_000)
+
+    combined_audio, combined_text = await backend.combine_voice_prompts(
+        [str(clip_a), str(clip_b)], ["First clip.", "Second clip."]
+    )
+
+    assert rates_seen == [vb.COMBINE_SAMPLE_RATE]
+    assert combined_text == "First clip. Second clip."
+    # Both clips, each resampled to the combine rate: 1.0 s + 0.5 s at 24 kHz.
+    assert combined_audio.ndim == 1
+    assert abs(len(combined_audio) - int(1.5 * vb.COMBINE_SAMPLE_RATE)) <= 2
+
+    combined_path = real_prompt_cache / "combined_profile_abc.wav"
+    save_audio(combined_audio, str(combined_path), 24000)
+
+    prompt, was_cached = await backend.create_voice_prompt(str(combined_path), combined_text)
+    assert was_cached is False
+
+    await backend.generate("A new sentence in the combined voice.", prompt, seed=7)
+
+    kwargs = recorder.generate_calls[0]
+    assert kwargs["prompt_wav_path"] == str(combined_path)
+    assert kwargs["prompt_text"] == "First clip. Second clip."
+
+
+@pytest.fixture
+def rng_vendor(vb, recorder: _Recorder, monkeypatch: pytest.MonkeyPatch):
+    """Fake vendor whose output is drawn from torch's global RNG, with the real manual_seed."""
+    import torch
+
+    from backend.backends import base
+
+    fake_module = sys.modules["voxcpm"]
+
+    def generate(self, *args, **kwargs):
+        recorder.generate_calls.append(kwargs)
+        return torch.randn(16).numpy().astype(np.float32)
+
+    monkeypatch.setattr(fake_module.VoxCPM, "generate", generate)
+    # Real seeding; the CPU generator is what torch.randn above draws from.
+    monkeypatch.setattr(vb, "manual_seed", base.manual_seed)
+    monkeypatch.setattr(vb.VoxCPMBackend, "_get_device", lambda self: "cpu")
+    return torch
+
+
+@pytest.mark.asyncio
+async def test_same_seed_gives_identical_output(backend, rng_vendor, reference_file: Path) -> None:
+    prompt = _clone_prompt(reference_file)
+
+    first, _ = await backend.generate("Same text.", prompt, seed=1234)
+    rng_vendor.randn(100)  # disturb the global RNG between the two runs
+    second, _ = await backend.generate("Same text.", prompt, seed=1234)
+
+    assert first.tobytes() == second.tobytes()
+
+
+@pytest.mark.asyncio
+async def test_different_seed_gives_different_output(backend, rng_vendor, reference_file: Path) -> None:
+    prompt = _clone_prompt(reference_file)
+
+    first, _ = await backend.generate("Same text.", prompt, seed=1234)
+    second, _ = await backend.generate("Same text.", prompt, seed=4321)
+
+    assert first.tobytes() != second.tobytes()
+
+
+# ---------------------------------------------------------------------------
+# T027: voxcpm clones existing voice profiles (FR-014)
+# ---------------------------------------------------------------------------
+
+
+def test_voxcpm_is_a_cloning_engine() -> None:
+    from backend.services.profiles import CLONING_ENGINES
+
+    assert "voxcpm" in CLONING_ENGINES
+
+
+def test_cloned_profile_with_voxcpm_passes_profile_validation() -> None:
+    from types import SimpleNamespace
+
+    from backend.services.profiles import _validate_profile_fields, validate_profile_engine
+
+    assert (
+        _validate_profile_fields(
+            voice_type="cloned",
+            preset_engine=None,
+            preset_voice_id=None,
+            design_prompt=None,
+            default_engine="voxcpm",
+        )
+        is None
+    )
+    validate_profile_engine(SimpleNamespace(id="p1", voice_type="cloned"), "voxcpm")
 
 
 # ---------------------------------------------------------------------------
