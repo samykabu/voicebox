@@ -1,0 +1,135 @@
+# T003 requirements check
+# timestamp: 2026-09-23T03:23:03+03:00
+
+$ grep -n -i -E "^(numpy|huggingface[-_]hub|einops|pydantic|transformers|librosa|torch|torchaudio|inflect|wetext)\b" backend/requirements.txt
+4:pydantic>=2.5.0
+11:torch>=2.2.0
+12:transformers>=4.36.0,<=4.57.6
+14:huggingface_hub>=0.20.0
+25:transformers-stream-generator
+58:torchaudio
+66:einops
+82:librosa>=0.10.0
+84:numpy>=1.24.0,<2.0
+
+$ git show HEAD:backend/requirements.txt | grep -n -i -E "^(einops|inflect|wetext)\b"   (pre-change: expect no output)
+exit=1
+
+$ grep -n "Requires:" specs/001-voxcpm2-tts-engine/evidence/probe/06-pip-show.txt | head -1
+11:Requires: addict, argbind, datasets, einops, funasr, gradio, huggingface-hub, inflect, librosa, matplotlib, modelscope, pydantic, safetensors, simplejson, sortedcontainers, soundfile, spaces, torch, torchaudio, torchcodec, tqdm, transformers, wetext
+
+$ grep -n "missing module" specs/001-voxcpm2-tts-engine/evidence/probe/26-nodeps312-import-load-generate-loop.txt specs/001-voxcpm2-tts-engine/evidence/probe/27-nodeps312-optional-paths.txt
+specs/001-voxcpm2-tts-engine/evidence/probe/26-nodeps312-import-load-generate-loop.txt:11:>> missing module 'numpy' -> pip install numpy  (-c project-constraints)
+specs/001-voxcpm2-tts-engine/evidence/probe/26-nodeps312-import-load-generate-loop.txt:21:>> missing module 'huggingface_hub' -> pip install huggingface-hub  (-c project-constraints)
+specs/001-voxcpm2-tts-engine/evidence/probe/26-nodeps312-import-load-generate-loop.txt:50:>> missing module 'einops' -> pip install einops  (-c project-constraints)
+specs/001-voxcpm2-tts-engine/evidence/probe/26-nodeps312-import-load-generate-loop.txt:79:>> missing module 'pydantic' -> pip install pydantic  (-c project-constraints)
+specs/001-voxcpm2-tts-engine/evidence/probe/26-nodeps312-import-load-generate-loop.txt:107:>> missing module 'transformers' -> pip install transformers  (-c project-constraints)
+specs/001-voxcpm2-tts-engine/evidence/probe/26-nodeps312-import-load-generate-loop.txt:133:>> missing module 'librosa' -> pip install librosa  (-c project-constraints)
+specs/001-voxcpm2-tts-engine/evidence/probe/27-nodeps312-optional-paths.txt:22:>> missing module 'inflect' -> pip install inflect  (-c project-constraints)
+specs/001-voxcpm2-tts-engine/evidence/probe/27-nodeps312-optional-paths.txt:45:>> missing module 'wetext' -> pip install wetext  (-c project-constraints)
+
+$ git diff backend/requirements.txt
+diff --git a/backend/requirements.txt b/backend/requirements.txt
+index 2f60b4f..866aeb5 100644
+--- a/backend/requirements.txt
++++ b/backend/requirements.txt
+@@ -57,6 +57,14 @@ pyloudnorm
+ # provides the only class TADA uses: Snake1d.)
+ torchaudio
+ 
++# VoxCPM2 sub-dependencies (voxcpm itself is installed --no-deps in setup
++# because it pulls gradio>=6, datasets>=3, funasr and modelscope, none of
++# which it needs at runtime).  The dependency probe's minimal runtime set is
++# torch, torchaudio, numpy, huggingface_hub, einops, pydantic, transformers
++# and librosa; all but einops are already declared above.  inflect/wetext are
++# needed only for normalize=True, which Voicebox does not use.
++einops
++
+ # Kokoro TTS (lightweight 82M-param engine)
+ kokoro>=0.9.4
+ misaki[en,ja,zh]>=0.9.4
+
+## Decision table (voxcpm requirement per research.md R4 / probe/06; minimal set per probe.md Q11, probe/26)
+package          | voxcpm 2.0.3 requirement | existing line in backend/requirements.txt (HEAD) | action
+---------------- | ------------------------ | ------------------------------------------------- | ------
+torch            | torch>=2.5.0             | L11 torch>=2.2.0                                  | none (see note 1)
+torchaudio       | torchaudio>=2.5.0        | L58 torchaudio (unpinned)                         | none (see note 1)
+numpy            | not declared directly    | L84 (L76 at HEAD) numpy>=1.24.0,<2.0              | none; probe: voxcpm works on numpy 1.26.4 (Q5)
+huggingface-hub  | huggingface-hub          | L14 huggingface_hub>=0.20.0 (same name, PEP 503)  | none
+einops           | einops                   | absent                                            | ADD `einops` (unpinned, matches voxcpm's own unbounded requirement; probe used 0.8.2)
+pydantic         | pydantic                 | L4 pydantic>=2.5.0                                | none
+transformers     | transformers>=4.36.2     | L12 transformers>=4.36.0,<=4.57.6                 | none; compatible, probe resolved 4.57.6 (Q13a)
+librosa          | librosa                  | L82 (L74 at HEAD) librosa>=0.10.0                 | none
+inflect          | inflect                  | absent                                            | none: normalize=True only (see note 2)
+wetext           | wetext                   | absent                                            | none: normalize=True only (see note 2)
+gradio, datasets, spaces, funasr, modelscope, argbind, addict, simplejson, sortedcontainers, matplotlib, torchcodec | various | (datasets, matplotlib already present for F5-TTS; left untouched) | none: excluded per probe.md Q11 / research R4
+
+Note 1: voxcpm declares torch>=2.5.0 / torchaudio>=2.5.0, while the existing floor is torch>=2.2.0 and torchaudio is unpinned.
+  The brief forbids changing existing lines, so the floor was NOT raised. The probe showed the project install path gives
+  torch 2.11.0+cu128 (probe.md Q6), which satisfies it. Flagged for the dispatcher. Also: research.md R4 table says our pin
+  is "torch>=2.1", but the file actually says torch>=2.2.0 (doc discrepancy, not in T003's owned paths).
+Note 2: research.md R5 point 6 makes normalize=False the default (FR-008 pronunciation-dictionary path; T014/T024 assert
+  normalize=False is passed). The plan says "the 8-package minimal set"; neither plan nor tasks require normalize=True, so
+  the normalize-only packages inflect and wetext are not added.
+
+Tests/lint: T003 changes no Python and has no tests, so pytest/ruff were not run. No install or resolver dry-run was performed
+(no environment touched, per brief).
+
+================================================================
+# timestamp: 2026-09-23T05:39:09+03:00
+## User decision (2026-09-23): raise torch floor to >=2.5.0 to match voxcpm 2.0.3's declared requirement
+(Supersedes the 'torch: none (see note 1)' row and note 1 above. torchaudio deliberately left unpinned, per the user's decision.)
+
+$ git diff backend/requirements.txt
+diff --git a/backend/requirements.txt b/backend/requirements.txt
+index 2f60b4f..f99014d 100644
+--- a/backend/requirements.txt
++++ b/backend/requirements.txt
+@@ -8,7 +8,7 @@ sqlalchemy>=2.0.0
+ alembic>=1.13.0
+ 
+ # ML models
+-torch>=2.2.0
++torch>=2.5.0
+ transformers>=4.36.0,<=4.57.6
+ accelerate>=0.26.0
+ huggingface_hub>=0.20.0
+@@ -57,6 +57,14 @@ pyloudnorm
+ # provides the only class TADA uses: Snake1d.)
+ torchaudio
+ 
++# VoxCPM2 sub-dependencies (voxcpm itself is installed --no-deps in setup
++# because it pulls gradio>=6, datasets>=3, funasr and modelscope, none of
++# which it needs at runtime).  The dependency probe's minimal runtime set is
++# torch, torchaudio, numpy, huggingface_hub, einops, pydantic, transformers
++# and librosa; all but einops are already declared above.  inflect/wetext are
++# needed only for normalize=True, which Voicebox does not use.
++einops
++
+ # Kokoro TTS (lightweight 82M-param engine)
+ kokoro>=0.9.4
+ misaki[en,ja,zh]>=0.9.4
+
+$ grep -n "^torch" backend/requirements.txt
+11:torch>=2.5.0
+27:torchdiffeq
+58:torchaudio
+
+Note: the probe's cu128 torch was 2.11.0+cu128 (probe.md Q6, probe/21, probe/25), which satisfies torch>=2.5.0.
+
+## Other torch declarations in the repo (read-only check, nothing edited)
+$ grep -rn -i -E "torch(audio)?[\"']?\s*(==|>=|<=|~=|<|>)[0-9]" .github scripts docker Dockerfile* backend/*.txt backend/*.toml pyproject.toml justfile tauri
+docker/cuda-constraints.txt:3:torch==2.8.0
+docker/cuda-constraints.txt:4:torchaudio==2.8.0
+backend/requirements-rocm.txt:2:torch==2.9.1+rocm7.2.1
+backend/requirements-rocm.txt:3:torchaudio==2.9.1+rocm7.2.1
+backend/requirements.txt:11:torch>=2.5.0
+backend/requirements.txt:19:ema-pytorch>=0.5.2
+backend/requirements.txt:42:# --no-deps in the setup script because it pins numpy<1.26 / torch==2.6
+backend/requirements.txt:54:# --no-deps in the setup script because it pins torch>=2.7,<2.8.
+justfile:67:    # Chatterbox pins numpy<1.26 / torch==2.6 which break on Python 3.12+
+justfile:69:    # HumeAI TADA pins torch>=2.7,<2.8 which conflicts with our torch>=2.1
+
+Assessment: docker/cuda-constraints.txt torch==2.8.0 and backend/requirements-rocm.txt torch==2.9.1+rocm7.2.1 both satisfy >=2.5.0; no conflict.
+backend/requirements-mlx.txt has no torch pin. The torch installs in .github/workflows/release.yml (L124 and L346) and justfile (L63, L110, L113) are unpinned; they get the index's latest build.
+Stale comment only: justfile L69 says 'conflicts with our torch>=2.1'. That is a comment, not a constraint. justfile is not T003's file.

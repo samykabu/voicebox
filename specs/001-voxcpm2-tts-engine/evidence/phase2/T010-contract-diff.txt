@@ -1,0 +1,623 @@
+# T010 contract diff (public surface for the Principle V / Human Checkpoint 2 review)
+# timestamp: 2026-09-23T00:33:51Z
+# cwd: /d/Projects/Personal/voicebox
+# Note: backend/models.py also carries the T007 '|voxcpm' change in the four engine patterns (already reviewed).
+
+$ git diff backend/models.py backend/routes/models.py
+diff --git a/backend/models.py b/backend/models.py
+index eef08a2..1bb9deb 100644
+--- a/backend/models.py
++++ b/backend/models.py
+@@ -2,7 +2,7 @@
+ Pydantic models for request/response validation.
+ """
+ 
+-from pydantic import BaseModel, Field, StringConstraints
++from pydantic import BaseModel, Field, StringConstraints, model_validator
+ from typing_extensions import Annotated
+ from typing import Optional, List
+ from datetime import datetime
+@@ -89,7 +89,7 @@ class GenerationRequest(BaseModel):
+         pattern="^(1\\.7B|0\\.6B|1B|3B|habibi-(unified|msa|sau|uae|alg|irq|egy|mar))$",
+     )
+     instruct: Optional[str] = Field(None, max_length=500)
+-    engine: Optional[str] = Field(default="qwen", pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$")
++    engine: Optional[str] = Field(default="qwen", pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$")
+     personality: bool = Field(
+         default=False,
+         description="When true and the profile has a personality prompt, the input text is rewritten in-character before TTS.",
+@@ -104,6 +104,42 @@ class GenerationRequest(BaseModel):
+     effects_chain: Optional[List["EffectConfig"]] = Field(
+         None, description="Effects chain to apply after generation (overrides profile default)"
+     )
++    voice_description: str | None = Field(
++        None,
++        max_length=500,
++        description="Written voice description for engines that support voice design. Never sent as instruct.",
++    )
++    advanced_settings: dict[str, float] | None = Field(
++        None,
++        description="Advanced generation settings by name. Only names the engine declares, within their bounds.",
++    )
++
++    @model_validator(mode="after")
++    def _check_advanced_settings(self) -> "GenerationRequest":
++        """Reject advanced settings the engine does not declare, or values outside their bounds (422)."""
++        if not self.advanced_settings:
++            return self
++
++        # lazy: avoid circular import (models.py must not import the backends package at module scope)
++        from .backends import get_default_model_size, get_tts_model_configs
++
++        engine = self.engine or "qwen"
++        default_size = get_default_model_size(engine)
++        config = next(
++            (c for c in get_tts_model_configs() if c.engine == engine and c.model_size == default_size),
++            None,
++        )
++        declared = {s.name: s for s in config.advanced_settings} if config else {}
++
++        for name, value in self.advanced_settings.items():
++            setting = declared.get(name)
++            if setting is None:
++                raise ValueError(f"Engine '{engine}' does not declare an advanced setting named '{name}'")
++            if not setting.min <= value <= setting.max:
++                raise ValueError(
++                    f"Advanced setting '{name}' must be between {setting.min} and {setting.max} for engine '{engine}'"
++                )
++        return self
+ 
+ 
+ class GenerationResponse(BaseModel):
+@@ -410,7 +446,7 @@ class MCPClientBindingResponse(BaseModel):
+     profile_id: Optional[str] = None
+     default_engine: Optional[str] = Field(
+         None,
+-        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$",
++        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$",
+     )
+     default_personality: bool = False
+     last_seen_at: Optional[datetime] = None
+@@ -429,7 +465,7 @@ class MCPClientBindingUpsert(BaseModel):
+     profile_id: Optional[str] = None
+     default_engine: Optional[str] = Field(
+         None,
+-        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$",
++        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$",
+     )
+     default_personality: bool = False
+ 
+@@ -448,7 +484,7 @@ class SpeakRequest(BaseModel):
+     )
+     engine: Optional[str] = Field(
+         None,
+-        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$",
++        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$",
+     )
+     personality: Optional[bool] = Field(
+         None,
+@@ -580,6 +616,45 @@ class ModelStatusListResponse(BaseModel):
+     models: List[ModelStatus]
+ 
+ 
++class EngineAdvancedSettingResponse(BaseModel):
++    """An advanced generation setting an engine declares (FR-010)."""
++
++    name: str
++    label: str
++    default: float
++    min: float
++    max: float
++
++
++class EngineCapabilityResponse(BaseModel):
++    """One TTS engine's capabilities and whether this machine can run it (FR-004).
++
++    See specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md.
++    """
++
++    engine: str
++    display_name: str
++    available: bool
++    reason: str | None = Field(..., description="Non-null if and only if available is false.")
++    warning: str | None = Field(..., description="Advisory only; never blocks.")
++    supported_accelerators: list[str] = Field(..., description="Empty means unconstrained.")
++    detected_accelerator: str
++    languages: list[str]
++    supports_cloning: bool
++    supports_voice_design: bool
++    requires_download_confirmation: bool
++    advanced_settings: list[EngineAdvancedSettingResponse]
++    size_mb: int
++    license_id: str | None
++    commercial_use: bool | None
++
++
++class EngineCapabilitiesResponse(BaseModel):
++    """Response model for GET /models/engines."""
++
++    engines: list[EngineCapabilityResponse]
++
++
+ class ModelDownloadRequest(BaseModel):
+     """Request model for triggering model download."""
+ 
+diff --git a/backend/routes/models.py b/backend/routes/models.py
+index a691bff..2f7cade 100644
+--- a/backend/routes/models.py
++++ b/backend/routes/models.py
+@@ -400,6 +400,57 @@ async def get_model_status():
+     return models.ModelStatusListResponse(models=statuses)
+ 
+ 
++@router.get("/models/engines", response_model=models.EngineCapabilitiesResponse)
++async def get_engine_capabilities():
++    """Report each TTS engine's capabilities and whether this machine can run it.
++
++    One entry per engine, described by its default-size config. Hardware is detected once
++    per request. Never loads a model, starts a download or imports torch at module scope
++    (contracts/engine-capabilities.md, invariant 4).
++    """
++    from ..backends import TTS_ENGINES, get_default_model_size, get_tts_model_configs
++    from ..backends.base import detect_accelerator_and_memory, resolve_engine_availability
++    from ..services.profiles import CLONING_ENGINES  # lazy: services.profiles pulls in torch
++
++    accelerator, memory_mb = detect_accelerator_and_memory()
++    configs = get_tts_model_configs()
++
++    engines = []
++    for engine in TTS_ENGINES:
++        default_size = get_default_model_size(engine)
++        config = next((c for c in configs if c.engine == engine and c.model_size == default_size), None)
++        if config is None:
++            continue
++        # No ModelConfig field declares a memory threshold yet, so no memory warning is produced.
++        availability = resolve_engine_availability(config, accelerator, memory_mb=memory_mb, min_memory_mb=None)
++        engines.append(
++            models.EngineCapabilityResponse(
++                engine=engine,
++                display_name=config.display_name,
++                available=availability.available,
++                reason=availability.reason,
++                warning=availability.warning,
++                supported_accelerators=availability.supported_accelerators,
++                detected_accelerator=availability.detected_accelerator,
++                languages=list(config.languages),
++                supports_cloning=engine in CLONING_ENGINES,
++                supports_voice_design=config.supports_voice_design,
++                requires_download_confirmation=config.requires_download_confirmation,
++                advanced_settings=[
++                    models.EngineAdvancedSettingResponse(
++                        name=s.name, label=s.label, default=s.default, min=s.min, max=s.max
++                    )
++                    for s in config.advanced_settings
++                ],
++                size_mb=config.size_mb,
++                license_id=config.license_id,
++                commercial_use=config.commercial_use,
++            )
++        )
++
++    return models.EngineCapabilitiesResponse(engines=engines)
++
++
+ @router.post("/models/download")
+ async def trigger_model_download(request: models.ModelDownloadRequest):
+     """Trigger download of a specific model."""
+
+$ /c/Users/sabus/voicebox-testenv/Scripts/python.exe <scratchpad>/schema_dump.py   (mounts only backend.routes.models.router on a fresh FastAPI app, prints app.openapi() fragments and GenerationRequest.model_json_schema())
+# script:
+#   import json
+#   import sys
+#   from types import SimpleNamespace
+#   
+#   from fastapi import FastAPI
+#   
+#   sys.modules.setdefault("backend.services.profiles", SimpleNamespace(CLONING_ENGINES=set()))  # openapi() never runs the handler
+#   import backend.routes.models as routes_mod  # noqa: E402
+#   from backend import models  # noqa: E402
+#   
+#   app = FastAPI()
+#   app.include_router(routes_mod.router)
+#   spec = app.openapi()
+#   print("=== OpenAPI: paths['/models/engines'] ===")
+#   print(json.dumps(spec["paths"]["/models/engines"], indent=2))
+#   print()
+#   names = ["EngineCapabilitiesResponse", "EngineCapabilityResponse", "EngineAdvancedSettingResponse"]
+#   print("=== OpenAPI: components.schemas for " + ", ".join(names) + " ===")
+#   print(json.dumps({n: spec["components"]["schemas"][n] for n in names}, indent=2))
+#   print()
+#   print("=== models.GenerationRequest.model_json_schema() ===")
+#   print(json.dumps(models.GenerationRequest.model_json_schema(), indent=2))
+
+Traceback (most recent call last):
+  File "C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\schema_dump.py", line 8, in <module>
+    import backend.routes.models as routes_mod  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'backend'
+# exit code: 1
+# Attempt 1 above failed: the script lives outside the repo, so the repo root was not on sys.path. Attempt 2 sets PYTHONPATH to the repo root.
+
+$ PYTHONPATH=. /c/Users/sabus/voicebox-testenv/Scripts/python.exe <scratchpad>/schema_dump.py
+# timestamp: 2026-09-23T00:34:05Z
+=== OpenAPI: paths['/models/engines'] ===
+{
+  "get": {
+    "summary": "Get Engine Capabilities",
+    "description": "Report each TTS engine's capabilities and whether this machine can run it.\n\nOne entry per engine, described by its default-size config. Hardware is detected once\nper request. Never loads a model, starts a download or imports torch at module scope\n(contracts/engine-capabilities.md, invariant 4).",
+    "operationId": "get_engine_capabilities_models_engines_get",
+    "responses": {
+      "200": {
+        "description": "Successful Response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/EngineCapabilitiesResponse"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+=== OpenAPI: components.schemas for EngineCapabilitiesResponse, EngineCapabilityResponse, EngineAdvancedSettingResponse ===
+{
+  "EngineCapabilitiesResponse": {
+    "properties": {
+      "engines": {
+        "items": {
+          "$ref": "#/components/schemas/EngineCapabilityResponse"
+        },
+        "type": "array",
+        "title": "Engines"
+      }
+    },
+    "type": "object",
+    "required": [
+      "engines"
+    ],
+    "title": "EngineCapabilitiesResponse",
+    "description": "Response model for GET /models/engines."
+  },
+  "EngineCapabilityResponse": {
+    "properties": {
+      "engine": {
+        "type": "string",
+        "title": "Engine"
+      },
+      "display_name": {
+        "type": "string",
+        "title": "Display Name"
+      },
+      "available": {
+        "type": "boolean",
+        "title": "Available"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Reason",
+        "description": "Non-null if and only if available is false."
+      },
+      "warning": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Warning",
+        "description": "Advisory only; never blocks."
+      },
+      "supported_accelerators": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Supported Accelerators",
+        "description": "Empty means unconstrained."
+      },
+      "detected_accelerator": {
+        "type": "string",
+        "title": "Detected Accelerator"
+      },
+      "languages": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "title": "Languages"
+      },
+      "supports_cloning": {
+        "type": "boolean",
+        "title": "Supports Cloning"
+      },
+      "supports_voice_design": {
+        "type": "boolean",
+        "title": "Supports Voice Design"
+      },
+      "requires_download_confirmation": {
+        "type": "boolean",
+        "title": "Requires Download Confirmation"
+      },
+      "advanced_settings": {
+        "items": {
+          "$ref": "#/components/schemas/EngineAdvancedSettingResponse"
+        },
+        "type": "array",
+        "title": "Advanced Settings"
+      },
+      "size_mb": {
+        "type": "integer",
+        "title": "Size Mb"
+      },
+      "license_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "License Id"
+      },
+      "commercial_use": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Commercial Use"
+      }
+    },
+    "type": "object",
+    "required": [
+      "engine",
+      "display_name",
+      "available",
+      "reason",
+      "warning",
+      "supported_accelerators",
+      "detected_accelerator",
+      "languages",
+      "supports_cloning",
+      "supports_voice_design",
+      "requires_download_confirmation",
+      "advanced_settings",
+      "size_mb",
+      "license_id",
+      "commercial_use"
+    ],
+    "title": "EngineCapabilityResponse",
+    "description": "One TTS engine's capabilities and whether this machine can run it (FR-004).\n\nSee specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md."
+  },
+  "EngineAdvancedSettingResponse": {
+    "properties": {
+      "name": {
+        "type": "string",
+        "title": "Name"
+      },
+      "label": {
+        "type": "string",
+        "title": "Label"
+      },
+      "default": {
+        "type": "number",
+        "title": "Default"
+      },
+      "min": {
+        "type": "number",
+        "title": "Min"
+      },
+      "max": {
+        "type": "number",
+        "title": "Max"
+      }
+    },
+    "type": "object",
+    "required": [
+      "name",
+      "label",
+      "default",
+      "min",
+      "max"
+    ],
+    "title": "EngineAdvancedSettingResponse",
+    "description": "An advanced generation setting an engine declares (FR-010)."
+  }
+}
+
+=== models.GenerationRequest.model_json_schema() ===
+{
+  "$defs": {
+    "EffectConfig": {
+      "description": "A single effect in an effects chain.",
+      "properties": {
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "params": {
+          "additionalProperties": true,
+          "title": "Params",
+          "type": "object"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "EffectConfig",
+      "type": "object"
+    }
+  },
+  "description": "Request model for voice generation.",
+  "properties": {
+    "profile_id": {
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "text": {
+      "maxLength": 50000,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+    },
+    "language": {
+      "default": "en",
+      "pattern": "^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$",
+      "title": "Language",
+      "type": "string"
+    },
+    "seed": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seed"
+    },
+    "model_size": {
+      "anyOf": [
+        {
+          "pattern": "^(1\\.7B|0\\.6B|1B|3B|habibi-(unified|msa|sau|uae|alg|irq|egy|mar))$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model Size"
+    },
+    "instruct": {
+      "anyOf": [
+        {
+          "maxLength": 500,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Instruct"
+    },
+    "engine": {
+      "anyOf": [
+        {
+          "pattern": "^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "qwen",
+      "title": "Engine"
+    },
+    "personality": {
+      "default": false,
+      "description": "When true and the profile has a personality prompt, the input text is rewritten in-character before TTS.",
+      "title": "Personality",
+      "type": "boolean"
+    },
+    "max_chunk_chars": {
+      "default": 800,
+      "description": "Max characters per chunk for long text splitting",
+      "maximum": 5000,
+      "minimum": 100,
+      "title": "Max Chunk Chars",
+      "type": "integer"
+    },
+    "crossfade_ms": {
+      "default": 50,
+      "description": "Crossfade duration in ms between chunks (0 for hard cut)",
+      "maximum": 500,
+      "minimum": 0,
+      "title": "Crossfade Ms",
+      "type": "integer"
+    },
+    "normalize": {
+      "default": true,
+      "description": "Normalize output audio volume",
+      "title": "Normalize",
+      "type": "boolean"
+    },
+    "effects_chain": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/EffectConfig"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Effects chain to apply after generation (overrides profile default)",
+      "title": "Effects Chain"
+    },
+    "voice_description": {
+      "anyOf": [
+        {
+          "maxLength": 500,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Written voice description for engines that support voice design. Never sent as instruct.",
+      "title": "Voice Description"
+    },
+    "advanced_settings": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Advanced generation settings by name. Only names the engine declares, within their bounds.",
+      "title": "Advanced Settings"
+    }
+  },
+  "required": [
+    "profile_id",
+    "text"
+  ],
+  "title": "GenerationRequest",
+  "type": "object"
+}
+# exit code: 0

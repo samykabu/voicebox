@@ -45,31 +45,31 @@ beneath it.
 
 ### Install and packaging
 
-- [ ] T003 [P] [SUBAGENT] Add VoxCPM2 runtime dependencies to backend/requirements.txt
+- [x] T003 [P] [SUBAGENT] Add VoxCPM2 runtime dependencies to backend/requirements.txt
   - Add the minimal required transitive dependencies from T001 to `backend/requirements.txt`: the probe found only numpy, huggingface-hub, einops, pydantic, transformers and librosa beyond torch/torchaudio (evidence/probe.md Q11); keep the existing pins. Exclude `gradio`, `datasets`, `spaces` and anything else the probe showed is unused at runtime (research R4). Must not disturb `numpy>=1.24.0,<2.0` or `transformers<=4.57.6`. **Covers**: FR-019.
-- [ ] T004 [P] [SUBAGENT] Install voxcpm with --no-deps on the Unix setup path in justfile
+- [x] T004 [P] [SUBAGENT] Install voxcpm with --no-deps on the Unix setup path in justfile
   - Add `pip install --no-deps 'voxcpm==2.0.3'` to the Unix setup path in `justfile` after the `habibi-tts` line (`justfile:67-74`), with a one-line comment on why `--no-deps`, matching the existing entries. **Covers**: FR-019.
-- [ ] T005 [P] [SUBAGENT] Install voxcpm with --no-deps on the Windows setup path in justfile
+- [x] T005 [P] [SUBAGENT] Install voxcpm with --no-deps on the Windows setup path in justfile
   - Add the same install to the Windows setup path in `justfile` (`justfile:120-123`). Do **not** change the interpreter selection at `justfile:21` — research R1 showed there is no Python ceiling. **Covers**: FR-019.
 
 ### Engine validation
 
-- [ ] T006 [TDD] Test that engine validation accepts voxcpm in backend/tests/test_engine_patterns.py
+- [x] T006 [TDD] Test that engine validation accepts voxcpm in backend/tests/test_engine_patterns.py
   - Write `backend/tests/test_engine_patterns.py` asserting `voxcpm` is accepted and an unknown engine is rejected by every engine-validated field in `backend/models.py` (the four patterns at lines 92, 413, 432 and 451). Watch it fail. **Covers**: FR-001.
-- [ ] T007 Add voxcpm to the four engine patterns in backend/models.py
+- [x] T007 Add voxcpm to the four engine patterns in backend/models.py
   - Add `voxcpm` to all four regex alternations in `backend/models.py` (lines 92, 413, 432, 451). T006 passes. **Covers**: FR-001.
 
 ### Capability channel (FR-002, FR-004, FR-024)
 
-- [ ] T008 [TDD] Test engine availability resolution in backend/tests/test_engine_capabilities.py
+- [x] T008 [TDD] Test engine availability resolution in backend/tests/test_engine_capabilities.py
   - Write `backend/tests/test_engine_capabilities.py` covering availability resolution per [data-model.md](./data-model.md) §2 and the invariants in [contracts/engine-capabilities.md](./contracts/engine-capabilities.md): empty `accelerators` → available with no reason; detected accelerator in the declared set → available; not in the set → unavailable **with** a reason; supported but marginal memory → available with a warning, never blocked (C1Q4); `available == false` always implies `reason != null`. Use injected device and memory values — no torch. Watch it fail. **Covers**: FR-002, FR-003, FR-004.
-- [ ] T009 Add capability fields to ModelConfig and the availability resolver in backends/base.py
+- [x] T009 Add capability fields to ModelConfig and the availability resolver in backends/base.py
   - Add `accelerators: tuple[str, ...] = ()`, `supports_voice_design: bool = False`, `requires_download_confirmation: bool = False` and `advanced_settings: tuple[AdvancedSetting, ...] = ()` to `ModelConfig` in `backend/backends/__init__.py` per [data-model.md](./data-model.md) §1, and implement the availability resolver in `backend/backends/base.py` with torch imported lazily (`# lazy: heavy import`). Every default preserves today's behaviour, so all seven existing engines are unchanged. T008 passes. **Covers**: FR-002, FR-004, FR-024.
-- [ ] T010 [REVIEW] Add GET /models/engines and the optional GenerationRequest fields
+- [x] T010 [REVIEW] Add GET /models/engines and the optional GenerationRequest fields
   - Add the Pydantic response models to `backend/models.py` and `GET /models/engines` to `backend/routes/models.py`, per [contracts/engine-capabilities.md](./contracts/engine-capabilities.md). Add the two optional `GenerationRequest` fields from the contract, `voice_description` and `advanced_settings`, both defaulting to `None`, with 422 validation against the engine's declared bounds. Extend `test_engine_capabilities.py` with a route test and a validation test. The endpoint must never load a model or trigger a download. **Review the contract shape before T011** — it is a public surface under Principle V and plan.md Human Checkpoint 2. **Covers**: FR-004, FR-024.
 - [ ] T011 Regenerate the TypeScript client with bun run generate:api
   - Regenerate the TypeScript client with `bun run generate:api`. Never hand-edit the generated directories `app/src/lib/api/models/`, `app/src/lib/api/services/` or `app/src/lib/api/core/`. (Note: `app/src/lib/api/types.ts` is hand-written — see Notes.) **Covers**: FR-024.
-- [ ] T012 [P] Document GET /models/engines in backend/README.md
+- [x] T012 [P] Document GET /models/engines in backend/README.md
   - Document `GET /models/engines` in `backend/README.md` (Principle V). **Covers**: FR-024.
 - [ ] T013 [P] Add the useEngineCapabilities hook in app/src/lib/hooks/useEngineCapabilities.ts
   - Create `app/src/lib/hooks/useEngineCapabilities.ts`, a query hook over the regenerated client, following the `cuda-status` query pattern in `app/src/components/ServerSettings/GpuAcceleration.tsx`. **Covers**: FR-004, FR-024.

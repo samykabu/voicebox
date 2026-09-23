@@ -25,3 +25,63 @@ Inspect git status before continuing; do not discard uncommitted files.
 - T001: worker `acfb9a64552ba129d` (general-purpose, spawned by the orchestrator). The orchestrator reviewed it and marked it done. Evidence: `evidence/probe.md` and `evidence/probe/` (30 files, failed attempts kept).
 - T001 scope deviation (not undone; the user decides): the worker ran `uv python install 3.12`, which linked CPython 3.12.14 under `%APPDATA%\uv\python` and added the shim `C:\Users\sabus\.local\bin\python3.12.exe`. The interpreter was probably already in uv's store. The scratch venvs `C:\Users\sabus\voxcpm-probe`, `voxcpm-nodeps` and `voxcpm-nodeps312`, the `C:\Users\sabus\voxcpm-probe-out` folder and the ~4.96 GB model in the default HF cache remain outside the repo.
 - T002 ([HUMAN-REVIEW]) was decided by the user: pin voxcpm==2.0.3; effort re-scored from 13 to 8; User Story 3 moved to P2 and FR-023's exception withdrawn. Recorded in `evidence/probe.md` under "T002 decisions".
+- Phase 1 commit: `08417b726c234aa342654959f097d7be0107e66d` on `feature/001-voxcpm2-tts-engine` (76 files; staged only `specs/001-voxcpm2-tts-engine/`, `.specify/scope/` and `.specify/project-sync-state.json`). Pushed with `git push -u origin feature/001-voxcpm2-tts-engine` (new remote branch, exit 0). `git ls-remote` returns the same SHA. The Sanduq upgrade changes under `.agents/`, `.claude/` and `.specify/` were left unstaged.
+- Phase 2, batch 1 (2026-09-23), four workers in parallel:
+  - T003 → `a4e708c2f155bbf59`, owns `backend/requirements.txt`.
+  - T004 and T005 → `a8ac983afa0279999`, owns `justfile`. Both tasks go to one worker because they write the same file. The pin is `voxcpm==2.0.3 --no-deps`, and `justfile:21` is not touched.
+  - T006 then T007 → `a65a7c2b10714ad2f`, owns the new `backend/tests/test_engine_patterns.py` and the four engine regexes in `backend/models.py`.
+  - T008 then T009 → `a4f81f269334221b3`, owns the new `backend/tests/test_engine_capabilities.py`, the ModelConfig fields in `backend/backends/__init__.py`, and the resolver in `backend/backends/base.py`.
+  - Shared resources: the scratch test env `C:\Users\sabus\voicebox-testenv` (read-only for workers) and `evidence/phase2/` (each task writes its own filenames).
+  - T010 starts only after T007 and T009 are integrated, as an explicit handover of `backend/models.py` and `test_engine_capabilities.py`. T010 is a [REVIEW] gate: stop before T011.
+- Test environment: `backend/venv` does not exist and `just` is not installed. Phase 2 tests run in a scratch venv outside the repo (py3.12.14 via uv, with fastapi, pydantic, numpy<2, librosa, pytest and ruff, but no torch). The baseline is in `evidence/phase2/00-baseline-pytest.txt`. `just test` has NOT been run.
+- Phase 2, batch 1 accepted by the orchestrator after its own re-runs:
+  - T003, T004 and T005 accepted on diff review.
+  - T006 and T007: TDD red (4 failed), then green (57 passed).
+  - T008 and T009: TDD red (ImportError), then green (198 passed).
+  - ruff: no new findings.
+- Open items for the user from T003:
+  - `torch>=2.2.0` in requirements.txt is below voxcpm's declared `>=2.5.0`. It was left unchanged per the no-pin-change rule.
+  - research.md R4 says the pin is `torch>=2.1`, but the actual pin is `>=2.2.0`.
+- Phase 2, batch 2: T010 → `a65a7c2b10714ad2f`. This is the same owner as `backend/models.py`, and `test_engine_capabilities.py` was handed over from `a4f81f269334221b3` as append-only section 5. T010 is a [REVIEW] gate: stop before T011, T012 and T013.
+- T010 implemented by `a65a7c2b10714ad2f` and verified by the orchestrator:
+  - Red run: 41 failed.
+  - Green run: 239 passed.
+  - Whole suite in the scratch env: 15 failed, 415 passed, 5 skipped, 10 errors. The failure set is the same as the baseline.
+  - ruff: no new findings.
+- T010 is marked `blocked` in the report while it awaits the human contract review. Phase 2 is paused at this gate: T011, T012 and T013 have not started, and nothing is committed.
+- Contract diff: `evidence/phase2/T010-contract-diff.txt`.
+- Open review questions:
+  - Should each engine be reported from its default-size config? That picks tada-1b (en only) and habibi-msa (Apache-2.0).
+  - `display_name` is the variant name, not the engine name.
+  - An engine with no config is skipped silently.
+  - No memory-threshold field exists yet, so no warning is ever produced.
+  - The route test stubs out `backend.services.profiles`, because it imports torch in this env.
+
+## Dispatcher notes
+
+- 2026-09-23 T010 code review (user): the contract was approved with two fixes. First, engine-level
+  aggregation across variants: languages are combined, licence and commercial use are null when the
+  variants disagree, and the display name comes from TTS_ENGINES. Second, `min_memory_mb` on
+  ModelConfig so the C1Q4 warning can fire. The user also raised the torch floor to `>=2.5.0`.
+- Upstream artifacts amended during Execute to match: contracts/engine-capabilities.md
+  (invariants 6 and 7, plus field rules), data-model.md (`min_memory_mb`), and research.md (R4 torch
+  pin). **Before completing the Execute claim, recover it and revalidate Plan → Tasks-to-Issues**,
+  because the runtime rejects upstream drift at completion. The change is batched, so run the
+  revalidation once at the end of Execute rather than per edit.
+- T010 fix round (T010b), done by `a65a7c2b10714ad2f`. That worker took over the single `ModelConfig.min_memory_mb` field from `a4f81f269334221b3` by explicit handover.
+  - `/models/engines` now aggregates every variant of an engine:
+    - `display_name` comes from `TTS_ENGINES`.
+    - `languages` is the union of all variants.
+    - `license_id` and `commercial_use` are the value all variants share, or null if they differ.
+    - Size, capability flags and `min_memory_mb` come from the default-size variant.
+  - The route passes `min_memory_mb` through.
+  - Results, verified by the orchestrator:
+    - JUnit red run: tests=250, failures=12.
+    - Green run: tests=307, failures=0.
+    - Whole suite: tests=456, failures=15, errors=10, skipped=5. These are the same IDs that fail in the baseline.
+- Torch floor raised to `torch>=2.5.0` in `backend/requirements.txt` (user decision; T003 follow-up by `a4e708c2f155bbf59`).
+- T012 (README) done by `acdf87d17c5c83c4d`.
+- T011 is blocked. `bun run generate:api` fails with `/usr/bin/bash: line 1: bun: command not found`, exit 127. The backend is not running (curl returns 000), and `backend/venv` does not exist. The generated client was not hand-edited. Evidence: `evidence/phase2/T011-generate-api-blocked.txt`.
+- T013 is blocked on T011, because there is no regenerated client to build the hook on.
+- Nothing is committed yet. The dispatcher confirms the Phase 2 commit.
+- The user approved a partial Phase 2 commit. T011 and T013 stay blocked. Setting up the environment for T011 (bun, backend venv, running backend) is assigned to the dispatcher.

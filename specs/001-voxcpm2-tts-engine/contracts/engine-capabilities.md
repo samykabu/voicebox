@@ -68,20 +68,20 @@ Read-only. No parameters. No authentication beyond whatever the backend already 
 | Field | Type | Rules |
 | --- | --- | --- |
 | `engine` | `string` | Stable identifier. Matches the engine regex in `backend/models.py`. |
-| `display_name` | `string` | Human-facing name. |
+| `display_name` | `string` | The engine's name from `TTS_ENGINES` (for example "TADA"), not a model variant's name. |
 | `available` | `boolean` | False only when the detected accelerator is not in `supported_accelerators`. Memory is never a hard gate (C1Q4). |
 | `reason` | `string \| null` | Non-null **if and only if** `available` is false. A specific, user-facing sentence — FR-003 forbids a bare disabled control with no explanation. |
 | `warning` | `string \| null` | Non-null when the engine is usable but the machine looks marginal. Advisory only; never blocks. |
 | `supported_accelerators` | `string[]` | Echo of the declaration. An **empty array means unconstrained**, which is how all seven existing engines report, preserving today's behaviour exactly. |
 | `detected_accelerator` | `string` | What this machine actually resolved to via `get_torch_device`. Lets the UI explain the mismatch. |
-| `languages` | `string[]` | Replaces the app's hardcoded per-engine map for this engine (FR-007). |
+| `languages` | `string[]` | The union of languages across **all** of the engine's model variants, in a stable order. Replaces the app's hardcoded per-engine map for this engine (FR-007). |
 | `supports_cloning` | `boolean` | Derived from `CLONING_ENGINES`. |
 | `supports_voice_design` | `boolean` | True only for engines accepting a written voice description. Drives whether the FR-015 input is shown at all. |
 | `requires_download_confirmation` | `boolean` | When true, the app asks the user to confirm before downloading (FR-018, C1Q7). False for every existing engine. |
 | `advanced_settings` | `object[]` | Settings the app may show as advanced controls, each with `name`, `label`, `default`, `min`, `max` (FR-010, C1Q8). Empty for every existing engine. Bounds are placeholders until the probe (T001) confirms them. |
-| `size_mb` | `integer` | Download size. Shown in the FR-018 confirmation dialog. |
-| `license_id` | `string \| null` | As declared on `ModelConfig`. |
-| `commercial_use` | `boolean \| null` | As declared on `ModelConfig`. |
+| `size_mb` | `integer` | Download size of the engine's **default** variant, the one downloaded by default. Shown in the FR-018 confirmation dialog. |
+| `license_id` | `string \| null` | The value shared by all of the engine's variants; `null` when they disagree (for example F5-TTS, whose Habibi variants mix Apache-2.0 and CC-BY-NC-SA-4.0), so no caller is told a variant is commercial when it is not. |
+| `commercial_use` | `boolean \| null` | Same rule as `license_id`. |
 
 ### Invariants
 
@@ -90,6 +90,8 @@ Read-only. No parameters. No authentication beyond whatever the backend already 
 3. `warning` and `reason` are independent: an unavailable engine carries a reason, not a warning.
 4. The endpoint never triggers a model download, never loads a model, and never imports torch at module scope — availability is computed from already-detected device state (Principle III, lazy heavy imports).
 5. The response is stable within a process run for a given machine; it is not user-specific.
+6. `warning` is produced only when the engine's default variant declares `min_memory_mb` and the detected memory is below it. Engines that declare none never warn.
+7. Every field describes the **engine**, aggregated across its variants as stated above. Amended after the T010 code review on 2026-09-23.
 
 ---
 

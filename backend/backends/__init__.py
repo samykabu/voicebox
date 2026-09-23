@@ -45,6 +45,17 @@ WHISPER_HF_REPOS = {
 }
 
 
+@dataclass(frozen=True)
+class AdvancedSetting:
+    """A generation setting the app may expose as an advanced control (FR-010)."""
+
+    name: str  # e.g. "cfg_value"
+    label: str  # e.g. "Guidance"
+    default: float
+    min: float
+    max: float
+
+
 @dataclass
 class ModelConfig:
     """Declarative config for a downloadable model variant."""
@@ -62,6 +73,12 @@ class ModelConfig:
     license_id: Optional[str] = None
     commercial_use: Optional[bool] = None
     dialect: Optional[str] = None
+    # Capability declarations (FR-002, FR-004). Every default preserves today's behaviour.
+    accelerators: tuple[str, ...] = ()  # empty = unconstrained, e.g. ("cuda", "mps", "cpu")
+    supports_voice_design: bool = False  # accepts a written voice description (FR-015)
+    requires_download_confirmation: bool = False  # confirm before downloading (FR-018)
+    advanced_settings: tuple[AdvancedSetting, ...] = ()  # advanced controls (FR-010)
+    min_memory_mb: int | None = None  # usual memory needed; below it the engine stays available but warns (C1Q4)
 
 
 @runtime_checkable

@@ -122,7 +122,7 @@ Checked against our pins in [backend/requirements.txt](../../backend/requirement
 | Their requirement | Our pin | Verdict |
 | --- | --- | --- |
 | `transformers>=4.36.2` | `>=4.36.0,<=4.57.6` | **Compatible.** The issue expected a conflict here; there is none. |
-| `torch>=2.5.0` | `torch>=2.1` | **Needs attention.** Our floor is lower than theirs. Whether the installed torch satisfies 2.5 is environment-dependent and is a probe task. |
+| `torch>=2.5.0` | `torch>=2.2.0` (raised to `>=2.5.0` by user decision at T010 review, 2026-09-23) | **Needs attention.** Our floor is lower than theirs. Whether the installed torch satisfies 2.5 is environment-dependent and is a probe task. |
 | `gradio>=6,<7` | not pinned; `f5-tts` already installed `--no-deps` partly over gradio bounds | **Conflict, and the main justification for `--no-deps`.** A web UI framework is not needed for library use. |
 | `datasets>=3,<4` | not pinned | Exclude. Training/eval dependency. |
 | `numpy` (indirect, via librosa/torch) | `>=1.24.0,<2.0` | **Unresolved.** Not declared directly by `voxcpm`, but several of its dependencies now prefer numpy 2. This is the one pin most likely to break and must be confirmed by the probe. |

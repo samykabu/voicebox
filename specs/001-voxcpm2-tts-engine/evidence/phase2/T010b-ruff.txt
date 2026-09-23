@@ -1,0 +1,60 @@
+# T010b ruff results
+# timestamp: 2026-09-23T02:41:49Z
+# cwd: /d/Projects/Personal/voicebox
+ruff 0.16.8
+# Earlier attempt (kept as note): after adding the Field descriptions, ruff format wanted two of them (advanced_settings, commercial_use) on one line; fixed by hand in the new lines only. No raw output was saved for that check.
+
+================ backend/tests/test_engine_capabilities.py ================
+$ ruff check --config backend/pyproject.toml backend/tests/test_engine_capabilities.py
+All checks passed!
+# exit code: 0
+$ ruff format --check --config backend/pyproject.toml backend/tests/test_engine_capabilities.py
+1 file already formatted
+# exit code: 0
+# untracked (no HEAD version): clean, nothing pre-existing to separate
+
+================ backend/routes/models.py ================
+$ ruff check --config backend/pyproject.toml backend/routes/models.py
+Found 11 errors.
+[*] 5 fixable with the `--fix` option (2 hidden fixes can be enabled with the `--unsafe-fixes` option).
+# exit code: 1
+$ ruff format --check --config backend/pyproject.toml backend/routes/models.py
+1 file already formatted
+# exit code: 0
+$ diff <HEAD check findings> <working-tree check findings>   (rule+message, line numbers stripped)
+# diff exit code: 0 (0 = no new check findings)
+$ diff <HEAD formatter changes> <working-tree formatter changes>   (changed lines only; voxcpm alternation normalised)
+# diff exit code: 0
+
+================ backend/models.py ================
+$ ruff check --config backend/pyproject.toml backend/models.py
+Found 187 errors.
+[*] 186 fixable with the `--fix` option.
+# exit code: 1
+$ ruff format --check --config backend/pyproject.toml backend/models.py
+1 file would be reformatted
+# exit code: 1
+$ diff <HEAD check findings> <working-tree check findings>   (rule+message, line numbers stripped)
+# diff exit code: 0 (0 = no new check findings)
+$ diff <HEAD formatter changes> <working-tree formatter changes>   (changed lines only; voxcpm alternation normalised)
+7c7,8
+< +        default="qwen", pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$"
+---
+> +        default="qwen",
+> +        pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts)$",
+# diff exit code: 1
+
+================ backend/backends/__init__.py ================
+$ ruff check --config backend/pyproject.toml backend/backends/__init__.py
+Found 28 errors.
+[*] 24 fixable with the `--fix` option.
+# exit code: 1
+$ ruff format --check --config backend/pyproject.toml backend/backends/__init__.py
+1 file would be reformatted
+# exit code: 1
+$ diff <HEAD check findings> <working-tree check findings>   (rule+message, line numbers stripped)
+# diff exit code: 0 (0 = no new check findings)
+$ diff <HEAD formatter changes> <working-tree formatter changes>   (changed lines only; voxcpm alternation normalised)
+# diff exit code: 0
+
+# backend/models.py: the only formatter difference vs HEAD is pre-existing line 92 (GenerationRequest.engine), already recorded in T006-T007-ruff.txt.

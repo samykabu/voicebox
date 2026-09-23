@@ -400,6 +400,65 @@ async def get_model_status():
     return models.ModelStatusListResponse(models=statuses)
 
 
+@router.get("/models/engines", response_model=models.EngineCapabilitiesResponse)
+async def get_engine_capabilities():
+    """Report each TTS engine's capabilities and whether this machine can run it.
+
+    One entry per engine, aggregated from all of its model variants: languages are the
+    union, license fields are the shared value or null, and the download size, capability
+    flags, accelerators and memory threshold come from the default-size variant. Hardware is
+    detected once per request. Never loads a model, starts a download or imports torch at
+    module scope (contracts/engine-capabilities.md, invariant 4).
+    """
+    from ..backends import TTS_ENGINES, get_default_model_size, get_tts_model_configs
+    from ..backends.base import detect_accelerator_and_memory, resolve_engine_availability
+    from ..services.profiles import CLONING_ENGINES  # lazy: services.profiles pulls in torch
+
+    accelerator, memory_mb = detect_accelerator_and_memory()
+    configs = get_tts_model_configs()
+
+    def _shared(values):
+        distinct = set(values)
+        return distinct.pop() if len(distinct) == 1 else None
+
+    engines = []
+    for engine, engine_name in TTS_ENGINES.items():
+        variants = [c for c in configs if c.engine == engine]
+        if not variants:
+            continue
+        default_size = get_default_model_size(engine)
+        default = next((c for c in variants if c.model_size == default_size), variants[0])
+        availability = resolve_engine_availability(
+            default, accelerator, memory_mb=memory_mb, min_memory_mb=default.min_memory_mb
+        )
+        engines.append(
+            models.EngineCapabilityResponse(
+                engine=engine,
+                display_name=engine_name,
+                available=availability.available,
+                reason=availability.reason,
+                warning=availability.warning,
+                supported_accelerators=availability.supported_accelerators,
+                detected_accelerator=availability.detected_accelerator,
+                languages=list(dict.fromkeys(lang for c in variants for lang in c.languages)),
+                supports_cloning=engine in CLONING_ENGINES,
+                supports_voice_design=default.supports_voice_design,
+                requires_download_confirmation=default.requires_download_confirmation,
+                advanced_settings=[
+                    models.EngineAdvancedSettingResponse(
+                        name=s.name, label=s.label, default=s.default, min=s.min, max=s.max
+                    )
+                    for s in default.advanced_settings
+                ],
+                size_mb=default.size_mb,
+                license_id=_shared(c.license_id for c in variants),
+                commercial_use=_shared(c.commercial_use for c in variants),
+            )
+        )
+
+    return models.EngineCapabilitiesResponse(engines=engines)
+
+
 @router.post("/models/download")
 async def trigger_model_download(request: models.ModelDownloadRequest):
     """Trigger download of a specific model."""

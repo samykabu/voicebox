@@ -22,6 +22,7 @@ carries `model_name`, `display_name`, `engine`, `hf_repo_id`, `model_size`, `siz
 | `accelerators` | `tuple[str, ...]` | `()` | The accelerators this model can run on, e.g. `("cuda", "mps", "cpu")`. Empty means "unconstrained", preserving today's behaviour for the seven existing engines so none of them change. Required by FR-002 and FR-004: capability is declared once here and queried, never branched on by engine name. |
 | `supports_voice_design` | `bool` | `False` | Accepts a written description of a voice in place of reference audio (FR-015). Deliberately separate from `supports_instruct`, which means delivery instructions (C1Q5). |
 | `requires_download_confirmation` | `bool` | `False` | The app asks the user to confirm before downloading this model (FR-018; C1Q7 chose this engine only, not a size threshold). |
+| `min_memory_mb` | `int \| None` | `None` | Memory below which the app warns before download (C1Q4). Advisory only, never a gate. `None` means no warning. Added after the T010 code review on 2026-09-23. |
 | `advanced_settings` | `tuple[AdvancedSetting, ...]` | `()` | Generation settings the app may expose as advanced controls, each with a name, label, default, minimum and maximum (FR-010, C1Q8). Empty for every existing engine. |
 
 ### The VoxCPM2 instance
@@ -45,6 +46,7 @@ carries `model_name`, `display_name`, `engine`, `hf_repo_id`, `model_size`, `siz
 | `commercial_use` | `True` | the premise of the whole feature |
 | `dialect` | `None` | multi-dialect, not a single-dialect checkpoint |
 | `accelerators` | `("cuda", "mps", "cpu")` | research.md R2 — vendor documents all three |
+| `min_memory_mb` | set in T016 from the probe (peak about 5.9 GB of GPU memory on short text) | C1Q4; evidence/probe.md Q8 |
 
 **Validation**: `engine` must match the four regex patterns in
 [backend/models.py](../../backend/models.py) at lines 92, 413, 432 and 451. All four take

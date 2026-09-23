@@ -1,0 +1,23 @@
+# T011 attempt, 2026-09-23T05:39:06+03:00, cwd D:/Projects/Personal/voicebox, shell: Git Bash
+$ bun run generate:api
+/usr/bin/bash: line 1: bun: command not found
+# exit=127
+$ command -v bun bunx
+# exit=1
+$ powershell -NoProfile -Command "bun run generate:api"
+bun : The term 'bun' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the 
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ bun run generate:api
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (bun:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+# exit=1
+$ curl -s -o /dev/null -w "%{http_code}" http://localhost:17493/openapi.json
+000
+# exit=7
+$ ls -d backend/venv
+ls: cannot access 'backend/venv': No such file or directory
+# Not run: bash scripts/generate-api.sh directly — when the backend is down it creates backend/venv and pip-installs requirements.txt, which Phase 2 forbids; the backend also imports torch (not available).
+# Generated client under app/src/lib/api/{models,services,core} was NOT edited.
