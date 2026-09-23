@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One generation with a designed voice</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Serif:ital,wght@0,400;1,400&amp;family=Noto+Naskh+Arabic:wght@400;500;600&amp;family=Noto+Sans+Arabic:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --paper: #f6f8fc; --ink: #15233c; --muted: #4f6078; --accent: #2563eb; }
+  body { font-family: 'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh;
+         display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; }
+  .frame { max-width: 1200px; width: 100%; }
+  .eyebrow { font-family: 'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace; font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em;
+             text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+  h1 { font-family: 'IBM Plex Serif', 'Noto Naskh Arabic', serif; font-size: 1.75rem; font-weight: 400; line-height: 1.2; margin-bottom: 0.5rem; }
+  .sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+  svg { width: 100%; min-width: 900px; display: block; }
+</style>
+</head>
+<body>
+<div class="frame">
+<p class="eyebrow">Sequence · VoxCPM2</p>
+<h1>One generation with a designed voice</h1>
+<p class="sub">How the service picks the voice source, and how long designed text keeps one speaker by cloning chunk 0.</p>
+<svg viewBox="0 0 1080 760" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f6078"/></marker>
+    <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker>
+    <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#1d4ed8"/></marker>
+  </defs>
+  <rect width="100%" height="100%" fill="#f6f8fc"/>
+  <line x1="120" y1="128" x2="120" y2="660" stroke="rgba(21,35,60,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="340" y1="128" x2="340" y2="660" stroke="rgba(21,35,60,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="560" y1="128" x2="560" y2="660" stroke="rgba(21,35,60,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="780" y1="128" x2="780" y2="660" stroke="rgba(21,35,60,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+  <rect x="336" y="168" width="8" height="468" fill="rgba(21,35,60,0.06)" stroke="#4f6078" stroke-width="0.8"/>
+  <rect x="556" y="272" width="8" height="300" fill="rgba(21,35,60,0.06)" stroke="#4f6078" stroke-width="0.8"/>
+  <rect x="776" y="316" width="8" height="208" fill="rgba(21,35,60,0.06)" stroke="#4f6078" stroke-width="0.8"/>
+  <text x="836" y="212" fill="#4f6078" font-size="12" font-style="italic" font-family="'IBM Plex Serif', 'Noto Naskh Arabic', serif">Recording on the profile wins.</text>
+  <text x="836" y="228" fill="#4f6078" font-size="12" font-style="italic" font-family="'IBM Plex Serif', 'Noto Naskh Arabic', serif">Else the one-off description,</text>
+  <text x="836" y="244" fill="#4f6078" font-size="12" font-style="italic" font-family="'IBM Plex Serif', 'Noto Naskh Arabic', serif">else the profile's own description.</text>
+  <text x="836" y="400" fill="#4f6078" font-size="12" font-style="italic" font-family="'IBM Plex Serif', 'Noto Naskh Arabic', serif">Design mode only: chunk 0 is saved</text>
+  <text x="836" y="416" fill="#4f6078" font-size="12" font-style="italic" font-family="'IBM Plex Serif', 'Noto Naskh Arabic', serif">as an untagged temp WAV and later</text>
+  <text x="836" y="432" fill="#4f6078" font-size="12" font-style="italic" font-family="'IBM Plex Serif', 'Noto Naskh Arabic', serif">chunks clone it. One speaker.</text>
+  <text x="836" y="524" fill="#4f6078" font-size="12" font-style="italic" font-family="'IBM Plex Serif', 'Noto Naskh Arabic', serif">Runs in a finally block and</text>
+  <text x="836" y="540" fill="#4f6078" font-size="12" font-style="italic" font-family="'IBM Plex Serif', 'Noto Naskh Arabic', serif">deletes the temp WAV, even on cancel.</text>
+  <path d="M 120,168 H 336" fill="none" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+  <path d="M 344,268 H 556" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <path d="M 564,316 H 776" fill="none" stroke="#2563eb" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+  <path d="M 776,356 H 564" fill="none" stroke="#4f6078" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+  <path d="M 564,400 H 776" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <path d="M 564,444 H 776" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <path d="M 776,484 H 564" fill="none" stroke="#4f6078" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+  <path d="M 564,524 H 776" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <path d="M 556,568 H 344" fill="none" stroke="#4f6078" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+  <path d="M 336,636 H 120" fill="none" stroke="#2563eb" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+  <path d="M 344,200 H 380 V 232 H 348" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <path d="M 344,592 H 380 V 616 H 348" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <rect x="184" y="148" width="92" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="230" y="157" fill="#1d4ed8" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">POST /GENERATE</text>
+  <rect x="416" y="248" width="68" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="450" y="257" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">SPLIT TEXT</text>
+  <rect x="624" y="296" width="92" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="670" y="305" fill="#2563eb" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">CHUNK 0 + DESC</text>
+  <rect x="628" y="336" width="84" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="670" y="345" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">CHUNK 0 AUDIO</text>
+  <rect x="632" y="380" width="76" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="670" y="389" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">SAVE PROMPT</text>
+  <rect x="632" y="424" width="76" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="670" y="433" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">CHUNKS 1..N</text>
+  <rect x="650" y="464" width="40" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="670" y="473" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">AUDIO</text>
+  <rect x="624" y="504" width="92" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="670" y="513" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">RELEASE PROMPT</text>
+  <rect x="410" y="548" width="80" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="450" y="557" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">JOINED AUDIO</text>
+  <rect x="190" y="616" width="80" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="230" y="625" fill="#2563eb" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">WAV · AI TAG</text>
+  <rect x="388" y="208" width="68" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="422" y="217" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">PICK VOICE</text>
+  <rect x="388" y="596" width="68" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="422" y="605" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">SAVE + TAG</text>
+  <rect x="40" y="72" width="160" height="56" rx="6" fill="#f6f8fc"/>
+  <rect x="40" y="72" width="160" height="56" rx="6" fill="rgba(79,96,120,0.10)" stroke="#6b7a90" stroke-width="1"/>
+  <rect x="48" y="78" width="28" height="12" rx="2" fill="transparent" stroke="#6b7a90" stroke-opacity="0.4" stroke-width="0.8"/>
+  <text x="62" y="87" fill="#6b7a90" font-size="7" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">APP</text>
+  <text x="120" y="104" fill="#15233c" font-size="12" font-weight="600" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif" text-anchor="middle">Voicebox app</text>
+  <text x="120" y="120" fill="#4f6078" font-size="9" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle">generate box</text>
+  <rect x="260" y="72" width="160" height="56" rx="6" fill="#f6f8fc"/>
+  <rect x="260" y="72" width="160" height="56" rx="6" fill="#ffffff" stroke="#15233c" stroke-width="1"/>
+  <rect x="268" y="78" width="52" height="12" rx="2" fill="transparent" stroke="#4f6078" stroke-opacity="0.4" stroke-width="0.8"/>
+  <text x="294" y="87" fill="#4f6078" font-size="7" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">SERVICE</text>
+  <text x="340" y="104" fill="#15233c" font-size="12" font-weight="600" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif" text-anchor="middle">Generation service</text>
+  <text x="340" y="120" fill="#4f6078" font-size="9" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle">services/generation.py</text>
+  <rect x="480" y="72" width="160" height="56" rx="6" fill="#f6f8fc"/>
+  <rect x="480" y="72" width="160" height="56" rx="6" fill="#ffffff" stroke="#15233c" stroke-width="1"/>
+  <rect x="488" y="78" width="32" height="12" rx="2" fill="transparent" stroke="#4f6078" stroke-opacity="0.4" stroke-width="0.8"/>
+  <text x="504" y="87" fill="#4f6078" font-size="7" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">UTIL</text>
+  <text x="560" y="104" fill="#15233c" font-size="12" font-weight="600" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif" text-anchor="middle">Chunked TTS</text>
+  <text x="560" y="120" fill="#4f6078" font-size="9" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle">utils/chunked_tts.py</text>
+  <rect x="700" y="72" width="160" height="56" rx="6" fill="#f6f8fc"/>
+  <rect x="700" y="72" width="160" height="56" rx="6" fill="rgba(37,99,235,0.09)" stroke="#2563eb" stroke-width="1"/>
+  <rect x="708" y="78" width="44" height="12" rx="2" fill="transparent" stroke="#2563eb" stroke-opacity="0.4" stroke-width="0.8"/>
+  <text x="730" y="87" fill="#2563eb" font-size="7" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">ENGINE</text>
+  <text x="780" y="104" fill="#15233c" font-size="12" font-weight="600" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif" text-anchor="middle">VoxCPM2 backend</text>
+  <text x="780" y="120" fill="#4f6078" font-size="9" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle">voxcpm_backend.py</text>
+  <line x1="40" y1="680" x2="1040" y2="680" stroke="rgba(21,35,60,0.10)" stroke-width="0.8"/>
+  <text x="40" y="696" fill="#4f6078" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" letter-spacing="0.14em">LEGEND</text>
+  <rect x="40" y="708" width="16" height="12" rx="2" fill="rgba(37,99,235,0.09)" stroke="#2563eb" stroke-width="1"/>
+  <text x="64" y="717" fill="#4f6078" font-size="9" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif">New engine</text>
+  <path d="M 152,714 H 176" fill="none" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+  <text x="184" y="717" fill="#4f6078" font-size="9" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif">Request</text>
+  <path d="M 248,714 H 272" fill="none" stroke="#2563eb" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+  <text x="280" y="717" fill="#4f6078" font-size="9" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif">Designed voice / result</text>
+  <path d="M 428,714 H 452" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <text x="460" y="717" fill="#4f6078" font-size="9" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif">Call</text>
+  <path d="M 508,714 H 532" fill="none" stroke="#4f6078" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+  <text x="540" y="717" fill="#4f6078" font-size="9" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif">Return</text>
+</svg>
+</div>
+</body>
+</html>

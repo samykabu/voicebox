@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First use: confirm, download, load</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Serif:ital,wght@0,400;1,400&amp;family=Noto+Naskh+Arabic:wght@400;500;600&amp;family=Noto+Sans+Arabic:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --paper: #f6f8fc; --ink: #15233c; --muted: #4f6078; --accent: #2563eb; }
+  body { font-family: 'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh;
+         display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; }
+  .frame { max-width: 1200px; width: 100%; }
+  .eyebrow { font-family: 'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace; font-size: 0.66rem; font-weight: 500; letter-spacing: 0.18em;
+             text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+  h1 { font-family: 'IBM Plex Serif', 'Noto Naskh Arabic', serif; font-size: 1.75rem; font-weight: 400; line-height: 1.2; margin-bottom: 0.5rem; }
+  .sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+  svg { width: 100%; min-width: 900px; display: block; }
+</style>
+</head>
+<body>
+<div class="frame">
+<p class="eyebrow">Flowchart · download</p>
+<h1>First use: confirm, download, load</h1>
+<p class="sub">VoxCPM2 is the only engine that asks before its download starts. Once cached, it loads with the network off.</p>
+<svg viewBox="0 0 1080 640" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f6078"/></marker>
+    <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker>
+    <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#1d4ed8"/></marker>
+  </defs>
+  <rect width="100%" height="100%" fill="#f6f8fc"/>
+  <path d="M 380,92 V 132" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <path d="M 480,180 H 600" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <path d="M 380,228 V 276" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <path d="M 380,340 V 388" fill="none" stroke="#2563eb" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+  <path d="M 480,436 H 600" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <path d="M 700,412 V 212" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <path d="M 380,484 V 536" fill="none" stroke="#4f6078" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <rect x="526" y="160" width="28" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="540" y="169" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">YES</text>
+  <rect x="388" y="244" width="24" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="400" y="253" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">NO</text>
+  <rect x="526" y="416" width="28" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="540" y="425" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">YES</text>
+  <rect x="708" y="304" width="68" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="742" y="313" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">CACHED NOW</text>
+  <rect x="388" y="504" width="24" height="12" rx="2" fill="#f6f8fc"/>
+  <text x="400" y="513" fill="#6b7a90" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">NO</text>
+  <rect x="280" y="52" width="200" height="40" rx="20" fill="#f6f8fc"/>
+  <rect x="280" y="52" width="200" height="40" rx="20" fill="#ffffff" stroke="#15233c" stroke-width="1"/>
+  <text x="380" y="76" fill="#15233c" font-size="12" font-weight="600" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif" text-anchor="middle">Generate or Download</text>
+  <polygon points="380,132 480,180 380,228 280,180" fill="#f6f8fc"/>
+  <polygon points="380,132 480,180 380,228 280,180" fill="#ffffff" stroke="#15233c" stroke-width="1"/>
+  <text x="380" y="178" fill="#15233c" font-size="12" font-weight="600" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif" text-anchor="middle">Model cached?</text>
+  <text x="380" y="194" fill="#4f6078" font-size="9" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle">openbmb/VoxCPM2</text>
+  <rect x="600" y="148" width="200" height="64" rx="6" fill="#f6f8fc"/>
+  <rect x="600" y="148" width="200" height="64" rx="6" fill="#ffffff" stroke="#15233c" stroke-width="1"/>
+  <rect x="608" y="154" width="32" height="12" rx="2" fill="transparent" stroke="#4f6078" stroke-opacity="0.4" stroke-width="0.8"/>
+  <text x="624" y="163" fill="#4f6078" font-size="7" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">LOAD</text>
+  <text x="700" y="184" fill="#15233c" font-size="12" font-weight="600" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif" text-anchor="middle">Load offline, generate</text>
+  <text x="700" y="200" fill="#4f6078" font-size="9" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle">no HF / ModelScope call</text>
+  <rect x="280" y="276" width="200" height="64" rx="6" fill="#f6f8fc"/>
+  <rect x="280" y="276" width="200" height="64" rx="6" fill="rgba(37,99,235,0.09)" stroke="#2563eb" stroke-width="1"/>
+  <rect x="288" y="282" width="44" height="12" rx="2" fill="transparent" stroke="#2563eb" stroke-opacity="0.4" stroke-width="0.8"/>
+  <text x="310" y="291" fill="#2563eb" font-size="7" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">DIALOG</text>
+  <text x="380" y="312" fill="#15233c" font-size="12" font-weight="600" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif" text-anchor="middle">Confirm the download</text>
+  <text x="380" y="328" fill="#4f6078" font-size="9" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle">4961 MB · memory warning</text>
+  <polygon points="380,388 480,436 380,484 280,436" fill="#f6f8fc"/>
+  <polygon points="380,388 480,436 380,484 280,436" fill="#ffffff" stroke="#15233c" stroke-width="1"/>
+  <text x="380" y="434" fill="#15233c" font-size="12" font-weight="600" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif" text-anchor="middle">User confirms?</text>
+  <text x="380" y="450" fill="#4f6078" font-size="9" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle">fails closed</text>
+  <rect x="600" y="412" width="200" height="64" rx="6" fill="#f6f8fc"/>
+  <rect x="600" y="412" width="200" height="64" rx="6" fill="#ffffff" stroke="#15233c" stroke-width="1"/>
+  <rect x="608" y="418" width="28" height="12" rx="2" fill="transparent" stroke="#4f6078" stroke-opacity="0.4" stroke-width="0.8"/>
+  <text x="622" y="427" fill="#4f6078" font-size="7" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">HF</text>
+  <text x="700" y="448" fill="#15233c" font-size="12" font-weight="600" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif" text-anchor="middle">Download with progress</text>
+  <text x="700" y="464" fill="#4f6078" font-size="9" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" text-anchor="middle">resumable, cached</text>
+  <rect x="280" y="536" width="200" height="40" rx="20" fill="#f6f8fc"/>
+  <rect x="280" y="536" width="200" height="40" rx="20" fill="rgba(21,35,60,0.02)" stroke="rgba(21,35,60,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="380" y="560" fill="#15233c" font-size="12" font-weight="600" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif" text-anchor="middle">Nothing downloaded</text>
+  <text x="840" y="296" fill="#4f6078" font-size="12" font-style="italic" font-family="'IBM Plex Serif', 'Noto Naskh Arabic', serif">If the capabilities have not</text>
+  <text x="840" y="312" fill="#4f6078" font-size="12" font-style="italic" font-family="'IBM Plex Serif', 'Noto Naskh Arabic', serif">loaded yet, the app still asks.</text>
+  <line x1="40" y1="584" x2="1040" y2="584" stroke="rgba(21,35,60,0.10)" stroke-width="0.8"/>
+  <text x="40" y="600" fill="#4f6078" font-size="8" font-family="'IBM Plex Mono', 'Noto Sans Arabic', ui-monospace, monospace" letter-spacing="0.14em">LEGEND</text>
+  <rect x="40" y="612" width="16" height="12" rx="6" fill="#ffffff" stroke="#15233c" stroke-width="1"/>
+  <text x="64" y="621" fill="#4f6078" font-size="9" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif">Start / end</text>
+  <polygon points="168,610 176,618 168,626 160,618" fill="#ffffff" stroke="#15233c" stroke-width="1"/>
+  <text x="184" y="621" fill="#4f6078" font-size="9" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif">Decision</text>
+  <rect x="264" y="612" width="16" height="12" rx="2" fill="#ffffff" stroke="#15233c" stroke-width="1"/>
+  <text x="288" y="621" fill="#4f6078" font-size="9" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif">Step</text>
+  <rect x="344" y="612" width="16" height="12" rx="2" fill="rgba(37,99,235,0.09)" stroke="#2563eb" stroke-width="1"/>
+  <text x="368" y="621" fill="#4f6078" font-size="9" font-family="'IBM Plex Sans', 'Noto Sans Arabic', system-ui, sans-serif">Confirmation (VoxCPM2 only)</text>
+</svg>
+</div>
+</body>
+</html>
