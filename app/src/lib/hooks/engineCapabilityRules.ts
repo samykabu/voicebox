@@ -15,6 +15,31 @@ export function isEngineSelectable(capability: EngineCapabilityResponse | undefi
   return capability ? capability.available : true;
 }
 
+/** A line shown next to an engine: why it cannot run, or an advisory warning. */
+export interface EngineNotice {
+  kind: 'reason' | 'warning';
+  text: string;
+}
+
+/**
+ * What to show next to an engine (FR-003, C1Q3, C1Q4). An unavailable engine shows its
+ * `reason`, falling back to a sentence built from its display name so a greyed-out engine
+ * always explains itself; an available engine shows its `warning`. A warning is advisory
+ * only: it never changes `isEngineSelectable`.
+ */
+export function engineNotice(
+  capability: EngineCapabilityResponse | undefined,
+): EngineNotice | null {
+  if (!capability) return null;
+  if (!capability.available) {
+    return {
+      kind: 'reason',
+      text: capability.reason || `${capability.display_name} can't run on this machine.`,
+    };
+  }
+  return capability.warning ? { kind: 'warning', text: capability.warning } : null;
+}
+
 /**
  * Whether a cloned (reference-audio) profile can be used with this engine (FR-011, FR-014).
  *
@@ -62,9 +87,14 @@ export interface DownloadConfirmationDetails {
   sizeMb: number;
   licenseId?: string | null;
   commercialUse?: boolean | null;
+  /** Advisory only, for example too little memory (C1Q4). Never blocks the download. */
+  warning?: string | null;
 }
 
-/** Confirmation details for an engine's default download (FR-018: size, FR-005: licence). */
+/**
+ * Confirmation details for an engine's default download (FR-018: size, FR-005: licence,
+ * C1Q4: advisory warning).
+ */
 export function downloadConfirmationDetails(
   capability: EngineCapabilityResponse,
   displayName?: string,
@@ -74,6 +104,7 @@ export function downloadConfirmationDetails(
     sizeMb: capability.size_mb,
     licenseId: capability.license_id,
     commercialUse: capability.commercial_use,
+    warning: capability.warning,
   };
 }
 

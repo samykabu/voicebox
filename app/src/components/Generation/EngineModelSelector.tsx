@@ -18,9 +18,14 @@ import {
   isHabibiModelId,
 } from '@/lib/constants/habibiModels';
 import { getLanguageOptionsForEngine } from '@/lib/constants/languages';
-import { isEngineSelectable, supportsCloning } from '@/lib/hooks/engineCapabilityRules';
+import {
+  engineNotice,
+  isEngineSelectable,
+  supportsCloning,
+} from '@/lib/hooks/engineCapabilityRules';
 import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
 import type { GenerationFormValues } from '@/lib/hooks/useGenerationForm';
+import { cn } from '@/lib/utils/cn';
 
 /**
  * Engine/model options and their display metadata.
@@ -167,12 +172,10 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
   const selectedHabibiModel = engine === 'f5_tts' ? getHabibiModel(modelSize) : null;
   const selectedCapability = findEngineCapability(capabilities, engine);
   // FR-003 / C1Q3: an engine this machine cannot run stays listed, greyed out, with the
-  // backend's reason. A warning is advisory only and never disables anything.
-  const selectedNotice = selectedCapability
-    ? !isEngineSelectable(selectedCapability)
-      ? selectedCapability.reason
-      : selectedCapability.warning
-    : null;
+  // backend's reason. A warning is advisory only and never disables anything. An engine
+  // that was selected and has since become unavailable stays selected with its reason;
+  // generating with it is refused with that reason (useGenerationForm).
+  const selectedNotice = engineNotice(selectedCapability)?.text;
 
   const currentEngineAvailable = availableOptions.some((opt) => opt.value === selectValue);
 
@@ -189,7 +192,12 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
 
   useEffect(() => {
     if (!currentEngineAvailable && availableOptions.length > 0) {
-      applyEngineSelection(form, availableOptions[0].value, capabilities);
+      // Prefer an engine this machine can run; the list order is otherwise kept.
+      const fallback =
+        availableOptions.find((opt) =>
+          isEngineSelectable(findEngineCapability(capabilities, opt.engine)),
+        ) ?? availableOptions[0];
+      applyEngineSelection(form, fallback.value, capabilities);
     }
   }, [availableOptions, currentEngineAvailable, form, capabilities]);
 
@@ -213,17 +221,26 @@ export function EngineModelSelector({ form, compact, selectedProfile }: EngineMo
           {availableOptions.map((opt) => {
             const capability = findEngineCapability(capabilities, opt.engine);
             const selectable = isEngineSelectable(capability);
+            const notice = engineNotice(capability);
             return (
               <SelectItem
                 key={opt.value}
                 value={opt.value}
-                className={itemClass}
+                // Only the label is greyed out, so a disabled engine's reason stays readable.
+                className={cn(itemClass, 'data-[disabled]:opacity-100')}
                 disabled={!selectable}
               >
-                {opt.label}
-                {!selectable && capability?.reason ? (
-                  <span className="block text-[10px] text-muted-foreground">
-                    {capability.reason}
+                <span className={selectable ? undefined : 'opacity-50'}>{opt.label}</span>
+                {notice ? (
+                  <span
+                    className={cn(
+                      'block text-[10px]',
+                      notice.kind === 'reason'
+                        ? 'text-muted-foreground'
+                        : 'text-amber-600 dark:text-amber-400',
+                    )}
+                  >
+                    {notice.text}
                   </span>
                 ) : null}
               </SelectItem>

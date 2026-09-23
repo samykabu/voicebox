@@ -1,0 +1,138 @@
+# 2026-09-23T17:32:50+03:00  (cwd: backend/)
+=== tests/test_engine_capabilities.py
+$ ruff check tests/test_engine_capabilities.py (working tree)
+All checks passed!
+$ git show HEAD:backend/tests/test_engine_capabilities.py | ruff check --stdin-filename tests/test_engine_capabilities.py - (HEAD)
+All checks passed!
+$ ruff format --check tests/test_engine_capabilities.py (working tree)
+1 file already formatted
+$ git show HEAD:backend/tests/test_engine_capabilities.py | ruff format --check --stdin-filename tests/test_engine_capabilities.py - (HEAD)
+exit 0
+=== routes/generations.py
+$ ruff check routes/generations.py (working tree)
+routes\generations.py:3:1: I001 [*] Import block is un-sorted or un-formatted
+routes\generations.py:94:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+routes\generations.py:105:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+routes\generations.py:141:13: SIM105 Use `contextlib.suppress(Exception)` instead of `try`-`except`-`pass`
+routes\generations.py:365:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+routes\generations.py:492:9: SIM105 Use `contextlib.suppress(OSError)` instead of `try`-`except`-`pass`
+Found 6 errors.
+[*] 1 fixable with the `--fix` option (2 hidden fixes can be enabled with the `--unsafe-fixes` option).
+$ git show HEAD:backend/routes/generations.py | ruff check --stdin-filename routes/generations.py - (HEAD)
+routes\generations.py:3:1: I001 [*] Import block is un-sorted or un-formatted
+routes\generations.py:76:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+routes\generations.py:86:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+routes\generations.py:122:13: SIM105 Use `contextlib.suppress(Exception)` instead of `try`-`except`-`pass`
+routes\generations.py:342:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+routes\generations.py:468:9: SIM105 Use `contextlib.suppress(OSError)` instead of `try`-`except`-`pass`
+Found 6 errors.
+[*] 1 fixable with the `--fix` option (2 hidden fixes can be enabled with the `--unsafe-fixes` option).
+$ ruff format --check routes/generations.py (working tree)
+unformatted: File would be reformatted
+   --> routes\generations.py:38:11
+    |
+37  |     Generation FK happy without making profile_id nullable across the schema."""
+    -     row = (
+    -         db.query(DBVoiceProfile)
+    -         .filter(DBVoiceProfile.name == IMPORTED_AUDIO_PROFILE_NAME)
+    -         .first()
+    -     )
+38  +     row = db.query(DBVoiceProfile).filter(DBVoiceProfile.name == IMPORTED_AUDIO_PROFILE_NAME).first()
+39  |     if row is not None:
+--------------------------------------------------------------------------------
+158 |             advanced_settings=data.advanced_settings,
+    -         )
+159 +         ),
+160 |     )
+--------------------------------------------------------------------------------
+202 |             mode="retry",
+    -         )
+203 +         ),
+204 |     )
+--------------------------------------------------------------------------------
+249 |             version_id=version_id,
+    -         )
+250 +         ),
+251 |     )
+--------------------------------------------------------------------------------
+390 |     # what /generate would produce.
+    -     stream_text, _applied = pronunciation.apply_pronunciations(
+    -         data.text, data.language, db, profile_id=data.profile_id
+    -     )
+391 +     stream_text, _applied = pronunciation.apply_pronunciations(data.text, data.language, db, profile_id=data.profile_id)
+392 |
+    |
+
+1 file would be reformatted
+$ git show HEAD:backend/routes/generations.py | ruff format --check --stdin-filename routes/generations.py - (HEAD)
+exit 1
+=== services/generation.py
+$ ruff check services/generation.py (working tree)
+services\generation.py:17:1: I001 [*] Import block is un-sorted or un-formatted
+services\generation.py:117:11: UP045 [*] Use `X | None` for type annotations
+services\generation.py:119:20: UP045 [*] Use `X | None` for type annotations
+services\generation.py:120:15: UP045 [*] Use `X | None` for type annotations
+services\generation.py:122:22: UP045 [*] Use `X | None` for type annotations
+services\generation.py:123:19: UP045 [*] Use `X | None` for type annotations
+services\generation.py:124:17: UP045 [*] Use `X | None` for type annotations
+services\generation.py:132:5: I001 [*] Import block is un-sorted or un-formatted
+services\generation.py:271:20: UP045 [*] Use `X | None` for type annotations
+services\generation.py:350:11: UP045 [*] Use `X | None` for type annotations
+services\generation.py:351:15: UP045 [*] Use `X | None` for type annotations
+services\generation.py:353:22: UP045 [*] Use `X | None` for type annotations
+services\generation.py:354:19: UP045 [*] Use `X | None` for type annotations
+services\generation.py:368:5: I001 [*] Import block is un-sorted or un-formatted
+services\generation.py:423:17: UP045 [*] Use `X | None` for type annotations
+services\generation.py:433:5: I001 [*] Import block is un-sorted or un-formatted
+Found 16 errors.
+[*] 16 fixable with the `--fix` option.
+$ git show HEAD:backend/services/generation.py | ruff check --stdin-filename services/generation.py - (HEAD)
+services\generation.py:17:1: I001 [*] Import block is un-sorted or un-formatted
+services\generation.py:76:11: UP045 [*] Use `X | None` for type annotations
+services\generation.py:78:20: UP045 [*] Use `X | None` for type annotations
+services\generation.py:79:15: UP045 [*] Use `X | None` for type annotations
+services\generation.py:81:22: UP045 [*] Use `X | None` for type annotations
+services\generation.py:82:19: UP045 [*] Use `X | None` for type annotations
+services\generation.py:83:17: UP045 [*] Use `X | None` for type annotations
+services\generation.py:91:5: I001 [*] Import block is un-sorted or un-formatted
+services\generation.py:230:20: UP045 [*] Use `X | None` for type annotations
+services\generation.py:309:11: UP045 [*] Use `X | None` for type annotations
+services\generation.py:310:15: UP045 [*] Use `X | None` for type annotations
+services\generation.py:312:22: UP045 [*] Use `X | None` for type annotations
+services\generation.py:313:19: UP045 [*] Use `X | None` for type annotations
+services\generation.py:327:5: I001 [*] Import block is un-sorted or un-formatted
+services\generation.py:380:17: UP045 [*] Use `X | None` for type annotations
+services\generation.py:390:5: I001 [*] Import block is un-sorted or un-formatted
+Found 16 errors.
+[*] 16 fixable with the `--fix` option.
+$ ruff format --check services/generation.py (working tree)
+unformatted: File would be reformatted
+   --> services\generation.py:165:61
+    |
+164 |         # and editing an entry changes future audio without rewriting the past.
+    -         text, _applied = pronunciation.apply_pronunciations(
+    -             text, language, bg_db, profile_id=profile_id
+    -         )
+165 +         text, _applied = pronunciation.apply_pronunciations(text, language, bg_db, profile_id=profile_id)
+166 |
+--------------------------------------------------------------------------------
+303 |             import logging
+304 +
+305 |             logging.getLogger(__name__).warning("invalid effects chain, skipping: %s", error_msg)
+    -             versions_mod.set_default_version(
+    -                 versions_mod.list_versions(generation_id, db)[0].id, db
+    -             )
+306 +             versions_mod.set_default_version(versions_mod.list_versions(generation_id, db)[0].id, db)
+307 |         else:
+--------------------------------------------------------------------------------
+406 |
+    -     audio, sample_rate = await generate_chunked(
+    -         tts_model, text, voice_prompt, **gen_kwargs
+    -     )
+407 +     audio, sample_rate = await generate_chunked(tts_model, text, voice_prompt, **gen_kwargs)
+408 |
+    |
+
+1 file would be reformatted
+$ git show HEAD:backend/services/generation.py | ruff format --check --stdin-filename services/generation.py - (HEAD)
+exit 1

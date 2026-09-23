@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="24" skipped="0" tests="342" time="4.899" timestamp="2026-09-23T17:31:12.178635+03:00" hostname="DevelopmentPC"><testcase classname="tests.test_engine_capabilities" name="test_model_config_capability_fields_default_to_todays_behaviour" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_model_config_declares_the_new_fields" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_advanced_setting_carries_contract_shape_and_is_frozen" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_there_are_existing_tts_configs_to_check" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[qwen-tts-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[qwen-tts-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[qwen-custom-voice-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[qwen-custom-voice-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[chatterbox-tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[chatterbox-turbo]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[tada-1b]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[tada-3b-ml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-msa]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-unified]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-sau]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-uae]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-alg]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-irq]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-egy]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_keeps_default_capabilities[habibi-mar]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-qwen-tts-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-qwen-tts-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-qwen-custom-voice-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-qwen-custom-voice-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-chatterbox-tts]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-chatterbox-turbo]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-tada-1b]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-tada-3b-ml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-msa]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-unified]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-sau]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-uae]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-alg]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-irq]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-egy]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cuda-habibi-mar]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-qwen-tts-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-qwen-tts-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-qwen-custom-voice-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-qwen-custom-voice-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-chatterbox-tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-chatterbox-turbo]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-tada-1b]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-tada-3b-ml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-msa]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-unified]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-sau]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-uae]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-alg]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-irq]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-egy]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[mps-habibi-mar]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-qwen-tts-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-qwen-tts-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-qwen-custom-voice-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-qwen-custom-voice-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-chatterbox-tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-chatterbox-turbo]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-tada-1b]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-tada-3b-ml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-msa]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-unified]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-sau]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-uae]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-alg]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-irq]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-egy]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[cpu-habibi-mar]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-qwen-tts-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-qwen-tts-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-qwen-custom-voice-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-qwen-custom-voice-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-chatterbox-tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-chatterbox-turbo]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-tada-1b]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-tada-3b-ml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-msa]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-unified]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-sau]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-uae]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-alg]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-irq]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-egy]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[xpu-habibi-mar]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-qwen-tts-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-qwen-tts-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-qwen-custom-voice-1.7B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-qwen-custom-voice-0.6B]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-chatterbox-tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-chatterbox-turbo]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-tada-1b]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-tada-3b-ml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-msa]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-unified]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-sau]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-uae]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-alg]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-irq]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-egy]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_tts_config_is_always_available[directml-habibi-mar]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_accelerators_is_available_with_no_reason" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_detected_accelerator_in_declared_set_is_available[cuda]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_detected_accelerator_in_declared_set_is_available[mps]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_detected_accelerator_in_declared_set_is_available[cpu]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_indexed_cuda_device_counts_as_cuda" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_detected_accelerator_not_in_set_is_unavailable_with_specific_reason" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_supported_but_marginal_memory_warns_and_never_blocks" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_sufficient_memory_has_no_warning" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_unknown_memory_or_threshold_has_no_warning[None-8192]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_unknown_memory_or_threshold_has_no_warning[4096-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_unknown_memory_or_threshold_has_no_warning[None-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_unavailable_engine_carries_reason_not_warning_even_with_marginal_memory" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda-accelerators1]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cuda:0-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-mps-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-mps-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-mps-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-mps-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cpu-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cpu-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cpu-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-cpu-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-xpu-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-xpu-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-xpu-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-xpu-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-directml-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-directml-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-directml-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[None-None-directml-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators1]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators2]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cuda:0-accelerators3]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-mps-accelerators3]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-cpu-accelerators3]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-xpu-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators2]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[2048-8192-directml-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cuda:0-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-mps-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators1]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-cpu-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators0]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators1]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators2]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-xpu-accelerators3]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators0]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators1]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators2]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_contract_invariants_hold_everywhere[16384-8192-directml-accelerators3]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_wrapper_detects_mps_and_resolves" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_wrapper_reads_cuda_memory_for_the_warning" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_returns_every_tts_engine_with_every_contract_field" time="0.050" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_detects_hardware_once_per_request" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_existing_engines_keep_todays_behaviour" time="0.006" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_describes_each_engine_from_all_of_its_variants" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_display_name_is_the_engine_name" time="0.004" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_tada_languages_include_the_multilingual_variant" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_f5_license_is_null_when_variants_disagree" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_returns_the_shared_license_when_variants_agree" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_returns_null_license_when_synthetic_variants_disagree" time="0.004" /><testcase classname="tests.test_engine_capabilities" name="test_current_engine_variants_agree_on_default_variant_fields" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_engine_configs_declare_the_expected_memory_threshold" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_model_config_min_memory_mb_defaults_to_none" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_warns_when_memory_is_below_the_declared_threshold" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_has_no_warning_without_a_declared_threshold" time="0.004" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_uses_the_default_variant_memory_threshold" time="0.004" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_engine_ids_match_the_request_engine_pattern" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_invariants_hold_for_a_constrained_engine" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_passes_declared_capabilities_through" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_never_imports_torch" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_existing_generation_payloads_still_validate" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[None-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[None-qwen]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[None-kokoro]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[None-f5_tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[value1-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[value1-qwen]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[value1-kokoro]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_empty_advanced_settings_pass_for_every_engine[value1-f5_tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[None]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[qwen]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[luxtts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[chatterbox]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[tada]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[kokoro]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_existing_engines_reject_any_advanced_setting[f5_tts]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_voice_description_accepts_500_characters_and_rejects_501" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[1.0-qwen]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[1.0-None]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[2.5-qwen]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[2.5-None]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[5.0-qwen]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[5.0-None]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[3-qwen]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_within_bounds_passes[3-None]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_out_of_bounds_is_rejected[0.99]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_out_of_bounds_is_rejected[5.01]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_out_of_bounds_is_rejected[-1.0]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_out_of_bounds_is_rejected[inf]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_out_of_bounds_is_rejected[nan]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_undeclared_setting_is_rejected_even_when_the_engine_declares_others" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_declared_setting_is_scoped_to_its_engine" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_invalid_generation_body_is_a_422_through_fastapi" time="0.011" /><testcase classname="tests.test_engine_capabilities" name="test_voxcpm_is_available_without_warning_on_its_accelerators[6144-cuda]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_voxcpm_is_available_without_warning_on_its_accelerators[6144-mps]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_voxcpm_is_available_without_warning_on_its_accelerators[6144-cpu]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_voxcpm_is_available_without_warning_on_its_accelerators[16384-cuda]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_voxcpm_is_available_without_warning_on_its_accelerators[16384-mps]" time="0.001" /><testcase classname="tests.test_engine_capabilities" name="test_voxcpm_is_available_without_warning_on_its_accelerators[16384-cpu]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_voxcpm_is_available_without_warning_on_its_accelerators[None-cuda]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_voxcpm_is_available_without_warning_on_its_accelerators[None-mps]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_voxcpm_is_available_without_warning_on_its_accelerators[None-cpu]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_voxcpm_warns_but_stays_available_on_a_4gb_gpu" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_voxcpm_is_unavailable_with_a_reason_on_other_accelerators[xpu]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_voxcpm_is_unavailable_with_a_reason_on_other_accelerators[directml]" time="0.000" /><testcase classname="tests.test_engine_capabilities" name="test_engines_route_describes_voxcpm_from_its_declaration" time="0.005" /><testcase classname="tests.test_engine_capabilities" name="test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-generate]" time="0.965"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('xpu', None), row=None, hit=&lt;fun...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x00000275529227A0&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027552928A70&gt;)
+entry_point = 'generate', accelerator = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-stream]" time="0.014"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['get_tts_backend_for_engine'], detect_calls=0, hardware=('xpu', None), row=None, hit=&lt;fu...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x000002755293CA40&gt;), client=&lt;starlette.testclient.TestClient object at 0x000002755296CB60&gt;)
+entry_point = 'stream', accelerator = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-retry]" time="0.014"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('xpu', None), row=namespace(...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x000002755293ECA0&gt;), client=&lt;starlette.testclient.TestClient object at 0x00000275529A9070&gt;)
+entry_point = 'retry', accelerator = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-regenerate]" time="0.013"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('xpu', None), row=namespace(...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x000002755293DEE0&gt;), client=&lt;starlette.testclient.TestClient object at 0x000002755296D250&gt;)
+entry_point = 'regenerate', accelerator = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-speak]" time="0.015"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('xpu', None), row=None, hit=&lt;fun...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x00000275529847C0&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027552988860&gt;)
+entry_point = 'speak', accelerator = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[xpu-None-mcp_speak]" time="0.003"><failure message="AssertionError: a refused generation must not reach history.create_generation">generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('xpu', None), row=None, hit=&lt;fun...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027552986AC0&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553A9D520&gt;)
+entry_point = 'mcp_speak', accelerator = 'xpu', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+&gt;       status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:1099: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\tests\test_engine_capabilities.py:1067: in _call_entry_point
+    await mcp_tools._speak(
+backend\mcp_server\tools.py:263: in _speak
+    generation = await generate_speech(req, db)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\routes\generations.py:92: in generate_speech
+    generation = await history.create_generation(
+backend\tests\test_engine_capabilities.py:962: in fake_create_generation
+    hit("history.create_generation")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'history.create_generation'
+
+    def hit(name):
+        state.calls.append(name)
+        if state.forbid:
+&gt;           raise AssertionError(f"a refused generation must not reach {name}")
+E           AssertionError: a refused generation must not reach history.create_generation
+
+backend\tests\test_engine_capabilities.py:916: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-generate]" time="0.014"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('directml', None), row=None, hit...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027553C69120&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553A9F170&gt;)
+entry_point = 'generate', accelerator = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-stream]" time="0.012"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['get_tts_backend_for_engine'], detect_calls=0, hardware=('directml', None), row=None, hi...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027552985D00&gt;), client=&lt;starlette.testclient.TestClient object at 0x00000275529AAC90&gt;)
+entry_point = 'stream', accelerator = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-retry]" time="0.012"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('directml', None), row=names...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027552984400&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553C7BB00&gt;)
+entry_point = 'retry', accelerator = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-regenerate]" time="0.012"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('directml', None), row=names...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027553BC0180&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553BF2960&gt;)
+entry_point = 'regenerate', accelerator = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-speak]" time="0.014"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('directml', None), row=None, hit...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027553BC2160&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553BA7110&gt;)
+entry_point = 'speak', accelerator = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1101: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason[directml-None-mcp_speak]" time="0.003"><failure message="AssertionError: a refused generation must not reach history.create_generation">generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('directml', None), row=None, hit...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027553C6BCE0&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553BF32C0&gt;)
+entry_point = 'mcp_speak', accelerator = 'directml', memory_mb = None
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    @pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+    async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+        generation_app, entry_point, accelerator, memory_mb
+    ):
+        generation_app.hardware = (accelerator, memory_mb)
+        expected = _expected_reason(_voxcpm_config(), accelerator)
+    
+&gt;       status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:1099: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\tests\test_engine_capabilities.py:1067: in _call_entry_point
+    await mcp_tools._speak(
+backend\mcp_server\tools.py:263: in _speak
+    generation = await generate_speech(req, db)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\routes\generations.py:92: in generate_speech
+    generation = await history.create_generation(
+backend\tests\test_engine_capabilities.py:962: in fake_create_generation
+    hit("history.create_generation")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'history.create_generation'
+
+    def hit(name):
+        state.calls.append(name)
+        if state.forbid:
+&gt;           raise AssertionError(f"a refused generation must not reach {name}")
+E           AssertionError: a refused generation must not reach history.create_generation
+
+backend\tests\test_engine_capabilities.py:916: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[generate]" time="0.013"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('mps', None), row=None, hit=&lt;fun...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027553BC0F40&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553C7B920&gt;)
+entry_point = 'generate'
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000027553BF0B60&gt;
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+        generation_app, entry_point, monkeypatch
+    ):
+        """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+        import backend.backends as backends_pkg
+    
+        configs = _constrained_default_qwen(accelerators=("cuda",))
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+        generation_app.hardware = ("mps", None)
+        expected = _expected_reason(configs()[0], "mps")
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1121: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[stream]" time="0.012"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['get_tts_backend_for_engine'], detect_calls=0, hardware=('mps', None), row=None, hit=&lt;fu...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027553BC47C0&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553BDBBF0&gt;)
+entry_point = 'stream'
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000027553BDB1A0&gt;
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+        generation_app, entry_point, monkeypatch
+    ):
+        """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+        import backend.backends as backends_pkg
+    
+        configs = _constrained_default_qwen(accelerators=("cuda",))
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+        generation_app.hardware = ("mps", None)
+        expected = _expected_reason(configs()[0], "mps")
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1121: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[retry]" time="0.013"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('mps', None), row=namespace(...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027553BC6AC0&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553AAC8C0&gt;)
+entry_point = 'retry'
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000027553AAD010&gt;
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+        generation_app, entry_point, monkeypatch
+    ):
+        """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+        import backend.backends as backends_pkg
+    
+        configs = _constrained_default_qwen(accelerators=("cuda",))
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+        generation_app.hardware = ("mps", None)
+        expected = _expected_reason(configs()[0], "mps")
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1121: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[regenerate]" time="0.012"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('mps', None), row=namespace(...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027552986520&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553BEF4D0&gt;)
+entry_point = 'regenerate'
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000027553BED580&gt;
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+        generation_app, entry_point, monkeypatch
+    ):
+        """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+        import backend.backends as backends_pkg
+    
+        configs = _constrained_default_qwen(accelerators=("cuda",))
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+        generation_app.hardware = ("mps", None)
+        expected = _expected_reason(configs()[0], "mps")
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1121: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[speak]" time="0.014"><failure message="AssertionError: (500, None)&#10;assert 500 == 400">generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('mps', None), row=None, hit=&lt;fun...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027553BC65C0&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553BF13D0&gt;)
+entry_point = 'speak'
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000027553BF3110&gt;
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+        generation_app, entry_point, monkeypatch
+    ):
+        """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+        import backend.backends as backends_pkg
+    
+        configs = _constrained_default_qwen(accelerators=("cuda",))
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+        generation_app.hardware = ("mps", None)
+        expected = _expected_reason(configs()[0], "mps")
+    
+        status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+    
+&gt;       assert status_code == 400, (status_code, detail)
+E       AssertionError: (500, None)
+E       assert 500 == 400
+
+backend\tests\test_engine_capabilities.py:1121: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name[mcp_speak]" time="0.003"><failure message="AssertionError: a refused generation must not reach history.create_generation">generation_app = namespace(forbid=True, calls=['history.create_generation'], detect_calls=0, hardware=('mps', None), row=None, hit=&lt;fun...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027553AC1C60&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553B44410&gt;)
+entry_point = 'mcp_speak'
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000027553AD77A0&gt;
+
+    @pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+    async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+        generation_app, entry_point, monkeypatch
+    ):
+        """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+        import backend.backends as backends_pkg
+    
+        configs = _constrained_default_qwen(accelerators=("cuda",))
+        monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+        generation_app.hardware = ("mps", None)
+        expected = _expected_reason(configs()[0], "mps")
+    
+&gt;       status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend\tests\test_engine_capabilities.py:1119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\tests\test_engine_capabilities.py:1067: in _call_entry_point
+    await mcp_tools._speak(
+backend\mcp_server\tools.py:263: in _speak
+    generation = await generate_speech(req, db)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\routes\generations.py:92: in generate_speech
+    generation = await history.create_generation(
+backend\tests\test_engine_capabilities.py:962: in fake_create_generation
+    hit("history.create_generation")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+name = 'history.create_generation'
+
+    def hit(name):
+        state.calls.append(name)
+        if state.forbid:
+&gt;           raise AssertionError(f"a refused generation must not reach {name}")
+E           AssertionError: a refused generation must not reach history.create_generation
+
+backend\tests\test_engine_capabilities.py:916: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_proceeds_for_voxcpm_on_a_supported_accelerator[generate]" time="0.014" /><testcase classname="tests.test_engine_capabilities" name="test_generation_proceeds_for_voxcpm_on_a_supported_accelerator[stream]" time="0.011" /><testcase classname="tests.test_engine_capabilities" name="test_generation_proceeds_for_voxcpm_on_a_supported_accelerator[retry]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_generation_proceeds_for_voxcpm_on_a_supported_accelerator[regenerate]" time="0.036" /><testcase classname="tests.test_engine_capabilities" name="test_generation_proceeds_for_voxcpm_on_a_supported_accelerator[speak]" time="0.011" /><testcase classname="tests.test_engine_capabilities" name="test_generation_proceeds_for_voxcpm_on_a_supported_accelerator[mcp_speak]" time="0.002" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox-generate]" time="0.011" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox-stream]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox-retry]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox-regenerate]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox-speak]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox-mcp_speak]" time="0.002" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox_turbo-generate]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox_turbo-stream]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox_turbo-retry]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox_turbo-regenerate]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox_turbo-speak]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[chatterbox_turbo-mcp_speak]" time="0.002" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[f5_tts-generate]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[f5_tts-stream]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[f5_tts-retry]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[f5_tts-regenerate]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[f5_tts-speak]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[f5_tts-mcp_speak]" time="0.002" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[kokoro-generate]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[kokoro-stream]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[kokoro-retry]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[kokoro-regenerate]" time="0.025" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[kokoro-speak]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[kokoro-mcp_speak]" time="0.002" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[luxtts-generate]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[luxtts-stream]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[luxtts-retry]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[luxtts-regenerate]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[luxtts-speak]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[luxtts-mcp_speak]" time="0.003" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen-generate]" time="0.012" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen-stream]" time="0.161" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen-retry]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen-regenerate]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen-speak]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen-mcp_speak]" time="0.002" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen_custom_voice-generate]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen_custom_voice-stream]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen_custom_voice-retry]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen_custom_voice-regenerate]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen_custom_voice-speak]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[qwen_custom_voice-mcp_speak]" time="0.003" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[tada-generate]" time="0.011" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[tada-stream]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[tada-retry]" time="0.008" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[tada-regenerate]" time="0.009" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[tada-speak]" time="0.010" /><testcase classname="tests.test_engine_capabilities" name="test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware[tada-mcp_speak]" time="0.002" /><testcase classname="tests.test_engine_capabilities" name="test_refused_retry_leaves_the_stored_row_untouched[retry]" time="0.009"><failure message="AssertionError: assert 'generating' == 'failed'&#10;  &#10;  - failed&#10;  + generating">generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('xpu', None), row=namespace(...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027553F7D800&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027553F81280&gt;)
+entry_point = 'retry'
+
+    @pytest.mark.parametrize("entry_point", ["retry", "regenerate"])
+    async def test_refused_retry_leaves_the_stored_row_untouched(generation_app, entry_point):
+        generation_app.hardware = ("xpu", None)
+    
+        await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+        row = generation_app.row
+&gt;       assert row.status == ("failed" if entry_point == "retry" else "completed")
+E       AssertionError: assert 'generating' == 'failed'
+E         
+E         - failed
+E         + generating
+
+backend\tests\test_engine_capabilities.py:1159: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_refused_retry_leaves_the_stored_row_untouched[regenerate]" time="0.010"><failure message="AssertionError: assert 'generating' == 'completed'&#10;  &#10;  - completed&#10;  + generating">generation_app = namespace(forbid=True, calls=['task_manager.start_generation'], detect_calls=0, hardware=('xpu', None), row=namespace(...n_app.&lt;locals&gt;.&lt;lambda&gt; at 0x0000027553F7EAC0&gt;), client=&lt;starlette.testclient.TestClient object at 0x0000027554050500&gt;)
+entry_point = 'regenerate'
+
+    @pytest.mark.parametrize("entry_point", ["retry", "regenerate"])
+    async def test_refused_retry_leaves_the_stored_row_untouched(generation_app, entry_point):
+        generation_app.hardware = ("xpu", None)
+    
+        await _call_entry_point(generation_app, entry_point, "voxcpm")
+    
+        row = generation_app.row
+&gt;       assert row.status == ("failed" if entry_point == "retry" else "completed")
+E       AssertionError: assert 'generating' == 'completed'
+E         
+E         - completed
+E         + generating
+
+backend\tests\test_engine_capabilities.py:1159: AssertionError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_availability_helper_raises_the_resolver_reason" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'EngineUnavailableError'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000027554050950&gt;
+
+    def test_availability_helper_raises_the_resolver_reason(monkeypatch):
+        import backend.backends.base as base_mod
+        from backend.services import generation as generation_service
+    
+        monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", lambda: ("directml", None))
+    
+&gt;       with pytest.raises(generation_service.EngineUnavailableError) as excinfo:
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'EngineUnavailableError'
+
+backend\tests\test_engine_capabilities.py:1170: AttributeError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_availability_helper_proceeds_when_torch_is_missing" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'ensure_engine_available'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000027553FB8860&gt;
+
+    def test_availability_helper_proceeds_when_torch_is_missing(monkeypatch):
+        """Undetectable hardware resolves to CPU, which VoxCPM2 declares, so generation proceeds."""
+        import backend.backends.base as base_mod
+        from backend.services import generation as generation_service
+    
+        def _no_torch(**_k):
+            raise ImportError("No module named 'torch'")
+    
+        monkeypatch.setattr(base_mod, "get_torch_device", _no_torch)
+    
+        assert base_mod.detect_accelerator_and_memory() == ("cpu", None)
+&gt;       generation_service.ensure_engine_available("voxcpm")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'ensure_engine_available'
+
+backend\tests\test_engine_capabilities.py:1188: AttributeError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_availability_helper_ignores_unknown_engines" time="0.001"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'ensure_engine_available'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000027553FBB080&gt;
+
+    def test_availability_helper_ignores_unknown_engines(monkeypatch):
+        import backend.backends.base as base_mod
+        from backend.services import generation as generation_service
+    
+        monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", _forbid("detect_accelerator_and_memory"))
+    
+&gt;       generation_service.ensure_engine_available("not-an-engine")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'ensure_engine_available'
+
+backend\tests\test_engine_capabilities.py:1197: AttributeError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_in_memory_generation_service_refuses_before_loading" time="0.002"><failure message="AttributeError: module 'backend.services.generation' has no attribute 'EngineUnavailableError'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000027554053C80&gt;
+
+    async def test_in_memory_generation_service_refuses_before_loading(monkeypatch):
+        """generate_audio_sync (the non-persisting service path) applies the same refusal."""
+        import backend.backends as backends_pkg
+        import backend.backends.base as base_mod
+        from backend.services import generation as generation_service
+    
+        monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", lambda: ("xpu", None))
+        for name in ("load_engine_model", "get_tts_backend_for_engine"):
+            monkeypatch.setattr(backends_pkg, name, _forbid(name))
+        monkeypatch.setattr(generation_service, "get_db", _forbid("get_db"))
+    
+&gt;       with pytest.raises(generation_service.EngineUnavailableError, match="VoxCPM2"):
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'backend.services.generation' has no attribute 'EngineUnavailableError'
+
+backend\tests\test_engine_capabilities.py:1211: AttributeError</failure></testcase><testcase classname="tests.test_engine_capabilities" name="test_generation_code_has_no_engine_name_checks" time="0.006" /></testsuite></testsuites>

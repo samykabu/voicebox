@@ -857,3 +857,367 @@ def test_engines_route_describes_voxcpm_from_its_declaration(engines_client):
     assert voxcpm["commercial_use"] is True
     assert len(voxcpm["languages"]) == 30
     assert "ar" in voxcpm["languages"]
+
+
+# ---------------------------------------------------------------------------
+# 6. Generation refuses an engine the resolver marks unavailable (T029, FR-003)
+# ---------------------------------------------------------------------------
+#
+# Every generation entry point that accepts an engine is exercised on a fresh app with
+# only the routers it needs. The load, download, backend and queue entry points are
+# patched to raise while a refusal is expected, so a refusal that comes too late fails
+# loudly. Hardware is injected through the resolver's detection function, never by name.
+
+# Detected hardware outside VoxCPM2's declared ("cuda", "mps", "cpu") set.
+UNSUPPORTED_HARDWARE = [("xpu", None), ("directml", None)]
+SUPPORTED_HARDWARE = ("cuda", 16 * 1024)
+
+# The ways a generation can start from the outside. Retry and regenerate read the engine
+# from the stored row; /speak and the MCP tool delegate to /generate.
+GENERATION_ENTRY_POINTS = ["generate", "stream", "retry", "regenerate", "speak", "mcp_speak"]
+
+
+class _RefusalBackend:
+    def __init__(self, state):
+        self._state = state
+
+    def is_loaded(self):
+        return True
+
+    async def generate(self, text, voice_prompt, language="en", seed=None, instruct=None):
+        self._state.hit("backend.generate")
+        import numpy as np
+
+        return np.zeros(2400, dtype=np.float32), 24000
+
+
+@pytest.fixture
+def generation_app(monkeypatch):
+    """Fresh app with the generation and speak routers, fake database and guarded heavy paths.
+
+    ``state.forbid`` (default True) makes every load, download, backend, queue and
+    history-write entry point raise; tests that expect a request to proceed switch it off
+    and then read ``state.calls``.
+    """
+    from datetime import datetime
+
+    import backend.backends as backends_pkg
+    import backend.backends.base as base_mod
+    import backend.routes.generations as gen_routes
+    import backend.routes.speak as speak_routes
+    from backend import models as models_mod
+    from backend.database import get_db
+
+    state = SimpleNamespace(forbid=True, calls=[], detect_calls=0, hardware=SUPPORTED_HARDWARE, row=None)
+
+    def hit(name):
+        state.calls.append(name)
+        if state.forbid:
+            raise AssertionError(f"a refused generation must not reach {name}")
+
+    state.hit = hit
+
+    def _fake_detect():
+        state.detect_calls += 1
+        return state.hardware
+
+    monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", _fake_detect)
+
+    async def fake_load(*_a, **_k):
+        hit("load_engine_model")
+
+    async def fake_ensure_cached(*_a, **_k):
+        hit("ensure_model_cached_or_raise")
+
+    def fake_backend_for(_engine):
+        hit("get_tts_backend_for_engine")
+        return _RefusalBackend(state)
+
+    def fake_load_func(*_a, **_k):
+        hit("get_model_load_func")
+
+    monkeypatch.setattr(backends_pkg, "load_engine_model", fake_load)
+    monkeypatch.setattr(backends_pkg, "ensure_model_cached_or_raise", fake_ensure_cached)
+    monkeypatch.setattr(backends_pkg, "get_tts_backend_for_engine", fake_backend_for)
+    monkeypatch.setattr(backends_pkg, "get_model_load_func", fake_load_func)
+
+    profile = SimpleNamespace(
+        id="p1",
+        name="Morgan",
+        language="en",
+        default_engine=None,
+        preset_engine=None,
+        personality=None,
+        effects_chain=None,
+    )
+
+    async def fake_get_profile(*_a, **_k):
+        return profile
+
+    async def fake_voice_prompt(*_a, **_k):
+        hit("create_voice_prompt_for_profile")
+        return {}
+
+    async def fake_create_generation(**kwargs):
+        hit("history.create_generation")
+        return models_mod.GenerationResponse(
+            id=kwargs["generation_id"],
+            profile_id=kwargs["profile_id"],
+            text=kwargs["text"],
+            language=kwargs["language"],
+            engine=kwargs["engine"],
+            model_size=kwargs.get("model_size"),
+            status="generating",
+            created_at=datetime(2026, 9, 23),
+        )
+
+    def fake_run_generation(**kwargs):
+        hit("run_generation")
+        return ("job", kwargs)
+
+    def fake_enqueue(generation_id, job):
+        hit("enqueue_generation")
+
+    fake_tasks = SimpleNamespace(
+        start_generation=lambda **_k: hit("task_manager.start_generation"),
+        complete_generation=lambda *_a, **_k: None,
+    )
+
+    monkeypatch.setattr(gen_routes.profiles, "get_profile", fake_get_profile)
+    monkeypatch.setattr(gen_routes.profiles, "validate_profile_engine", lambda *_a, **_k: None)
+    monkeypatch.setattr(gen_routes.profiles, "create_voice_prompt_for_profile", fake_voice_prompt)
+    monkeypatch.setattr(gen_routes.pronunciation, "apply_pronunciations", lambda text, *_a, **_k: (text, []))
+    monkeypatch.setattr(gen_routes.history, "create_generation", fake_create_generation)
+    monkeypatch.setattr(gen_routes, "run_generation", fake_run_generation)
+    monkeypatch.setattr(gen_routes, "enqueue_generation", fake_enqueue)
+    monkeypatch.setattr(gen_routes, "get_task_manager", lambda: fake_tasks)
+    monkeypatch.setattr(speak_routes, "resolve_profile", lambda *_a, **_k: profile)
+    monkeypatch.setattr(speak_routes.mcp_events, "publish", lambda *_a, **_k: None)
+
+    class FakeQuery:
+        def filter_by(self, **_k):
+            return self
+
+        def filter(self, *_a, **_k):
+            return self
+
+        def first(self):
+            return state.row
+
+    fake_db = SimpleNamespace(
+        query=lambda *_a: FakeQuery(),
+        commit=lambda: None,
+        refresh=lambda _obj: None,
+        close=lambda: None,
+    )
+    state.db = fake_db
+
+    app = FastAPI()
+    app.include_router(gen_routes.router)
+    app.include_router(speak_routes.router)
+    app.dependency_overrides[get_db] = lambda: fake_db
+    state.client = TestClient(app, raise_server_exceptions=False)
+    return state
+
+
+def _stored_row(engine, status):
+    from datetime import datetime
+
+    return SimpleNamespace(
+        id="gen-1",
+        profile_id="p1",
+        text="Hello there.",
+        language="en",
+        audio_path="generations/gen-1.wav",
+        duration=1.5,
+        seed=7,
+        instruct=None,
+        engine=engine,
+        model_size=None,
+        status=status,
+        error=None,
+        is_favorited=False,
+        source="manual",
+        created_at=datetime(2026, 9, 23),
+        versions=None,
+        active_version_id=None,
+    )
+
+
+async def _call_entry_point(state, entry_point, engine):
+    """Invoke one generation entry point with ``engine``; return (status_code, detail)."""
+    from fastapi import HTTPException
+
+    body = {"profile_id": "p1", "text": "Hello there.", "language": "en", "engine": engine}
+    client = state.client
+    if entry_point == "generate":
+        response = client.post("/generate", json=body)
+    elif entry_point == "stream":
+        response = client.post("/generate/stream", json=body)
+    elif entry_point in ("retry", "regenerate"):
+        state.row = _stored_row(engine, "failed" if entry_point == "retry" else "completed")
+        response = client.post(f"/generate/gen-1/{entry_point}")
+    elif entry_point == "speak":
+        response = client.post("/speak", json={"text": "Hello there.", "profile": "Morgan", "engine": engine})
+    elif entry_point == "mcp_speak":
+        from backend.mcp_server import tools as mcp_tools
+
+        # The fixture already silenced the shared mcp_server.events.publish.
+        try:
+            await mcp_tools._speak(
+                profile_id="p1",
+                profile_name="Morgan",
+                text="Hello there.",
+                engine=engine,
+                language="en",
+                personality=False,
+                db=state.db,
+            )
+        except HTTPException as exc:
+            return exc.status_code, exc.detail
+        return 200, None
+    else:  # pragma: no cover - guards the parametrization
+        raise AssertionError(entry_point)
+    is_json = response.headers.get("content-type", "").startswith("application/json")
+    return response.status_code, (response.json().get("detail") if is_json else None)
+
+
+def _expected_reason(config, accelerator):
+    reason = resolve_engine_availability(config, accelerator).reason
+    assert reason, "the resolver must state a reason for the hardware under test"
+    return reason
+
+
+@pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+@pytest.mark.parametrize(("accelerator", "memory_mb"), UNSUPPORTED_HARDWARE)
+async def test_generation_refuses_unavailable_voxcpm_with_the_resolver_reason(
+    generation_app, entry_point, accelerator, memory_mb
+):
+    generation_app.hardware = (accelerator, memory_mb)
+    expected = _expected_reason(_voxcpm_config(), accelerator)
+
+    status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+
+    assert status_code == 400, (status_code, detail)
+    assert detail == expected
+    # Refused before any model load, download, backend call, queue entry or history row.
+    assert generation_app.calls == []
+
+
+@pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+async def test_generation_refusal_is_driven_by_the_declaration_not_the_engine_name(
+    generation_app, entry_point, monkeypatch
+):
+    """A fake qwen config that declares accelerators is refused the same way; nothing keys on 'voxcpm'."""
+    import backend.backends as backends_pkg
+
+    configs = _constrained_default_qwen(accelerators=("cuda",))
+    monkeypatch.setattr(backends_pkg, "get_tts_model_configs", configs)
+    generation_app.hardware = ("mps", None)
+    expected = _expected_reason(configs()[0], "mps")
+
+    status_code, detail = await _call_entry_point(generation_app, entry_point, "qwen")
+
+    assert status_code == 400, (status_code, detail)
+    assert detail == expected
+    assert "Qwen Test" in detail
+    assert generation_app.calls == []
+
+
+@pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+async def test_generation_proceeds_for_voxcpm_on_a_supported_accelerator(generation_app, entry_point):
+    generation_app.forbid = False
+    generation_app.hardware = SUPPORTED_HARDWARE
+
+    status_code, detail = await _call_entry_point(generation_app, entry_point, "voxcpm")
+
+    assert status_code == 200, (status_code, detail)
+    assert generation_app.calls, "an available engine must reach the generation pipeline"
+
+
+@pytest.mark.parametrize("entry_point", GENERATION_ENTRY_POINTS)
+@pytest.mark.parametrize("engine", sorted(PRE_VOXCPM_ENGINES))
+async def test_unconstrained_engines_proceed_exactly_as_before_on_any_hardware(generation_app, entry_point, engine):
+    generation_app.forbid = False
+    generation_app.hardware = ("xpu", None)
+
+    status_code, detail = await _call_entry_point(generation_app, entry_point, engine)
+
+    assert status_code == 200, (status_code, detail)
+    assert generation_app.calls
+    # Unconstrained engines do not even probe the hardware: today's path, unchanged.
+    assert generation_app.detect_calls == 0
+
+
+@pytest.mark.parametrize("entry_point", ["retry", "regenerate"])
+async def test_refused_retry_leaves_the_stored_row_untouched(generation_app, entry_point):
+    generation_app.hardware = ("xpu", None)
+
+    await _call_entry_point(generation_app, entry_point, "voxcpm")
+
+    row = generation_app.row
+    assert row.status == ("failed" if entry_point == "retry" else "completed")
+    assert row.error is None
+    assert row.audio_path == "generations/gen-1.wav"
+
+
+def test_availability_helper_raises_the_resolver_reason(monkeypatch):
+    import backend.backends.base as base_mod
+    from backend.services import generation as generation_service
+
+    monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", lambda: ("directml", None))
+
+    with pytest.raises(generation_service.EngineUnavailableError) as excinfo:
+        generation_service.ensure_engine_available("voxcpm")
+
+    assert str(excinfo.value) == _expected_reason(_voxcpm_config(), "directml")
+    assert excinfo.value.reason == str(excinfo.value)
+
+
+def test_availability_helper_proceeds_when_torch_is_missing(monkeypatch):
+    """Undetectable hardware resolves to CPU, which VoxCPM2 declares, so generation proceeds."""
+    import backend.backends.base as base_mod
+    from backend.services import generation as generation_service
+
+    def _no_torch(**_k):
+        raise ImportError("No module named 'torch'")
+
+    monkeypatch.setattr(base_mod, "get_torch_device", _no_torch)
+
+    assert base_mod.detect_accelerator_and_memory() == ("cpu", None)
+    generation_service.ensure_engine_available("voxcpm")
+
+
+def test_availability_helper_ignores_unknown_engines(monkeypatch):
+    import backend.backends.base as base_mod
+    from backend.services import generation as generation_service
+
+    monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", _forbid("detect_accelerator_and_memory"))
+
+    generation_service.ensure_engine_available("not-an-engine")
+
+
+async def test_in_memory_generation_service_refuses_before_loading(monkeypatch):
+    """generate_audio_sync (the non-persisting service path) applies the same refusal."""
+    import backend.backends as backends_pkg
+    import backend.backends.base as base_mod
+    from backend.services import generation as generation_service
+
+    monkeypatch.setattr(base_mod, "detect_accelerator_and_memory", lambda: ("xpu", None))
+    for name in ("load_engine_model", "get_tts_backend_for_engine"):
+        monkeypatch.setattr(backends_pkg, name, _forbid(name))
+    monkeypatch.setattr(generation_service, "get_db", _forbid("get_db"))
+
+    with pytest.raises(generation_service.EngineUnavailableError, match="VoxCPM2"):
+        await generation_service.generate_audio_sync(
+            profile_id="p1", text="Hello.", language="en", engine="voxcpm", model_size="default"
+        )
+
+
+def test_generation_code_has_no_engine_name_checks():
+    """The refusal is generic: no route or service in the generation path names an engine."""
+    backend_dir = Path(__file__).resolve().parent.parent
+    for relative in ("routes/generations.py", "routes/speak.py", "services/generation.py"):
+        tree = ast.parse((backend_dir / relative).read_text(encoding="utf-8"))
+        literals = {n.value for n in ast.walk(tree) if isinstance(n, ast.Constant) and isinstance(n.value, str)}
+        assert "voxcpm" not in literals, relative

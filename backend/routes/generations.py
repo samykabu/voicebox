@@ -13,7 +13,12 @@ from .. import config, models
 from ..backends import get_default_model_size
 from ..services import history, personality, profiles, pronunciation, tts
 from ..database import Generation as DBGeneration, VoiceProfile as DBVoiceProfile, get_db
-from ..services.generation import backend_with_generation_options, run_generation
+from ..services.generation import (
+    EngineUnavailableError,
+    backend_with_generation_options,
+    ensure_engine_available,
+    run_generation,
+)
 from ..services.task_queue import cancel_generation as cancel_generation_job, enqueue_generation
 from ..utils.audio import load_audio
 from ..utils.tasks import get_task_manager
@@ -54,6 +59,19 @@ def _resolve_generation_engine(data: models.GenerationRequest, profile) -> str:
     return data.engine or getattr(profile, "default_engine", None) or getattr(profile, "preset_engine", None) or "qwen"
 
 
+def _require_available_engine(engine: str) -> None:
+    """Refuse, with the resolver's reason, an engine this machine cannot run (FR-003).
+
+    Called by every route that starts a generation, before any row change, model load or
+    download. 400 matches the other engine refusals here (profile/engine mismatch, model
+    not downloaded): a well-formed request this machine cannot serve, not a schema error.
+    """
+    try:
+        ensure_engine_available(engine)
+    except EngineUnavailableError as e:
+        raise HTTPException(status_code=400, detail=e.reason) from e
+
+
 @router.post("/generate", response_model=models.GenerationResponse)
 async def generate_speech(
     data: models.GenerationRequest,
@@ -74,6 +92,7 @@ async def generate_speech(
         profiles.validate_profile_engine(profile, engine)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    _require_available_engine(engine)
 
     model_size = (data.model_size or get_default_model_size(engine)) if engine_has_model_sizes(engine) else None
 
@@ -157,6 +176,8 @@ async def retry_generation(generation_id: str, db: Session = Depends(get_db)):
     if (gen.status or "completed") != "failed":
         raise HTTPException(status_code=400, detail="Only failed generations can be retried")
 
+    _require_available_engine(gen.engine or "qwen")
+
     gen.status = "generating"
     gen.error = None
     gen.audio_path = ""
@@ -200,6 +221,8 @@ async def regenerate_generation(generation_id: str, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="Generation not found")
     if (gen.status or "completed") != "completed":
         raise HTTPException(status_code=400, detail="Generation must be completed to regenerate")
+
+    _require_available_engine(gen.engine or "qwen")
 
     gen.status = "generating"
     gen.error = None
@@ -340,6 +363,7 @@ async def stream_speech(
         profiles.validate_profile_engine(profile, engine)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    _require_available_engine(engine)
     tts_model = get_tts_backend_for_engine(engine)
     model_size = data.model_size or get_default_model_size(engine)
 

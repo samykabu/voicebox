@@ -1,0 +1,78 @@
+# T033: no engine-name capability or hardware branching for voxcpm. Generated 2026-09-23T17:41:51+03:00
+Working tree at HEAD 60cd4fe plus uncommitted Phase 5 changes (T031/T032 frontend, T029/T030 backend). Grep timestamp 2026-09-23T17:40:58+03:00.
+
+## 1. Exact task command
+$ grep -rn "voxcpm" app/src backend/routes
+app/src/components/Generation/EngineModelSelector.tsx:45:  { value: 'voxcpm', label: 'VoxCPM2', engine: 'voxcpm' },
+app/src/components/Generation/EngineModelSelector.tsx:62:  voxcpm: 'OpenBMB, 30 languages incl. Arabic, voice design',
+app/src/components/Generation/FloatingGenerateBox.tsx:166:    | 'voxcpm';
+app/src/components/ServerSettings/ModelManagement.tsx:90:  voxcpm2:
+app/src/components/ServerSettings/ModelManagement.tsx:120:  voxcpm2: 'voxcpm',
+app/src/components/ServerSettings/ModelManagement.tsx:471:        m.model_name.startsWith('voxcpm'),
+app/src/lib/api/models/EngineCapabilityResponse.ts:10: * See specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md.
+app/src/lib/api/schemas/$EngineCapabilityResponse.ts:8:    See specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md.`,
+app/src/lib/api/schemas/$GenerationRequest.ts:52:                pattern: '^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$',
+app/src/lib/api/schemas/$MCPClientBindingResponse.ts:34:                pattern: '^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$',
+app/src/lib/api/schemas/$MCPClientBindingUpsert.ts:35:                pattern: '^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$',
+app/src/lib/api/schemas/$SpeakRequest.ts:27:                pattern: '^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$',
+app/src/lib/api/types.ts:85:    | 'voxcpm';
+app/src/lib/hooks/useGenerationForm.ts:44:      'voxcpm',
+app/src/lib/hooks/useGenerationForm.ts:150:                      : engine === 'voxcpm'
+app/src/lib/hooks/useGenerationForm.ts:151:                        ? 'voxcpm2'
+app/src/lib/hooks/useGenerationForm.ts:172:                      : engine === 'voxcpm'
+app/src/lib/utils/format.ts:65:  voxcpm: 'VoxCPM2',
+exit=0
+(backend/routes: 0 hits)
+
+## 2. Same grep including backend/services
+$ grep -rn "voxcpm" app/src backend/routes backend/services
+app/src/components/Generation/EngineModelSelector.tsx:45:  { value: 'voxcpm', label: 'VoxCPM2', engine: 'voxcpm' },
+app/src/components/Generation/EngineModelSelector.tsx:62:  voxcpm: 'OpenBMB, 30 languages incl. Arabic, voice design',
+app/src/components/Generation/FloatingGenerateBox.tsx:166:    | 'voxcpm';
+app/src/components/ServerSettings/ModelManagement.tsx:90:  voxcpm2:
+app/src/components/ServerSettings/ModelManagement.tsx:120:  voxcpm2: 'voxcpm',
+app/src/components/ServerSettings/ModelManagement.tsx:471:        m.model_name.startsWith('voxcpm'),
+app/src/lib/api/models/EngineCapabilityResponse.ts:10: * See specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md.
+app/src/lib/api/schemas/$EngineCapabilityResponse.ts:8:    See specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md.`,
+app/src/lib/api/schemas/$GenerationRequest.ts:52:                pattern: '^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$',
+app/src/lib/api/schemas/$MCPClientBindingResponse.ts:34:                pattern: '^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$',
+app/src/lib/api/schemas/$MCPClientBindingUpsert.ts:35:                pattern: '^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$',
+app/src/lib/api/schemas/$SpeakRequest.ts:27:                pattern: '^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$',
+app/src/lib/api/types.ts:85:    | 'voxcpm';
+app/src/lib/hooks/useGenerationForm.ts:44:      'voxcpm',
+app/src/lib/hooks/useGenerationForm.ts:150:                      : engine === 'voxcpm'
+app/src/lib/hooks/useGenerationForm.ts:151:                        ? 'voxcpm2'
+app/src/lib/hooks/useGenerationForm.ts:172:                      : engine === 'voxcpm'
+app/src/lib/utils/format.ts:65:  voxcpm: 'VoxCPM2',
+backend/services/profiles.py:27:CLONING_ENGINES = {"qwen", "luxtts", "chatterbox", "chatterbox_turbo", "tada", "f5_tts", "voxcpm"}
+Binary file backend/services/__pycache__/profiles.cpython-312.pyc matches
+exit=0
+
+## 3. Classification (every line). Categories: registration | test | comment | capability/hardware decision
+| # | Location | Class | Why |
+|---|----------|-------|-----|
+| 1 | EngineModelSelector.tsx:45 `{ value: 'voxcpm', label: 'VoxCPM2', engine: 'voxcpm' }` | registration | The picker's option entry. Every engine has one. |
+| 2 | EngineModelSelector.tsx:62 `voxcpm: 'OpenBMB, 30 languages...'` | registration | Description text in the per-engine map. |
+| 3 | FloatingGenerateBox.tsx:166 `\| 'voxcpm';` | registration | Member of the EngineValue type union. |
+| 4 | ModelManagement.tsx:90 `voxcpm2:` | registration | Model description entry (the key is the model id). |
+| 5 | ModelManagement.tsx:120 `voxcpm2: 'voxcpm'` | registration | Model-to-engine map used to look up the capability. The file's doc comment says what the UI does comes from the capability. |
+| 6 | ModelManagement.tsx:471 `m.model_name.startsWith('voxcpm')` | registration | Puts the model in the "voice generation" list section. Every TTS model is grouped this way by name prefix, and it decides no behaviour. |
+| 7 | lib/api/models/EngineCapabilityResponse.ts:10 | comment | Generated doc comment citing the spec path. |
+| 8 | lib/api/schemas/$EngineCapabilityResponse.ts:8 | comment | Generated description citing the spec path. |
+| 9 | lib/api/schemas/$GenerationRequest.ts:52 | registration | Generated engine-name pattern (API schema enum). |
+| 10 | lib/api/schemas/$MCPClientBindingResponse.ts:34 | registration | Generated engine-name pattern. |
+| 11 | lib/api/schemas/$MCPClientBindingUpsert.ts:35 | registration | Generated engine-name pattern. |
+| 12 | lib/api/schemas/$SpeakRequest.ts:27 | registration | Generated engine-name pattern. |
+| 13 | lib/api/types.ts:85 `\| 'voxcpm';` | registration | Engine type union. |
+| 14 | lib/hooks/useGenerationForm.ts:44 `'voxcpm',` | registration | Zod engine enum. |
+| 15 | lib/hooks/useGenerationForm.ts:150-151 `engine === 'voxcpm' ? 'voxcpm2'` | registration | Engine-to-model-id lookup in the ternary chain every engine uses. It names the model to check download status for and decides no capability or hardware behaviour; the confirmation, availability and settings around it all come from `capability`. |
+| 16 | lib/hooks/useGenerationForm.ts:172 `engine === 'voxcpm'` (-> 'VoxCPM2') | registration | Engine-to-display-name lookup in the same chain. |
+| 17 | lib/utils/format.ts:65 `voxcpm: 'VoxCPM2'` | registration | Display-name map. |
+| 18 | backend/services/profiles.py:27 `CLONING_ENGINES = {..., "voxcpm"}` | registration | The backend's declaration of which engines clone (T027). It is the source of `supports_cloning` in GET /models/engines, and the app reads that field, not the name. |
+| 19 | backend/services/__pycache__/profiles.cpython-312.pyc (binary match) | not source | Compiled copy of item 18, not a separate reference. |
+
+Result: 0 capability or hardware decisions on the engine name. backend/routes has 0 hits.
+Closest call: items 15-16 are `engine === 'voxcpm'` comparisons, but they are name-to-id and name-to-label lookups that exist for all 9 engines, not capability or hardware branching. The contract forbids the latter. Removing them would need a model id and display name in the capability response (display_name exists, a model id does not); that is outside T033.
+The app's T028-T032 changes add no voxcpm string. The T031/T032 diff contains no 'voxcpm':
+$ grep -c -i voxcpm <T031/T032 diff of the 4 owned files>
+0

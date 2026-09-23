@@ -26,6 +26,47 @@ from ..database import get_db
 from ..utils.tasks import get_task_manager
 
 
+class EngineUnavailableError(ValueError):
+    """The availability resolver marked an engine unusable on this machine (FR-003).
+
+    ``reason`` is the resolver's user-facing sentence, passed through unchanged.
+    """
+
+    def __init__(self, engine: str, reason: str) -> None:
+        super().__init__(reason)
+        self.engine = engine
+        self.reason = reason
+
+
+def ensure_engine_available(engine: str) -> None:
+    """Refuse *engine* when the availability resolver marks it unavailable here (FR-003).
+
+    Generic: reads the accelerators declared by the engine's default-size config and
+    resolves them against the detected hardware, the same rule ``GET /models/engines``
+    reports. Engines that declare no accelerators (every pre-existing engine) are
+    unconstrained, so hardware is not probed for them and they proceed as before; unknown
+    engines are left to the existing lookups. Detection reads device state only: it never
+    loads a model or starts a download, and torch is imported lazily inside it.
+
+    Raises:
+        EngineUnavailableError: carrying the resolver's ``reason``.
+    """
+    from ..backends import get_default_model_size, get_tts_model_configs
+    from ..backends.base import detect_engine_availability
+
+    variants = [c for c in get_tts_model_configs() if c.engine == engine]
+    if not variants:
+        return
+    default_size = get_default_model_size(engine)
+    config = next((c for c in variants if c.model_size == default_size), variants[0])
+    if not config.accelerators:
+        return
+
+    availability = detect_engine_availability(config, min_memory_mb=config.min_memory_mb)
+    if not availability.available:
+        raise EngineUnavailableError(engine, availability.reason or f"{config.display_name} is unavailable.")
+
+
 def engine_declares_advanced_settings(engine: str) -> bool:
     """Whether any model config of *engine* declares advanced settings (FR-010)."""
     from ..backends import get_tts_model_configs
@@ -333,6 +374,8 @@ async def generate_audio_sync(
     from ..utils.chunked_tts import generate_chunked
     from ..utils.audio import has_tts_runaway, normalize_audio, trim_tts_output
     from . import tts
+
+    ensure_engine_available(engine)
 
     bg_db = next(get_db())
     try:

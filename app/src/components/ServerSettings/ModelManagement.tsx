@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  AlertTriangle,
   ChevronDown,
   ChevronRight,
   ChevronUp,
@@ -51,6 +52,7 @@ import {
 import {
   type DownloadConfirmationDetails,
   downloadConfirmationDetails,
+  engineNotice,
   needsDownloadConfirmation,
 } from '@/lib/hooks/engineCapabilityRules';
 import { findEngineCapability, useEngineCapabilities } from '@/lib/hooks/useEngineCapabilities';
@@ -502,6 +504,7 @@ export function ModelManagement() {
   const selectedCapability = freshSelectedModel
     ? getModelCapability(freshSelectedModel.model_name)
     : undefined;
+  const selectedNotice = engineNotice(selectedCapability);
 
   return (
     <div className="flex flex-col h-full">
@@ -883,6 +886,15 @@ export function ModelManagement() {
                         defaultValue: 'Download size: {{size}}',
                       })}
                     </span>
+                  </div>
+                )}
+
+                {/* FR-003 / C1Q4: why the engine cannot run here, or an advisory warning
+                    (for example too little memory) shown before Download. Never blocks it. */}
+                {selectedNotice && (
+                  <div className="flex items-start gap-2 text-xs text-amber-600 dark:text-amber-400">
+                    <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                    <span>{selectedNotice.text}</span>
                   </div>
                 )}
 

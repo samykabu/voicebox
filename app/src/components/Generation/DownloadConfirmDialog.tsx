@@ -23,7 +23,8 @@ interface DownloadConfirmDialogProps {
 
 /**
  * Asks before starting a model download for engines whose capability sets
- * `requires_download_confirmation` (FR-018, C1Q7), showing the declared download size.
+ * `requires_download_confirmation` (FR-018, C1Q7), showing the declared download size and
+ * any capability warning, such as too little memory (C1Q4), without blocking the download.
  */
 export function DownloadConfirmDialog({
   details,
@@ -61,6 +62,10 @@ export function DownloadConfirmDialog({
                 }`
               : null}
           </AlertDialogDescription>
+          {/* C1Q4: advisory only; Download stays enabled. */}
+          {details?.warning ? (
+            <p className="text-sm text-amber-600 dark:text-amber-400">{details.warning}</p>
+          ) : null}
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
