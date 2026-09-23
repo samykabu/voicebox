@@ -1,0 +1,36 @@
+T011 (issue #27) - regenerate the TypeScript client
+Repo: D:/Projects/Personal/voicebox  branch: feature/001-voxcpm2-tts-engine  HEAD: cd42d4c
+Backend: already running on http://localhost:17493 (not started/stopped by this task)
+Backup taken before generation: C:/Users/sabus/AppData/Local/Temp/t011-api-backup (43 files, full copy of app/src/lib/api)
+
+=== Attempt 1: bun run generate:api (PowerShell, bun 1.4.2) ===
+Command: bun run generate:api   (cwd D:/Projects/Personal/voicebox)
+TS=2026-09-23T15:44:07.3231055+03:00
+EXIT=1
+$ ./scripts/generate-api.sh
+bun: unknown error: 
+error: script "generate:api" exited with code 1
+
+Result: bun on Windows cannot execute the .sh script directly ("bun: unknown error"); the script printed nothing, so it never reached the download or codegen steps.
+
+=== Attempt 2: bash scripts/generate-api.sh (Git Bash, WinGet Links on PATH) ===
+Command: bash scripts/generate-api.sh   (cwd /d/Projects/Personal/voicebox)
+TS=2026-09-23T15:44:12+03:00
+EXIT=0
+--- full output ---
+Generating OpenAPI client...
+Downloading OpenAPI schema...
+Generating TypeScript client...
+API client generated in app/src/lib/api
+Done!
+--- end output ---
+Notes: the script took the 'backend already running' branch (no venv/pip/uvicorn activity);
+the 'bunx --bun openapi-typescript-codegen --version' probe succeeded, so 'bun add' was NOT run.
+git status of package.json / bun.lock / app/package.json after run: (empty = unchanged)
+app/openapi.json written: 121071 bytes, 2026-09-23 15:44:13.114865700 +0300 (gitignored)
+
+=== Hand-written files (compared byte-for-byte with backup via cmp) ===
+client.ts: present, identical to backup (not touched; no restore needed)
+types.ts: present, identical to backup (not touched; no restore needed)
+.gitkeep: present, identical to backup (not touched; no restore needed)
+The generator did not empty the output directory; no file was deleted (git status shows only M and ??).

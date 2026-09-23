@@ -1,0 +1,398 @@
+T011 diff review - app/src/lib/api after regeneration (2026-09-23T15:47:17+03:00)
+
+=== git status --short -- app/src/lib/api ===
+ M app/src/lib/api/core/ApiError.ts
+ M app/src/lib/api/core/ApiRequestOptions.ts
+ M app/src/lib/api/core/ApiResult.ts
+ M app/src/lib/api/core/CancelablePromise.ts
+ M app/src/lib/api/core/OpenAPI.ts
+ M app/src/lib/api/core/request.ts
+ M app/src/lib/api/index.ts
+ M app/src/lib/api/models/Body_add_profile_sample_profiles__profile_id__samples_post.ts
+ M app/src/lib/api/models/Body_transcribe_audio_transcribe_post.ts
+ M app/src/lib/api/models/GenerationRequest.ts
+ M app/src/lib/api/models/GenerationResponse.ts
+ M app/src/lib/api/models/HTTPValidationError.ts
+ M app/src/lib/api/models/HealthResponse.ts
+ M app/src/lib/api/models/HistoryListResponse.ts
+ M app/src/lib/api/models/HistoryResponse.ts
+ M app/src/lib/api/models/ModelDownloadRequest.ts
+ M app/src/lib/api/models/ModelStatus.ts
+ M app/src/lib/api/models/ModelStatusListResponse.ts
+ M app/src/lib/api/models/ProfileSampleResponse.ts
+ M app/src/lib/api/models/TranscriptionResponse.ts
+ M app/src/lib/api/models/ValidationError.ts
+ M app/src/lib/api/models/VoiceProfileCreate.ts
+ M app/src/lib/api/models/VoiceProfileResponse.ts
+ M app/src/lib/api/schemas/$Body_add_profile_sample_profiles__profile_id__samples_post.ts
+ M app/src/lib/api/schemas/$Body_transcribe_audio_transcribe_post.ts
+ M app/src/lib/api/schemas/$GenerationRequest.ts
+ M app/src/lib/api/schemas/$GenerationResponse.ts
+ M app/src/lib/api/schemas/$HTTPValidationError.ts
+ M app/src/lib/api/schemas/$HealthResponse.ts
+ M app/src/lib/api/schemas/$HistoryListResponse.ts
+ M app/src/lib/api/schemas/$HistoryResponse.ts
+ M app/src/lib/api/schemas/$ModelDownloadRequest.ts
+ M app/src/lib/api/schemas/$ModelStatus.ts
+ M app/src/lib/api/schemas/$ModelStatusListResponse.ts
+ M app/src/lib/api/schemas/$ProfileSampleResponse.ts
+ M app/src/lib/api/schemas/$TranscriptionResponse.ts
+ M app/src/lib/api/schemas/$ValidationError.ts
+ M app/src/lib/api/schemas/$VoiceProfileCreate.ts
+ M app/src/lib/api/schemas/$VoiceProfileResponse.ts
+ M app/src/lib/api/services/DefaultService.ts
+?? app/src/lib/api/models/ActiveDownloadTask.ts
+?? app/src/lib/api/models/ActiveGenerationTask.ts
+?? app/src/lib/api/models/ActiveTasksResponse.ts
+?? app/src/lib/api/models/ApplyEffectsRequest.ts
+?? app/src/lib/api/models/AudioChannelCreate.ts
+?? app/src/lib/api/models/AudioChannelResponse.ts
+?? app/src/lib/api/models/AudioChannelUpdate.ts
+?? app/src/lib/api/models/AvailableEffect.ts
+?? app/src/lib/api/models/AvailableEffectsResponse.ts
+?? app/src/lib/api/models/Body_create_capture_endpoint_captures_post.ts
+?? app/src/lib/api/models/Body_import_audio_generate_import_post.ts
+?? app/src/lib/api/models/Body_import_generation_history_import_post.ts
+?? app/src/lib/api/models/Body_import_profile_profiles_import_post.ts
+?? app/src/lib/api/models/Body_upload_profile_avatar_profiles__profile_id__avatar_post.ts
+?? app/src/lib/api/models/CaptureCreateResponse.ts
+?? app/src/lib/api/models/CaptureListResponse.ts
+?? app/src/lib/api/models/CaptureReadinessResponse.ts
+?? app/src/lib/api/models/CaptureRefineRequest.ts
+?? app/src/lib/api/models/CaptureResponse.ts
+?? app/src/lib/api/models/CaptureRetranscribeRequest.ts
+?? app/src/lib/api/models/CaptureSettingsResponse.ts
+?? app/src/lib/api/models/CaptureSettingsUpdate.ts
+?? app/src/lib/api/models/ChannelVoiceAssignment.ts
+?? app/src/lib/api/models/CloudLoginStartResponse.ts
+?? app/src/lib/api/models/CloudStatusResponse.ts
+?? app/src/lib/api/models/DirectoryCheck.ts
+?? app/src/lib/api/models/EffectConfig.ts
+?? app/src/lib/api/models/EffectPresetCreate.ts
+?? app/src/lib/api/models/EffectPresetResponse.ts
+?? app/src/lib/api/models/EffectPresetUpdate.ts
+?? app/src/lib/api/models/EngineAdvancedSettingResponse.ts
+?? app/src/lib/api/models/EngineCapabilitiesResponse.ts
+?? app/src/lib/api/models/EngineCapabilityResponse.ts
+?? app/src/lib/api/models/FilesystemHealthResponse.ts
+?? app/src/lib/api/models/GenerationSettingsResponse.ts
+?? app/src/lib/api/models/GenerationSettingsUpdate.ts
+?? app/src/lib/api/models/GenerationVersionResponse.ts
+?? app/src/lib/api/models/HistoryBulkDeleteRequest.ts
+?? app/src/lib/api/models/LLMGenerateRequest.ts
+?? app/src/lib/api/models/LLMGenerateResponse.ts
+?? app/src/lib/api/models/MCPClientBindingListResponse.ts
+?? app/src/lib/api/models/MCPClientBindingResponse.ts
+?? app/src/lib/api/models/MCPClientBindingUpsert.ts
+?? app/src/lib/api/models/ModelMigrateRequest.ts
+?? app/src/lib/api/models/ModelReadiness.ts
+?? app/src/lib/api/models/PersonalityTextResponse.ts
+?? app/src/lib/api/models/ProfileChannelAssignment.ts
+?? app/src/lib/api/models/ProfileEffectsUpdate.ts
+?? app/src/lib/api/models/ProfileSampleUpdate.ts
+?? app/src/lib/api/models/PronunciationEntryCreate.ts
+?? app/src/lib/api/models/PronunciationEntryResponse.ts
+?? app/src/lib/api/models/PronunciationEntryUpdate.ts
+?? app/src/lib/api/models/PronunciationPreviewRequest.ts
+?? app/src/lib/api/models/PronunciationPreviewResponse.ts
+?? app/src/lib/api/models/PronunciationSubstitution.ts
+?? app/src/lib/api/models/RefinementFlagsModel.ts
+?? app/src/lib/api/models/SpeakRequest.ts
+?? app/src/lib/api/models/StoryCreate.ts
+?? app/src/lib/api/models/StoryDetailResponse.ts
+?? app/src/lib/api/models/StoryItemBatchUpdate.ts
+?? app/src/lib/api/models/StoryItemCreate.ts
+?? app/src/lib/api/models/StoryItemDetail.ts
+?? app/src/lib/api/models/StoryItemMove.ts
+?? app/src/lib/api/models/StoryItemReorder.ts
+?? app/src/lib/api/models/StoryItemSplit.ts
+?? app/src/lib/api/models/StoryItemTrim.ts
+?? app/src/lib/api/models/StoryItemUpdateTime.ts
+?? app/src/lib/api/models/StoryItemVersionUpdate.ts
+?? app/src/lib/api/models/StoryItemVolumeUpdate.ts
+?? app/src/lib/api/models/StoryResponse.ts
+?? app/src/lib/api/schemas/$ActiveDownloadTask.ts
+?? app/src/lib/api/schemas/$ActiveGenerationTask.ts
+?? app/src/lib/api/schemas/$ActiveTasksResponse.ts
+?? app/src/lib/api/schemas/$ApplyEffectsRequest.ts
+?? app/src/lib/api/schemas/$AudioChannelCreate.ts
+?? app/src/lib/api/schemas/$AudioChannelResponse.ts
+?? app/src/lib/api/schemas/$AudioChannelUpdate.ts
+?? app/src/lib/api/schemas/$AvailableEffect.ts
+?? app/src/lib/api/schemas/$AvailableEffectsResponse.ts
+?? app/src/lib/api/schemas/$Body_create_capture_endpoint_captures_post.ts
+?? app/src/lib/api/schemas/$Body_import_audio_generate_import_post.ts
+?? app/src/lib/api/schemas/$Body_import_generation_history_import_post.ts
+?? app/src/lib/api/schemas/$Body_import_profile_profiles_import_post.ts
+?? app/src/lib/api/schemas/$Body_upload_profile_avatar_profiles__profile_id__avatar_post.ts
+?? app/src/lib/api/schemas/$CaptureCreateResponse.ts
+?? app/src/lib/api/schemas/$CaptureListResponse.ts
+?? app/src/lib/api/schemas/$CaptureReadinessResponse.ts
+?? app/src/lib/api/schemas/$CaptureRefineRequest.ts
+?? app/src/lib/api/schemas/$CaptureResponse.ts
+?? app/src/lib/api/schemas/$CaptureRetranscribeRequest.ts
+?? app/src/lib/api/schemas/$CaptureSettingsResponse.ts
+?? app/src/lib/api/schemas/$CaptureSettingsUpdate.ts
+?? app/src/lib/api/schemas/$ChannelVoiceAssignment.ts
+?? app/src/lib/api/schemas/$CloudLoginStartResponse.ts
+?? app/src/lib/api/schemas/$CloudStatusResponse.ts
+?? app/src/lib/api/schemas/$DirectoryCheck.ts
+?? app/src/lib/api/schemas/$EffectConfig.ts
+?? app/src/lib/api/schemas/$EffectPresetCreate.ts
+?? app/src/lib/api/schemas/$EffectPresetResponse.ts
+?? app/src/lib/api/schemas/$EffectPresetUpdate.ts
+?? app/src/lib/api/schemas/$EngineAdvancedSettingResponse.ts
+?? app/src/lib/api/schemas/$EngineCapabilitiesResponse.ts
+?? app/src/lib/api/schemas/$EngineCapabilityResponse.ts
+?? app/src/lib/api/schemas/$FilesystemHealthResponse.ts
+?? app/src/lib/api/schemas/$GenerationSettingsResponse.ts
+?? app/src/lib/api/schemas/$GenerationSettingsUpdate.ts
+?? app/src/lib/api/schemas/$GenerationVersionResponse.ts
+?? app/src/lib/api/schemas/$HistoryBulkDeleteRequest.ts
+?? app/src/lib/api/schemas/$LLMGenerateRequest.ts
+?? app/src/lib/api/schemas/$LLMGenerateResponse.ts
+?? app/src/lib/api/schemas/$MCPClientBindingListResponse.ts
+?? app/src/lib/api/schemas/$MCPClientBindingResponse.ts
+?? app/src/lib/api/schemas/$MCPClientBindingUpsert.ts
+?? app/src/lib/api/schemas/$ModelMigrateRequest.ts
+?? app/src/lib/api/schemas/$ModelReadiness.ts
+?? app/src/lib/api/schemas/$PersonalityTextResponse.ts
+?? app/src/lib/api/schemas/$ProfileChannelAssignment.ts
+?? app/src/lib/api/schemas/$ProfileEffectsUpdate.ts
+?? app/src/lib/api/schemas/$ProfileSampleUpdate.ts
+?? app/src/lib/api/schemas/$PronunciationEntryCreate.ts
+?? app/src/lib/api/schemas/$PronunciationEntryResponse.ts
+?? app/src/lib/api/schemas/$PronunciationEntryUpdate.ts
+?? app/src/lib/api/schemas/$PronunciationPreviewRequest.ts
+?? app/src/lib/api/schemas/$PronunciationPreviewResponse.ts
+?? app/src/lib/api/schemas/$PronunciationSubstitution.ts
+?? app/src/lib/api/schemas/$RefinementFlagsModel.ts
+?? app/src/lib/api/schemas/$SpeakRequest.ts
+?? app/src/lib/api/schemas/$StoryCreate.ts
+?? app/src/lib/api/schemas/$StoryDetailResponse.ts
+?? app/src/lib/api/schemas/$StoryItemBatchUpdate.ts
+?? app/src/lib/api/schemas/$StoryItemCreate.ts
+?? app/src/lib/api/schemas/$StoryItemDetail.ts
+?? app/src/lib/api/schemas/$StoryItemMove.ts
+?? app/src/lib/api/schemas/$StoryItemReorder.ts
+?? app/src/lib/api/schemas/$StoryItemSplit.ts
+?? app/src/lib/api/schemas/$StoryItemTrim.ts
+?? app/src/lib/api/schemas/$StoryItemUpdateTime.ts
+?? app/src/lib/api/schemas/$StoryItemVersionUpdate.ts
+?? app/src/lib/api/schemas/$StoryItemVolumeUpdate.ts
+?? app/src/lib/api/schemas/$StoryResponse.ts
+?? app/src/lib/api/services/CloudService.ts
+?? app/src/lib/api/services/SettingsService.ts
+
+=== git diff --stat -- app/src/lib/api ===
+ app/src/lib/api/core/ApiError.ts                   |   28 +-
+ app/src/lib/api/core/ApiRequestOptions.ts          |   22 +-
+ app/src/lib/api/core/ApiResult.ts                  |   10 +-
+ app/src/lib/api/core/CancelablePromise.ts          |  221 +-
+ app/src/lib/api/core/OpenAPI.ts                    |   36 +-
+ app/src/lib/api/core/request.ts                    |  495 ++--
+ app/src/lib/api/index.ts                           |  142 +
+ ...le_sample_profiles__profile_id__samples_post.ts |    5 +-
+ .../Body_transcribe_audio_transcribe_post.ts       |    6 +-
+ app/src/lib/api/models/GenerationRequest.ts        |   43 +-
+ app/src/lib/api/models/GenerationResponse.ts       |   28 +-
+ app/src/lib/api/models/HTTPValidationError.ts      |    3 +-
+ app/src/lib/api/models/HealthResponse.ts           |   19 +-
+ app/src/lib/api/models/HistoryListResponse.ts      |    5 +-
+ app/src/lib/api/models/HistoryResponse.ts          |   29 +-
+ app/src/lib/api/models/ModelDownloadRequest.ts     |    3 +-
+ app/src/lib/api/models/ModelStatus.ts              |   17 +-
+ app/src/lib/api/models/ModelStatusListResponse.ts  |    3 +-
+ app/src/lib/api/models/ProfileSampleResponse.ts    |    9 +-
+ app/src/lib/api/models/TranscriptionResponse.ts    |    5 +-
+ app/src/lib/api/models/ValidationError.ts          |    9 +-
+ app/src/lib/api/models/VoiceProfileCreate.ts       |   13 +-
+ app/src/lib/api/models/VoiceProfileResponse.ts     |   24 +-
+ ...le_sample_profiles__profile_id__samples_post.ts |   19 +-
+ .../$Body_transcribe_audio_transcribe_post.ts      |   34 +-
+ app/src/lib/api/schemas/$GenerationRequest.ts      |  135 +-
+ app/src/lib/api/schemas/$GenerationResponse.ts     |  146 +-
+ app/src/lib/api/schemas/$HTTPValidationError.ts    |   14 +-
+ app/src/lib/api/schemas/$HealthResponse.ts         |  116 +-
+ app/src/lib/api/schemas/$HistoryListResponse.ts    |   26 +-
+ app/src/lib/api/schemas/$HistoryResponse.ts        |  151 +-
+ app/src/lib/api/schemas/$ModelDownloadRequest.ts   |   12 +-
+ app/src/lib/api/schemas/$ModelStatus.ts            |   84 +-
+ .../lib/api/schemas/$ModelStatusListResponse.ts    |   18 +-
+ app/src/lib/api/schemas/$ProfileSampleResponse.ts  |   36 +-
+ app/src/lib/api/schemas/$TranscriptionResponse.ts  |   20 +-
+ app/src/lib/api/schemas/$ValidationError.ts        |   54 +-
+ app/src/lib/api/schemas/$VoiceProfileCreate.ts     |   95 +-
+ app/src/lib/api/schemas/$VoiceProfileResponse.ts   |  133 +-
+ app/src/lib/api/services/DefaultService.ts         | 2985 +++++++++++++++++---
+ 40 files changed, 3982 insertions(+), 1271 deletions(-)
+
+=== Counts ===
+New untracked files: 142  (models 70, schemas 70, services 2: CloudService.ts, SettingsService.ts)
+Modified tracked files: 40  (core 6, models 16, schemas 16, services 1, index.ts 1)
+Deleted files: 0
+
+=== Required item 1: service method for GET /models/engines (services/DefaultService.ts) ===
+2267:     * Get Engine Capabilities
+2268-     * Report each TTS engine's capabilities and whether this machine can run it.
+2269-     *
+2270-     * One entry per engine, aggregated from all of its model variants: languages are the
+2271-     * union, license fields are the shared value or null, and the download size, capability
+2272-     * flags, accelerators and memory threshold come from the default-size variant. Hardware is
+2273-     * detected once per request. Never loads a model, starts a download or imports torch at
+2274-     * module scope (contracts/engine-capabilities.md, invariant 4).
+2275-     * @returns EngineCapabilitiesResponse Successful Response
+2276-     * @throws ApiError
+2277-     */
+2278-    public static getEngineCapabilitiesModelsEnginesGet(): CancelablePromise<EngineCapabilitiesResponse> {
+2279-        return __request(OpenAPI, {
+2280-            method: 'GET',
+2281-            url: '/models/engines',
+2282-        });
+2283-    }
+2284-    /**
+2285-     * Trigger Model Download
+2286-     * Trigger download of a specific model.
+2287-     * @returns any Successful Response
+
+=== Required item 2: models/EngineCapabilitiesResponse.ts ===
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+import type { EngineCapabilityResponse } from './EngineCapabilityResponse';
+/**
+ * Response model for GET /models/engines.
+ */
+export type EngineCapabilitiesResponse = {
+    engines: Array<EngineCapabilityResponse>;
+};
+
+=== Required item 3: models/EngineCapabilityResponse.ts ===
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+import type { EngineAdvancedSettingResponse } from './EngineAdvancedSettingResponse';
+/**
+ * One TTS engine's capabilities and whether this machine can run it (FR-004).
+ *
+ * Describes the engine as a whole, aggregated from all of its model variants.
+ * See specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md.
+ */
+export type EngineCapabilityResponse = {
+    engine: string;
+    /**
+     * The engine name (not a model variant name).
+     */
+    display_name: string;
+    available: boolean;
+    /**
+     * Non-null if and only if available is false.
+     */
+    reason: (string | null);
+    /**
+     * Advisory only; never blocks.
+     */
+    warning: (string | null);
+    /**
+     * From the default-size variant. Empty means unconstrained.
+     */
+    supported_accelerators: Array<string>;
+    detected_accelerator: string;
+    /**
+     * Union across all of the engine's variants, in first-seen order over the variants in registry order.
+     */
+    languages: Array<string>;
+    supports_cloning: boolean;
+    /**
+     * From the default-size variant.
+     */
+    supports_voice_design: boolean;
+    /**
+     * From the default-size variant.
+     */
+    requires_download_confirmation: boolean;
+    /**
+     * From the default-size variant.
+     */
+    advanced_settings: Array<EngineAdvancedSettingResponse>;
+    /**
+     * Download size of the default-size variant, the one downloaded by default.
+     */
+    size_mb: number;
+    /**
+     * Shared by every variant, or null when the variants differ.
+     */
+    license_id: (string | null);
+    /**
+     * Shared by every variant, or null when the variants differ.
+     */
+    commercial_use: (boolean | null);
+};
+
+=== Required item 4: models/EngineAdvancedSettingResponse.ts ===
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+/**
+ * An advanced generation setting an engine declares (FR-010).
+ */
+export type EngineAdvancedSettingResponse = {
+    name: string;
+    label: string;
+    default: number;
+    min: number;
+    max: number;
+};
+
+=== Required item 5: GenerationRequest voice_description / advanced_settings ===
+37-    /**
+38-     * Written voice description for engines that support voice design. Never sent as instruct.
+39-     */
+40:    voice_description?: (string | null);
+41-    /**
+42-     * Advanced generation settings by name. Only names the engine declares, within their bounds.
+43-     */
+44:    advanced_settings?: (Record<string, number> | null);
+
+All required items present. index.ts exports them: 6 export lines.
+
+=== Unrelated churn (not reverted) ===
+The committed client was generated long ago (OpenAPI VERSION '0.1.0') and then formatted by
+Biome (2-space indent, trailing commas). The regenerated output is raw openapi-typescript-codegen
+output (4-space indent, no Biome pass) against the current API (VERSION '0.5.4'). Churn by category:
+
+1. Formatting / line-ending only (no change under git diff -w, or only a trailing blank line): 15 modified files
+   - core: ApiError.ts, ApiRequestOptions.ts, ApiResult.ts (3)
+   - models: whitespace plus a trailing blank line only: HTTPValidationError, HistoryListResponse,
+     ModelDownloadRequest, ModelStatusListResponse, ProfileSampleResponse, TranscriptionResponse (6)
+   - schemas: $HTTPValidationError, $HistoryListResponse, $ModelDownloadRequest,
+     $ModelStatusListResponse, $ProfileSampleResponse, $TranscriptionResponse (6)
+   Files are written with LF; git (core.autocrlf=true) warns "LF will be replaced by CRLF".
+2. Codegen template / style differences in core (no behaviour change found):
+   CancelablePromise.ts (11 -w lines), OpenAPI.ts (VERSION 0.1.0 -> 0.5.4 only), request.ts
+   (51 -w lines: argument wrapping and arrow-paren style that Biome had applied to the committed copy).
+3. Real model/schema drift from backend changes made before this feature (10 models + 10 schemas):
+   Body_add_profile_sample..., Body_transcribe_audio..., GenerationResponse, HealthResponse
+   (e.g. +version, gpu_type, backend_type, backend_variant, supports_rocm, gpu_compatibility_warning),
+   HistoryResponse, ModelStatus (+hf_repo_id, license_id, commercial_use, dialect), ValidationError,
+   VoiceProfileCreate, VoiceProfileResponse (+avatar_path, effects_chain, voice_type, preset_*,
+   design_prompt, default_engine, personality, counts), and GenerationRequest (pre-existing drift:
+   +engine, personality, max_chunk_chars, crossfade_ms, normalize, effects_chain; plus this
+   feature's voice_description and advanced_settings).
+4. New models: 70 (67 unrelated to this feature: stories, captures, effects, channels, MCP bindings,
+   pronunciation, cloud, settings, active tasks, LLM, filesystem health, etc.; 3 feature-owned:
+   EngineAdvancedSettingResponse, EngineCapabilitiesResponse, EngineCapabilityResponse).
+   New schemas: 70 (the matching $-prefixed schema objects).
+5. Services: DefaultService.ts grows from 22 to 121 static methods (+99; one is the
+   feature's getEngineCapabilitiesModelsEnginesGet). New CloudService.ts (4 methods) and
+   SettingsService.ts (4 methods).
+6. index.ts: +142 export lines for the new models, schemas and services.
+
+Consumers: nothing in app/src (outside app/src/lib/api) or web/src imports the generated models,
+services, core, schemas or index, and nothing sets OpenAPI.BASE. So the churn does not change the
+behaviour of existing app code. 'bun run typecheck' passes with the regenerated client (see T013-hook.txt).
+Biome: the generated directory is not excluded from biome.json, so the unformatted output raises
+the Biome error count inside app/src/lib/api (see T013-hook.txt for the numbers).

@@ -85,3 +85,31 @@ Inspect git status before continuing; do not discard uncommitted files.
 - T013 is blocked on T011, because there is no regenerated client to build the hook on.
 - Nothing is committed yet. The dispatcher confirms the Phase 2 commit.
 - The user approved a partial Phase 2 commit. T011 and T013 stay blocked. Setting up the environment for T011 (bun, backend venv, running backend) is assigned to the dispatcher.
+- Phase 2 partial commit: `cd42d4cdb319f2b2b084ec72458e284071fe3d61` on `feature/001-voxcpm2-tts-engine`.
+  - 37 files. Staged were only the nine allowed backend/`justfile` paths plus `specs/001-voxcpm2-tts-engine/`.
+  - The secret scan was clean. No hooks are installed (only `.sample` files, and no `core.hooksPath`), so no hook output was produced.
+  - Pushed `08417b7..cd42d4c`, exit 0. `git ls-remote` returns the same SHA.
+  - Phase 2 is recorded as `in-progress` because T011 and T013 are blocked.
+  - Git for Windows was removed partway through the first commit attempt by external installers. It was reinstalled (2.55.0) via winget, and the staged set was checked and found intact before the commit.
+- Phase 2 completion round. The dispatcher built the real environment: `backend/venv` with torch 2.11+cu128, bun 1.4.2, just 1.58.0, and the backend running on :17493, which the dispatcher owns. Assignments:
+  - T011 then T013 → `a8f07092c2e5968c1`. It owns `app/src/lib/api/` (generator output), `app/openapi.json` and `app/src/lib/hooks/useEngineCapabilities.ts`, and backs up the hand-written `client.ts` and `types.ts` before regenerating.
+  - The first full test run in the real env → `ab7e9bbf07701e289`. It writes evidence files only.
+  - The `justfile:69` comment fix ("our torch>=2.1" becomes "our torch>=2.5.0") → `a8ac983afa0279999`.
+- T011 done by `a8f07092c2e5968c1`.
+  - `bun run generate:api` does not work on Windows: it prints "bun: unknown error" and exits 1. The same script run through Git Bash, `bash scripts/generate-api.sh`, against the running backend exits 0.
+  - The client now has the `/models/engines` service method, the three Engine* models, and the two new GenerationRequest fields.
+  - Also regenerated: 40 modified and 142 new files, all churn from the stale generated client.
+  - The hand-written `client.ts` and `types.ts` are unchanged.
+- T013 done by `a8f07092c2e5968c1`.
+  - `app/src/lib/hooks/useEngineCapabilities.ts` uses the generated `request()` and types, with a per-call BASE set to `serverUrl`.
+  - `bun run typecheck` exits 0, and Biome reports the hook clean.
+  - `bun run check` fails, with pre-existing errors plus about 143 new format/import errors inside the generated directory. The user should decide whether to exclude that directory in `biome.json` or format it after generation.
+- `justfile:69` comment updated to "our torch>=2.5.0" by `a8ac983afa0279999`.
+- Real-env tests by `ab7e9bbf07701e289`:
+  - Phase 2 files: tests=307, failures=0.
+  - `just test` stops at collection on the error in `test_profile_duplicate_names`, which is not a Phase 2 file.
+  - A run with `--continue-on-collection-errors` gave 516 passed, 1 failed (`test_progress::test_hf_progress_tracker`) and 6 skipped before it was stopped.
+- **The backend venv is damaged.** `test_rocm_build.py::TestRocmBuildE2E::test_rocm_binary_compiles_and_runs` has no gate. It runs `build_binary.py --rocm`, which force-reinstalled ROCm torch into `backend/venv`. Stopping the run skipped its restore step.
+  - The venv now has torch 2.9.1+rocm7.2.1 and CUDA is unavailable.
+  - It needs a reinstall of cu128 torch, torchaudio and torchvision and removal of the rocm packages. The commands are in `evidence/phase2/realenv-suite.txt`.
+  - This is assigned to the dispatcher; the orchestrator has not repaired it.

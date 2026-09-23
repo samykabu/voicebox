@@ -83,3 +83,27 @@ NOTES:
   would treat it as a comment so it would not fail, but it is noisy and diverges from the local style (existing Windows entries carry no comments).
   The Unix recipe is a #!/usr/bin/env bash shebang recipe, where '#' lines are plain bash comments, matching the neighbouring entries.
 - Line 21 (system_python interpreter selection) unchanged, per research R1.
+
+## Follow-up: TADA comment torch floor (torch>=2.1 -> torch>=2.5.0)
+# Timestamp: 2026-09-23T12:44:24Z
+$ git log --oneline -1
+cd42d4c feat(tts): add the engine capability channel and VoxCPM2 install plumbing (phase 2)
+$ git diff justfile   (vs HEAD cd42d4c, which already contains the voxcpm lines)
+diff --git a/justfile b/justfile
+index 5e998a2..da11d4b 100644
+--- a/justfile
++++ b/justfile
+@@ -66,7 +66,7 @@ setup-python:
+     {{ pip }} install -r {{ backend_dir }}/requirements.txt
+     # Chatterbox pins numpy<1.26 / torch==2.6 which break on Python 3.12+
+     {{ pip }} install --no-deps chatterbox-tts
+-    # HumeAI TADA pins torch>=2.7,<2.8 which conflicts with our torch>=2.1
++    # HumeAI TADA pins torch>=2.7,<2.8 which conflicts with our torch>=2.5.0
+     {{ pip }} install --no-deps hume-tada
+     # F5-TTS causes dependency resolution hell due to gradio/accelerate bounds
+     {{ pip }} install --no-deps 'f5-tts==1.1.21'
+$ git diff --numstat justfile
+1	1	justfile
+$ cmp <(git show HEAD:justfile | sed -n 21p) <(sed -n 21p justfile) && echo "line 21 byte-identical"
+line 21 byte-identical
+- No recipes run (just not installed); no installs; no git writes.

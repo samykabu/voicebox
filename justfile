@@ -66,7 +66,7 @@ setup-python:
     {{ pip }} install -r {{ backend_dir }}/requirements.txt
     # Chatterbox pins numpy<1.26 / torch==2.6 which break on Python 3.12+
     {{ pip }} install --no-deps chatterbox-tts
-    # HumeAI TADA pins torch>=2.7,<2.8 which conflicts with our torch>=2.1
+    # HumeAI TADA pins torch>=2.7,<2.8 which conflicts with our torch>=2.5.0
     {{ pip }} install --no-deps hume-tada
     # F5-TTS causes dependency resolution hell due to gradio/accelerate bounds
     {{ pip }} install --no-deps 'f5-tts==1.1.21'
