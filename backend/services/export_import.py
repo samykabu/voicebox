@@ -6,6 +6,7 @@ Also handles exporting individual generations.
 """
 
 import json
+import logging
 import zipfile
 import io
 from pathlib import Path
@@ -17,6 +18,8 @@ from ..database import VoiceProfile as DBVoiceProfile, ProfileSample as DBProfil
 from .profiles import create_profile, add_profile_sample
 from ..models import VoiceProfileCreate
 from .. import config
+
+logger = logging.getLogger(__name__)
 
 
 def _get_unique_profile_name(name: str, db: Session) -> str:
@@ -48,8 +51,10 @@ def _get_unique_profile_name(name: str, db: Session) -> str:
 PROFILE_MANIFEST_VERSION = "1.1"
 
 # Generation manifest 1.1 adds generation.voice_description (the written voice
-# description retry and regenerate replay). Import still accepts 1.0 manifests,
-# which lack it, and restores null.
+# description retry and regenerate replay) and generation.engine / model_size (the
+# engine and variant retry and regenerate run on). Import still accepts 1.0
+# manifests, which lack them: voice_description restores null, and engine and
+# model_size keep the column defaults.
 GENERATION_MANIFEST_VERSION = "1.1"
 
 PROVENANCE_FIELDS = (
@@ -343,6 +348,8 @@ def export_generation_to_zip(generation_id: str, db: Session) -> bytes:
                 "seed": generation.seed,
                 "instruct": generation.instruct,
                 "voice_description": generation.voice_description,
+                "engine": generation.engine,
+                "model_size": generation.model_size,
                 "created_at": generation.created_at.isoformat(),
             },
             "profile": {
@@ -369,6 +376,55 @@ def export_generation_to_zip(generation_id: str, db: Session) -> bytes:
     
     zip_buffer.seek(0)
     return zip_buffer.read()
+
+
+def _validated_engine_fields(generation_data: dict) -> dict:
+    """Return the ``engine`` / ``model_size`` columns to restore from a generation manifest.
+
+    Values are checked against the TTS registry before they reach the database:
+
+    - no ``engine`` (a 1.0 manifest), or one that is not a string in
+      ``backends.TTS_ENGINES``: return nothing, so the column defaults apply
+      (engine ``"qwen"``, model_size null), exactly as import did before 1.1;
+    - a known engine with several sizes: keep ``model_size`` when it is one of that
+      engine's configured sizes, otherwise store the engine's registry default;
+    - a known engine without sizes: store null, as ``POST /generate`` does.
+
+    Every rejected manifest value is logged as a warning.
+    """
+    from ..backends import TTS_ENGINES, engine_has_model_sizes, get_default_model_size, get_tts_model_configs
+
+    if "engine" not in generation_data or generation_data["engine"] is None:
+        return {}
+    engine = generation_data["engine"]
+    if not isinstance(engine, str) or engine not in TTS_ENGINES:
+        logger.warning("Generation import: unknown engine %r in manifest; using the default engine", engine)
+        return {}
+
+    model_size = generation_data.get("model_size")
+    valid = isinstance(model_size, str) and model_size in {
+        c.model_size for c in get_tts_model_configs() if c.engine == engine
+    }
+    if not engine_has_model_sizes(engine):
+        if model_size is not None and not valid:
+            logger.warning(
+                "Generation import: model_size %r is not valid for engine %r; storing null",
+                model_size,
+                engine,
+            )
+        return {"engine": engine, "model_size": None}
+
+    if not valid:
+        fallback = get_default_model_size(engine)
+        if model_size is not None:
+            logger.warning(
+                "Generation import: model_size %r is not valid for engine %r; using %r",
+                model_size,
+                engine,
+                fallback,
+            )
+        return {"engine": engine, "model_size": fallback}
+    return {"engine": engine, "model_size": model_size}
 
 
 async def import_generation_from_zip(file_bytes: bytes, db: Session) -> dict:
@@ -475,6 +531,7 @@ async def import_generation_from_zip(file_bytes: bytes, db: Session) -> dict:
                     instruct=generation_data.get("instruct"),
                     voice_description=generation_data.get("voice_description"),
                     created_at=datetime.utcnow(),
+                    **_validated_engine_fields(generation_data),
                 )
                 
                 db.add(db_generation)
