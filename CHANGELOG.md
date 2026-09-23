@@ -66,6 +66,7 @@ All of these are additive. Existing requests and files keep working.
 - Profile export manifests are now version 1.1, with `voice_type`,
   `design_prompt`, `default_engine`, `preset_engine` and `preset_voice_id`.
   Version 1.0 archives still import, as cloned profiles.
+- Generation export manifests are now version 1.1 and carry `voice_description`; import restores it, and 1.0 archives import with none.
 - Generated WAV audio now includes a RIFF `LIST/INFO` chunk (`ICMT` comment,
   `ISFT` software). This covers saved files and the bytes returned by
   `/generate/stream` and the effects preview. The audio samples are unchanged.

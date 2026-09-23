@@ -444,3 +444,34 @@ class TestDesignModeChunkContinuity:
 
         assert declining.hook_calls == 1
         assert all(p is prompt for p in declining.prompts)
+
+
+class TestContinuationReservedPath:
+    """S4: the VoxCPM hook writes into the path generate_chunked reserved for it."""
+
+    def test_hook_writes_into_the_supplied_path(self, backend, tmp_path: Path) -> None:
+        reserved = tmp_path / "reserved.wav"
+        reserved.write_bytes(b"")
+        audio = np.full(4_800, 0.1, dtype=np.float32)
+
+        prompt = backend.continuation_voice_prompt({}, DESCRIPTION, "Hi.", audio, FAKE_SAMPLE_RATE, str(reserved))
+
+        assert prompt == {"prompt_wav_path": str(reserved), "prompt_text": "Hi."}
+        written, rate = sf.read(str(reserved), dtype="float32")
+        assert rate == FAKE_SAMPLE_RATE
+        np.testing.assert_allclose(written, audio, atol=1e-4)
+
+    def test_declining_hook_leaves_the_supplied_path_alone(self, backend, tmp_path: Path) -> None:
+        reserved = tmp_path / "reserved.wav"
+        reserved.write_bytes(b"")
+
+        assert backend.continuation_voice_prompt({}, None, "Hi.", np.zeros(10), FAKE_SAMPLE_RATE, str(reserved)) is None
+        assert reserved.read_bytes() == b""
+
+    @pytest.mark.asyncio
+    async def test_chunked_design_run_uses_a_caller_reserved_file(self, backend, vendor: _Vendor) -> None:
+        await generate_chunked(backend, LONG_TEXT, {}, instruct=DESCRIPTION, max_chunk_chars=MAX_CHARS)
+
+        continuation_wav = vendor.generate_calls[1]["prompt_wav_path"]
+        assert not os.path.basename(continuation_wav).startswith("voxcpm_continuation_")
+        assert not os.path.exists(continuation_wav)

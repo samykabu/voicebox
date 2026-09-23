@@ -249,6 +249,7 @@ class VoxCPMBackend:
         chunk_text: str,
         chunk_audio: np.ndarray,
         sample_rate: int,
+        prompt_path: str | None = None,
     ) -> dict | None:
         """Pin a designed voice across chunks by continuing from the first chunk.
 
@@ -263,9 +264,12 @@ class VoxCPMBackend:
             chunk_text: Chunk 0's text, without the description prefix.
             chunk_audio: Chunk 0's audio.
             sample_rate: Chunk 0's sample rate.
+            prompt_path: A file ``generate_chunked`` reserved for the prompt audio; it
+                owns the file and deletes it even if this call is still running when
+                the task is cancelled. Without it a temporary WAV is created here.
 
         Returns:
-            ``{"prompt_wav_path", "prompt_text"}`` pointing at a temporary WAV, or None
+            ``{"prompt_wav_path", "prompt_text"}`` pointing at the WAV, or None
             outside design mode (a cloned profile keeps its own reference).
         """
         prompt_wav_path, _prompt_text = _prompt_pair(voice_prompt)
@@ -274,13 +278,16 @@ class VoxCPMBackend:
 
         from ..utils.audio import save_audio  # lazy: pulls in librosa
 
-        fd, path = tempfile.mkstemp(prefix="voxcpm_continuation_", suffix=".wav")
-        os.close(fd)
+        path = prompt_path
+        if path is None:
+            fd, path = tempfile.mkstemp(prefix="voxcpm_continuation_", suffix=".wav")
+            os.close(fd)
         try:
             # A transient internal prompt, never shown to the user: no AI disclosure tag.
             save_audio(np.asarray(chunk_audio, dtype=np.float32), path, sample_rate, disclosure=None)
         except Exception:
-            _remove_quietly(path)
+            if prompt_path is None:  # a reserved path is the caller's to delete
+                _remove_quietly(path)
             raise
         return {"prompt_wav_path": path, "prompt_text": chunk_text}
 

@@ -11,7 +11,10 @@ overhead.
 
 import asyncio
 import logging
+import os
 import re
+import tempfile
+import threading
 from typing import List, Tuple
 
 import numpy as np
@@ -248,12 +251,16 @@ async def generate_chunked(
         unstable output, the affected text is split in half and retried.
 
     A backend may define ``continuation_voice_prompt(voice_prompt, instruct,
-    chunk_text, chunk_audio, sample_rate) -> dict | None``. When the text needs
-    more than one chunk it is called once, after the first chunk, and a returned
-    prompt replaces *voice_prompt* for every later chunk (so an engine can keep
-    the speaker it sampled for chunk 0). The backend's optional
-    ``release_continuation_voice_prompt(prompt)`` is called once generation ends,
-    successfully or not.
+    chunk_text, chunk_audio, sample_rate, prompt_path) -> dict | None``. When the
+    text needs more than one chunk it is called once, after the first chunk, in a
+    worker thread, and a returned prompt replaces *voice_prompt* for every later
+    chunk (so an engine can keep the speaker it sampled for chunk 0).
+    ``prompt_path`` is an empty ``.wav`` file this function reserves before the
+    hook runs; the hook may write its prompt audio there. The reserved file is
+    always deleted once generation ends, and the backend's optional
+    ``release_continuation_voice_prompt(prompt)`` is called for a returned
+    prompt, successfully or not, even when the task is cancelled while the hook
+    is still running (the worker thread then cleans up when it finishes).
 
     Returns
     -------
@@ -333,7 +340,7 @@ async def generate_chunked(
     audio_chunks: List[np.ndarray] = []
     sample_rate: int | None = None
     chunk_prompt = voice_prompt
-    continuation_prompt: dict | None = None
+    continuation = _ContinuationPrompt(backend)
 
     try:
         for i, chunk_text in enumerate(chunks):
@@ -359,33 +366,95 @@ async def generate_chunked(
                 sample_rate = chunk_sr
 
             if i == 0:
-                continuation_prompt = await _continuation_prompt(
-                    backend, voice_prompt, instruct, chunk_text, chunk_audio, chunk_sr
+                continuation_prompt = await continuation.request(
+                    voice_prompt, instruct, chunk_text, chunk_audio, chunk_sr
                 )
                 if continuation_prompt is not None:
                     chunk_prompt = continuation_prompt
     finally:
-        if continuation_prompt is not None:
-            release = getattr(backend, "release_continuation_voice_prompt", None)
-            if callable(release):
-                await asyncio.to_thread(release, continuation_prompt)
+        await continuation.close()
 
     audio = concatenate_audio_chunks(audio_chunks, sample_rate, crossfade_ms=crossfade_ms)
     return audio, sample_rate
 
 
-async def _continuation_prompt(
-    backend,
-    voice_prompt: dict,
-    instruct: str | None,
-    chunk_text: str,
-    chunk_audio: np.ndarray,
-    sample_rate: int,
-) -> dict | None:
-    """Ask the backend's optional hook for the prompt later chunks should use."""
-    hook = getattr(backend, "continuation_voice_prompt", None)
-    if not callable(hook):
-        return None
-    # The hook may write a file, so it runs off the event loop.
-    prompt = await asyncio.to_thread(hook, voice_prompt, instruct, chunk_text, chunk_audio, sample_rate)
-    return prompt if isinstance(prompt, dict) else None
+class _ContinuationPrompt:
+    """One run's continuation prompt: its reserved temp file and its cleanup.
+
+    The temp file is created on the event-loop side before the backend hook runs
+    in a worker thread, so ``close()`` always knows what to delete. A worker
+    thread cannot be cancelled: if the task is cancelled while the hook is still
+    running, ``close()`` hands the cleanup to that thread, which runs it as soon
+    as the hook returns. A lock makes exactly one side clean up.
+    """
+
+    def __init__(self, backend) -> None:
+        self._backend = backend
+        self._lock = threading.Lock()
+        self._path: str | None = None
+        self._prompt: dict | None = None
+        self._started = False
+        self._finished = False
+        self._closed = False
+
+    async def request(
+        self,
+        voice_prompt: dict,
+        instruct: str | None,
+        chunk_text: str,
+        chunk_audio: np.ndarray,
+        sample_rate: int,
+    ) -> dict | None:
+        """Ask the backend's optional hook for the prompt later chunks should use."""
+        hook = getattr(self._backend, "continuation_voice_prompt", None)
+        if not callable(hook):
+            return None
+
+        # Reserve the file here, synchronously, so close() can always release it.
+        fd, self._path = tempfile.mkstemp(prefix="tts_continuation_", suffix=".wav")
+        os.close(fd)
+        path = self._path
+
+        def run() -> dict | None:
+            with self._lock:
+                if self._closed:
+                    return None
+                self._started = True
+            try:
+                prompt = hook(voice_prompt, instruct, chunk_text, chunk_audio, sample_rate, path)
+                self._prompt = prompt if isinstance(prompt, dict) else None
+                return self._prompt
+            finally:
+                with self._lock:
+                    self._finished = True
+                    orphaned = self._closed
+                if orphaned:
+                    self._cleanup()
+
+        # The hook writes a file, so it runs off the event loop.
+        return await asyncio.to_thread(run)
+
+    async def close(self) -> None:
+        """Release the prompt and delete the reserved file, now or when the hook ends."""
+        with self._lock:
+            self._closed = True
+            if self._started and not self._finished:
+                return  # the worker thread cleans up when the hook returns
+        if self._path is not None or self._prompt is not None:
+            await asyncio.to_thread(self._cleanup)
+
+    def _cleanup(self) -> None:
+        prompt, self._prompt = self._prompt, None
+        path, self._path = self._path, None
+        try:
+            release = getattr(self._backend, "release_continuation_voice_prompt", None)
+            if prompt is not None and callable(release):
+                release(prompt)
+        finally:
+            if path is not None:
+                try:
+                    os.remove(path)
+                except FileNotFoundError:
+                    pass
+                except OSError:
+                    logger.warning("Could not remove the continuation prompt file %s", path, exc_info=True)

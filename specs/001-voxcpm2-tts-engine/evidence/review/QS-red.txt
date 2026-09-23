@@ -1,0 +1,25 @@
+timestamp: 2026-09-23T18:28:01Z
+command: backend/venv/Scripts/python.exe -m pytest backend/tests/test_review_q3_s4.py backend/tests/test_voxcpm_review.py -q -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/review/QS-red.xml
+state: HEAD ec1dbc3 code, new tests only (before the Q3/S4 fixes)
+
+        with pytest.raises(RuntimeError, match="hook failed"):
+FAILED backend\tests\test_review_q3_s4.py::TestGenerationExportVoiceDescription::test_voice_description_survives_export_then_import
+FAILED backend\tests\test_review_q3_s4.py::TestGenerationExportVoiceDescription::test_null_voice_description_stays_null
+FAILED backend\tests\test_review_q3_s4.py::TestContinuationTempFileLifecycle::test_cancel_while_the_hook_write_is_blocked_does_not_leak
+FAILED backend\tests\test_review_q3_s4.py::TestContinuationTempFileLifecycle::test_success_path_uses_the_reserved_file_and_cleans_it_up
+FAILED backend\tests\test_review_q3_s4.py::TestContinuationTempFileLifecycle::test_declined_hook_still_removes_the_reserved_file
+FAILED backend\tests\test_review_q3_s4.py::TestContinuationTempFileLifecycle::test_failing_hook_still_removes_the_reserved_file
+FAILED backend\tests\test_voxcpm_review.py::TestContinuationReservedPath::test_hook_writes_into_the_supplied_path
+FAILED backend\tests\test_voxcpm_review.py::TestContinuationReservedPath::test_declining_hook_leaves_the_supplied_path_alone
+FAILED backend\tests\test_voxcpm_review.py::TestContinuationReservedPath::test_chunked_design_run_uses_a_caller_reserved_file
+9 failed, 19 passed, 25 warnings in 13.41s
+<testsuite name="pytest" errors="0" failures="9" skipped="0" tests="28" time="13.145" timestamp="2026-09-23T21:28:03.255916+03:00" hostname="DevelopmentPC">
+<failure message="KeyError: 'voice_description'
+<failure message="AssertionError: assert 'voice_description' in {'id': '96cdc1a6-95ce-4bcc-a520-fe66c3d6a758', 'text': 'Hello there.', 'la
+<failure message="AssertionError: leaked 'C:\\Users\\sabus\\AppData\\Local\\Temp\\hook_test_64uyinwx.wav'; released=[]
+<failure message="assert None is not None
+<failure message="assert None is not None
+<failure message="assert None is not None
+<failure message="TypeError: VoxCPMBackend.continuation_voice_prompt() takes 6 positional arguments but 7 were given
+<failure message="TypeError: VoxCPMBackend.continuation_voice_prompt() takes 6 positional arguments but 7 were given
+<failure message="AssertionError: assert not True

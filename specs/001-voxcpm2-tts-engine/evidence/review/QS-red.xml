@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="28" time="13.145" timestamp="2026-09-23T21:28:03.255916+03:00" hostname="DevelopmentPC"><testcase classname="tests.test_review_q3_s4.TestGenerationExportVoiceDescription" name="test_voice_description_survives_export_then_import" time="0.195"><failure message="KeyError: 'voice_description'">self = &lt;backend.tests.test_review_q3_s4.TestGenerationExportVoiceDescription object at 0x000001750C5B3140&gt;
+test_db = &lt;sqlalchemy.orm.session.Session object at 0x000001751017FD10&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-99/test_voice_description_survive0/data')
+
+    @pytest.mark.asyncio
+    async def test_voice_description_survives_export_then_import(self, test_db, data_dir):
+        generation = _generation(test_db, _profile(test_db), DESCRIPTION)
+    
+        zip_bytes = export_generation_to_zip(generation.id, test_db)
+        manifest = _manifest(zip_bytes)
+&gt;       assert manifest["generation"]["voice_description"] == DESCRIPTION
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'voice_description'
+
+backend\tests\test_review_q3_s4.py:114: KeyError</failure></testcase><testcase classname="tests.test_review_q3_s4.TestGenerationExportVoiceDescription" name="test_null_voice_description_stays_null" time="0.193"><failure message="AssertionError: assert 'voice_description' in {'id': '96cdc1a6-95ce-4bcc-a520-fe66c3d6a758', 'text': 'Hello there.', 'language': 'en', 'duration': 1.5, ...}">self = &lt;backend.tests.test_review_q3_s4.TestGenerationExportVoiceDescription object at 0x000001750CF94B90&gt;
+test_db = &lt;sqlalchemy.orm.session.Session object at 0x0000017510293E90&gt;
+data_dir = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-99/test_null_voice_description_st0/data')
+
+    @pytest.mark.asyncio
+    async def test_null_voice_description_stays_null(self, test_db, data_dir):
+        generation = _generation(test_db, _profile(test_db), None)
+    
+        zip_bytes = export_generation_to_zip(generation.id, test_db)
+        exported = _manifest(zip_bytes)["generation"]
+&gt;       assert "voice_description" in exported
+E       AssertionError: assert 'voice_description' in {'id': '96cdc1a6-95ce-4bcc-a520-fe66c3d6a758', 'text': 'Hello there.', 'language': 'en', 'duration': 1.5, ...}
+
+backend\tests\test_review_q3_s4.py:128: AssertionError</failure></testcase><testcase classname="tests.test_review_q3_s4.TestGenerationExportVoiceDescription" name="test_legacy_manifest_without_the_key_imports_with_null" time="0.176" /><testcase classname="tests.test_review_q3_s4.TestContinuationTempFileLifecycle" name="test_cancel_while_the_hook_write_is_blocked_does_not_leak" time="5.026"><failure message="AssertionError: leaked 'C:\\Users\\sabus\\AppData\\Local\\Temp\\hook_test_64uyinwx.wav'; released=[]&#10;assert False">self = &lt;backend.tests.test_review_q3_s4.TestContinuationTempFileLifecycle object at 0x000001750CF94290&gt;
+
+    @pytest.mark.asyncio
+    async def test_cancel_while_the_hook_write_is_blocked_does_not_leak(self) -&gt; None:
+        backend = _HookBackend(block=True)
+        task = asyncio.create_task(
+            generate_chunked(backend, LONG_TEXT, {}, instruct=DESCRIPTION, max_chunk_chars=MAX_CHARS)
+        )
+    
+        assert await _wait_until(backend.entered.is_set)
+    
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+    
+        # Now let the worker thread finish its write.
+        backend.proceed.set()
+        assert await _wait_until(lambda: len(backend.written_paths) == 1)
+        written = backend.written_paths[0]
+    
+        # Once the thread is done, the file it wrote is gone and release ran.
+&gt;       assert await _wait_until(lambda: len(backend.released) == 1 and not os.path.exists(written)), (
+            f"leaked {written!r}; released={backend.released!r}"
+        )
+E       AssertionError: leaked 'C:\\Users\\sabus\\AppData\\Local\\Temp\\hook_test_64uyinwx.wav'; released=[]
+E       assert False
+
+backend\tests\test_review_q3_s4.py:245: AssertionError</failure></testcase><testcase classname="tests.test_review_q3_s4.TestContinuationTempFileLifecycle" name="test_success_path_uses_the_reserved_file_and_cleans_it_up" time="0.024"><failure message="assert None is not None">self = &lt;backend.tests.test_review_q3_s4.TestContinuationTempFileLifecycle object at 0x000001750CF948F0&gt;
+
+    @pytest.mark.asyncio
+    async def test_success_path_uses_the_reserved_file_and_cleans_it_up(self) -&gt; None:
+        backend = _HookBackend()
+    
+        audio, sample_rate = await generate_chunked(
+            backend, LONG_TEXT, {}, instruct=DESCRIPTION, max_chunk_chars=MAX_CHARS
+        )
+    
+        assert sample_rate == SAMPLE_RATE
+        assert len(audio) &gt; 0
+        reserved = backend.hook_paths[0]
+&gt;       assert reserved is not None
+E       assert None is not None
+
+backend\tests\test_review_q3_s4.py:263: AssertionError</failure></testcase><testcase classname="tests.test_review_q3_s4.TestContinuationTempFileLifecycle" name="test_declined_hook_still_removes_the_reserved_file" time="0.014"><failure message="assert None is not None">self = &lt;backend.tests.test_review_q3_s4.TestContinuationTempFileLifecycle object at 0x000001750CF94DD0&gt;
+
+    @pytest.mark.asyncio
+    async def test_declined_hook_still_removes_the_reserved_file(self) -&gt; None:
+        backend = _HookBackend(decline=True)
+        prompt: dict = {}
+    
+        await generate_chunked(backend, LONG_TEXT, prompt, instruct=DESCRIPTION, max_chunk_chars=MAX_CHARS)
+    
+        reserved = backend.hook_paths[0]
+&gt;       assert reserved is not None
+E       assert None is not None
+
+backend\tests\test_review_q3_s4.py:277: AssertionError</failure></testcase><testcase classname="tests.test_review_q3_s4.TestContinuationTempFileLifecycle" name="test_failing_hook_still_removes_the_reserved_file" time="0.014"><failure message="assert None is not None">self = &lt;backend.tests.test_review_q3_s4.TestContinuationTempFileLifecycle object at 0x000001750CF94140&gt;
+
+    @pytest.mark.asyncio
+    async def test_failing_hook_still_removes_the_reserved_file(self) -&gt; None:
+        backend = _HookBackend(fail=True)
+    
+        with pytest.raises(RuntimeError, match="hook failed"):
+            await generate_chunked(backend, LONG_TEXT, {}, instruct=DESCRIPTION, max_chunk_chars=MAX_CHARS)
+    
+        reserved = backend.hook_paths[0]
+&gt;       assert reserved is not None
+E       assert None is not None
+
+backend\tests\test_review_q3_s4.py:290: AssertionError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestNoVoiceboxRunawayRetry" name="test_voxcpm_does_not_declare_voicebox_runaway_retry" time="0.001" /><testcase classname="tests.test_voxcpm_review.TestNoVoiceboxRunawayRetry" name="test_chunked_path_never_calls_the_detector_or_resplits" time="0.362" /><testcase classname="tests.test_voxcpm_review.TestNoVoiceboxRunawayRetry" name="test_service_path_never_calls_the_detector_for_voxcpm" time="0.086" /><testcase classname="tests.test_voxcpm_review.TestLoadAndInferenceLocks" name="test_concurrent_async_loads_call_from_pretrained_once" time="0.241" /><testcase classname="tests.test_voxcpm_review.TestLoadAndInferenceLocks" name="test_concurrent_thread_loads_call_from_pretrained_once" time="0.282" /><testcase classname="tests.test_voxcpm_review.TestLoadAndInferenceLocks" name="test_concurrent_generates_never_overlap_in_the_vendor" time="0.222" /><testcase classname="tests.test_voxcpm_review.TestLoadAndInferenceLocks" name="test_generate_during_a_load_waits_and_loads_once" time="0.227" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_later_chunks_continue_from_chunk_zero" time="0.041" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_continuation_temp_file_is_removed" time="0.030" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_continuation_temp_file_is_removed_when_a_later_chunk_fails" time="0.031" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_seeds_still_vary_per_chunk" time="0.051" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_short_design_text_is_a_single_unchanged_call" time="0.008" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_long_text_without_a_description_is_unchanged" time="0.020" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_cloned_profile_keeps_its_reference_for_every_chunk" time="0.025" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_hook_is_reached_through_the_advanced_settings_wrapper" time="0.027" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_hook_returns_nothing_outside_design_mode" time="0.007" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_engines_without_the_hook_are_unaffected" time="0.002" /><testcase classname="tests.test_voxcpm_review.TestDesignModeChunkContinuity" name="test_a_hook_that_declines_leaves_the_prompt_unchanged" time="0.023" /><testcase classname="tests.test_voxcpm_review.TestContinuationReservedPath" name="test_hook_writes_into_the_supplied_path" time="0.004"><failure message="TypeError: VoxCPMBackend.continuation_voice_prompt() takes 6 positional arguments but 7 were given">self = &lt;backend.tests.test_voxcpm_review.TestContinuationReservedPath object at 0x000001751017E240&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x0000017511664E60&gt;
+tmp_path = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-99/test_hook_writes_into_the_supp0')
+
+    def test_hook_writes_into_the_supplied_path(self, backend, tmp_path: Path) -&gt; None:
+        reserved = tmp_path / "reserved.wav"
+        reserved.write_bytes(b"")
+        audio = np.full(4_800, 0.1, dtype=np.float32)
+    
+&gt;       prompt = backend.continuation_voice_prompt({}, DESCRIPTION, "Hi.", audio, FAKE_SAMPLE_RATE, str(reserved))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: VoxCPMBackend.continuation_voice_prompt() takes 6 positional arguments but 7 were given
+
+backend\tests\test_voxcpm_review.py:457: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestContinuationReservedPath" name="test_declining_hook_leaves_the_supplied_path_alone" time="0.005"><failure message="TypeError: VoxCPMBackend.continuation_voice_prompt() takes 6 positional arguments but 7 were given">self = &lt;backend.tests.test_voxcpm_review.TestContinuationReservedPath object at 0x000001751017DCD0&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x000001751163AF90&gt;
+tmp_path = WindowsPath('C:/Users/sabus/AppData/Local/Temp/pytest-of-sabus/pytest-99/test_declining_hook_leaves_the0')
+
+    def test_declining_hook_leaves_the_supplied_path_alone(self, backend, tmp_path: Path) -&gt; None:
+        reserved = tmp_path / "reserved.wav"
+        reserved.write_bytes(b"")
+    
+&gt;       assert backend.continuation_voice_prompt({}, None, "Hi.", np.zeros(10), FAKE_SAMPLE_RATE, str(reserved)) is None
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: VoxCPMBackend.continuation_voice_prompt() takes 6 positional arguments but 7 were given
+
+backend\tests\test_voxcpm_review.py:468: TypeError</failure></testcase><testcase classname="tests.test_voxcpm_review.TestContinuationReservedPath" name="test_chunked_design_run_uses_a_caller_reserved_file" time="0.039"><failure message="AssertionError: assert not True&#10; +  where True = &lt;built-in method startswith of str object at 0x000001751165F280&gt;('voxcpm_continuation_')&#10; +    where &lt;built-in method startswith of str object at 0x000001751165F280&gt; = 'voxcpm_continuation_otowhizi.wav'.startswith&#10; +      where 'voxcpm_continuation_otowhizi.wav' = &lt;function basename at 0x000001754CE49760&gt;('C:\\Users\\sabus\\AppData\\Local\\Temp\\voxcpm_continuation_otowhizi.wav')&#10; +        where &lt;function basename at 0x000001754CE49760&gt; = &lt;module 'ntpath' (frozen)&gt;.basename&#10; +          where &lt;module 'ntpath' (frozen)&gt; = os.path">self = &lt;backend.tests.test_voxcpm_review.TestContinuationReservedPath object at 0x000001751017D550&gt;
+backend = &lt;backend.backends.voxcpm_backend.VoxCPMBackend object at 0x0000017511664F80&gt;
+vendor = &lt;backend.tests.test_voxcpm_review._Vendor object at 0x0000017511665040&gt;
+
+    @pytest.mark.asyncio
+    async def test_chunked_design_run_uses_a_caller_reserved_file(self, backend, vendor: _Vendor) -&gt; None:
+        await generate_chunked(backend, LONG_TEXT, {}, instruct=DESCRIPTION, max_chunk_chars=MAX_CHARS)
+    
+        continuation_wav = vendor.generate_calls[1]["prompt_wav_path"]
+&gt;       assert not os.path.basename(continuation_wav).startswith("voxcpm_continuation_")
+E       AssertionError: assert not True
+E        +  where True = &lt;built-in method startswith of str object at 0x000001751165F280&gt;('voxcpm_continuation_')
+E        +    where &lt;built-in method startswith of str object at 0x000001751165F280&gt; = 'voxcpm_continuation_otowhizi.wav'.startswith
+E        +      where 'voxcpm_continuation_otowhizi.wav' = &lt;function basename at 0x000001754CE49760&gt;('C:\\Users\\sabus\\AppData\\Local\\Temp\\voxcpm_continuation_otowhizi.wav')
+E        +        where &lt;function basename at 0x000001754CE49760&gt; = &lt;module 'ntpath' (frozen)&gt;.basename
+E        +          where &lt;module 'ntpath' (frozen)&gt; = os.path
+
+backend\tests\test_voxcpm_review.py:476: AssertionError</failure></testcase></testsuite></testsuites>

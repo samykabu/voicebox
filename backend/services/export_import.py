@@ -47,6 +47,11 @@ def _get_unique_profile_name(name: str, db: Session) -> str:
 # to be valid. Import still accepts 1.0 manifests, which lack these fields.
 PROFILE_MANIFEST_VERSION = "1.1"
 
+# Generation manifest 1.1 adds generation.voice_description (the written voice
+# description retry and regenerate replay). Import still accepts 1.0 manifests,
+# which lack it, and restores null.
+GENERATION_MANIFEST_VERSION = "1.1"
+
 PROVENANCE_FIELDS = (
     "voice_type",
     "preset_engine",
@@ -329,7 +334,7 @@ def export_generation_to_zip(generation_id: str, db: Session) -> bytes:
             })
 
         manifest = {
-            "version": "1.0",
+            "version": GENERATION_MANIFEST_VERSION,
             "generation": {
                 "id": generation.id,
                 "text": generation.text,
@@ -337,6 +342,7 @@ def export_generation_to_zip(generation_id: str, db: Session) -> bytes:
                 "duration": generation.duration,
                 "seed": generation.seed,
                 "instruct": generation.instruct,
+                "voice_description": generation.voice_description,
                 "created_at": generation.created_at.isoformat(),
             },
             "profile": {
@@ -467,6 +473,7 @@ async def import_generation_from_zip(file_bytes: bytes, db: Session) -> dict:
                     duration=generation_data["duration"],
                     seed=generation_data.get("seed"),
                     instruct=generation_data.get("instruct"),
+                    voice_description=generation_data.get("voice_description"),
                     created_at=datetime.utcnow(),
                 )
                 
