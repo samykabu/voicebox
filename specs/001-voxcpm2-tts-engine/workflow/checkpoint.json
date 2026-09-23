@@ -2735,14 +2735,50 @@
         "web/vite.config.ts": "9efc5103abda7e3cde53dbe75c7e15c8f5ef3b1bfda21fbadf729eb02b95fdef"
       },
       "completed_at": "2026-09-23T18:59:59.570533+00:00"
+    },
+    "pr": {
+      "stage": "pr",
+      "outcome": "passed",
+      "pr_url": "https://github.com/samykabu/voicebox/pull/73",
+      "images_verified": true,
+      "summary": "PR #73 created on samykabu/voicebox with the feature CHANGELOG and plain-English explainer (docs commit a9bbd3e). Four Illustrate diagrams embedded with commit-pinned blob URLs; body_html has 4 img elements and no raw.githubusercontent.com; each image fetched with authenticated GitHub credentials returned 200 image/png matching the committed size. First CI run: frontend-quality and workflow-evidence pass.",
+      "inputs": [
+        "specs/001-voxcpm2-tts-engine/spec.md",
+        "docs/001-voxcpm2-tts-engine/VoxCPM2-Explained.md"
+      ],
+      "evidence": [
+        "specs/001-voxcpm2-tts-engine/evidence/pr/pr-73.md",
+        "docs/001-voxcpm2-tts-engine/CHANGELOG.md",
+        "docs/001-voxcpm2-tts-engine/assets/diagrams/001-voxcpm2-tts-engine-architecture.png"
+      ],
+      "command": "speckit.pr.generate",
+      "dependency_digest": "e59b9f46ff13271d896bdda3fafca27f42a992823e767a359132482e0b6f7f70",
+      "fingerprints": {
+        ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+        "docs/001-voxcpm2-tts-engine/CHANGELOG.md": "eaf764a5d79a121eaf9e24098d3317c8770043735d897d94d311317ecb095657",
+        "docs/001-voxcpm2-tts-engine/VoxCPM2-Explained.md": "e292c20c50c95417d09b1ef41acca655401923ceed7d9c947c83dc017f39e3d6",
+        "docs/001-voxcpm2-tts-engine/assets/diagrams/001-voxcpm2-tts-engine-architecture.png": "cb983f9da72813e3caffd9aad0c93ef55732f71c5e409629880ed6f418d4a947",
+        "specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md": "2b522516920bbb1ad15fcf7f3780bfc352f11c1299b14e3c75862ea6c86b6402",
+        "specs/001-voxcpm2-tts-engine/contracts/tts-backend-protocol.md": "cd0f67574ee607909701bfa61fc9116e2cf450a5f177c900c6a133844efb521b",
+        "specs/001-voxcpm2-tts-engine/data-model.md": "5cbdd5a3d4782388b5ed458e934c225069c1c7724732cb2b8d6a058d875f88d2",
+        "specs/001-voxcpm2-tts-engine/evidence/pr/pr-73.md": "1cb5910db40da0e022aad0ec5ccc927f9e7522e4a55e4bcde44c6e4975cdd37b",
+        "specs/001-voxcpm2-tts-engine/plan.md": "4da7fe7b0b778c254f30ce8ca0edf1eb3c11b0209a093e33af83ac25b80b7608",
+        "specs/001-voxcpm2-tts-engine/quickstart.md": "77bd8b6f0e2a208fb2911d1346d907c1b9259d5c1cb3932e9537489b451e8e98",
+        "specs/001-voxcpm2-tts-engine/research.md": "69a0f98ae65dd18908bffe44630d5d7bbfe531c0810ecd4c9178e8d6d6d89283",
+        "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+        "specs/001-voxcpm2-tts-engine/spec.md": "afdaa0a83b1662df0ca50d57a7025ab05ffb00905f62ec3f94832c752c60b897",
+        "specs/001-voxcpm2-tts-engine/tasks.md": "2f680f0c3b53b16097c4605960172967ed5e0701e19a46d419be5c806e464a92",
+        "specs/001-voxcpm2-tts-engine/workflow/task-issues.json": "4bc57099a4bfab7f2b0519205d2be3b4f051b4662340a9ec082fecccf5105476"
+      },
+      "completed_at": "2026-09-23T19:08:09.475164+00:00"
     }
   },
-  "generation": 117,
+  "generation": 119,
   "active": null,
   "status": "in-progress",
   "dependency_digest": "e59b9f46ff13271d896bdda3fafca27f42a992823e767a359132482e0b6f7f70",
-  "updated_at": "2026-09-23T18:59:59.570546+00:00",
-  "head": "68e9cc012e2027b1a759a5d45b71fbf21d3de8dc",
+  "updated_at": "2026-09-23T19:08:09.475176+00:00",
+  "head": "a9bbd3e2a51fa5715a406bf92307f8059130adfd",
   "branch_history": [
     {
       "from": "main",
