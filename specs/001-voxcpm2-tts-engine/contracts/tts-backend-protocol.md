@@ -6,7 +6,8 @@ How `backend/backends/voxcpm_backend.py` satisfies the existing protocol in
 [backend/backends/__init__.py](../../../backend/backends/__init__.py#L85). The protocol is
 unchanged by this feature — this is a conformance contract for a new implementation, not a
 protocol revision. VoxCPM2's `generate` takes one extra keyword, `options`, that is not part
-of the `TTSBackend` Protocol (see below).
+of the `TTSBackend` Protocol (see below). It also defines two optional methods that
+`utils/chunked_tts.py` looks up with `getattr` (rule 5); backends without them are unaffected.
 
 Signatures below are verified against upstream `main` (research.md R5), not assumed from
 the source issue.
@@ -61,7 +62,10 @@ Four rules this call must respect:
 1. **`generate()` returns a bare `np.ndarray`, not a tuple.** The backend pairs it with the rate. The array is float32, 1-D, already on CPU.
 2. **Read the sample rate from the model.** `voxcpm2.py:249` computes it as `getattr(audio_vae, "out_sample_rate", audio_vae.sample_rate)`, and the encode rate differs from the output rate. Copying LuxTTS's hardcoded `return audio, 48000` would be a latent bug even if 48000 happens to be right today.
 3. **`normalize=False`.** Upstream text normalization would run after our pronunciation dictionary and could undo the Arabic diacritics handling from PR #11 (FR-008).
-4. **Do not add our own runaway retry.** Upstream retries internally (`retry_badcase=True`); the engine declares `retries_runaway=True` instead.
+4. **Do not add our own runaway retry.** Upstream retries internally (`retry_badcase=True`), so the engine declares `retries_runaway=False`: `generate_chunked` gets no runaway detector and never re-splits VoxCPM2 output (corrected at review, 2026-09-23).
+5. **One speaker per designed text.** With no reference audio, chunk 0 is generated from the description and later chunks clone chunk 0's audio and text, so long text keeps one speaker. Load and inference are each guarded by a lock, as in the Chatterbox and F5-TTS backends. The hooks:
+   - `continuation_voice_prompt(voice_prompt, instruct, chunk_text, chunk_audio, sample_rate, prompt_path=None) -> dict | None` is called once after chunk 0. `utils/chunked_tts.py` reserves `prompt_path` on the event loop before the call, so a cancellation mid-save cannot leak the file. In design mode (a description and no reference pair) the hook saves chunk 0 there as a WAV, untagged, and returns a prompt pair for the later chunks; otherwise it returns `None` and nothing changes.
+   - `release_continuation_voice_prompt(voice_prompt) -> None` is called in a `finally` when chunked generation ends, and deletes that temporary WAV.
 
 `seed` is applied with `manual_seed(seed, device)` immediately before calling the vendor, matching the LuxTTS pattern (FR-009). It is **not** passed to the vendor: voxcpm 2.0.3, the pinned release, has no `seed` parameter (research.md R5 correction).
 

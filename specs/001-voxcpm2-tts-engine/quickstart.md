@@ -106,7 +106,8 @@ Every generation needs a profile, so voice design starts in the profile dialog.
 3. Generate again with the same profile and a **different one-off description** in the generate box → the one-off description wins. It is sent as `voice_description`, never as `instruct`; the delivery-instruction box stays hidden for VoxCPM2 (C1Q5).
 4. Write the description in English and generate Arabic speech → accepted (C1Q9). Record the real behaviour; document it if poor.
 5. Select a **cloned** profile and enter a one-off description → **the recording wins and the generate box says the description is not used** (C1Q6).
-6. Retry or regenerate a generation made with a one-off description → it is not reapplied, because it is not stored with the generation. A designed profile's own description is.
+6. Retry or regenerate a generation made with a one-off description → the same description is reapplied, because it is stored with the generation. Without one, a designed profile's own description applies.
+6a. Generate a designed-profile text longer than one chunk → one speaker throughout (later chunks clone the first).
 7. **Consent check (Principle II)**: the voice-design path carries the same disclosure affordances as cloning (Step 6b). This is a review gate, not a checkbox.
 
 ## Step 6b — Responsible use, disclosure and export (FR-025, FR-026, FR-027)

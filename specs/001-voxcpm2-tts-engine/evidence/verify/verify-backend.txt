@@ -1,0 +1,17 @@
+$ backend/venv/Scripts/python -m pytest backend/tests --junitxml=verify-backend.xml
+2026-09-23T20:56:48+03:00
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+tests/test_pronunciation.py::test_replaces_a_term
+  D:\Projects\Personal\voicebox\backend\database\migrations.py:74: SAWarning: Skipped unsupported reflection of expression-based index uq_pronunciation_scope
+    existing = {ix["name"] for ix in inspector.get_indexes("pronunciation_entries")}
+
+tests/test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original
+  D:\Projects\Personal\voicebox\backend\services\history.py:107: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\test_progress.py::test_hf_progress_tracker - AssertionEr...
+1 failed, 1063 passed, 9 skipped, 2645 warnings in 25.47s

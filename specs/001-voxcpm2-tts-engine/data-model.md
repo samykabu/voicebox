@@ -2,10 +2,11 @@
 
 **Feature**: `specs/001-voxcpm2-tts-engine` | **Date**: 2026-09-22
 
-This feature adds no new table or column, so there is no database migration. It extends
+This feature adds one nullable column, `generations.voice_description` (TEXT), through the existing additive `_add_column` migration in `backend/database/migrations.py`; no table is added. It extends
 one existing in-memory descriptor and adds two transient runtime shapes. It puts existing
 Voice Profile columns to new use (the designed source, §3), writes a disclosure tag into
-generated WAV files (§6), and moves the profile export manifest to version 1.1 (§7).
+generated WAV files (§6), and moves the profile export manifest to version 1.1 (§7). The generation export manifest
+also moves to 1.1, adding `voice_description`, `engine` and `model_size` (§5).
 
 ---
 
@@ -37,7 +38,7 @@ carries `model_name`, `display_name`, `engine`, `hf_repo_id`, `model_size`, `siz
 | `model_size` | `default` | single size only; out of scope to add variants |
 | `size_mb` | `4961` | research.md R3, measured |
 | `needs_trim` | `False` | vendor trims internally via VAD (`voxcpm2.py:420`) |
-| `retries_runaway` | `True` | `retry_badcase=True` upstream, research.md R5.5 |
+| `retries_runaway` | `False` | Voicebox's own split-and-retry stays off; upstream already retries (`retry_badcase=True`), research.md R5.5 |
 | `supports_instruct` | `False` | VoxCPM2 takes no delivery instructions; keeps the existing instruction box off for it (C1Q5) |
 | `supports_voice_design` | `True` | FR-015 |
 | `requires_download_confirmation` | `True` | FR-018, C1Q7 |
@@ -103,7 +104,7 @@ Every generation needs a Voice Profile, so voice design (FR-015) is reached thro
 | Source | Where it lives | Stored? |
 | --- | --- | --- |
 | Designed profile | Voice Profile with `voice_type = "designed"` and a required `design_prompt` (up to 2000 characters). Created with the "Describe a voice" source in the profile dialog. | Yes, in the existing `design_prompt` column. No new column, no migration. |
-| One-off request description | The optional `voice_description` field on the generation request (up to 500 characters). | No. It is not saved with the generation. Retry and regenerate re-run with the stored `instruct` only, so a one-off description is not reapplied; a designed profile's `design_prompt` is. |
+| One-off request description | The optional `voice_description` field on the generation request (up to 500 characters). | Yes, in the new nullable `generations.voice_description` column, stripped, and only when the resolved engine declares voice design (otherwise null). Retry and regenerate replay it. When it is null, a designed profile's `design_prompt` applies as before. Reference audio still wins over both. |
 
 Rules for both:
 
@@ -161,7 +162,7 @@ generation time, so the cached value must carry it.
 - **Model download progress** and the HuggingFace cache — reused via `model_load_progress`
   (FR-016).
 - **Generation queue and history** — the queue is unchanged. Generations are stored as
-  before; the one-off `voice_description` and the advanced settings are not stored with them.
+  before, plus the one-off `voice_description` (voice-design engines only) so retry and regenerate can replay it. Advanced settings are not stored. The generation export manifest moves to 1.1 and carries `voice_description` (null when empty); a 1.0 archive imports with none.
 - **Audio writing** — changed. `save_audio` in `backend/utils/audio.py` now writes the
   AI-generated disclosure by default, and a new `wav_bytes()` helper does the same for audio
   that is never saved to disk (§6).
@@ -194,6 +195,7 @@ Where it is written:
 | Profile reference samples | `save_audio(..., disclosure=None)` in `services/profiles.py` | No |
 | Combined multi-clip reference | `save_audio(..., 24000, disclosure=None)` in `services/profiles.py` | No |
 | Transcription re-encode of the user's upload | `save_audio(..., disclosure=None)` in `routes/transcription.py` | No |
+| Temporary chunk-0 prompt for designed long text (internal, deleted when the generation ends) | `save_audio(..., disclosure=None)` in `voxcpm_backend.continuation_voice_prompt` | No, never shown or saved for the user |
 
 With `disclosure=None` no comment and no software tag are set, so libsndfile writes no INFO
 chunk at all. The user's own recordings are never labelled AI-generated.
@@ -238,5 +240,5 @@ ModelConfig(engine="voxcpm", accelerators=("cuda","mps","cpu"))
                                │                                └── prompt_wav_path + prompt_text
                                ├── VoiceProfile (designed) ──> design_prompt  (stored)
                                │
-                               └── voice_description  (one-off, not stored; unused with a cloned profile)
+                               └── voice_description  (one-off; stored on the generation for voice-design engines; unused with a cloned profile)
 ```

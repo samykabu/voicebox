@@ -1,0 +1,6 @@
+$ bun run check (biome)
+2026-09-23T20:57:58+03:00
+  × Some errors were emitted while running checks.
+  
+
+error: script "check" exited with code 1

@@ -175,7 +175,8 @@ A user who wants a particular kind of voice but has nothing to clone from writes
 
 - The engine is added alongside the existing engines. Nothing that works today stops working, and no existing engine, model or voice is removed or replaced.
 - Only one size of this model ships. Users are not asked to choose between variants of it, so none of the product's model-size machinery is involved.
-- Streaming generation is not part of this feature; generation behaves like the product's other chunked engines.
+- Streaming generation is not part of this feature; generation behaves like the product's other chunked engines. Long designed-voice text keeps one speaker across chunks.
+- A one-off voice description is stored with the generation, so retry and regenerate reapply it (decided at review, 2026-09-23).
 - Reference audio, generated audio and model weights stay on the user's machine, as with every other engine. This feature introduces no new remote path.
 - Voicebox had no in-app consent prompt, responsible-use acknowledgement or AI-generated disclosure before this feature, for cloning or any other path (confirmed by the T037 survey, 2026-09-23). This feature adds them for every path through FR-025 to FR-027, rather than assuming they already exist.
 - The existing Voice Profile, pronunciation dictionary, download-progress and model-unload mechanisms are reused rather than rebuilt.

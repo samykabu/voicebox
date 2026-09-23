@@ -1,0 +1,4 @@
+$ bun run typecheck
+2026-09-23T20:57:23+03:00
+$ bunx tsc -p app/tsconfig.json --noEmit && cd web && bunx tsc --noEmit
+exit 0

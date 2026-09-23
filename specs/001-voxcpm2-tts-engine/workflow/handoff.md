@@ -281,3 +281,9 @@ Follow-ups (pre-existing, not fixed here):
     - The tasks.md T054 detail and spec FR-026 still mention "non-persisted /speak" or "non-persisted API responses". This is dispatcher-owned task text and was left alone.
 - Analyze re-run N1–N7: the N4 test is in commit `39cdc3a` (4 tests, 0 failures; full suite 1073 tests / 1 failure (baseline) / 9 skipped). The docs fixes are by `af29b24ad9fb3a016`, plus the orchestrator's edit to gpu-acceleration.mdx for XPU and DirectML. Left as-is: overview/generating-speech.mdx:25 and introduction.mdx:65 ("an engine this computer can't run is greyed out"), which is still true for the mechanism.
 - P1: `from __future__ import annotations` removed from 4 new test files. Tests: those 4 files 191/0; full suite 1073/1 (baseline)/9 skipped. ruff clean. P2: generating-speech.mdx:27 and PROJECT_STATUS.md:701 updated for the processor-fallback warning (orchestrator edits).
+
+## Dispatcher: revalidation and Execute close (2026-09-23)
+
+- Execute claim c56a1c65 recovered after 5c1d739, because spec, plan, data model, contracts, quickstart and tasks changed during Execute.
+- Specify, Clarify, Plan, Tasks, Analyze and Tasks-to-Issues revalidated with fresh receipts. Analyze evidence: evidence/revalidation/analyze-2026-09-23.md (four passes, Blocking: 0).
+- Next: complete Execute, then Verify, Review, Ready, PR (merge when green is authorized).

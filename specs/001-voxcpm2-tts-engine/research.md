@@ -168,9 +168,9 @@ Findings that change the implementation:
 4. **`reference_wav_path` is an additional VoxCPM2-only cloning mode**, structurally
    isolated via reference-audio tokens, usable alone or combined with the prompt pair. The
    issue does not mention it. Out of scope for v1, but worth recording.
-5. **`retry_badcase=True` by default** with a ratio threshold. Our `ModelConfig` has a
-   `retries_runaway` flag for exactly this class of behaviour; the engine retries
-   internally, so we should not layer our own retry on top.
+5. **`retry_badcase=True` by default** with a ratio threshold. Our `ModelConfig.retries_runaway`
+   flag turns on Voicebox's own split-and-retry. The engine already retries internally, so
+   VoxCPM2 sets it to `False` and we do not layer a second retry on top.
 6. **`normalize=False` by default.** Our pronunciation-dictionary path (FR-008) feeds
    pre-processed text, so leaving upstream normalization off is the correct default —
    turning it on could undo our Arabic diacritics work.

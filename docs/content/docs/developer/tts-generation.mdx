@@ -189,7 +189,7 @@ The request path from frontend to audio file:
 
 Text longer than `max_chunk_chars` (default 800, range 100–5000) is split at sentence boundaries, generated in sequence, and crossfaded together. The chunking behavior is engine-agnostic — it lives in the service layer, not in individual backends.
 
-A backend may define `continuation_voice_prompt(voice_prompt, instruct, chunk_text, chunk_audio, sample_rate)`. After the first chunk, a returned prompt replaces the voice prompt for the remaining chunks, and `release_continuation_voice_prompt()` cleans it up afterwards. VoxCPM2 uses this in voice design: chunk 0 is generated from the description, then its audio and text become the prompt pair for every later chunk, so a long designed generation keeps one speaker. Cloned profiles keep their own reference for every chunk.
+A backend may define `continuation_voice_prompt(voice_prompt, instruct, chunk_text, chunk_audio, sample_rate, prompt_path=None)`. The chunking code reserves `prompt_path` before calling the hook, so the temporary file is removed even if the generation is cancelled mid-save. After the first chunk, a returned prompt replaces the voice prompt for the remaining chunks, and `release_continuation_voice_prompt()` cleans it up afterwards. VoxCPM2 uses this in voice design: chunk 0 is generated from the description, then its audio and text become the prompt pair for every later chunk, so a long designed generation keeps one speaker. Cloned profiles keep their own reference for every chunk.
 
 ## Instruct Mode
 
