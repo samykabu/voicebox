@@ -1,0 +1,78 @@
+Sanity check: prove the N4 test can fail.
+Timestamp: 2026-09-23T17:42:04Z
+Temporary change (restored afterwards):
+96c96
+<     failing = FakeBackend(load_error=RuntimeError(LOAD_ERROR))
+---
+>     failing = FakeBackend(load_error=None)  # SANITY FLIP: load no longer fails
+
+Command: backend/venv/Scripts/python.exe -m pytest backend/tests/test_engine_load_failure.py -v -p no:cacheprovider
+
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- D:\Projects\Personal\voicebox\backend\venv\Scripts\python.exe
+rootdir: D:\Projects\Personal\voicebox\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1, hydra-core-1.3.7, asyncio-1.4.0, typeguard-4.6.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 4 items
+
+backend\tests\test_engine_load_failure.py::test_harness_uses_the_real_backend_seams PASSED [ 25%]
+backend\tests\test_engine_load_failure.py::test_second_engine_load_failure_marks_generation_failed_and_keeps_first_engine FAILED [ 50%]
+backend\tests\test_engine_load_failure.py::test_load_failure_error_text_reaches_the_generation[MemoryError] PASSED [ 75%]
+backend\tests\test_engine_load_failure.py::test_load_failure_error_text_reaches_the_generation[RuntimeError-cuda-oom] PASSED [100%]
+
+================================== FAILURES ===================================
+_ test_second_engine_load_failure_marks_generation_failed_and_keeps_first_engine _
+
+harness = namespace(loaded=<backend.tests.test_engine_load_failure.FakeBackend object at 0x00000236B1ED7710>, failing=<backend.t...b1'], backends_pkg=<module 'backend.backends' from 'D:\\Projects\\Personal\\voicebox\\backend\\backends\\__init__.py'>)
+
+    @pytest.mark.asyncio
+    async def test_second_engine_load_failure_marks_generation_failed_and_keeps_first_engine(harness) -> None:
+        loaded, failing, statuses = harness.loaded, harness.failing, harness.statuses
+    
+        # 1. The first engine loads and generates.
+        await _run("gen-a1", LOADED_ENGINE, "First line.")
+    
+        assert statuses["gen-a1"] == [("loading_model", None), ("generating", None), ("completed", None)]
+        assert loaded.is_loaded()
+        assert loaded.load_calls == 1
+        assert loaded.generate_calls == ["First line."]
+    
+        # 2. The second engine raises while loading: the generation fails with that error.
+        await _run("gen-b1", FAILING_ENGINE, "Second line.")
+    
+        assert statuses["gen-b1"][0] == ("loading_model", None)
+        final_status, error = statuses["gen-b1"][-1]
+>       assert final_status == "failed"
+E       AssertionError: assert 'completed' == 'failed'
+E         
+E         - failed
+E         + completed
+
+backend\tests\test_engine_load_failure.py:151: AssertionError
+============================== warnings summary ===============================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\test_engine_load_failure.py::test_second_engine_load_failure_marks_generation_failed_and_keeps_first_engine
+================== 1 failed, 3 passed, 16 warnings in 2.15s ===================
+Exit code: 1
+
+Result: the flipped fake made the main N4 test fail (generation completed instead of failed), as intended.
+The two parametrized tests still pass because they set load_error themselves.
+Restored: the file was copied back from the saved original and checked byte-identical with cmp at 2026-09-23T17:42:13Z.
