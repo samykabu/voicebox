@@ -6,6 +6,7 @@
  * Chatterbox Multilingual supports 23 languages.
  * Chatterbox Turbo is English-only.
  * Kokoro supports 8 languages.
+ * VoxCPM2 declares 30 languages through the engine capabilities (all in ALL_LANGUAGES).
  */
 
 /** All languages that any engine supports. */
@@ -20,10 +21,14 @@ export const ALL_LANGUAGES = {
   fr: 'French',
   he: 'Hebrew',
   hi: 'Hindi',
+  id: 'Indonesian',
   it: 'Italian',
   ja: 'Japanese',
+  km: 'Khmer',
   ko: 'Korean',
+  lo: 'Lao',
   ms: 'Malay',
+  my: 'Burmese',
   nl: 'Dutch',
   no: 'Norwegian',
   pl: 'Polish',
@@ -31,7 +36,10 @@ export const ALL_LANGUAGES = {
   ru: 'Russian',
   sv: 'Swedish',
   sw: 'Swahili',
+  th: 'Thai',
+  tl: 'Tagalog',
   tr: 'Turkish',
+  vi: 'Vietnamese',
   zh: 'Chinese',
 } as const;
 

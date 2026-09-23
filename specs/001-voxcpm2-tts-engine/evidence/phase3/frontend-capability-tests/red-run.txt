@@ -1,0 +1,15 @@
+$ cd <scratchpad>/fe-tests; bun test ./capability-logic.test.ts --reporter=junit --reporter-outfile=<scratchpad>/fe-tests/red.xml
+timestamp 2026-09-23T16:28:40.6747011+03:00, exit=1 (no JUnit file written: the module failed to load before any test ran)
+bun test v1.4.2 (744846f84)
+
+capability-logic.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+error: Cannot find module 'D:/Projects/Personal/voicebox/app/src/lib/hooks/engineCapabilityRules' from 'C:\Users\sabus\AppData\Local\Temp\claude\d--Projects-Personal-voicebox\930ef2a0-dd0d-4a44-a944-6b0a6c359932\scratchpad\fe-tests\capability-logic.test.ts'
+-------------------------------
+
+ 0 pass
+ 1 fail
+ 1 error
+Ran 1 test across 1 file. [18.00ms]

@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="36" skipped="0" tests="174" time="2.152" timestamp="2026-09-23T17:28:14.650628+03:00" hostname="DevelopmentPC"><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[my-VoiceProfileCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='my', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.VoiceProfileCreate'&gt;, field = 'language'
+required = {'name': 'Voice'}, code = 'my'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='my', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[my-GenerationRequest.language]" time="0.002"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='my', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.GenerationRequest'&gt;, field = 'language'
+required = {'profile_id': 'p1', 'text': 'hello'}, code = 'my'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='my', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[my-PronunciationEntryCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='my', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryCreate'&gt;, field = 'language'
+required = {'term': 'foo', 'replacement': 'bar'}, code = 'my'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='my', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[my-PronunciationEntryUpdate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='my', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryUpdate'&gt;, field = 'language'
+required = {}, code = 'my'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='my', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[my-SpeakRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='my', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.SpeakRequest'&gt;, field = 'language'
+required = {'text': 'hello'}, code = 'my'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='my', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[id-VoiceProfileCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='id', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.VoiceProfileCreate'&gt;, field = 'language'
+required = {'name': 'Voice'}, code = 'id'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='id', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[id-GenerationRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='id', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.GenerationRequest'&gt;, field = 'language'
+required = {'profile_id': 'p1', 'text': 'hello'}, code = 'id'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='id', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[id-PronunciationEntryCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='id', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryCreate'&gt;, field = 'language'
+required = {'term': 'foo', 'replacement': 'bar'}, code = 'id'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='id', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[id-PronunciationEntryUpdate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='id', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryUpdate'&gt;, field = 'language'
+required = {}, code = 'id'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='id', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[id-SpeakRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='id', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.SpeakRequest'&gt;, field = 'language'
+required = {'text': 'hello'}, code = 'id'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='id', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[km-VoiceProfileCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='km', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.VoiceProfileCreate'&gt;, field = 'language'
+required = {'name': 'Voice'}, code = 'km'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='km', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[km-GenerationRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='km', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.GenerationRequest'&gt;, field = 'language'
+required = {'profile_id': 'p1', 'text': 'hello'}, code = 'km'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='km', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[km-PronunciationEntryCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='km', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryCreate'&gt;, field = 'language'
+required = {'term': 'foo', 'replacement': 'bar'}, code = 'km'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='km', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[km-PronunciationEntryUpdate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='km', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryUpdate'&gt;, field = 'language'
+required = {}, code = 'km'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='km', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[km-SpeakRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='km', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.SpeakRequest'&gt;, field = 'language'
+required = {'text': 'hello'}, code = 'km'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='km', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[lo-VoiceProfileCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='lo', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.VoiceProfileCreate'&gt;, field = 'language'
+required = {'name': 'Voice'}, code = 'lo'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='lo', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[lo-GenerationRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='lo', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.GenerationRequest'&gt;, field = 'language'
+required = {'profile_id': 'p1', 'text': 'hello'}, code = 'lo'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='lo', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[lo-PronunciationEntryCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='lo', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryCreate'&gt;, field = 'language'
+required = {'term': 'foo', 'replacement': 'bar'}, code = 'lo'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='lo', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[lo-PronunciationEntryUpdate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='lo', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryUpdate'&gt;, field = 'language'
+required = {}, code = 'lo'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='lo', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[lo-SpeakRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='lo', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.SpeakRequest'&gt;, field = 'language'
+required = {'text': 'hello'}, code = 'lo'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='lo', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[tl-VoiceProfileCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='tl', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.VoiceProfileCreate'&gt;, field = 'language'
+required = {'name': 'Voice'}, code = 'tl'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='tl', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[tl-GenerationRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='tl', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.GenerationRequest'&gt;, field = 'language'
+required = {'profile_id': 'p1', 'text': 'hello'}, code = 'tl'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='tl', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[tl-PronunciationEntryCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='tl', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryCreate'&gt;, field = 'language'
+required = {'term': 'foo', 'replacement': 'bar'}, code = 'tl'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='tl', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[tl-PronunciationEntryUpdate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='tl', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryUpdate'&gt;, field = 'language'
+required = {}, code = 'tl'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='tl', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[tl-SpeakRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='tl', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.SpeakRequest'&gt;, field = 'language'
+required = {'text': 'hello'}, code = 'tl'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='tl', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[th-VoiceProfileCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='th', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.VoiceProfileCreate'&gt;, field = 'language'
+required = {'name': 'Voice'}, code = 'th'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='th', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[th-GenerationRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='th', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.GenerationRequest'&gt;, field = 'language'
+required = {'profile_id': 'p1', 'text': 'hello'}, code = 'th'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='th', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[th-PronunciationEntryCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='th', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryCreate'&gt;, field = 'language'
+required = {'term': 'foo', 'replacement': 'bar'}, code = 'th'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='th', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[th-PronunciationEntryUpdate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='th', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryUpdate'&gt;, field = 'language'
+required = {}, code = 'th'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='th', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[th-SpeakRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='th', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.SpeakRequest'&gt;, field = 'language'
+required = {'text': 'hello'}, code = 'th'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='th', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[vi-VoiceProfileCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='vi', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.VoiceProfileCreate'&gt;, field = 'language'
+required = {'name': 'Voice'}, code = 'vi'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for VoiceProfileCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='vi', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[vi-GenerationRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='vi', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.GenerationRequest'&gt;, field = 'language'
+required = {'profile_id': 'p1', 'text': 'hello'}, code = 'vi'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='vi', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[vi-PronunciationEntryCreate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='vi', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryCreate'&gt;, field = 'language'
+required = {'term': 'foo', 'replacement': 'bar'}, code = 'vi'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryCreate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='vi', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[vi-PronunciationEntryUpdate.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='vi', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.PronunciationEntryUpdate'&gt;, field = 'language'
+required = {}, code = 'vi'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PronunciationEntryUpdate
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='vi', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_new_codes_accepted[vi-SpeakRequest.language]" time="0.001"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='vi', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">model = &lt;class 'backend.models.SpeakRequest'&gt;, field = 'language'
+required = {'text': 'hello'}, code = 'vi'
+
+    @pytest.mark.parametrize(("model", "field", "required"), TTS_LANGUAGE_FIELDS, ids=TTS_FIELD_IDS)
+    @pytest.mark.parametrize("code", NEW_CODES)
+    def test_new_codes_accepted(model, field, required, code):
+&gt;       instance = model(**required, **{field: code})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for SpeakRequest
+E       language
+E         String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='vi', input_type=str]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:91: ValidationError</failure></testcase><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[zh-VoiceProfileCreate.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[zh-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[zh-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[zh-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[zh-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[en-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[en-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[en-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[en-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[en-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ja-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ja-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ja-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ja-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ja-SpeakRequest.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ko-VoiceProfileCreate.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ko-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ko-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ko-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ko-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[de-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[de-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[de-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[de-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[de-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[fr-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[fr-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[fr-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[fr-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[fr-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ru-VoiceProfileCreate.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ru-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ru-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ru-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ru-SpeakRequest.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[pt-VoiceProfileCreate.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[pt-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[pt-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[pt-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[pt-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[es-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[es-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[es-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[es-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[es-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[it-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[it-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[it-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[it-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[it-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[he-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[he-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[he-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[he-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[he-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ar-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ar-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ar-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ar-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ar-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[da-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[da-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[da-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[da-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[da-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[el-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[el-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[el-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[el-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[el-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[fi-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[fi-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[fi-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[fi-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[fi-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[hi-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[hi-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[hi-PronunciationEntryCreate.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[hi-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[hi-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ms-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ms-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ms-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ms-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[ms-SpeakRequest.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[nl-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[nl-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[nl-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[nl-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[nl-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[no-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[no-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[no-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[no-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[no-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[pl-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[pl-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[pl-PronunciationEntryCreate.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[pl-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[pl-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[sv-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[sv-GenerationRequest.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[sv-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[sv-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[sv-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[sw-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[sw-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[sw-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[sw-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[sw-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[tr-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[tr-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[tr-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[tr-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_existing_codes_still_accepted[tr-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['xx'-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['xx'-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['xx'-PronunciationEntryCreate.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['xx'-PronunciationEntryUpdate.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['xx'-SpeakRequest.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['EN'-VoiceProfileCreate.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['EN'-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['EN'-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['EN'-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['EN'-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['en-US'-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['en-US'-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['en-US'-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['en-US'-PronunciationEntryUpdate.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected['en-US'-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected[''-VoiceProfileCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected[''-GenerationRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected[''-PronunciationEntryCreate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected[''-PronunciationEntryUpdate.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_invalid_codes_rejected[''-SpeakRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_tts_language_patterns_are_identical_and_complete" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_stt_language_fields_unchanged[TranscriptionRequest.language]" time="0.000" /><testcase classname="tests.test_language_patterns" name="test_stt_language_fields_unchanged[CaptureRetranscribeRequest.language]" time="0.001" /><testcase classname="tests.test_language_patterns" name="test_every_voxcpm_declared_language_accepted_by_generation_request" time="0.000"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest&#10;language&#10;  String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='my', input_type=str]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch">def test_every_voxcpm_declared_language_accepted_by_generation_request():
+        voxcpm = [c for c in get_tts_model_configs() if c.engine == "voxcpm"]
+        assert voxcpm, "no voxcpm model config"
+        languages = voxcpm[0].languages
+        assert len(languages) == 30
+        for code in languages:
+&gt;           request = GenerationRequest(profile_id="p1", text="hello", language=code, engine="voxcpm")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           pydantic_core._pydantic_core.ValidationError: 1 validation error for GenerationRequest
+E           language
+E             String should match pattern '^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$' [type=string_pattern_mismatch, input_value='my', input_type=str]
+E               For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch
+
+backend\tests\test_language_patterns.py:130: ValidationError</failure></testcase></testsuite></testsuites>

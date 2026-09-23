@@ -1,0 +1,412 @@
+## RED run
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_language_patterns.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase3/lang-red.xml
+2026-09-23T17:28:14+03:00
+backend\models.py:751
+  D:\Projects\Personal\voicebox\backend\models.py:751: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryResponse(BaseModel):
+
+backend\models.py:765
+  D:\Projects\Personal\voicebox\backend\models.py:765: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryItemDetail(BaseModel):
+
+backend\models.py:797
+  D:\Projects\Personal\voicebox\backend\models.py:797: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class StoryDetailResponse(BaseModel):
+
+backend\models.py:905
+  D:\Projects\Personal\voicebox\backend\models.py:905: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class EffectPresetResponse(BaseModel):
+
+backend\models.py:919
+  D:\Projects\Personal\voicebox\backend\models.py:919: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class GenerationVersionResponse(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase3\lang-red.xml -
+=========================== short test summary info ===========================
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[my-VoiceProfileCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[my-GenerationRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[my-PronunciationEntryCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[my-PronunciationEntryUpdate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[my-SpeakRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[id-VoiceProfileCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[id-GenerationRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[id-PronunciationEntryCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[id-PronunciationEntryUpdate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[id-SpeakRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[km-VoiceProfileCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[km-GenerationRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[km-PronunciationEntryCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[km-PronunciationEntryUpdate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[km-SpeakRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[lo-VoiceProfileCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[lo-GenerationRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[lo-PronunciationEntryCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[lo-PronunciationEntryUpdate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[lo-SpeakRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[tl-VoiceProfileCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[tl-GenerationRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[tl-PronunciationEntryCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[tl-PronunciationEntryUpdate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[tl-SpeakRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[th-VoiceProfileCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[th-GenerationRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[th-PronunciationEntryCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[th-PronunciationEntryUpdate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[th-SpeakRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[vi-VoiceProfileCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[vi-GenerationRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[vi-PronunciationEntryCreate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[vi-PronunciationEntryUpdate.language]
+FAILED backend\tests\test_language_patterns.py::test_new_codes_accepted[vi-SpeakRequest.language]
+FAILED backend\tests\test_language_patterns.py::test_every_voxcpm_declared_language_accepted_by_generation_request
+================= 36 failed, 138 passed, 15 warnings in 2.16s =================
+exit=1
+
+Failure reasons in lang-red.xml (count of 'String should match pattern'): 72
+
+
+## GREEN run (after extending the 5 TTS-language patterns in backend/models.py) + regression
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_language_patterns.py backend/tests/test_engine_patterns.py backend/tests/test_pronunciation.py backend/tests/test_mcp_speak.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase3/lang-green.xml
+2026-09-23T17:28:38+03:00
+backend\tests\test_pronunciation.py::test_untrimmed_term_still_finds_its_duplicate PASSED [ 96%]
+backend\tests\test_pronunciation.py::test_whitespace_only_values_are_rejected[term] PASSED [ 96%]
+backend\tests\test_pronunciation.py::test_whitespace_only_values_are_rejected[replacement] PASSED [ 97%]
+backend\tests\test_pronunciation.py::test_values_are_stored_trimmed PASSED [ 97%]
+backend\tests\test_pronunciation.py::test_preview_rejects_an_unknown_profile PASSED [ 97%]
+backend\tests\test_pronunciation.py::test_the_database_enforces_scope_uniqueness PASSED [ 98%]
+backend\tests\test_pronunciation.py::test_terms_are_not_logged_at_info PASSED [ 98%]
+backend\tests\test_pronunciation.py::test_dedup_migration_keeps_the_oldest_row PASSED [ 98%]
+backend\tests\test_mcp_speak.py::test_speak_forwards_explicit_model_size PASSED [ 99%]
+backend\tests\test_mcp_speak.py::test_speak_omitted_model_size_is_none PASSED [ 99%]
+backend\tests\test_mcp_speak.py::test_speak_rejects_invalid_model_size PASSED [100%]
+============================== warnings summary ===============================
+backend\tests\test_pronunciation.py:25
+  D:\Projects\Personal\voicebox\backend\tests\test_pronunciation.py:25: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient  # noqa: E402
+backend\database\models.py:26
+  D:\Projects\Personal\voicebox\backend\database\models.py:26: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+tests/test_pronunciation.py::test_replaces_a_term
+  D:\Projects\Personal\voicebox\backend\database\migrations.py:74: SAWarning: Skipped unsupported reflection of expression-based index uq_pronunciation_scope
+    existing = {ix["name"] for ix in inspector.get_indexes("pronunciation_entries")}
+tests/test_pronunciation.py: 100 warnings
+  D:\Projects\Personal\voicebox\backend\venv\Lib\site-packages\sqlalchemy\sql\schema.py:3627: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+tests/test_pronunciation.py::test_profile_entry_beats_global
+tests/test_pronunciation.py::test_other_profiles_entries_do_not_leak
+tests/test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:186: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+tests/test_pronunciation.py::test_profile_entry_beats_global
+tests/test_pronunciation.py::test_other_profiles_entries_do_not_leak
+tests/test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original
+  D:\Projects\Personal\voicebox\backend\services\profiles.py:187: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    updated_at=datetime.utcnow(),
+tests/test_pronunciation.py::test_engine_gets_the_respelling_but_the_row_keeps_the_original
+  D:\Projects\Personal\voicebox\backend\services\history.py:107: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\Projects\Personal\voicebox\specs\001-voxcpm2-tts-engine\evidence\phase3\lang-green.xml -
+====================== 280 passed, 125 warnings in 5.05s ======================
+exit=0
+
+## GREEN re-run (final; overwrites lang-green.xml from the run above, which also passed 280/280) after reflowing VoiceProfileCreate.language (line 22) onto two lines so ruff format has no new finding
+$ backend/venv/Scripts/python.exe -m pytest backend/tests/test_language_patterns.py backend/tests/test_engine_patterns.py backend/tests/test_pronunciation.py backend/tests/test_mcp_speak.py -v -p no:cacheprovider --junitxml=specs/001-voxcpm2-tts-engine/evidence/phase3/lang-green.xml
+2026-09-23T17:30:48+03:00
+PASSED lines: 280
+====================== 280 passed, 125 warnings in 6.88s ======================
+junit: <testsuite name="pytest" errors="0" failures="0" skipped="0" tests="280" time="6.875" timestamp="2026-09-23T17:30:58.598742+03:00" hostname="DevelopmentPC">
+per-file: 
+     57 classname="tests.test_engine_patterns"
+    174 classname="tests.test_language_patterns"
+      3 classname="tests.test_mcp_speak"
+     46 classname="tests.test_pronunciation"
+n(ruff run before the line-22 reflow)
+
+## Ruff
+2026-09-23T17:28:53+03:00
+$ (cd backend) ruff check tests/test_language_patterns.py
+All checks passed!
+exit=0
+$ ruff format --check tests/test_language_patterns.py
+1 file already formatted
+exit=0
+$ ruff check models.py --statistics (working tree) vs git show HEAD:backend/models.py | ruff check --stdin-filename models.py --statistics -
+-- working tree:
+147	UP045	[*] non-pep604-annotation-optional
+ 37	UP006	[*] non-pep585-annotation
+  2	UP035	[-] deprecated-import
+  1	I001 	[*] unsorted-imports
+Found 187 errors.
+[*] 186 fixable with the `--fix` option.
+-- HEAD:
+147	UP045	[*] non-pep604-annotation-optional
+ 37	UP006	[*] non-pep585-annotation
+  2	UP035	[-] deprecated-import
+  1	I001 	[*] unsorted-imports
+Found 187 errors.
+[*] 186 fixable with the `--fix` option.
+-- working-tree findings on the 5 changed lines (22,85,187,203,495):
+-- same lines at HEAD:
+$ ruff format --check models.py (HEAD vs tree)
+unformatted: File would be reformatted
+   --> models.py:22:22
+    |
+21  |     language: str = Field(
+    -         default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$"
+22  +         default="en",
+23  +         pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$",
+24  |     )
+--------------------------------------------------------------------------------
+85  |     text: str = Field(..., min_length=1, max_length=50000)
+    -     language: str = Field(default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$")
+86  +     language: str = Field(
+87  +         default="en",
+88  +         pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$",
+89  +     )
+90  |     seed: Optional[int] = Field(None, ge=0)
+--------------------------------------------------------------------------------
+95  |     instruct: Optional[str] = Field(None, max_length=500)
+    -     engine: Optional[str] = Field(default="qwen", pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$")
+96  +     engine: Optional[str] = Field(
+97  +         default="qwen",
+98  +         pattern="^(qwen|qwen_custom_voice|luxtts|chatterbox|chatterbox_turbo|tada|kokoro|f5_tts|voxcpm)$",
+99  +     )
+100 |     personality: bool = Field(
+--------------------------------------------------------------------------------
+178 | # the route strips it. Strip first, then length-check the result.
+    - TrimmedTerm = Annotated[
+    -     str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)
+    - ]
+    - TrimmedReplacement = Annotated[
+    -     str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)
+    - ]
+179 + TrimmedTerm = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
+180 + TrimmedReplacement = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
+181 |
+--------------------------------------------------------------------------------
+192 |     )
+    -     profile_id: Optional[str] = Field(
+    -         None, description="Scope to one voice. Omit for a global entry."
+    -     )
+193 +     profile_id: Optional[str] = Field(None, description="Scope to one voice. Omit for a global entry.")
+194 |     enabled: bool = True
+--------------------------------------------------------------------------------
+390 |     hotkey_enabled: bool = False
+    -     chord_push_to_talk_keys: List[str] = Field(
+    -         default_factory=default_push_to_talk_chord
+    -     )
+    -     chord_toggle_to_talk_keys: List[str] = Field(
+    -         default_factory=default_toggle_to_talk_chord
+    -     )
+391 +     chord_push_to_talk_keys: List[str] = Field(default_factory=default_push_to_talk_chord)
+392 +     chord_toggle_to_talk_keys: List[str] = Field(default_factory=default_toggle_to_talk_chord)
+393 |
+    |
+
+1 file would be reformatted
+exit=1
+HEAD format exit=1
+
+## Ruff after the line-22 reflow
+2026-09-23T17:31:06+03:00
+$ (cd backend) ruff check models.py --statistics / HEAD via stdin
+Found 187 errors.
+[*] 186 fixable with the `--fix` option.
+-- HEAD:
+Found 187 errors.
+[*] 186 fixable with the `--fix` option.
+$ ruff format --diff: working-tree hunks vs HEAD hunks (diff of the +/- lines)
+3c3
+< -    language: str = Field(default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$")
+---
+> -    language: str = Field(default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$")
+5c5,6
+< +        default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$"
+---
+> +        default="en",
+> +        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$",
+(only difference: the pre-existing unformatted GenerationRequest.language line 85 now carries the longer pattern; no new hunk)
+$ ruff check / format --check tests/test_language_patterns.py
+All checks passed!
+1 file already formatted
+
+## Frontend typecheck
+$ bun run typecheck
+2026-09-23T17:31:31.9218898+03:00
+$ bunx tsc -p app/tsconfig.json --noEmit && cd web && bunx tsc --noEmit
+
+exit=0
+
+## Biome
+$ bunx biome check app/src/lib/constants/languages.ts   (working copy is CRLF: core.autocrlf=true, index is LF)
+2026-09-23T17:31:40.2665649+03:00
+Found 1 error.
+check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.
+  
+
+
+exit=1
+Comparison (the file was temporarily replaced with each variant, checked with `bunx biome check app/src/lib/constants/languages.ts`, then restored byte-identical):
+  HEAD content, CRLF (as checked out): exit=1 (whole-file CRLF formatter finding, pre-existing)
+  HEAD content, LF: exit=0
+  my content, LF: exit=0
+  my content, CRLF (working copy): exit=1 (same CRLF finding only)
+=> no new biome findings.
+
+## Scratch frontend test (copy of evidence/phase3/frontend-capability-tests/capability-logic.test.ts; evidence copy NOT edited)
+Copy: C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/lang/capability-logic.test.ts
+$ diff -u <evidence copy> <scratch copy>
+--- specs/001-voxcpm2-tts-engine/evidence/phase3/frontend-capability-tests/capability-logic.test.ts	2026-09-23 16:28:33.845928700 +0300
++++ C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/lang/capability-logic.test.ts	2026-09-23 17:30:22.264454800 +0300
+@@ -46,16 +46,25 @@
+     const codes = getLanguageOptionsForEngine('engine-under-test', VOXCPM_LANGS).map((o) => o.value);
+     expect(codes[0]).toBe('zh');
+     expect(codes).toContain('ar');
+-    expect(codes).toHaveLength(23);
++    expect(codes).toHaveLength(30);
+   });
+ 
+-  test('declared codes the app cannot name or the backend cannot accept are filtered out', () => {
++  test('all 30 declared VoxCPM2 languages are offered, including the 7 added ones', () => {
+     const codes = getLanguageOptionsForEngine('engine-under-test', VOXCPM_LANGS).map((o) => o.value);
+-    for (const unknown of ['my', 'id', 'km', 'lo', 'tl', 'th', 'vi']) {
+-      expect(codes).not.toContain(unknown);
++    expect(codes).toEqual(VOXCPM_LANGS);
++    for (const added of ['my', 'id', 'km', 'lo', 'tl', 'th', 'vi']) {
++      expect(codes).toContain(added);
+     }
+   });
+ 
++  test('declared codes the app cannot name are still filtered out', () => {
++    const codes = getLanguageOptionsForEngine('engine-under-test', [...VOXCPM_LANGS, 'xx']).map(
++      (o) => o.value,
++    );
++    expect(codes).not.toContain('xx');
++    expect(codes).toHaveLength(30);
++  });
++
+   test('every option has a human label', () => {
+     for (const opt of getLanguageOptionsForEngine('engine-under-test', VOXCPM_LANGS)) {
+       expect(typeof opt.label).toBe('string');
+
+$ (unchanged original, run against the new languages.ts) bun test ./orig-capability-logic.test.ts
+
+error: expect(received).toHaveLength(expected)
+Expected length: 23
+Received length: 30
+(fail) T020 getLanguageOptionsForEngine > an engine without an app-side list uses its declared languages, in declared order [0.33ms]
+error: expect(received).not.toContain(expected)
+Expected to not contain: "my"
+Received: [
+(fail) T020 getLanguageOptionsForEngine > declared codes the app cannot name or the backend cannot accept are filtered out [0.76ms]
+ 14 pass
+ 2 fail
+
+
+$ (cd C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/lang) bun test ./capability-logic.test.ts --reporter=junit --reporter-outfile=C:/Users/sabus/AppData/Local/Temp/claude/d--Projects-Personal-voicebox/930ef2a0-dd0d-4a44-a944-6b0a6c359932/scratchpad/lang/lang-fe.xml
+2026-09-23T17:31:40.4745099+03:00
+bun test v1.4.2 (744846f84)
+
+ 17 pass
+ 0 fail
+ 102 expect() calls
+Ran 17 tests across 1 file. [11.00ms]
+
+exit=0
+<testsuites name="bun test" tests="17" assertions="102" failures="0" skipped="0" time="0.0116907">
+
+## git diff (owned files)
+warning: in the working copy of 'backend/models.py', LF will be replaced by CRLF the next time Git touches it
+diff --git a/app/src/lib/constants/languages.ts b/app/src/lib/constants/languages.ts
+index 8c81352..c4ae906 100644
+--- a/app/src/lib/constants/languages.ts
++++ b/app/src/lib/constants/languages.ts
+@@ -6,6 +6,7 @@
+  * Chatterbox Multilingual supports 23 languages.
+  * Chatterbox Turbo is English-only.
+  * Kokoro supports 8 languages.
++ * VoxCPM2 declares 30 languages through the engine capabilities (all in ALL_LANGUAGES).
+  */
+ 
+ /** All languages that any engine supports. */
+@@ -20,10 +21,14 @@ export const ALL_LANGUAGES = {
+   fr: 'French',
+   he: 'Hebrew',
+   hi: 'Hindi',
++  id: 'Indonesian',
+   it: 'Italian',
+   ja: 'Japanese',
++  km: 'Khmer',
+   ko: 'Korean',
++  lo: 'Lao',
+   ms: 'Malay',
++  my: 'Burmese',
+   nl: 'Dutch',
+   no: 'Norwegian',
+   pl: 'Polish',
+@@ -31,7 +36,10 @@ export const ALL_LANGUAGES = {
+   ru: 'Russian',
+   sv: 'Swedish',
+   sw: 'Swahili',
++  th: 'Thai',
++  tl: 'Tagalog',
+   tr: 'Turkish',
++  vi: 'Vietnamese',
+   zh: 'Chinese',
+ } as const;
+ 
+diff --git a/backend/models.py b/backend/models.py
+index 1f2a522..c26db81 100644
+--- a/backend/models.py
++++ b/backend/models.py
+@@ -19,7 +19,8 @@ class VoiceProfileCreate(BaseModel):
+     name: str = Field(..., min_length=1, max_length=100)
+     description: Optional[str] = Field(None, max_length=500)
+     language: str = Field(
+-        default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$"
++        default="en",
++        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$",
+     )
+     voice_type: Optional[str] = Field(default="cloned", pattern="^(cloned|preset|designed)$")
+     preset_engine: Optional[str] = Field(None, max_length=50)
+@@ -82,7 +83,7 @@ class GenerationRequest(BaseModel):
+ 
+     profile_id: str
+     text: str = Field(..., min_length=1, max_length=50000)
+-    language: str = Field(default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$")
++    language: str = Field(default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$")
+     seed: Optional[int] = Field(None, ge=0)
+     model_size: Optional[str] = Field(
+         default=None,
+@@ -184,7 +185,7 @@ class PronunciationEntryCreate(BaseModel):
+     replacement: TrimmedReplacement
+     language: Optional[str] = Field(
+         None,
+-        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$",
++        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$",
+         description="Apply only when generating in this language. Omit for all languages.",
+     )
+     profile_id: Optional[str] = Field(
+@@ -200,7 +201,7 @@ class PronunciationEntryUpdate(BaseModel):
+     term: Optional[TrimmedTerm] = None
+     replacement: Optional[TrimmedReplacement] = None
+     language: Optional[str] = Field(
+-        None, pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$"
++        None, pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$"
+     )
+     profile_id: Optional[str] = None
+     enabled: Optional[bool] = None
+@@ -492,7 +493,7 @@ class SpeakRequest(BaseModel):
+     )
+     language: Optional[str] = Field(
+         None,
+-        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$",
++        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$",
+     )
+ 
+ 
+

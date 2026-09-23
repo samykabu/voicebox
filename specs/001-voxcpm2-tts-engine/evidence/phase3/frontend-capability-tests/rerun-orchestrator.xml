@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="16" assertions="85" failures="0" skipped="0" time="0.0122294">
+  <testsuite name="capability-logic.test.ts" file="capability-logic.test.ts" tests="16" assertions="85" failures="0" skipped="0" time="0.00396" hostname="">
+    <testsuite name="T020 getLanguageOptionsForEngine" file="capability-logic.test.ts" line="44" tests="5" assertions="66" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="an engine without an app-side list uses its declared languages, in declared order" classname="T020 getLanguageOptionsForEngine" time="0.000111" file="capability-logic.test.ts" line="45" assertions="3" />
+      <testcase name="declared codes the app cannot name or the backend cannot accept are filtered out" classname="T020 getLanguageOptionsForEngine" time="0.000638" file="capability-logic.test.ts" line="52" assertions="7" />
+      <testcase name="every option has a human label" classname="T020 getLanguageOptionsForEngine" time="0.000142" file="capability-logic.test.ts" line="59" assertions="46" />
+      <testcase name="the eight unmigrated engines keep their hardcoded list even when a declaration is passed" classname="T020 getLanguageOptionsForEngine" time="0.000243" file="capability-logic.test.ts" line="66" assertions="8" />
+      <testcase name="no declaration and no app-side list falls back to the previous default list" classname="T020 getLanguageOptionsForEngine" time="0.000097" file="capability-logic.test.ts" line="73" assertions="2" />
+    </testsuite>
+    <testsuite name="T019 isEngineSelectable" file="capability-logic.test.ts" line="82" tests="2" assertions="4" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="available engine is selectable; unavailable is not; unknown capability stays selectable" classname="T019 isEngineSelectable" time="0.000071" file="capability-logic.test.ts" line="83" assertions="3" />
+      <testcase name="a warning never makes an engine unselectable" classname="T019 isEngineSelectable" time="0.000007" file="capability-logic.test.ts" line="89" assertions="1" />
+    </testsuite>
+    <testsuite name="T022 needsDownloadConfirmation" file="capability-logic.test.ts" line="94" tests="3" assertions="5" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="confirmation is required when the capability says so and the model is not downloaded" classname="T022 needsDownloadConfirmation" time="0.000018" file="capability-logic.test.ts" line="95" assertions="1" />
+      <testcase name="no confirmation when the capability does not require it" classname="T022 needsDownloadConfirmation" time="0.000011" file="capability-logic.test.ts" line="99" assertions="2" />
+      <testcase name="no confirmation when the model is already downloaded or already downloading" classname="T022 needsDownloadConfirmation" time="0.000009" file="capability-logic.test.ts" line="108" assertions="2" />
+    </testsuite>
+    <testsuite name="T023 buildAdvancedSettingsPayload" file="capability-logic.test.ts" line="116" tests="5" assertions="7" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="sends every declared default when the user changed nothing" classname="T023 buildAdvancedSettingsPayload" time="0.000114" file="capability-logic.test.ts" line="117" assertions="1" />
+      <testcase name="sends user values, clamped to the declared bounds" classname="T023 buildAdvancedSettingsPayload" time="0.00002" file="capability-logic.test.ts" line="124" assertions="2" />
+      <testcase name="drops names the engine does not declare" classname="T023 buildAdvancedSettingsPayload" time="0.000006" file="capability-logic.test.ts" line="134" assertions="1" />
+      <testcase name="sends nothing for an engine that declares no settings, or with no capability" classname="T023 buildAdvancedSettingsPayload" time="0.000009" file="capability-logic.test.ts" line="141" assertions="2" />
+      <testcase name="non-finite user values fall back to the default" classname="T023 buildAdvancedSettingsPayload" time="0.000008" file="capability-logic.test.ts" line="148" assertions="1" />
+    </testsuite>
+    <testsuite name="T023 advancedSettingStep" file="capability-logic.test.ts" line="156" tests="1" assertions="3" failures="0" skipped="0" time="0" hostname="">
+      <testcase name="integer declarations with a wide range step by 1; narrow or fractional ones by 0.1" classname="T023 advancedSettingStep" time="0.000051" file="capability-logic.test.ts" line="157" assertions="3" />
+    </testsuite>
+  </testsuite>
+</testsuites>

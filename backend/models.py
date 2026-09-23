@@ -19,7 +19,8 @@ class VoiceProfileCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = Field(None, max_length=500)
     language: str = Field(
-        default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$"
+        default="en",
+        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$",
     )
     voice_type: Optional[str] = Field(default="cloned", pattern="^(cloned|preset|designed)$")
     preset_engine: Optional[str] = Field(None, max_length=50)
@@ -82,7 +83,7 @@ class GenerationRequest(BaseModel):
 
     profile_id: str
     text: str = Field(..., min_length=1, max_length=50000)
-    language: str = Field(default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$")
+    language: str = Field(default="en", pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$")
     seed: Optional[int] = Field(None, ge=0)
     model_size: Optional[str] = Field(
         default=None,
@@ -184,7 +185,7 @@ class PronunciationEntryCreate(BaseModel):
     replacement: TrimmedReplacement
     language: Optional[str] = Field(
         None,
-        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$",
+        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$",
         description="Apply only when generating in this language. Omit for all languages.",
     )
     profile_id: Optional[str] = Field(
@@ -200,7 +201,7 @@ class PronunciationEntryUpdate(BaseModel):
     term: Optional[TrimmedTerm] = None
     replacement: Optional[TrimmedReplacement] = None
     language: Optional[str] = Field(
-        None, pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$"
+        None, pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$"
     )
     profile_id: Optional[str] = None
     enabled: Optional[bool] = None
@@ -492,7 +493,7 @@ class SpeakRequest(BaseModel):
     )
     language: Optional[str] = Field(
         None,
-        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr)$",
+        pattern="^(zh|en|ja|ko|de|fr|ru|pt|es|it|he|ar|da|el|fi|hi|ms|nl|no|pl|sv|sw|tr|my|id|km|lo|tl|th|vi)$",
     )
 
 

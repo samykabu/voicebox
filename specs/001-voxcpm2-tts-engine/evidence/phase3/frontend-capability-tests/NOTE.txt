@@ -1,0 +1,6 @@
+Frontend capability-logic tests for T019-T023, preserved at the dispatcher's request (the app has no test runner; none was added).
+- capability-logic.test.ts: 16 bun:test tests against app/src/lib/hooks/engineCapabilityRules.ts (written by worker a9505a747d4388a3b in the orchestrator scratchpad).
+- red-run.txt: red run (module did not exist yet).
+- green.xml, green-final.xml: the worker's green JUnit runs (tests=16 failures=0).
+- rerun-orchestrator.xml: orchestrator re-run on 2026-09-23T17:26:52+03:00 with bun 1.4.2 from the scratchpad copy: 16 pass, 0 fail, 85 expect() calls.
+To re-run: copy capability-logic.test.ts to a scratch folder, fix its import paths to point at the repo, and run: bun test ./capability-logic.test.ts --reporter=junit --reporter-outfile=out.xml
