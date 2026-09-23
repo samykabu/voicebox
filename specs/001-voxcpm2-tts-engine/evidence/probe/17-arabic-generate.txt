@@ -1,0 +1,3 @@
+# timestamp: 2026-09-23T02:34:40+03:00
+# venv nodeps312, CUDA, HF_HUB_OFFLINE=1. Arabic text, no language tag (none exists). Judged by: runs without error + plausible duration; intelligibility NOT verified by ASR here.
+ARABIC OK text= مرحبا، هذا اختبار قصير لمحرك تحويل النص إلى كلام. audio_s=4.80 wall_s=5.45 file=C:\Users\sabus\voxcpm-probe-out\arabic.wav

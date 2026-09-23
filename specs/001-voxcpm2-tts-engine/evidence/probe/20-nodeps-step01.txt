@@ -1,0 +1,14 @@
+# timestamp: 2026-09-23T01:52:53+03:00
+$ py -3.13 -m venv C:\Users\sabus\voxcpm-nodeps
+(psutil installed as probe-only helper)
+$ pip install voxcpm --no-deps
+Using cached voxcpm-2.0.3-py3-none-any.whl (88 kB)
+Installing collected packages: voxcpm
+Successfully installed voxcpm-2.0.3
+exit dur=2s
+
+## attempt 1: import voxcpm with nothing else
+    from .core import VoxCPM
+  File "C:\Users\sabus\voxcpm-nodeps\Lib\site-packages\voxcpm\core.py", line 6, in <module>
+    import numpy as np
+ModuleNotFoundError: No module named 'numpy'

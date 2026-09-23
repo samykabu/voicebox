@@ -1,0 +1,98 @@
+# timestamp: 2026-09-23T02:34:04+03:00
+## where is ffmpeg on PATH and does it ship shared DLLs?
+/c/ProgramData/chocolatey/bin/ffmpeg
+ffmpeg.exe
+ffplay.exe
+ffprobe.exe
+
+## torchcodec wheel contents (bundled FFmpeg DLLs?)
+__init__.py
+__pycache__
+_core
+_frame.py
+_internally_replaced_utils.py
+_logging.py
+decoders
+encoders
+jpeg8.dll
+libavif.dll
+libpng16.dll
+libsharpyuv.dll
+libtorchcodec_core4.dll
+libtorchcodec_core5.dll
+libtorchcodec_core6.dll
+libtorchcodec_core7.dll
+libtorchcodec_core8.dll
+libtorchcodec_core9.dll
+libtorchcodec_custom_ops4.dll
+libtorchcodec_custom_ops5.dll
+libtorchcodec_custom_ops6.dll
+libtorchcodec_custom_ops7.dll
+libtorchcodec_custom_ops8.dll
+libtorchcodec_custom_ops9.dll
+libtorchcodec_heic.dll
+libtorchcodec_image.dll
+libtorchcodec_pybind_ops.pyd
+libwebp.dll
+libwebpdecoder.dll
+libwebpdemux.dll
+
+## A. torchcodec decode/encode with normal PATH
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\_ops.py", line 1589, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: C:\Users\sabus\voxcpm-probe\Lib\site-packages\torchcodec\libtorchcodec_core4.dll
+[end of libtorchcodec loading traceback].
+
+## B. same with PATH stripped to System32 only (no ffmpeg dirs)
+    torch.ops.load_library(core_library_path)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\_ops.py", line 1589, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: C:\Users\sabus\voxcpm-probe\Lib\site-packages\torchcodec\libtorchcodec_core4.dll
+[end of libtorchcodec loading traceback].
+
+## C. torchaudio.load (torchaudio 2.11 delegates to torchcodec) with stripped PATH
+    torch.ops.load_library(core_library_path)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\_ops.py", line 1589, in load_library
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: C:\Users\sabus\voxcpm-probe\Lib\site-packages\torchcodec\libtorchcodec_core4.dll
+[end of libtorchcodec loading traceback].
+
+## D. voxcpm itself: torchcodec never imported directly (grep earlier); torchaudio used in zipenhancer.py (denoiser) and model/voxcpm.py (v1 model)
+/c/Users/sabus/voxcpm-probe/Lib/site-packages/voxcpm/model/voxcpm.py:410:            audio, sr = torchaudio.load(prompt_wav_path)
+/c/Users/sabus/voxcpm-probe/Lib/site-packages/voxcpm/model/voxcpm.py:415:                audio = torchaudio.functional.resample(audio, sr, self.sample_rate)
+/c/Users/sabus/voxcpm-probe/Lib/site-packages/voxcpm/model/voxcpm.py:516:        audio, sr = torchaudio.load(prompt_wav_path)
+/c/Users/sabus/voxcpm-probe/Lib/site-packages/voxcpm/model/voxcpm.py:521:            audio = torchaudio.functional.resample(audio, sr, self.sample_rate)
+/c/Users/sabus/voxcpm-probe/Lib/site-packages/voxcpm/zipenhancer.py:35:        audio, sr = torchaudio.load(wav_path)
+/c/Users/sabus/voxcpm-probe/Lib/site-packages/voxcpm/zipenhancer.py:36:        loudness = torchaudio.functional.loudness(audio, sr)
+/c/Users/sabus/voxcpm-probe/Lib/site-packages/voxcpm/zipenhancer.py:37:        normalized_audio = torchaudio.functional.gain(audio, -20 - loudness)
+/c/Users/sabus/voxcpm-probe/Lib/site-packages/voxcpm/zipenhancer.py:38:        torchaudio.save(wav_path, normalized_audio, sr)
+
+## E. full torchcodec load message (first attempt of the decode)
+    raise RuntimeError(
+RuntimeError: Could not load libtorchcodec. Likely causes:
+          1. FFmpeg is not properly installed in your environment. We support
+             versions 4, 5, 6, 7, 8, and 9, and we attempt to load libtorchcodec
+             for each of those versions. Errors for versions not installed on
+             your system are expected; only the error for your installed FFmpeg
+             version is relevant. On Windows, ensure you've installed the
+             "full-shared" version which ships DLLs.
+          2. The PyTorch version (2.14.0+cpu) is not compatible with
+             this version of TorchCodec. Refer to the version compatibility
+             https://github.com/pytorch/torchcodec?tab=readme-ov-file#installing-torchcodec.
+FFmpeg version 9:
+FileNotFoundError: Could not find module 'C:\Users\sabus\voxcpm-probe\Lib\site-packages\torchcodec\libtorchcodec_core9.dll' (or one of its dependencies). Try using the full path with constructor syntax.
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: C:\Users\sabus\voxcpm-probe\Lib\site-packages\torchcodec\libtorchcodec_core9.dll
+FFmpeg version 8:
+FileNotFoundError: Could not find module 'C:\Users\sabus\voxcpm-probe\Lib\site-packages\torchcodec\libtorchcodec_core8.dll' (or one of its dependencies). Try using the full path with constructor syntax.
+    raise OSError(f"Could not load this library: {path}") from e
+OSError: Could not load this library: C:\Users\sabus\voxcpm-probe\Lib\site-packages\torchcodec\libtorchcodec_core8.dll
+FFmpeg version 7:
+
+## F. is the chocolatey ffmpeg a static build (no avcodec-*.dll anywhere on PATH)?
+ffmpeg.exe
+ffplay.exe
+ffprobe.exe
+(no avcodec-*.dll found => static build)

@@ -1,0 +1,68 @@
+# Offline / Principle I checks (attempt 2; attempt 1 hung, see 14a-*). Model fully cached in C:\Users\sabus\.cache\huggingface\hub.
+# Evidence method: probe_run.py hooks socket.getaddrinfo + socket.socket.connect for the whole process; every Python-level lookup/connect is logged as [NET]. With PROBE_DENY_NET=1 any non-loopback lookup/connect is REFUSED (hard block, no admin) and logged as [NET] BLOCKED. HTTP(S)_PROXY -> 127.0.0.1:1 (verified no listener). urllib3/httpx/huggingface_hub/modelscope loggers at DEBUG.
+# Limitation: hook sees Python sockets only; native hf-xet (Rust) bypasses it but only runs for actual file downloads.
+
+################ O1 nodeps312 (hub 0.36.2): network UP, no offline env, defaults  (2026-09-23T02:29:07+03:00)
+cmd: env /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --out C:\Users\sabus\voxcpm-probe-out\offline
+HF_HUB_OFFLINE=None
+TRANSFORMERS_OFFLINE=None
+HTTP_PROXY=None
+HTTPS_PROXY=None
+PROBE_DENY_NET=None
+args {'device': 'cuda', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': False, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (1): huggingface.co:443
+[NET] getaddrinfo: huggingface.co:443
+[NET] connect: ('3.175.149.15', 443)
+[LOG] urllib3.connectionpool DEBUG https://huggingface.co:443 "GET /api/models/openbmb/VoxCPM2/revision/main HTTP/1.1" 200 None
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+Loaded VoxCPM2Model
+denoiser: None
+GEN {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 4.48, 'audio_s': 4.0, 'rtf': 1.121, 'dtype': 'float32', 'shape': (192000,), 'rms': 0.1342, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+timings {'import_s': 2.72, 'load_s': 8.63}
+RESULT {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 4.48, 'audio_s': 4.0, 'rtf': 1.121, 'dtype': 'float32', 'shape': (192000,), 'rms': 0.1342, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+NETWORK getaddrinfo hosts: ['huggingface.co:443']
+NETWORK connect count: 1
+exit=0 (124=timeout) dur=17s
+
+################ O2 nodeps312: network BLOCKED, no offline env vars  (2026-09-23T02:29:24+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --out C:\Users\sabus\voxcpm-probe-out\offline
+timeout: failed to run command 'HTTPS_PROXY=http://127.0.0.1:1': No such file or directory
+exit=127 (124=timeout) dur=1s
+
+################ O3 nodeps312: network BLOCKED + HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1  (2026-09-23T02:29:25+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --out C:\Users\sabus\voxcpm-probe-out\offline
+timeout: failed to run command 'HTTPS_PROXY=http://127.0.0.1:1': No such file or directory
+exit=127 (124=timeout) dur=0s
+
+################ O4 nodeps312: network BLOCKED, no env vars, from_pretrained(local_files_only=True)  (2026-09-23T02:29:25+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --local-files-only --out C:\Users\sabus\voxcpm-probe-out\offline
+timeout: failed to run command 'HTTPS_PROXY=http://127.0.0.1:1': No such file or directory
+exit=127 (124=timeout) dur=0s
+
+################ O4b nodeps312: proxy only (no PROBE_DENY_NET), no env vars, local_files_only=True  (2026-09-23T02:29:25+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --local-files-only --out C:\Users\sabus\voxcpm-probe-out\offline
+timeout: failed to run command 'HTTPS_PROXY=http://127.0.0.1:1': No such file or directory
+exit=127 (124=timeout) dur=0s
+
+################ O5 nodeps312: BLOCKED + offline env, load_denoiser=True (LIBRARY DEFAULT); modelscope NOT installed here  (2026-09-23T02:29:25+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --denoiser --skip-generate --out C:\Users\sabus\voxcpm-probe-out\offline
+timeout: failed to run command 'HTTPS_PROXY=http://127.0.0.1:1': No such file or directory
+exit=127 (124=timeout) dur=0s
+
+################ O6 venv1 (full deps, hub 1.32.0, torch cpu): BLOCKED, no offline env vars  (2026-09-23T02:29:25+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 /c/Users/sabus/voxcpm-probe/Scripts/python.exe probe_run.py --device cpu --skip-generate --out C:\Users\sabus\voxcpm-probe-out\offline
+timeout: failed to run command 'HTTPS_PROXY=http://127.0.0.1:1': No such file or directory
+exit=127 (124=timeout) dur=0s
+
+################ O7 venv1: BLOCKED + HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 (+generate)  (2026-09-23T02:29:25+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 /c/Users/sabus/voxcpm-probe/Scripts/python.exe probe_run.py --device cpu --out C:\Users\sabus\voxcpm-probe-out\offline
+timeout: failed to run command 'HTTPS_PROXY=http://127.0.0.1:1': No such file or directory
+exit=127 (124=timeout) dur=0s
+
+################ O8 venv1: BLOCKED + offline env, load_denoiser=True (LIBRARY DEFAULT); modelscope installed  (2026-09-23T02:29:26+03:00)
+cmd: env HTTPS_PROXY=http://127.0.0.1:1 HTTP_PROXY=http://127.0.0.1:1 PROBE_DENY_NET=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 /c/Users/sabus/voxcpm-probe/Scripts/python.exe probe_run.py --device cpu --denoiser --skip-generate --out C:\Users\sabus\voxcpm-probe-out\offline
+timeout: failed to run command 'HTTPS_PROXY=http://127.0.0.1:1': No such file or directory
+exit=127 (124=timeout) dur=0s
+
+# ---- attempt 2 invalid from O2 on: runner bug "env A=1 timeout 300 B=2 python" -> timeout tried to exec "B=2" (exit 127). O1 valid. Fix: "timeout 300 env ... B=2 python". Rerun -> 14-offline-checks.txt

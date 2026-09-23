@@ -1,0 +1,9 @@
+# nvidia-smi sampling every 500ms during 11-cuda-generate-and-design run
+baseline (first sample) and peak memory.used per GPU:
+GPU 0 baseline 414 MiB peak 6299 MiB delta 5885 MiB
+GPU 1 baseline 2976 MiB peak 2980 MiB delta 4 MiB
+samples: 127
+
+# RERUN sampling every 250ms during 11b-* run
+GPU 0 baseline 414 MiB peak 6299 MiB delta 5885 MiB
+GPU 1 baseline 2978 MiB peak 2981 MiB delta 3 MiB

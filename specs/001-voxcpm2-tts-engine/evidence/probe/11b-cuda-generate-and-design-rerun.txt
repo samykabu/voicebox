@@ -1,0 +1,64 @@
+# timestamp start: 2026-09-23T02:14:49+03:00
+# RERUN of 11-* after harness crash (UnicodeEncodeError printing full-width parens to cp1252 stdout). Fix: PYTHONIOENCODING=utf-8. Same venv/settings.
+=== ENV ===
+python 3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]
+executable C:\Users\sabus\voxcpm-nodeps312\Scripts\python.exe
+HF_HOME=None
+HF_HUB_CACHE=None
+HUGGINGFACE_HUB_CACHE=None
+HF_HUB_OFFLINE=None
+TRANSFORMERS_OFFLINE=None
+HTTP_PROXY=None
+HTTPS_PROXY=None
+NO_PROXY=None
+MODELSCOPE_CACHE=None
+HF_TOKEN=None
+args {'device': 'cuda', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out', 'denoiser': False, 'optimize': True, 'local_files_only': False, 'design': True, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+=== VERSIONS ===
+numpy 1.26.4 | torch 2.11.0+cu128 cuda build 12.8 | cuda available True | huggingface_hub 0.36.2
+transformers 4.57.6
+HF_HUB_CACHE resolved: C:\Users\sabus\.cache\huggingface\hub | HF_HUB_OFFLINE const: False
+cuda device 0 NVIDIA GeForce RTX 5070 (12, 0)
+cuda device 1 NVIDIA GeForce RTX 5060 Ti (12, 0)
+=== LOAD ===
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (1): huggingface.co:443
+[NET] getaddrinfo: huggingface.co:443
+[NET] connect: ('3.175.149.9', 443)
+[LOG] urllib3.connectionpool DEBUG https://huggingface.co:443 "GET /api/models/openbmb/VoxCPM2/revision/main HTTP/1.1" 200 None
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+The class this function is called from is 'LlamaTokenizerFast'.
+C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cuda, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Warning: torch.compile disabled - triton is not installed
+Loaded VoxCPM2Model
+Warm up VoxCPMModel...
+model device: cuda | dtype: bfloat16
+tts_model.sample_rate (output): 48000
+tts_model._encode_sample_rate: 16000
+audio_vae.sample_rate: 16000 | audio_vae.out_sample_rate: 48000
+denoiser: None
+peak RSS after load (MB): 10656
+=== GENERATE ===
+GEN {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 5.41, 'audio_s': 5.6, 'rtf': 0.967, 'dtype': 'float32', 'shape': (268800,), 'rms': 0.1243, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\cuda_plain.wav', 'file_sr': 48000}
+GEN {'label': 'cuda_design_female', 'text': '(A young woman, gentle and sweet voice)Hello, welcome to the voice design test.', 'wall_s': 2.55, 'audio_s': 2.72, 'rtf': 0.936, 'dtype': 'float32', 'shape': (130560,), 'rms': 0.1033, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\cuda_design_female.wav', 'file_sr': 48000}
+GEN {'label': 'cuda_design_male', 'text': '(An old man, deep, slow and raspy voice)Hello, welcome to the voice design test.', 'wall_s': 3.82, 'audio_s': 4.0, 'rtf': 0.954, 'dtype': 'float32', 'shape': (192000,), 'rms': 0.0518, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\cuda_design_male.wav', 'file_sr': 48000}
+GEN {'label': 'cuda_design_fullwidth', 'text': '（A young woman, gentle and sweet voice）Hello, welcome to the voice design test.', 'wall_s': 6.22, 'audio_s': 6.72, 'rtf': 0.926, 'dtype': 'float32', 'shape': (322560,), 'rms': 0.1156, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\cuda_design_fullwidth.wav', 'file_sr': 48000}
+=== SUMMARY ===
+timings {'import_s': 2.73, 'load_s': 11.57}
+peak RSS sampled (MB): 10656
+peak working set (MB, Windows peak_wset): 11111
+torch.cuda.max_memory_allocated (MB): 5458
+torch.cuda.max_memory_reserved (MB): 5692
+RESULT {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 5.41, 'audio_s': 5.6, 'rtf': 0.967, 'dtype': 'float32', 'shape': (268800,), 'rms': 0.1243, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\cuda_plain.wav', 'file_sr': 48000}
+RESULT {'label': 'cuda_design_female', 'text': '(A young woman, gentle and sweet voice)Hello, welcome to the voice design test.', 'wall_s': 2.55, 'audio_s': 2.72, 'rtf': 0.936, 'dtype': 'float32', 'shape': (130560,), 'rms': 0.1033, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\cuda_design_female.wav', 'file_sr': 48000}
+RESULT {'label': 'cuda_design_male', 'text': '(An old man, deep, slow and raspy voice)Hello, welcome to the voice design test.', 'wall_s': 3.82, 'audio_s': 4.0, 'rtf': 0.954, 'dtype': 'float32', 'shape': (192000,), 'rms': 0.0518, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\cuda_design_male.wav', 'file_sr': 48000}
+RESULT {'label': 'cuda_design_fullwidth', 'text': '（A young woman, gentle and sweet voice）Hello, welcome to the voice design test.', 'wall_s': 6.22, 'audio_s': 6.72, 'rtf': 0.926, 'dtype': 'float32', 'shape': (322560,), 'rms': 0.1156, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\cuda_design_fullwidth.wav', 'file_sr': 48000}
+NETWORK getaddrinfo hosts: ['huggingface.co:443']
+NETWORK connect count: 1
+exit=0 dur=34s
+# timestamp end: 2026-09-23T02:15:23+03:00

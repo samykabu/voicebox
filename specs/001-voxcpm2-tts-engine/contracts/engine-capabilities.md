@@ -1,0 +1,122 @@
+# Contract: Engine Capabilities
+
+**Feature**: `specs/001-voxcpm2-tts-engine` | **Status**: proposed, requires review before implementation
+
+This is the capability channel required by FR-004 and FR-024 and settled by clarification
+C1Q2 ("build the smallest real channel and use it for VoxCPM2 only"). It exists because
+nothing in the product carries engine capability from the backend to the app today: the
+app keeps its own hardcoded engine list in
+[EngineModelSelector.tsx](../../../app/src/components/Generation/EngineModelSelector.tsx#L23)
+and its own language map in
+[languages.ts](../../../app/src/lib/constants/languages.ts#L65), and no route reads
+`TTS_ENGINES` at all.
+
+This contract is additive. No existing endpoint, field or MCP tool is removed or narrowed,
+so it is not a breaking change under Principle V.
+
+---
+
+## Scope boundary
+
+This channel serves **VoxCPM2 only** in this feature. The seven existing engines keep their
+current app-side lists and are not migrated — an explicit exclusion in the specification,
+kept deliberately so the upstream merge surface stays small (Principle IV). The endpoint
+still returns every engine, so a later change can migrate the rest without another contract
+revision; the app simply does not consume it for them yet.
+
+---
+
+## Endpoint
+
+```http
+GET /models/engines
+```
+
+Read-only. No parameters. No authentication beyond whatever the backend already applies.
+
+### Response
+
+```json
+{
+  "engines": [
+    {
+      "engine": "voxcpm",
+      "display_name": "VoxCPM2",
+      "available": true,
+      "reason": null,
+      "warning": "This machine has about 6 GB of graphics memory. VoxCPM2 usually needs more, so generation may fail.",
+      "supported_accelerators": ["cuda", "mps", "cpu"],
+      "detected_accelerator": "cuda",
+      "languages": ["ar", "en", "zh", "..."],
+      "supports_cloning": true,
+      "supports_voice_design": true,
+      "requires_download_confirmation": true,
+      "advanced_settings": [
+        {"name": "cfg_value", "label": "Guidance", "default": 2.0, "min": 1.0, "max": 5.0},
+        {"name": "inference_timesteps", "label": "Quality steps", "default": 10, "min": 4, "max": 30}
+      ],
+      "size_mb": 4961,
+      "license_id": "Apache-2.0",
+      "commercial_use": true
+    }
+  ]
+}
+```
+
+### Field contract
+
+| Field | Type | Rules |
+| --- | --- | --- |
+| `engine` | `string` | Stable identifier. Matches the engine regex in `backend/models.py`. |
+| `display_name` | `string` | Human-facing name. |
+| `available` | `boolean` | False only when the detected accelerator is not in `supported_accelerators`. Memory is never a hard gate (C1Q4). |
+| `reason` | `string \| null` | Non-null **if and only if** `available` is false. A specific, user-facing sentence — FR-003 forbids a bare disabled control with no explanation. |
+| `warning` | `string \| null` | Non-null when the engine is usable but the machine looks marginal. Advisory only; never blocks. |
+| `supported_accelerators` | `string[]` | Echo of the declaration. An **empty array means unconstrained**, which is how all seven existing engines report, preserving today's behaviour exactly. |
+| `detected_accelerator` | `string` | What this machine actually resolved to via `get_torch_device`. Lets the UI explain the mismatch. |
+| `languages` | `string[]` | Replaces the app's hardcoded per-engine map for this engine (FR-007). |
+| `supports_cloning` | `boolean` | Derived from `CLONING_ENGINES`. |
+| `supports_voice_design` | `boolean` | True only for engines accepting a written voice description. Drives whether the FR-015 input is shown at all. |
+| `requires_download_confirmation` | `boolean` | When true, the app asks the user to confirm before downloading (FR-018, C1Q7). False for every existing engine. |
+| `advanced_settings` | `object[]` | Settings the app may show as advanced controls, each with `name`, `label`, `default`, `min`, `max` (FR-010, C1Q8). Empty for every existing engine. Bounds are placeholders until the probe (T001) confirms them. |
+| `size_mb` | `integer` | Download size. Shown in the FR-018 confirmation dialog. |
+| `license_id` | `string \| null` | As declared on `ModelConfig`. |
+| `commercial_use` | `boolean \| null` | As declared on `ModelConfig`. |
+
+### Invariants
+
+1. `available == false` implies `reason != null`. A disabled engine with no reason is a contract violation, not a cosmetic issue.
+2. `supported_accelerators == []` implies `available == true`. Unconstrained engines are always offered.
+3. `warning` and `reason` are independent: an unavailable engine carries a reason, not a warning.
+4. The endpoint never triggers a model download, never loads a model, and never imports torch at module scope — availability is computed from already-detected device state (Principle III, lazy heavy imports).
+5. The response is stable within a process run for a given machine; it is not user-specific.
+
+---
+
+## Principle V obligations
+
+Adding this endpoint requires **all of the following in the same change**:
+
+- [ ] Pydantic response models defined in `backend/models.py`.
+- [ ] TypeScript client regenerated with `bun run generate:api`. The generated client (`app/src/lib/api/models/`, `services/` and `core/`) **must not** be hand-edited. `app/src/lib/api/types.ts` is a separate hand-written file and is edited normally.
+- [ ] `GenerationRequest` gains two optional fields, both defaulting to `None` so every existing caller and agent integration is unaffected: `voice_description: str | None` (max 500 characters, matching `instruct`) and `advanced_settings: dict[str, float] | None`. A value outside a declared setting's bounds, or a name the engine does not declare, is rejected with a 422.
+- [ ] `backend/README.md` updated to document the endpoint.
+- [ ] New fields are additive and optional-by-default so existing agent integrations keep working untouched.
+
+---
+
+## Consumption rules for the app
+
+- The engine picker reads `available`, `reason` and `warning` for `voxcpm` and renders it **greyed out with the reason** when unavailable, rather than hiding it (C1Q3, FR-003).
+- The language selector reads `languages` for `voxcpm` instead of the hardcoded map (FR-007).
+- Model management shows `size_mb` and asks for confirmation before starting the download when `requires_download_confirmation` is true (C1Q7, FR-018).
+- The voice-description input is shown only when `supports_voice_design` is true, and its text is sent as `voice_description`, never as `instruct` (C1Q5, FR-015).
+- Advanced controls are rendered from `advanced_settings`, prefilled with each `default`, and sent as `advanced_settings` (C1Q8, FR-010).
+- **No `if (engine === 'voxcpm')` hardware or capability branching anywhere in `app/`.** That is the rule this contract exists to satisfy; a conditional on the *data* is fine, a conditional on the *name* is not.
+
+---
+
+## Open item
+
+The exact 30-language list is confirmed by the dependency probe before this contract is
+implemented. `ar` is required to be present (FR-007); the rest come from upstream.

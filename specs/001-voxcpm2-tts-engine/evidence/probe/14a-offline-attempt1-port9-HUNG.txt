@@ -1,0 +1,121 @@
+# Offline / Principle I checks. Evidence method: probe_run.py hooks socket.getaddrinfo + socket.socket.connect for the whole process (every Python-level lookup/connect is logged as [NET]); with PROBE_DENY_NET=1 any non-loopback lookup/connect is REFUSED (hard block, no admin needed) and logged as [NET] BLOCKED; HTTP(S)_PROXY points at dead port 127.0.0.1:9; urllib3/httpx/huggingface_hub/modelscope loggers at DEBUG.
+# Limitation: the hook only sees Python sockets (requests/httpx/urllib3). Native Rust clients (hf-xet) bypass it; hf-xet is only used for actual file downloads, which cannot happen for a fully cached snapshot.
+
+################ O1 nodeps312: network UP, no offline env, defaults (local_files_only=False, load_denoiser=False)  (2026-09-23T02:17:49+03:00)
+venv: nodeps312
+cmd: env /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --out C:\Users\sabus\voxcpm-probe-out\offline python probe_run.py --device cuda --out ...offline
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (1): huggingface.co:443
+[NET] getaddrinfo: huggingface.co:443
+[NET] connect: ('3.175.149.77', 443)
+[LOG] urllib3.connectionpool DEBUG https://huggingface.co:443 "GET /api/models/openbmb/VoxCPM2/revision/main HTTP/1.1" 200 None
+Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]Fetching 9 files: 100%|██████████| 9/9 [00:00<00:00, 3000.22it/s]
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+The class this function is called from is 'LlamaTokenizerFast'.
+C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cuda, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Loaded VoxCPM2Model
+  0%|          | 0/130 [00:00<?, ?it/s]  1%|          | 1/130 [00:00<00:29,  4.37it/s]  2%|▏         | 2/130 [00:00<00:22,  5.60it/s]  2%|▏         | 3/130 [00:00<00:21,  5.88it/s]  3%|▎         | 4/130 [00:00<00:21,  5.87it/s]  4%|▍         | 5/130 [00:00<00:19,  6.25it/s]  5%|▍         | 6/130 [00:00<00:19,  6.39it/s]  5%|▌         | 7/130 [00:01<00:19,  6.27it/s]  6%|▌         | 8/130 [00:01<00:19,  6.13it/s]  7%|▋         | 9/130 [00:01<00:19,  6.27it/s]  8%|▊         | 10/130 [00:01<00:19,  6.20it/s]  8%|▊         | 11/130 [00:01<00:18,  6.32it/s]  9%|▉         | 12/130 [00:01<00:18,  6.33it/s] 10%|█         | 13/130 [00:02<00:18,  6.20it/s] 11%|█         | 14/130 [00:02<00:18,  6.18it/s] 12%|█▏        | 15/130 [00:02<00:18,  6.31it/s] 12%|█▏        | 16/130 [00:02<00:18,  6.17it/s] 13%|█▎        | 17/130 [00:02<00:17,  6.36it/s] 14%|█▍        | 18/130 [00:02<00:17,  6.30it/s] 15%|█▍        | 19/130 [00:03<00:17,  6.26it/s] 15%|█▌        | 20/130 [00:03<00:17,  6.47it/s] 16%|█▌        | 21/130 [00:03<00:16,  6.63it/s] 17%|█▋        | 22/130 [00:03<00:16,  6.40it/s] 18%|█▊        | 23/130 [00:03<00:17,  6.20it/s] 18%|█▊        | 24/130 [00:03<00:16,  6.31it/s] 19%|█▉        | 25/130 [00:04<00:16,  6.33it/s] 20%|██        | 26/130 [00:04<00:16,  6.27it/s] 21%|██        | 27/130 [00:04<00:16,  6.30it/s] 22%|██▏       | 28/130 [00:04<00:16,  6.27it/s] 22%|██▏       | 28/130 [00:04<00:16,  6.05it/s]
+HF_HUB_OFFLINE=None
+TRANSFORMERS_OFFLINE=None
+HTTP_PROXY=None
+HTTPS_PROXY=None
+PROBE_DENY_NET=None
+args {'device': 'cuda', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': False, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+HF_HUB_CACHE resolved: C:\Users\sabus\.cache\huggingface\hub | HF_HUB_OFFLINE const: False
+denoiser: None
+GEN {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 5.49, 'audio_s': 4.64, 'rtf': 1.182, 'dtype': 'float32', 'shape': (222720,), 'rms': 0.1251, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+timings {'import_s': 2.8, 'load_s': 9.01}
+NETWORK getaddrinfo hosts: ['huggingface.co:443']
+NETWORK connect count: 1
+exit=0 dur=18s
+
+################ O2 nodeps312: network BLOCKED, no offline env vars  (2026-09-23T02:18:07+03:00)
+venv: nodeps312
+cmd: env HTTPS_PROXY=http://127.0.0.1:9 HTTP_PROXY=http://127.0.0.1:9 PROBE_DENY_NET=1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --out C:\Users\sabus\voxcpm-probe-out\offline python probe_run.py --device cuda --out ...offline
+[LOG] urllib3.connectionpool DEBUG Starting new HTTPS connection (1): huggingface.co:443
+[NET] getaddrinfo: 127.0.0.1:9
+[NET] connect: ('127.0.0.1', 9)
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+The class this function is called from is 'LlamaTokenizerFast'.
+C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cuda, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Loaded VoxCPM2Model
+  0%|          | 0/130 [00:00<?, ?it/s]  1%|          | 1/130 [00:00<00:30,  4.27it/s]  2%|▏         | 2/130 [00:00<00:24,  5.26it/s]  2%|▏         | 3/130 [00:00<00:23,  5.47it/s]  3%|▎         | 4/130 [00:00<00:22,  5.66it/s]  4%|▍         | 5/130 [00:00<00:21,  5.86it/s]  5%|▍         | 6/130 [00:01<00:20,  5.96it/s]  5%|▌         | 7/130 [00:01<00:20,  5.90it/s]  6%|▌         | 8/130 [00:01<00:20,  5.90it/s]  7%|▋         | 9/130 [00:01<00:19,  6.08it/s]  8%|▊         | 10/130 [00:01<00:19,  6.30it/s]  8%|▊         | 11/130 [00:01<00:19,  6.21it/s]  9%|▉         | 12/130 [00:02<00:19,  5.93it/s] 10%|█         | 13/130 [00:02<00:19,  6.03it/s] 11%|█         | 14/130 [00:02<00:19,  6.03it/s] 12%|█▏        | 15/130 [00:02<00:18,  6.15it/s] 12%|█▏        | 16/130 [00:02<00:19,  5.99it/s] 13%|█▎        | 17/130 [00:02<00:18,  6.08it/s] 14%|█▍        | 18/130 [00:03<00:18,  6.08it/s] 15%|█▍        | 19/130 [00:03<00:18,  6.14it/s] 15%|█▌        | 20/130 [00:03<00:17,  6.20it/s] 16%|█▌        | 21/130 [00:03<00:16,  6.48it/s] 17%|█▋        | 22/130 [00:03<00:16,  6.64it/s] 18%|█▊        | 23/130 [00:03<00:15,  6.76it/s] 18%|█▊        | 24/130 [00:03<00:16,  6.43it/s] 19%|█▉        | 25/130 [00:04<00:15,  6.63it/s] 19%|█▉        | 25/130 [00:04<00:17,  5.97it/s]
+HF_HUB_OFFLINE=None
+TRANSFORMERS_OFFLINE=None
+HTTP_PROXY=http://127.0.0.1:9
+HTTPS_PROXY=http://127.0.0.1:9
+PROBE_DENY_NET=1
+args {'device': 'cuda', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': False, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+HF_HUB_CACHE resolved: C:\Users\sabus\.cache\huggingface\hub | HF_HUB_OFFLINE const: False
+denoiser: None
+GEN {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 5.08, 'audio_s': 4.16, 'rtf': 1.22, 'dtype': 'float32', 'shape': (199680,), 'rms': 0.1517, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+timings {'import_s': 2.74, 'load_s': 609.14}
+NETWORK getaddrinfo hosts: ['127.0.0.1:9']
+NETWORK connect count: 1
+exit=0 dur=618s
+
+################ O3 nodeps312: network BLOCKED + HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1  (2026-09-23T02:28:25+03:00)
+venv: nodeps312
+cmd: env HTTPS_PROXY=http://127.0.0.1:9 HTTP_PROXY=http://127.0.0.1:9 PROBE_DENY_NET=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --out C:\Users\sabus\voxcpm-probe-out\offline python probe_run.py --device cuda --out ...offline
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+The class this function is called from is 'LlamaTokenizerFast'.
+C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cuda, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Loaded VoxCPM2Model
+  0%|          | 0/130 [00:00<?, ?it/s]  1%|          | 1/130 [00:00<00:30,  4.26it/s]  2%|▏         | 2/130 [00:00<00:26,  4.92it/s]  2%|▏         | 3/130 [00:00<00:23,  5.33it/s]  3%|▎         | 4/130 [00:00<00:22,  5.58it/s]  4%|▍         | 5/130 [00:00<00:21,  5.93it/s]  5%|▍         | 6/130 [00:01<00:19,  6.27it/s]  5%|▌         | 7/130 [00:01<00:18,  6.50it/s]  6%|▌         | 8/130 [00:01<00:18,  6.70it/s]  7%|▋         | 9/130 [00:01<00:18,  6.60it/s]  8%|▊         | 10/130 [00:01<00:17,  6.71it/s]  8%|▊         | 11/130 [00:01<00:17,  6.85it/s]  9%|▉         | 12/130 [00:01<00:18,  6.37it/s] 10%|█         | 13/130 [00:02<00:18,  6.46it/s] 11%|█         | 14/130 [00:02<00:17,  6.60it/s] 12%|█▏        | 15/130 [00:02<00:17,  6.74it/s] 12%|█▏        | 16/130 [00:02<00:16,  6.71it/s] 13%|█▎        | 17/130 [00:02<00:16,  6.82it/s] 14%|█▍        | 18/130 [00:02<00:16,  6.85it/s] 15%|█▍        | 19/130 [00:02<00:16,  6.92it/s] 15%|█▌        | 20/130 [00:03<00:15,  6.93it/s] 16%|█▌        | 21/130 [00:03<00:15,  6.98it/s] 17%|█▋        | 22/130 [00:03<00:15,  6.98it/s] 18%|█▊        | 23/130 [00:03<00:15,  7.03it/s] 18%|█▊        | 24/130 [00:03<00:15,  6.86it/s] 19%|█▉        | 25/130 [00:03<00:15,  6.98it/s] 20%|██        | 26/130 [00:03<00:14,  6.96it/s] 21%|██        | 27/130 [00:04<00:14,  7.04it/s] 22%|██▏       | 28/130 [00:04<00:14,  6.99it/s] 22%|██▏       | 29/130 [00:04<00:14,  6.90it/s] 23%|██▎       | 30/130 [00:04<00:14,  6.99it/s] 24%|██▍       | 31/130 [00:04<00:14,  6.99it/s] 24%|██▍       | 31/130 [00:04<00:15,  6.47it/s]
+HF_HUB_OFFLINE=1
+TRANSFORMERS_OFFLINE=1
+HTTP_PROXY=http://127.0.0.1:9
+HTTPS_PROXY=http://127.0.0.1:9
+PROBE_DENY_NET=1
+args {'device': 'cuda', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': False, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+HF_HUB_CACHE resolved: C:\Users\sabus\.cache\huggingface\hub | HF_HUB_OFFLINE const: True
+denoiser: None
+GEN {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 5.71, 'audio_s': 5.12, 'rtf': 1.115, 'dtype': 'float32', 'shape': (245760,), 'rms': 0.1008, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+timings {'import_s': 2.94, 'load_s': 9.0}
+NETWORK getaddrinfo hosts: []
+NETWORK connect count: 0
+exit=0 dur=19s
+
+################ O4 nodeps312: network BLOCKED, no env vars, from_pretrained(local_files_only=True)  (2026-09-23T02:28:44+03:00)
+venv: nodeps312
+cmd: env HTTPS_PROXY=http://127.0.0.1:9 HTTP_PROXY=http://127.0.0.1:9 PROBE_DENY_NET=1 /c/Users/sabus/voxcpm-nodeps312/Scripts/python.exe probe_run.py --device cuda --local-files-only --out C:\Users\sabus\voxcpm-probe-out\offline python probe_run.py --device cuda --out ...offline
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+The tokenizer class you load from this checkpoint is not the same type as the class this function is called from. It may result in unexpected tokenization. 
+The tokenizer class you load from this checkpoint is 'VoxCPM2Tokenizer'. 
+The class this function is called from is 'LlamaTokenizerFast'.
+C:\Users\sabus\voxcpm-nodeps312\Lib\site-packages\torch\nn\utils\weight_norm.py:144: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cuda, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Loaded VoxCPM2Model
+  0%|          | 0/130 [00:00<?, ?it/s]  1%|          | 1/130 [00:00<00:27,  4.61it/s]  2%|▏         | 2/130 [00:00<00:22,  5.63it/s]  2%|▏         | 3/130 [00:00<00:20,  6.24it/s]  3%|▎         | 4/130 [00:00<00:19,  6.48it/s]  4%|▍         | 5/130 [00:00<00:18,  6.59it/s]  5%|▍         | 6/130 [00:00<00:18,  6.64it/s]  5%|▌         | 7/130 [00:01<00:18,  6.78it/s]  6%|▌         | 8/130 [00:01<00:17,  6.81it/s]  7%|▋         | 9/130 [00:01<00:17,  6.84it/s]  8%|▊         | 10/130 [00:01<00:18,  6.63it/s]  8%|▊         | 11/130 [00:01<00:19,  6.17it/s]  9%|▉         | 12/130 [00:01<00:18,  6.35it/s] 10%|█         | 13/130 [00:02<00:18,  6.35it/s] 11%|█         | 14/130 [00:02<00:17,  6.55it/s] 12%|█▏        | 15/130 [00:02<00:17,  6.55it/s] 12%|█▏        | 16/130 [00:02<00:16,  6.71it/s] 13%|█▎        | 17/130 [00:02<00:17,  6.60it/s] 14%|█▍        | 18/130 [00:02<00:16,  6.74it/s] 15%|█▍        | 19/130 [00:02<00:16,  6.82it/s] 15%|█▌        | 20/130 [00:03<00:15,  6.94it/s] 16%|█▌        | 21/130 [00:03<00:15,  6.88it/s] 17%|█▋        | 22/130 [00:03<00:15,  6.91it/s] 18%|█▊        | 23/130 [00:03<00:15,  7.01it/s] 18%|█▊        | 24/130 [00:03<00:15,  7.06it/s] 19%|█▉        | 25/130 [00:03<00:15,  6.77it/s] 20%|██        | 26/130 [00:03<00:15,  6.90it/s] 21%|██        | 27/130 [00:04<00:15,  6.73it/s] 22%|██▏       | 28/130 [00:04<00:15,  6.79it/s] 22%|██▏       | 29/130 [00:04<00:14,  6.81it/s] 23%|██▎       | 30/130 [00:04<00:14,  6.90it/s] 24%|██▍       | 31/130 [00:04<00:14,  6.97it/s] 25%|██▍       | 32/130 [00:04<00:13,  7.00it/s] 25%|██▍       | 32/130 [00:04<00:14,  6.56it/s]
+HF_HUB_OFFLINE=None
+TRANSFORMERS_OFFLINE=None
+HTTP_PROXY=http://127.0.0.1:9
+HTTPS_PROXY=http://127.0.0.1:9
+PROBE_DENY_NET=1
+args {'device': 'cuda', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline', 'denoiser': False, 'optimize': False, 'local_files_only': True, 'design': False, 'skip_generate': False, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+HF_HUB_CACHE resolved: C:\Users\sabus\.cache\huggingface\hub | HF_HUB_OFFLINE const: False
+denoiser: None
+GEN {'label': 'cuda_plain', 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.', 'wall_s': 5.7, 'audio_s': 5.28, 'rtf': 1.079, 'dtype': 'float32', 'shape': (253440,), 'rms': 0.1617, 'file': 'C:\\Users\\sabus\\voxcpm-probe-out\\offline\\cuda_plain.wav', 'file_sr': 48000}
+timings {'import_s': 2.84, 'load_s': 8.71}
+NETWORK getaddrinfo hosts: []
+NETWORK connect count: 0

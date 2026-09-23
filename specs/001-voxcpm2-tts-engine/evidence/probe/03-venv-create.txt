@@ -1,0 +1,9 @@
+# timestamp: 2026-09-23T01:43:16+03:00
+# Python 3.12 not installed (py -0p lists 3.14, 3.13, 3.10); using 3.13 = closest >=3.12
+$ py -3.13 -m venv C:\Users\sabus\voxcpm-probe
+exit=0 dur=6s
+Python 3.13.15
+C:\Users\sabus\voxcpm-probe\Scripts\python.exe
+$ python -m pip install --upgrade pip
+Requirement already satisfied: pip in C:\Users\sabus\voxcpm-probe\Lib\site-packages (26.2.1)
+exit=0 dur=2s

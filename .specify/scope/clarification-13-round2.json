@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "issue": 13,
+  "snapshot_digest": "bf44fbed5f3802fa6d2200861caa7e1f8f706d4533c3fe889decea369248642d",
+  "engine": "brainstorm",
+  "coverage": {
+    "functional": "Clear. The voice-design path is now settled: its own labelled input, shown only for engines that support it (C1Q5).",
+    "actors": "Clear. One actor, unchanged.",
+    "exclusions": "Clear. Unchanged, and C1Q2 adds one: the seven existing engines are explicitly not migrated onto the new capability channel.",
+    "data": "Clear. Unchanged.",
+    "lifecycle": "Clear. The download now has a confirmation step before it starts (C1Q7) as well as progress while it runs.",
+    "ui_states": "Clear. The unavailable state is now specified as visibly greyed out with a reason, not hidden (C1Q3).",
+    "error_states": "Clear. Supported hardware with insufficient memory is now a pre-download warning rather than a hard block or a late failure (C1Q4).",
+    "empty_blocked_states": "Clear. A description supplied alongside reference audio now has a deterministic winner and a visible statement of which applies (C1Q6).",
+    "accessibility_locales": "Clear. Voice descriptions may be written in any language, with the real behaviour documented once known (C1Q9).",
+    "integrations": "Clear. The capability channel is now in scope at its smallest workable size, so FR-004 has a mechanism behind it (C1Q2).",
+    "security_tenancy": "Clear. Unchanged.",
+    "performance": "Clear. Generation-quality settings are exposed as advanced controls with chosen defaults (C1Q8).",
+    "scale": "Not applicable.",
+    "reliability": "Clear. Both realistic partial failures, interrupted downloads and insufficient memory, now have specified behaviour.",
+    "observability": "Clear. Unchanged.",
+    "acceptance_verification": "Clear. All nineteen source acceptance criteria remain mapped; no marker remains in the specification.",
+    "deployment": "Clear. Unchanged."
+  },
+  "summary": "All nine round-1 questions were answered by checkbox selection, each with exactly one original option checked, which the contract accepts as evidence. Eight answers matched the AI recommendation; C1Q8 did not, and its chosen option, exposing the generation-quality settings as advanced controls rather than fixing them, is recorded as the decision rather than the recommendation. Twelve edits apply the answers to the specification, removing all eight [NEEDS CLARIFICATION] markers, retitling the resolved-decisions subsection and lifting the conditional qualifier from SC-009. No question remains unresolved and no new question is raised, so this round closes clarification.\n\nEFFORT CONSEQUENCE, recorded rather than absorbed silently. Four answers add user-facing work that the source issue did not propose: a pre-download memory warning (C1Q4), a separate labelled voice-description input where the issue suggested reusing the existing instruction field (C1Q5), a download confirmation step (C1Q7), and advanced controls for two generation settings where the issue only asked for sensible defaults (C1Q8). C1Q2 does not add scope: the capability channel was already inside the approved Scope analysis. Working against that, uncertainty has dropped sharply, since the four open decisions that drove the original uncertainty score of 3 are now settled and only the dependency probe remains genuinely unknown. The recorded effort of 13 points was approved before these answers existed, so it should be treated as carrying new deliverables and reduced unknowns rather than as freshly verified. A fresh Scope assessment is warranted before implementation begins, not before planning.",
+  "answers": [
+    {
+      "question_id": "C1Q1",
+      "disposition": "answered",
+      "comment_ids": [
+        5781571879
+      ],
+      "explanation": "Checkbox selection A, exactly one original option checked on the question comment. Ship on supported hardware with a clear unavailable state everywhere else. Resolves FR-023: an accelerator-only engine is accepted as a deliberate, declared exception to the processor-fallback expectation, conditional on the unavailable state being explicit. Applied to FR-023 and reinforced by the FR-003 edit."
+    },
+    {
+      "question_id": "C1Q2",
+      "disposition": "answered",
+      "comment_ids": [
+        5781572294
+      ],
+      "explanation": "Checkbox selection A, exactly one original option checked on the question comment. Build the smallest real capability channel and use it for VoxCPM2 only. Resolves FR-024: the feature builds the declared-capability mechanism rather than recording a divergence, and explicitly does not migrate the seven existing engines. Applied to FR-024 and to SC-009, whose conditional qualifier is now removed."
+    },
+    {
+      "question_id": "C1Q3",
+      "disposition": "answered",
+      "comment_ids": [
+        5781572643
+      ],
+      "explanation": "Checkbox selection A, exactly one original option checked on the question comment. Show the engine greyed out everywhere with a specific reason. Resolves the hidden-or-disabled ambiguity that made User Story 3 untestable. Applied to FR-003, which previously permitted either behaviour."
+    },
+    {
+      "question_id": "C1Q4",
+      "disposition": "answered",
+      "comment_ids": [
+        5781573028
+      ],
+      "explanation": "Checkbox selection B, exactly one original option checked on the question comment. Offer the engine but warn before the download when memory looks insufficient. Resolves the insufficient-memory edge case: memory is explicitly not a hard availability gate, because free memory varies with what else is running. Applied to the edge case entry."
+    },
+    {
+      "question_id": "C1Q5",
+      "disposition": "answered",
+      "comment_ids": [
+        5781573432
+      ],
+      "explanation": "Checkbox selection A, exactly one original option checked on the question comment. Give voice-from-description its own labelled input, shown only for engines that support it. Resolves FR-015 against the source issue’s original suggestion of reusing the delivery-instruction field, on the grounds that describing a speaker and directing a performance are different things. Applied to FR-015."
+    },
+    {
+      "question_id": "C1Q6",
+      "disposition": "answered",
+      "comment_ids": [
+        5781573818
+      ],
+      "explanation": "Checkbox selection A, exactly one original option checked on the question comment. The reference recording wins and the interface says the description is unused. Resolves the conflicting-voice-inputs edge case so the outcome is deterministic rather than decided by evaluation order. Applied to the edge case entry."
+    },
+    {
+      "question_id": "C1Q7",
+      "disposition": "answered",
+      "comment_ids": [
+        5781574152
+      ],
+      "explanation": "Checkbox selection A, exactly one original option checked on the question comment. Show the size and confirm before downloading, for this engine. Resolves FR-018’s open half: the size must be measured, and this engine alone gets a confirmation step because it is far larger than any other. Applied to FR-018 and to SC-006."
+    },
+    {
+      "question_id": "C1Q8",
+      "disposition": "answered",
+      "comment_ids": [
+        5781574482
+      ],
+      "explanation": "Checkbox selection B, exactly one original option checked on the question comment. Expose the generation-quality settings as advanced controls with the chosen defaults preselected. This is the one answer that differs from the AI recommendation, which was to fix them for this release. Recorded as chosen, not as recommended. Applied to FR-010."
+    },
+    {
+      "question_id": "C1Q9",
+      "disposition": "answered",
+      "comment_ids": [
+        5781574948
+      ],
+      "explanation": "Checkbox selection A, exactly one original option checked on the question comment. Allow any language for the voice description and document the real behaviour once known. Resolves the description-language edge case without imposing a restriction before evidence exists. Applied to the edge case entry."
+    }
+  ],
+  "questions": [],
+  "spec_edits": [
+    {
+      "before": "- The user's machine can technically run the engine but does not have enough memory for it in practice. [NEEDS CLARIFICATION: is \"can run\" a hard capability check only, or does it also account for insufficient memory on an otherwise supported accelerator? The two give different answers on a supported-but-small GPU.]",
+      "after": "- The user’s machine can technically run the engine but does not have enough memory for it in practice. The engine stays available rather than being blocked, and the product warns before the download begins when the machine looks short of memory. Memory is not a hard availability check, because how much is free changes with whatever else is running."
+    },
+    {
+      "before": "- A written voice description is supplied at the same time as a Voice Profile with reference audio. [NEEDS CLARIFICATION: which wins — the reference audio, the description, or is the combination rejected with an explanation?]",
+      "after": "- A written voice description is supplied at the same time as a Voice Profile with reference audio. The reference audio wins, and the interface states plainly that the written description is not being used."
+    },
+    {
+      "before": "- Arabic text is supplied with a written voice description, where the description is in a different language than the text being spoken. [NEEDS CLARIFICATION: is a voice description in one language valid for speech in another, or must they match?]",
+      "after": "- Arabic text is supplied with a written voice description written in a different language. Any language is accepted for the description. The real behaviour is confirmed during implementation and documented as a known limitation if it works poorly, rather than being restricted in advance."
+    },
+    {
+      "before": "- **FR-003**: On hardware that cannot run the engine, the product MUST either withhold the engine from selection or present it as unavailable with a specific reason, and MUST NOT allow a user to reach a failed generation through it.",
+      "after": "- **FR-003**: On hardware that cannot run the engine, the product MUST show it as visibly unavailable with a specific reason wherever engines are listed, rather than hiding it, and MUST NOT allow a user to reach a failed generation through it."
+    },
+    {
+      "before": "- **FR-010**: The engine MUST use sensible, deliberately chosen defaults for its generation-quality settings rather than whatever the underlying library happens to default to. [NEEDS CLARIFICATION: should these settings also be exposed to users as advanced controls, or fixed at the chosen defaults for this release?]",
+      "after": "- **FR-010**: The engine MUST use sensible, deliberately chosen defaults for its generation-quality settings, and MUST expose those settings as advanced controls with the chosen defaults preselected."
+    },
+    {
+      "before": "- **FR-015**: Users MUST be able to produce a voice from a written description without supplying any reference audio. [NEEDS CLARIFICATION: should this reuse the existing delivery-instruction input, or is a distinct \"describe a voice\" affordance required so users can tell the two apart?]",
+      "after": "- **FR-015**: Users MUST be able to produce a voice from a written description without supplying any reference audio, through its own clearly labelled input, distinct from the existing delivery-instruction field and shown only for engines that support it."
+    },
+    {
+      "before": "- **FR-018**: The product MUST report this engine's download size accurately so users can decide before committing to it. [NEEDS CLARIFICATION: the real size is not yet measured; the estimate in the source issue is approximate and must be confirmed before it is shown to users.]",
+      "after": "- **FR-018**: The product MUST measure this engine’s real download size and report it accurately, and MUST ask the user to confirm before starting the download for this engine."
+    },
+    {
+      "before": "### Unresolved scope decisions",
+      "after": "### Resolved scope decisions"
+    },
+    {
+      "before": "- **FR-023**: [NEEDS CLARIFICATION: does this engine run on ordinary processors at all, merely slowly, or is the specialised accelerator genuinely mandatory? If mandatory, this becomes the first engine in the product with no support on an entire platform, and FR-003's behaviour becomes the normal experience for those users rather than an edge case. The answer changes what Story 3 is worth and how it must be presented.]",
+      "after": "- **FR-023**: The engine MUST ship on the hardware it supports even if it proves to require a specific accelerator with no processor fallback. It is the one engine permitted not to honour the processor-fallback expectation, on the condition that FR-002, FR-003 and FR-004 make its unavailability explicit and informative on every machine that cannot run it."
+    },
+    {
+      "before": "- **FR-024**: [NEEDS CLARIFICATION: FR-004 requires capability to be declared once and read, but nothing in the product today carries engine capability from the engine to the interface — the interface keeps its own lists. Building that channel is work the source issue did not ask for. Confirm whether this feature builds it, or whether this engine is added to the existing hand-maintained lists and the divergence from the product's own rule is recorded instead.]",
+      "after": "- **FR-024**: This feature MUST build the smallest workable capability channel: the engine declares its supported hardware and languages, those declarations are exposed, and the interface reads them for this engine. The seven existing engines keep their current hand-maintained lists and MUST NOT be migrated as part of this feature. Because this introduces an interface between the backend and the app, the product’s contract rules for such an interface apply within the same change."
+    },
+    {
+      "before": "- **SC-006**: A first-time user can tell how large the download is, and can see it progressing, before it completes.",
+      "after": "- **SC-006**: A first-time user is told how large the download is and confirms it before it starts, and can see it progressing once it does."
+    },
+    {
+      "before": "- **SC-009**: Adding this engine required no new hand-maintained per-engine list in the user interface. *(Conditional on the resolution of FR-024.)*",
+      "after": "- **SC-009**: Adding this engine required no new hand-maintained per-engine list in the user interface; its hardware support and languages are read from the engine’s own declaration."
+    }
+  ]
+}

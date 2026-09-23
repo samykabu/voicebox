@@ -1,0 +1,15 @@
+# timestamp: 2026-09-23T02:04:28+03:00
+# Python 3.12 is not installed system-wide (01-python-versions.txt). numpy<2 has no cp313 wheel (23-*), so to test the project floor + numpy<2 pin, fetch a managed CPython 3.12 with uv (installs under uv's own data dir, outside the repo; no system change).
+$ uv --version
+uv 0.12.13 (0ebbd9274 2026-09-10 x86_64-pc-windows-msvc)
+$ uv python install 3.12
+Installed Python 3.12.14 in 35ms
+ + cpython-3.12.14-windows-x86_64-none (python3.12.exe)
+dur=0s
+$ uv python find 3.12
+C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\python.exe
+$ C:\Users\sabus\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\python.exe -m venv C:\Users\sabus\voxcpm-nodeps312
+Python 3.12.14
+(psutil = probe-only helper)
+$ pip install voxcpm --no-deps
+Successfully installed voxcpm-2.0.3

@@ -1,0 +1,415 @@
+# timestamp start: 2026-09-23T01:52:44+03:00
+# First from_pretrained: model NOT cached -> includes download. load_denoiser=False, optimize=False, device=cpu, --skip-generate
+$ python probe_run.py --device cpu --skip-generate --out C:\Users\sabus\voxcpm-probe-out
+=== ENV ===
+python 3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]
+executable C:\Users\sabus\voxcpm-probe\Scripts\python.exe
+HF_HOME=None
+HF_HUB_CACHE=None
+HUGGINGFACE_HUB_CACHE=None
+HF_HUB_OFFLINE=None
+TRANSFORMERS_OFFLINE=None
+HTTP_PROXY=None
+HTTPS_PROXY=None
+NO_PROXY=None
+MODELSCOPE_CACHE=None
+HF_TOKEN=None
+args {'device': 'cpu', 'out': 'C:\\Users\\sabus\\voxcpm-probe-out', 'denoiser': False, 'optimize': False, 'local_files_only': False, 'design': False, 'skip_generate': True, 'text': 'Hello, this is a short test of the VoxCPM two speech engine, running locally.'}
+C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\jit\_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+=== VERSIONS ===
+numpy 2.5.3 | torch 2.14.0+cpu cuda build None | cuda available False | huggingface_hub 1.32.0
+transformers 5.17.0
+HF_HUB_CACHE resolved: C:\Users\sabus\.cache\huggingface\hub | HF_HUB_OFFLINE const: False
+=== LOAD ===
+[LOG] httpcore.connection DEBUG connect_tcp.started host='huggingface.co' port=443 local_address=None timeout=3 socket_options=None
+[NET] getaddrinfo: huggingface.co:443
+[NET] connect: ('3.175.149.77', 443)
+[LOG] httpcore.connection DEBUG connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C2C1A90>
+[LOG] httpcore.connection DEBUG start_tls.started ssl_context=<ssl.SSLContext object at 0x000002740C2C8F50> server_hostname='huggingface.co' timeout=3
+[LOG] httpcore.connection DEBUG start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C2DC050>
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:50 GMT'), (b'content-encoding', b'gzip'), (b'ETag', b'W/"164f-cVMc19JX8QJwuU/ZVV3kcWXr7tM"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c2-4788949d46661444256d9d2a;11672a8b-3eed-437f-842a-df3764d964c7'), (b'RateLimit', b'"api";r=499;t=246'), (b'RateLimit-Policy', b'"fixed window";"api";q=500;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin'), (b'vary', b'Accept-Encoding'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 39bc4d455c3de6880bee678ccdffcbe4.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'pkxCmWDmfzo5ZtJJBYygEvCrHvmjverdKDwMJ3HPwtrojCufYg5eYw=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: GET https://huggingface.co/api/agent-harnesses "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:50 GMT'), (b'content-encoding', b'gzip'), (b'ETag', b'W/"13df-mSJ/sjlL1xeHVAIqogaC4GEGUck"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c2-4270262c69af8bd95305e571;d3b7608b-ed1d-4aef-8b16-915d1fac7b51'), (b'RateLimit', b'"api";r=999;t=61'), (b'RateLimit-Policy', b'"fixed window";"api";q=1000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin'), (b'vary', b'Accept-Encoding'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 39bc4d455c3de6880bee678ccdffcbe4.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'9lAb8krsKXlFrVh3D_UAA0ecIy5YvOz73_iDvPSFNOLq_hbObBMk0Q=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: GET https://huggingface.co/api/models/openbmb/VoxCPM2/revision/main "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:50 GMT'), (b'content-encoding', b'gzip'), (b'ETag', b'W/"531-ioZR7rlFIU7JUL9YEcqAKr10um4"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c2-7b82b7463f156a372793be40;61631560-f782-4fdb-8448-b070877577d7'), (b'RateLimit', b'"api";r=998;t=61'), (b'RateLimit-Policy', b'"fixed window";"api";q=1000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin'), (b'vary', b'Accept-Encoding'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 39bc4d455c3de6880bee678ccdffcbe4.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'TsFuaWt2FwzGOBjQ--ysrp8Wu_5pdy6EOLtgpFjVRKI7iMT0lvgv4w=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: GET https://huggingface.co/api/models/openbmb/VoxCPM2/tree/32279effe8c19989596f05d353d1447f51d9e915?recursive=true&expand=false "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.connection DEBUG connect_tcp.started host='huggingface.co' port=443 local_address=None timeout=10 socket_options=None
+[NET] getaddrinfo: huggingface.co:443
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.connection DEBUG connect_tcp.started host='huggingface.co' port=443 local_address=None timeout=10 socket_options=None
+[NET] getaddrinfo: huggingface.co:443
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[NET] connect: ('3.175.149.77', 443)
+[NET] connect: ('3.175.149.77', 443)[LOG] httpcore.connection DEBUG connect_tcp.started host='huggingface.co' port=443 local_address=None timeout=10 socket_options=None
+[NET] getaddrinfo: huggingface.co:443
+
+[LOG] httpcore.connection DEBUG connect_tcp.started host='huggingface.co' port=443 local_address=None timeout=10 socket_options=None
+[NET] getaddrinfo: huggingface.co:443
+[LOG] httpcore.connection DEBUG connect_tcp.started host='huggingface.co' port=443 local_address=None timeout=10 socket_options=None
+[NET] getaddrinfo: huggingface.co:443
+[NET] connect: ('3.175.149.77', 443)
+[LOG] httpcore.connection DEBUG connect_tcp.started host='huggingface.co' port=443 local_address=None timeout=10 socket_options=None
+[NET] getaddrinfo: huggingface.co:443
+[LOG] httpcore.connection DEBUG connect_tcp.started host='huggingface.co' port=443 local_address=None timeout=10 socket_options=None
+[NET] getaddrinfo: huggingface.co:443
+[NET] connect: ('3.175.149.77', 443)
+[NET] connect: ('3.175.149.77', 443)
+[NET] connect: ('3.175.149.77', 443)
+[NET] connect: ('3.175.149.77', 443)
+[LOG] httpcore.connection DEBUG connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C2DFD90>
+[LOG] httpcore.connection DEBUG start_tls.started ssl_context=<ssl.SSLContext object at 0x000002740C2C8F50> server_hostname='huggingface.co' timeout=10
+[LOG] httpcore.connection DEBUG connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C314E90>
+[LOG] httpcore.connection DEBUG start_tls.started ssl_context=<ssl.SSLContext object at 0x000002740C2C8F50> server_hostname='huggingface.co' timeout=10
+[LOG] httpcore.connection DEBUG connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C314FC0>
+[LOG] httpcore.connection DEBUG start_tls.started ssl_context=<ssl.SSLContext object at 0x000002740C2C8F50> server_hostname='huggingface.co' timeout=10
+[LOG] httpcore.connection DEBUG start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C27BBF0>
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.connection DEBUG start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C305D00>
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.connection DEBUG start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C305E10>
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.connection DEBUG connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C664450>
+[LOG] httpcore.connection DEBUG start_tls.started ssl_context=<ssl.SSLContext object at 0x000002740C2C8F50> server_hostname='huggingface.co' timeout=10
+[LOG] httpcore.connection DEBUG connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C664550>
+[LOG] httpcore.connection DEBUG connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C3105F0>
+[LOG] httpcore.connection DEBUG connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C3116D0>
+[LOG] httpcore.connection DEBUG start_tls.started ssl_context=<ssl.SSLContext object at 0x000002740C2C8F50> server_hostname='huggingface.co' timeout=10
+[LOG] httpcore.connection DEBUG start_tls.started ssl_context=<ssl.SSLContext object at 0x000002740C2C8F50> server_hostname='huggingface.co' timeout=10
+[LOG] httpcore.connection DEBUG start_tls.started ssl_context=<ssl.SSLContext object at 0x000002740C2C8F50> server_hostname='huggingface.co' timeout=10
+[LOG] httpcore.connection DEBUG start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C2F9390>
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.connection DEBUG start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C2F9470>
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.connection DEBUG start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740C2BA8F0>
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.connection DEBUG start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002740CF2FD10>
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 307, b'Temporary Redirect', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'266'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:50 GMT'), (b'Location', b'/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/README.md?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2FREADME.md=&etag=%2214573f986536306e3d9d65f988a3fc4b863b895c%22'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c2-49c1c984750512776b5e96fd;9ff9a296-e295-459d-b7ae-51ccd3f83ab7'), (b'RateLimit', b'"resolvers";r=4999;t=61'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'README.md; filename="README.md";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'X-Linked-ETag', b'"14573f986536306e3d9d65f988a3fc4b863b895c"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 39bc4d455c3de6880bee678ccdffcbe4.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'gBU0D87EFCaO6ikwW6Z9vv1lYBDrwtVUHqd1tleZOcJpIdwoCzQnzw=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/openbmb/VoxCPM2/resolve/32279effe8c19989596f05d353d1447f51d9e915/README.md "HTTP/1.1 307 Temporary Redirect"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 307, b'Temporary Redirect', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'294'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:50 GMT'), (b'Location', b'/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/tokenization_voxcpm2.py?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Ftokenization_voxcpm2.py=&etag=%22e7d768677298d058fa6ef8b160e3ca4430997fad%22'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c2-2c5385f317308e115e73ba7f;53b7a655-9ff5-41d6-9935-9f59b4720e86'), (b'RateLimit', b'"resolvers";r=4998;t=61'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'tokenization_voxcpm2.py; filename="tokenization_voxcpm2.py";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'X-Linked-ETag', b'"e7d768677298d058fa6ef8b160e3ca4430997fad"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 8b1f6c3b4ec531e0b9f86244414b015e.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'6yvYpAg6ypMDoAd1XjrTuufxHPYXOTS9eFsb89AMa-aejLK9Bwtcrg=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/openbmb/VoxCPM2/resolve/32279effe8c19989596f05d353d1447f51d9e915/tokenization_voxcpm2.py "HTTP/1.1 307 Temporary Redirect"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 307, b'Temporary Redirect', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'276'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:50 GMT'), (b'Location', b'/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/.gitattributes?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2F.gitattributes=&etag=%22a6344aac8c09253b3b630fb776ae94478aa0275b%22'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c2-2f5a900820a568047b0ab70d;d0702ab5-af4a-40d7-9d31-1cd11011f994'), (b'RateLimit', b'"resolvers";r=4997;t=61'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'.gitattributes; filename=".gitattributes";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'X-Linked-ETag', b'"a6344aac8c09253b3b630fb776ae94478aa0275b"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 ad3199ba4b4dc150822d68e0836952dc.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'WPhAMvHPs8uDX_TLW10a6YjZTnVKQ45dVuiWo9DJsYT5PxWqB47t0w=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/openbmb/VoxCPM2/resolve/32279effe8c19989596f05d353d1447f51d9e915/.gitattributes "HTTP/1.1 307 Temporary Redirect"
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 307, b'Temporary Redirect', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'270'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:50 GMT'), (b'Location', b'/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/config.json?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Fconfig.json=&etag=%22792f1c223ed607f9e508c0a0deb15dd9532483be%22'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c2-3948be203b4a445f02f273f7;3d64e6e5-27b9-4c55-880a-792653cb7336'), (b'RateLimit', b'"resolvers";r=4992;t=61'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'HIT'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'config.json; filename="config.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'X-Linked-ETag', b'"792f1c223ed607f9e508c0a0deb15dd9532483be"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 96849898bdb021b5d18dcb4b6d3fca80.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'8hpAlmgAT75h4eT0hhNFmITanArY_rBCCw--i3AnKLGjzczTpa0P0Q=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/openbmb/VoxCPM2/resolve/32279effe8c19989596f05d353d1447f51d9e915/config.json "HTTP/1.1 307 Temporary Redirect"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 307, b'Temporary Redirect', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'294'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:50 GMT'), (b'Location', b'/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/special_tokens_map.json?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Fspecial_tokens_map.json=&etag=%228619dda6f3eb6d60d0a1bb274820054e46f41699%22'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c2-7b5c60141b2dbc6e265e6e77;7cba385c-a1b1-4b64-96f3-7b149f74ad29'), (b'RateLimit', b'"resolvers";r=4994;t=61'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'special_tokens_map.json; filename="special_tokens_map.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'X-Linked-ETag', b'"8619dda6f3eb6d60d0a1bb274820054e46f41699"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 149a6a142bbf27864a64f2e28a27957c.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'4d4zi1cZofy1S6sJrhces1m47DH5FK7nnG8-VSRuuje0B_ZPrxhtng=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/openbmb/VoxCPM2/resolve/32279effe8c19989596f05d353d1447f51d9e915/special_tokens_map.json "HTTP/1.1 307 Temporary Redirect"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 307, b'Temporary Redirect', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'276'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:50 GMT'), (b'Location', b'/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/tokenizer.json?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Ftokenizer.json=&etag=%2241a5c2a8dba4058dd1ad73fb898abf5e4f64f0f9%22'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c2-4b7a70f2254383000b9f4cdc;6aee033c-9da3-4263-891d-3e78ad441d1f'), (b'RateLimit', b'"resolvers";r=4993;t=61'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'tokenizer.json; filename="tokenizer.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'X-Linked-ETag', b'"41a5c2a8dba4058dd1ad73fb898abf5e4f64f0f9"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 bfe7dcc65be6a6fb51020c55bf9146fe.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'D21dQiJYm3mxJBM2H-zTVNiHK1OsSbEOWT4HzfdYiGfbMCsUqKElGA=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/openbmb/VoxCPM2/resolve/32279effe8c19989596f05d353d1447f51d9e915/tokenizer.json "HTTP/1.1 307 Temporary Redirect"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 302, b'Found', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'1064'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:50 GMT'), (b'Location', b'https://us.aws.cdn.hf.co/xet-bridge-us/69cf4f5e4e362d59e5fa3d81/f9ecfd88c9471d9574719d7996d1ef0da1db65ec988cfc9f933f4aa99f2de4bb?X-Xet-Cas-Uid=67ed7d338eb05167a0936aa8&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27audiovae.pth%3B+filename%3D%22audiovae.pth%22%3B&user_id=67ed7d338eb05167a0936aa8&Expires=1790121170&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjljZjRmNWU0ZTM2MmQ1OWU1ZmEzZDgxL2Y5ZWNmZDg4Yzk0NzFkOTU3NDcxOWQ3OTk2ZDFlZjBkYTFkYjY1ZWM5ODhjZmM5ZjkzM2Y0YWE5OWYyZGU0YmJcXD9YLVhldC1DYXMtVWlkPTY3ZWQ3ZDMzOGViMDUxNjdhMDkzNmFhOCZyZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3YXVkaW92YWUucHRoJTNCK2ZpbGVuYW1lJTNEJTIyYXVkaW92YWUucHRoJTIyJTNCJnVzZXJfaWQ9NjdlZDdkMzM4ZWIwNTE2N2EwOTM2YWE4IiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJFcG9jaFRpbWUiOjE3OTAxMjExNzB9fX1dfQ__&Signature=MEYCIQDeGZqoVBSnybHJ26pwVHt2hW7DFbIIsj1tZQaaYprhKwIhAP11wVpn0aTRktFudf-Oya7TAaJUG5Nu-1Hea9BmQna5&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F&Hash-Algorithm=SHA256'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c2-5176cfb43ddbe09d7a1a8ab0;409e3978-5cfd-4c03-b811-717602d03256'), (b'RateLimit', b'"resolvers";r=4995;t=61'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'X-Linked-Size', b'376951122'), (b'X-Linked-ETag', b'"94b5d51e107e0507d4acc976cfdadb64edd6fd06d1f751dadbf2fd1594274bf1"'), (b'Cache-Control', b'no-store'), (b'X-Xet-Hash', b'f9ecfd88c9471d9574719d7996d1ef0da1db65ec988cfc9f933f4aa99f2de4bb'), (b'Link', b'<https://huggingface.co/api/models/openbmb/VoxCPM2/xet-read-token/32279effe8c19989596f05d353d1447f51d9e915>; rel="xet-auth", <https://cas-server.xethub.hf.co/v1/reconstructions/f9ecfd88c9471d9574719d7996d1ef0da1db65ec988cfc9f933f4aa99f2de4bb>; rel="xet-reconstruction-info"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 2c86964c29e443febeac8fc361575a48.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'A7meT4mjpM5kS8PxeGxHSX6aVJkF0rYAIYStX1C0dU7xNO4yLlW8pg=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/openbmb/VoxCPM2/resolve/32279effe8c19989596f05d353d1447f51d9e915/audiovae.pth "HTTP/1.1 302 Found"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 302, b'Found', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'1098'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:50 GMT'), (b'Location', b'https://us.aws.cdn.hf.co/xet-bridge-us/69cf4f5e4e362d59e5fa3d81/45afd9afa29b02b0db6d0025d3849d2ef1e6f067c0d77e4b6af74cfc139fc622?response-content-disposition=inline%3B+filename*%3DUTF-8%27%27model.safetensors%3B+filename%3D%22model.safetensors%22%3B&X-Xet-Cas-Uid=67ed7d338eb05167a0936aa8&user_id=67ed7d338eb05167a0936aa8&Expires=1790121170&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjljZjRmNWU0ZTM2MmQ1OWU1ZmEzZDgxLzQ1YWZkOWFmYTI5YjAyYjBkYjZkMDAyNWQzODQ5ZDJlZjFlNmYwNjdjMGQ3N2U0YjZhZjc0Y2ZjMTM5ZmM2MjJcXD9yZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3bW9kZWwuc2FmZXRlbnNvcnMlM0IrZmlsZW5hbWUlM0QlMjJtb2RlbC5zYWZldGVuc29ycyUyMiUzQiZYLVhldC1DYXMtVWlkPTY3ZWQ3ZDMzOGViMDUxNjdhMDkzNmFhOCZ1c2VyX2lkPTY3ZWQ3ZDMzOGViMDUxNjdhMDkzNmFhOCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiRXBvY2hUaW1lIjoxNzkwMTIxMTcwfX19XX0_&Signature=MEQCIH5vvh7U6GzGxURJu%7E4xLRJWTBLQ4BO%7EeOsv7AhLhIIMAiB%7EBaFKuW3YFL8tAFno2y0%7E9QYAgJS1ewUhSj%7E00b7Z%7Ew__&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F&Hash-Algorithm=SHA256'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c2-79d9003f5689ea2328337cd7;b71ab973-16ac-430e-b79e-de30d5566273'), (b'RateLimit', b'"resolvers";r=4996;t=61'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin, Accept'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'X-Linked-Size', b'4580080592'), (b'X-Linked-ETag', b'"f7f964cfa9da23653baec6e6f7750719977ad944ed9f95fe52fe3a620506891d"'), (b'Cache-Control', b'no-store'), (b'X-Xet-Hash', b'45afd9afa29b02b0db6d0025d3849d2ef1e6f067c0d77e4b6af74cfc139fc622'), (b'Link', b'<https://huggingface.co/api/models/openbmb/VoxCPM2/xet-read-token/32279effe8c19989596f05d353d1447f51d9e915>; rel="xet-auth", <https://cas-server.xethub.hf.co/v1/reconstructions/45afd9afa29b02b0db6d0025d3849d2ef1e6f067c0d77e4b6af74cfc139fc622>; rel="xet-reconstruction-info"'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 c1e11f8718365142ba1e20b6103dc81a.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'7SBtJHawHu7gB8w8Rv3SSWoZB-ng1oox-TPeDIsBdB1Nx-nNGtNw7A=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/openbmb/VoxCPM2/resolve/32279effe8c19989596f05d353d1447f51d9e915/model.safetensors "HTTP/1.1 302 Found"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Content-Length', b'511'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'ETag', b'W/"1ff-+QFUuzXTyerQvZD9/JeQif4XZko"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-5fbe9bd601a7c86d1dd84ce2;6f518e09-4688-400c-b14c-0db390cac638'), (b'RateLimit', b'"api";r=997;t=60'), (b'RateLimit-Policy', b'"fixed window";"api";q=1000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Vary', b'Origin'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Xet-Cas-Url', b'https://cas-server.xethub.hf.co'), (b'X-Xet-Token-Expiration', b'1790118471'), (b'X-Xet-Access-Token', b'eyJhbGciOiJIUzI1NiJ9.eyJyZXBvSWQiOiI2OWNmNGY1ZTRlMzYyZDU5ZTVmYTNkODEiLCJ1c2VySWQiOiI2N2VkN2QzMzhlYjA1MTY3YTA5MzZhYTgiLCJhY2Nlc3MiOiJSRUFEIiwidXNlUHJpdmF0ZUxpbmsiOmZhbHNlLCJoZkNkblRpZXIiOiJhdXRoZW50aWNhdGVkIiwicmVwb19zdG9yYWdlX3R5cGUiOiJnaXQiLCJpYXQiOjE3OTAxMTc1NzEsImp0aSI6ImVjN2VjNzg1LTRmODMtNGIzMi05ZTg3LWMyYTRhM2I0OWI1NiIsImV4cCI6MTc5MDExODQ3MSwiaXNzIjoiaHR0cHM6Ly9odWdnaW5nZmFjZS5jbyJ9.0YpIHDxL75L7wAJwY1e5RrwvzKsQpSlgwmK-urxseJ0'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 c1e11f8718365142ba1e20b6103dc81a.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'LNRxeGHPpke3IG-4mMqSIuChj7bqrghwnYv37SIDtPk3wq3vAplBlA=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: GET https://huggingface.co/api/models/openbmb/VoxCPM2/xet-read-token/32279effe8c19989596f05d353d1447f51d9e915 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'1519'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'ETag', b'"a6344aac8c09253b3b630fb776ae94478aa0275b"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-7527609a73fc248a7b59ac7a;f5b890db-9c70-4709-a63b-b0ae5881b971'), (b'RateLimit', b'"resolvers";r=4990;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'.gitattributes; filename=".gitattributes";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 ad3199ba4b4dc150822d68e0836952dc.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'lkKvN4L9GYal6kz4pkkFUcEgqZ1TqHlCH-1c1SrhETwMgpPe3HK6MQ=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/.gitattributes?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2F.gitattributes=&etag=%22a6344aac8c09253b3b630fb776ae94478aa0275b%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'2895'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'ETag', b'"e7d768677298d058fa6ef8b160e3ca4430997fad"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-76fc37414a19397a7a20b6af;1bab1022-fa42-477c-9721-e1362ee49ae1'), (b'RateLimit', b'"resolvers";r=4991;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'tokenization_voxcpm2.py; filename="tokenization_voxcpm2.py";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 8b1f6c3b4ec531e0b9f86244414b015e.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'BvfEyxmjq6gPFF1DwbwtPecdMy5nGuRmnrpsjy7ekxwzQw6KoJCt9A=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/tokenization_voxcpm2.py?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Ftokenization_voxcpm2.py=&etag=%22e7d768677298d058fa6ef8b160e3ca4430997fad%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'1632'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'ETag', b'"8619dda6f3eb6d60d0a1bb274820054e46f41699"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-298f48f07802e3407f28d11e;9263cf3c-2bed-48ee-9af8-b25862eb0e66'), (b'RateLimit', b'"resolvers";r=4988;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'special_tokens_map.json; filename="special_tokens_map.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 2c86964c29e443febeac8fc361575a48.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'qCfpdXB6EcWqzhJA2dJedfqrLHJFn5VF9lbIX2tGI3nix5mMbin6wA=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/special_tokens_map.json?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Fspecial_tokens_map.json=&etag=%228619dda6f3eb6d60d0a1bb274820054e46f41699%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'3676772'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'ETag', b'"41a5c2a8dba4058dd1ad73fb898abf5e4f64f0f9"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-509616224d4c40e7143440b7;20ce5c37-50de-4789-af3c-48347e9818cd'), (b'RateLimit', b'"resolvers";r=4987;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'tokenizer.json; filename="tokenizer.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 149a6a142bbf27864a64f2e28a27957c.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'aSgN64z6hL4ltoPPIir6iCxj-GRwBXtEoFPzq4jTNey4SYmeijEpOw=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/tokenizer.json?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Ftokenizer.json=&etag=%2241a5c2a8dba4058dd1ad73fb898abf5e4f64f0f9%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'4336'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'ETag', b'"792f1c223ed607f9e508c0a0deb15dd9532483be"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-77de04d955ad94530b63071a;d7101d93-33cd-4f96-be0a-83a9e6aeed22'), (b'RateLimit', b'"resolvers";r=4989;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'config.json; filename="config.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 96849898bdb021b5d18dcb4b6d3fca80.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'Ebwr01CApd8eYhM2SmFbUstl9R4EhgUmDkjSONr_wWiUA9NqJtYnUw=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/config.json?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Fconfig.json=&etag=%22792f1c223ed607f9e508c0a0deb15dd9532483be%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'7939'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'ETag', b'"14573f986536306e3d9d65f988a3fc4b863b895c"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-35d32b177e6545216e29d1eb;7807c4e4-5c62-46d5-bffe-94abae70dba4'), (b'RateLimit', b'"resolvers";r=4986;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'README.md; filename="README.md";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 39bc4d455c3de6880bee678ccdffcbe4.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'LpN2ABOehwsEp04_qijTE18nL1HGO4Of7kdbhlWBX-La-Zo8_9j3eQ=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/README.md?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2FREADME.md=&etag=%2214573f986536306e3d9d65f988a3fc4b863b895c%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'Content-Encoding', b'br'), (b'ETag', b'W/"a6344aac8c09253b3b630fb776ae94478aa0275b"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-1ba3527513438c4a3e46551e;19ed4d0c-18a5-49d9-815c-ea3bda1c91e3'), (b'RateLimit', b'"resolvers";r=4985;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'.gitattributes; filename=".gitattributes";'), (b'Vary', b'Origin,Accept-Encoding'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 c1e11f8718365142ba1e20b6103dc81a.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'urTY-V4nyq1FzwWpxoGd1sqIt5Sj64jKf4dWf7uBE34JcUoOeh090Q=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/.gitattributes?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2F.gitattributes=&etag=%22a6344aac8c09253b3b630fb776ae94478aa0275b%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'Content-Encoding', b'br'), (b'ETag', b'W/"e7d768677298d058fa6ef8b160e3ca4430997fad"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-21a36ebf1bdc5c19217311a0;675ecb9e-f5f0-4768-ba35-4c5787e02a1e'), (b'RateLimit', b'"resolvers";r=4984;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'tokenization_voxcpm2.py; filename="tokenization_voxcpm2.py";'), (b'Vary', b'Origin,Accept-Encoding'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 ad3199ba4b4dc150822d68e0836952dc.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'C0IEhpjNzB9aBaTMra7k9f8mcCAfhYACn2h7ZWNz2HTSu-jA9Xcgfw=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpx INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/tokenization_voxcpm2.py?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Ftokenization_voxcpm2.py=&etag=%22e7d768677298d058fa6ef8b160e3ca4430997fad%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'Content-Encoding', b'br'), (b'ETag', b'W/"41a5c2a8dba4058dd1ad73fb898abf5e4f64f0f9"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-0b5659ba771874b731990f59;0201d917-5bfd-419e-a77d-814b2e7e846c'), (b'RateLimit', b'"resolvers";r=4983;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'tokenizer.json; filename="tokenizer.json";'), (b'Vary', b'Origin,Accept-Encoding'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 149a6a142bbf27864a64f2e28a27957c.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'fmMS2joJwXokU_7PrbMDA007-JxLgpsElwREJahCbszvnBuMl73rHQ=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/tokenizer.json?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Ftokenizer.json=&etag=%2241a5c2a8dba4058dd1ad73fb898abf5e4f64f0f9%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'Content-Encoding', b'br'), (b'ETag', b'W/"792f1c223ed607f9e508c0a0deb15dd9532483be"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-53ea8ddb153f3e3438024b53;9f1429ec-7fc3-42b9-b521-fb670b12b715'), (b'RateLimit', b'"resolvers";r=4981;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'config.json; filename="config.json";'), (b'Vary', b'Origin,Accept-Encoding'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 96849898bdb021b5d18dcb4b6d3fca80.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'75ZP-avFJqMYykGX7C9l8n4yQaSyUE0iMdsXbUU4KBy1ZvwdSm20iA=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/config.json?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Fconfig.json=&etag=%22792f1c223ed607f9e508c0a0deb15dd9532483be%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'Content-Encoding', b'br'), (b'ETag', b'W/"8619dda6f3eb6d60d0a1bb274820054e46f41699"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-441e178231b4b8b561de9bd6;3ff9d056-b398-4de3-be48-3731b619d707'), (b'RateLimit', b'"resolvers";r=4982;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'special_tokens_map.json; filename="special_tokens_map.json";'), (b'Vary', b'Origin,Accept-Encoding'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 2c86964c29e443febeac8fc361575a48.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'zF4oTMWSgvIpvkoYeqwB0z2wZ9OWnbNIMi7bQHi2M6yvX89DvynSVg=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/special_tokens_map.json?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Fspecial_tokens_map.json=&etag=%228619dda6f3eb6d60d0a1bb274820054e46f41699%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'Content-Encoding', b'br'), (b'ETag', b'W/"14573f986536306e3d9d65f988a3fc4b863b895c"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-540fa5897195beea2a7c1e56;538756d0-db2b-4fd7-a4af-4314a2b8b567'), (b'RateLimit', b'"resolvers";r=4980;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'README.md; filename="README.md";'), (b'Vary', b'Origin,Accept-Encoding'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 39bc4d455c3de6880bee678ccdffcbe4.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'c0wAK3HwervKttEbZicNQZ4Y9oOKQYrP0vCjmPPQa3Bn6bF8nb_kBw=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/README.md?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2FREADME.md=&etag=%2214573f986536306e3d9d65f988a3fc4b863b895c%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/openbmb/VoxCPM2/resolve/32279effe8c19989596f05d353d1447f51d9e915/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Content-Length', b'5059'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'ETag', b'"fecf4cdae73b57053cac2ad34c67febbe4e4f08b"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-6967c5aa64b2725b5521febe;a9348aec-89e3-4598-b379-6c489d09dbc5'), (b'RateLimit', b'"resolvers";r=4978;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Accept-Ranges', b'bytes'), (b'X-Hub-Cache', b'MISS'), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'tokenizer_config.json; filename="tokenizer_config.json";'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Vary', b'Origin'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 39bc4d455c3de6880bee678ccdffcbe4.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'bKHELsLL3Zmsk85YYFWGZGDIl0tH5GUTjuUvUWX8xEVlh9pDzUP9uQ=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/tokenizer_config.json?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Ftokenizer_config.json=&etag=%22fecf4cdae73b57053cac2ad34c67febbe4e4f08b%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'HEAD']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+[LOG] httpcore.http11 DEBUG send_request_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_headers.complete
+[LOG] httpcore.http11 DEBUG send_request_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG send_request_body.complete
+[LOG] httpcore.http11 DEBUG receive_response_headers.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'text/plain; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Date', b'Tue, 22 Sep 2026 22:52:51 GMT'), (b'Content-Encoding', b'br'), (b'ETag', b'W/"fecf4cdae73b57053cac2ad34c67febbe4e4f08b"'), (b'X-Powered-By', b'huggingface-moon'), (b'X-Request-Id', b'Root=1-6ab306c3-7a42f49227e16afa55c46cfa;d03a4160-961c-4a39-a763-f8c133e41dac'), (b'RateLimit', b'"resolvers";r=4977;t=60'), (b'RateLimit-Policy', b'"fixed window";"resolvers";q=5000;w=300'), (b'cross-origin-opener-policy', b'same-origin'), (b'Referrer-Policy', b'strict-origin-when-cross-origin'), (b'Access-Control-Max-Age', b'86400'), (b'Access-Control-Allow-Origin', b'https://huggingface.co'), (b'Access-Control-Expose-Headers', b'X-Repo-Commit,X-Request-Id,X-Error-Code,X-Error-Message,X-Total-Count,ETag,Link,Accept-Ranges,Content-Range,X-Linked-Size,X-Linked-ETag,X-Xet-Hash'), (b'X-Repo-Commit', b'32279effe8c19989596f05d353d1447f51d9e915'), (b'Content-Security-Policy', b"default-src 'none'; sandbox"), (b'Content-Disposition', b'inline; filename*=UTF-8\'\'tokenizer_config.json; filename="tokenizer_config.json";'), (b'Vary', b'Origin,Accept-Encoding'), (b'X-Cache', b'Miss from cloudfront'), (b'Via', b'1.1 39bc4d455c3de6880bee678ccdffcbe4.cloudfront.net (CloudFront)'), (b'X-Amz-Cf-Pop', b'JED50-P3'), (b'Alt-Svc', b'h3=":443"; ma=86400'), (b'X-Amz-Cf-Id', b'YblzTOpBitQqJZ4uC2vZPmvJ8j9j4HWDw0meim8_KMabDhN3zqHlOw=='), (b'Strict-Transport-Security', b'max-age=31536000')])
+[LOG] httpx INFO HTTP Request: GET https://huggingface.co/api/resolve-cache/models/openbmb/VoxCPM2/32279effe8c19989596f05d353d1447f51d9e915/tokenizer_config.json?%2Fopenbmb%2FVoxCPM2%2Fresolve%2F32279effe8c19989596f05d353d1447f51d9e915%2Ftokenizer_config.json=&etag=%22fecf4cdae73b57053cac2ad34c67febbe4e4f08b%22 "HTTP/1.1 200 OK"
+[LOG] httpcore.http11 DEBUG receive_response_body.started request=<Request [b'GET']>
+[LOG] httpcore.http11 DEBUG receive_response_body.complete
+[LOG] httpcore.http11 DEBUG response_closed.started
+[LOG] httpcore.http11 DEBUG response_closed.complete
+voxcpm_model_path: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915, zipenhancer_model_path: None, enable_denoiser: False
+C:\Users\sabus\voxcpm-probe\Lib\site-packages\torch\nn\utils\weight_norm.py:145: FutureWarning: `torch.nn.utils.weight_norm` is deprecated in favor of `torch.nn.utils.parametrizations.weight_norm`.
+  WeightNorm.apply(module, name, dim)
+Loading AudioVAE from pytorch: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\audiovae.pth
+Running on device: cpu, dtype: bfloat16
+Loading model from safetensors: C:\Users\sabus\.cache\huggingface\hub\models--openbmb--VoxCPM2\snapshots\32279effe8c19989596f05d353d1447f51d9e915\model.safetensors
+Loaded VoxCPM2Model
+model device: cpu | dtype: bfloat16
+tts_model.sample_rate (output): 48000
+tts_model._encode_sample_rate: 16000
+audio_vae.sample_rate: 16000 | audio_vae.out_sample_rate: 48000
+denoiser: None
+peak RSS after load (MB): 11232
+=== SUMMARY ===
+timings {'import_s': 2.73, 'load_s': 90.13}
+peak RSS sampled (MB): 11232
+peak working set (MB, Windows peak_wset): 11486
+NETWORK getaddrinfo hosts: ['huggingface.co:443']
+NETWORK connect count: 8
+[LOG] httpcore.connection DEBUG close.started
+[LOG] httpcore.connection DEBUG close.complete
+[LOG] httpcore.connection DEBUG close.started
+[LOG] httpcore.connection DEBUG close.complete
+[LOG] httpcore.connection DEBUG close.started
+[LOG] httpcore.connection DEBUG close.complete
+[LOG] httpcore.connection DEBUG close.started
+[LOG] httpcore.connection DEBUG close.complete
+[LOG] httpcore.connection DEBUG close.started
+[LOG] httpcore.connection DEBUG close.complete
+[LOG] httpcore.connection DEBUG close.started
+[LOG] httpcore.connection DEBUG close.complete
+[LOG] httpcore.connection DEBUG close.started
+[LOG] httpcore.connection DEBUG close.complete
+[LOG] httpcore.connection DEBUG close.started
+[LOG] httpcore.connection DEBUG close.complete
+exit=0 dur=94s
+# timestamp end: 2026-09-23T01:54:18+03:00
+$ du -sb / du -sh model dir
+4960733321	/c/Users/sabus/.cache/huggingface/hub/models--openbmb--VoxCPM2
+4.7G	/c/Users/sabus/.cache/huggingface/hub/models--openbmb--VoxCPM2
+-rw-r--r-- 1 sabus 197609       1519 Sep 23 01:52 /c/Users/sabus/.cache/huggingface/hub/models--openbmb--VoxCPM2/snapshots/32279effe8c19989596f05d353d1447f51d9e915/.gitattributes
+-rw-r--r-- 1 sabus 197609       7939 Sep 23 01:52 /c/Users/sabus/.cache/huggingface/hub/models--openbmb--VoxCPM2/snapshots/32279effe8c19989596f05d353d1447f51d9e915/README.md
+-rw-r--r-- 1 sabus 197609  376951122 Sep 23 01:53 /c/Users/sabus/.cache/huggingface/hub/models--openbmb--VoxCPM2/snapshots/32279effe8c19989596f05d353d1447f51d9e915/audiovae.pth
+-rw-r--r-- 1 sabus 197609       4336 Sep 23 01:52 /c/Users/sabus/.cache/huggingface/hub/models--openbmb--VoxCPM2/snapshots/32279effe8c19989596f05d353d1447f51d9e915/config.json
+-rw-r--r-- 1 sabus 197609 4580080592 Sep 23 01:54 /c/Users/sabus/.cache/huggingface/hub/models--openbmb--VoxCPM2/snapshots/32279effe8c19989596f05d353d1447f51d9e915/model.safetensors
+-rw-r--r-- 1 sabus 197609       1632 Sep 23 01:52 /c/Users/sabus/.cache/huggingface/hub/models--openbmb--VoxCPM2/snapshots/32279effe8c19989596f05d353d1447f51d9e915/special_tokens_map.json
+-rw-r--r-- 1 sabus 197609       2895 Sep 23 01:52 /c/Users/sabus/.cache/huggingface/hub/models--openbmb--VoxCPM2/snapshots/32279effe8c19989596f05d353d1447f51d9e915/tokenization_voxcpm2.py
+-rw-r--r-- 1 sabus 197609    3676772 Sep 23 01:52 /c/Users/sabus/.cache/huggingface/hub/models--openbmb--VoxCPM2/snapshots/32279effe8c19989596f05d353d1447f51d9e915/tokenizer.json
+-rw-r--r-- 1 sabus 197609       5059 Sep 23 01:52 /c/Users/sabus/.cache/huggingface/hub/models--openbmb--VoxCPM2/snapshots/32279effe8c19989596f05d353d1447f51d9e915/tokenizer_config.json

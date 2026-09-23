@@ -1,0 +1,426 @@
+{
+  "dry_run": false,
+  "repo": "samykabu/voicebox",
+  "parent": 13,
+  "feature": "specs/001-voxcpm2-tts-engine",
+  "tasks": {
+    "T001": {
+      "action": "reuse",
+      "number": 17,
+      "native_link_verified": true,
+      "depends_on": []
+    },
+    "T002": {
+      "action": "reuse",
+      "number": 18,
+      "native_link_verified": true,
+      "depends_on": [
+        "T001"
+      ]
+    },
+    "T003": {
+      "action": "reuse",
+      "number": 19,
+      "native_link_verified": true,
+      "depends_on": [
+        "T002"
+      ]
+    },
+    "T004": {
+      "action": "reuse",
+      "number": 20,
+      "native_link_verified": true,
+      "depends_on": [
+        "T002"
+      ]
+    },
+    "T005": {
+      "action": "reuse",
+      "number": 21,
+      "native_link_verified": true,
+      "depends_on": [
+        "T002"
+      ]
+    },
+    "T006": {
+      "action": "reuse",
+      "number": 22,
+      "native_link_verified": true,
+      "depends_on": [
+        "T002"
+      ]
+    },
+    "T007": {
+      "action": "reuse",
+      "number": 23,
+      "native_link_verified": true,
+      "depends_on": [
+        "T006"
+      ]
+    },
+    "T008": {
+      "action": "reuse",
+      "number": 24,
+      "native_link_verified": true,
+      "depends_on": [
+        "T002"
+      ]
+    },
+    "T009": {
+      "action": "reuse",
+      "number": 25,
+      "native_link_verified": true,
+      "depends_on": [
+        "T008"
+      ]
+    },
+    "T010": {
+      "action": "reuse",
+      "number": 26,
+      "native_link_verified": true,
+      "depends_on": [
+        "T009"
+      ]
+    },
+    "T011": {
+      "action": "reuse",
+      "number": 27,
+      "native_link_verified": true,
+      "depends_on": [
+        "T010"
+      ]
+    },
+    "T012": {
+      "action": "reuse",
+      "number": 28,
+      "native_link_verified": true,
+      "depends_on": [
+        "T010"
+      ]
+    },
+    "T013": {
+      "action": "reuse",
+      "number": 29,
+      "native_link_verified": true,
+      "depends_on": [
+        "T011"
+      ]
+    },
+    "T014": {
+      "action": "reuse",
+      "number": 30,
+      "native_link_verified": true,
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T012",
+        "T013"
+      ]
+    },
+    "T015": {
+      "action": "reuse",
+      "number": 31,
+      "native_link_verified": true,
+      "depends_on": [
+        "T014"
+      ]
+    },
+    "T016": {
+      "action": "reuse",
+      "number": 32,
+      "native_link_verified": true,
+      "depends_on": [
+        "T015"
+      ]
+    },
+    "T017": {
+      "action": "reuse",
+      "number": 33,
+      "native_link_verified": true,
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T012",
+        "T013"
+      ]
+    },
+    "T018": {
+      "action": "reuse",
+      "number": 34,
+      "native_link_verified": true,
+      "depends_on": [
+        "T003",
+        "T004",
+        "T005",
+        "T007",
+        "T012",
+        "T013"
+      ]
+    },
+    "T019": {
+      "action": "reuse",
+      "number": 35,
+      "native_link_verified": true,
+      "depends_on": [
+        "T013",
+        "T016",
+        "T018"
+      ]
+    },
+    "T020": {
+      "action": "reuse",
+      "number": 36,
+      "native_link_verified": true,
+      "depends_on": [
+        "T013",
+        "T016"
+      ]
+    },
+    "T021": {
+      "action": "reuse",
+      "number": 37,
+      "native_link_verified": true,
+      "depends_on": [
+        "T016",
+        "T018"
+      ]
+    },
+    "T022": {
+      "action": "reuse",
+      "number": 38,
+      "native_link_verified": true,
+      "depends_on": [
+        "T013",
+        "T016"
+      ]
+    },
+    "T023": {
+      "action": "reuse",
+      "number": 39,
+      "native_link_verified": true,
+      "depends_on": [
+        "T013",
+        "T016"
+      ]
+    },
+    "T024": {
+      "action": "reuse",
+      "number": 40,
+      "native_link_verified": true,
+      "depends_on": [
+        "T015"
+      ]
+    },
+    "T046": {
+      "action": "reuse",
+      "number": 41,
+      "native_link_verified": true,
+      "depends_on": [
+        "T015"
+      ]
+    },
+    "T047": {
+      "action": "reuse",
+      "number": 42,
+      "native_link_verified": true,
+      "depends_on": [
+        "T046"
+      ]
+    },
+    "T025": {
+      "action": "reuse",
+      "number": 43,
+      "native_link_verified": true,
+      "depends_on": [
+        "T015"
+      ]
+    },
+    "T026": {
+      "action": "reuse",
+      "number": 44,
+      "native_link_verified": true,
+      "depends_on": [
+        "T025"
+      ]
+    },
+    "T027": {
+      "action": "reuse",
+      "number": 45,
+      "native_link_verified": true,
+      "depends_on": [
+        "T016"
+      ]
+    },
+    "T028": {
+      "action": "reuse",
+      "number": 46,
+      "native_link_verified": true,
+      "depends_on": [
+        "T013",
+        "T026"
+      ]
+    },
+    "T029": {
+      "action": "reuse",
+      "number": 47,
+      "native_link_verified": true,
+      "depends_on": [
+        "T009",
+        "T016"
+      ]
+    },
+    "T030": {
+      "action": "reuse",
+      "number": 48,
+      "native_link_verified": true,
+      "depends_on": [
+        "T029"
+      ]
+    },
+    "T031": {
+      "action": "reuse",
+      "number": 49,
+      "native_link_verified": true,
+      "depends_on": [
+        "T013",
+        "T019"
+      ]
+    },
+    "T032": {
+      "action": "reuse",
+      "number": 50,
+      "native_link_verified": true,
+      "depends_on": [
+        "T013",
+        "T022"
+      ]
+    },
+    "T033": {
+      "action": "reuse",
+      "number": 51,
+      "native_link_verified": true,
+      "depends_on": [
+        "T030",
+        "T031",
+        "T032"
+      ]
+    },
+    "T034": {
+      "action": "reuse",
+      "number": 52,
+      "native_link_verified": true,
+      "depends_on": [
+        "T010",
+        "T015"
+      ]
+    },
+    "T035": {
+      "action": "reuse",
+      "number": 53,
+      "native_link_verified": true,
+      "depends_on": [
+        "T034"
+      ]
+    },
+    "T036": {
+      "action": "reuse",
+      "number": 54,
+      "native_link_verified": true,
+      "depends_on": [
+        "T013",
+        "T035"
+      ]
+    },
+    "T037": {
+      "action": "reuse",
+      "number": 55,
+      "native_link_verified": true,
+      "depends_on": [
+        "T036"
+      ]
+    },
+    "T038": {
+      "action": "reuse",
+      "number": 56,
+      "native_link_verified": true,
+      "depends_on": [
+        "T016"
+      ]
+    },
+    "T039": {
+      "action": "reuse",
+      "number": 57,
+      "native_link_verified": true,
+      "depends_on": [
+        "T016"
+      ]
+    },
+    "T040": {
+      "action": "reuse",
+      "number": 58,
+      "native_link_verified": true,
+      "depends_on": [
+        "T016"
+      ]
+    },
+    "T041": {
+      "action": "reuse",
+      "number": 59,
+      "native_link_verified": true,
+      "depends_on": [
+        "T016",
+        "T026",
+        "T035"
+      ]
+    },
+    "T042": {
+      "action": "reuse",
+      "number": 60,
+      "native_link_verified": true,
+      "depends_on": [
+        "T017",
+        "T047"
+      ]
+    },
+    "T043": {
+      "action": "reuse",
+      "number": 61,
+      "native_link_verified": true,
+      "depends_on": [
+        "T021",
+        "T023",
+        "T024",
+        "T028",
+        "T033",
+        "T037",
+        "T041",
+        "T047"
+      ]
+    },
+    "T044": {
+      "action": "reuse",
+      "number": 62,
+      "native_link_verified": true,
+      "depends_on": [
+        "T043"
+      ]
+    },
+    "T045": {
+      "action": "reuse",
+      "number": 63,
+      "native_link_verified": true,
+      "depends_on": [
+        "T038",
+        "T039",
+        "T040",
+        "T042",
+        "T044"
+      ]
+    }
+  },
+  "native_links_verified": true
+}

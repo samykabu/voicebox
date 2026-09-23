@@ -1,0 +1,11 @@
+{
+  "dry_run": false,
+  "changes": [
+    {
+      "task": "T002",
+      "number": 18,
+      "from": "open",
+      "to": "closed"
+    }
+  ]
+}

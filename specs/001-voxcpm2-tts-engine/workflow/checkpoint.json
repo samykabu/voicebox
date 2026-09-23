@@ -1,0 +1,777 @@
+{
+  "schema_version": 1,
+  "run_id": "ad804d3cd2484b3a9b538f620421d84b",
+  "repo_path": "D:\\Projects\\Personal\\voicebox",
+  "branch": "feature/001-voxcpm2-tts-engine",
+  "feature": "specs/001-voxcpm2-tts-engine",
+  "issue": "samykabu/voicebox#13",
+  "policy_digest": "54f0c0d66e0922e5b7f067672eb7c1f58c23c0403faaeec938f7823e8f6c53a6",
+  "commands": {
+    "scope": "speckit.scope.run",
+    "specify": "speckit.specify",
+    "clarify": "speckit.superspec.brainstorm",
+    "plan": "speckit.plan",
+    "tasks": "speckit.superspec.tasks",
+    "qa_analyze": "speckit.assure.analyze",
+    "manual_analyze": "speckit.user-manual.analyze",
+    "analyze": "speckit.analyze",
+    "taskstoissues": "speckit.taskstoissues",
+    "execute": "speckit.superspec.execute",
+    "qa_document": "speckit.assure.document",
+    "manual_update": "speckit.user-manual.update",
+    "pr": "speckit.pr.generate",
+    "verify": "workflow:verification",
+    "review": "speckit.superspec.review",
+    "ready": "workflow:gates"
+  },
+  "policy": {
+    "schema_version": 1,
+    "processes": {
+      "qa": false,
+      "user_manual": false
+    },
+    "execution": {
+      "engine": "auto",
+      "checkpoints": "required-only"
+    },
+    "providers": {
+      "clarification": "prefer-superspec",
+      "tasks": "prefer-superspec"
+    },
+    "issue_sync": {
+      "taskstoissues": "required",
+      "parent_link": "native-subissue"
+    },
+    "clarification": {
+      "transport": "github-comments",
+      "resume_on_reinvoke": "reread-answers"
+    },
+    "context": {
+      "mode": "measured-only",
+      "max_fraction": 0.6,
+      "checkpoint_fraction": 0.5,
+      "reserve_fraction": 0.1
+    },
+    "scope": {
+      "statuses": {
+        "In progress": "In Progress"
+      }
+    },
+    "finalize": {
+      "create_pr": true,
+      "merge": false
+    },
+    "updates": {
+      "policy": "reviewed"
+    },
+    "ci": {
+      "provider": "github-actions",
+      "policy": "hosted-allowed",
+      "runners": {
+        "linux": [
+          "ubuntu-latest"
+        ],
+        "windows": [
+          "windows-latest"
+        ]
+      },
+      "capabilities": {
+        "system_packages": "sudo-apt",
+        "python": "setup-action",
+        "python_version": "3.13"
+      },
+      "exceptions": []
+    }
+  },
+  "receipts": {
+    "scope": {
+      "summary": "Revalidation after the user's T002 decisions on 2026-09-23: pin voxcpm==2.0.3, re-score effort 13 to 8, and move User Story 3 to P2 with FR-023 withdrawn. These changed the scope analysis, spec.md, research R5, the protocol contract, plan.md and tasks.md. The checks below were re-run, not assumed. Scope republished with the effort re-scored from 13 to 8 (uncertainty 3 to 1 after the probe answered the open unknowns). The runtime carried the prior keep-together approval forward as a recorded revision: score and prompt changed, 0 sub-issues. Labels are now effort:8 and scope:large. scope.py gate 13 passes under this revalidation claim with score 8 and an unchanged requirement fingerprint.",
+      "inputs": [
+        ".specify/extensions/scope/skills/scope-analyst/SKILL.md",
+        ".specify/extensions/workflow/skills/workflow/SKILL.md",
+        "specs/001-voxcpm2-tts-engine/evidence/probe.md"
+      ],
+      "evidence": [
+        ".specify/scope/issue-13-analysis.json",
+        ".specify/scope/issue-13-publish.json",
+        ".specify/scope/approvals/13-baseline.json"
+      ],
+      "score": 8,
+      "child_count": 0,
+      "approval_carried_forward": true,
+      "stage": "scope",
+      "outcome": "passed",
+      "mode": "revalidate",
+      "command": "speckit.scope.run",
+      "dependency_digest": "e59b9f46ff13271d896bdda3fafca27f42a992823e767a359132482e0b6f7f70",
+      "fingerprints": {
+        ".specify/extensions/scope/skills/scope-analyst/SKILL.md": "0b6826b65fc7776b219ed22041888ccd2506e3d0efd293890e4aa71859412b4e",
+        ".specify/extensions/workflow/skills/workflow/SKILL.md": "a312c80c02fc6126d2c8e2e46881ed49f030d02009eba3f24b2947c5e5ca063a",
+        ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+        ".specify/scope/approvals/13-baseline.json": "1fa22526e1c414130370189bd3c6d6221a64b64eef1710173cc4b9c303b33180",
+        ".specify/scope/issue-13-analysis.json": "f4f8d9e9d4115d39dc8ab32d2c672b81ecd5acd1bb6364b1ac952bb6a0847252",
+        ".specify/scope/issue-13-publish.json": "e5439471711354e599912f58c86118118e99d69530d8c4e809a15073766cd928",
+        "specs/001-voxcpm2-tts-engine/evidence/probe.md": "fcbab0e305d93b3b752345ee308226b88e560c5a613978d1513255dd70276239"
+      },
+      "completed_at": "2026-09-23T00:15:13.936060+00:00"
+    },
+    "specify": {
+      "summary": "Revalidation after the user's T002 decisions on 2026-09-23: pin voxcpm==2.0.3, re-score effort 13 to 8, and move User Story 3 to P2 with FR-023 withdrawn. These changed the scope analysis, spec.md, research R5, the protocol contract, plan.md and tasks.md. The checks below were re-run, not assumed. Spec edits from T002 applied: Story 3 moved to P2, and FR-023 now requires processor fallback with its exception withdrawn. Scope gate exit 0 for issue 13; scope-source.json binds samykabu/voicebox#13; zero NEEDS CLARIFICATION markers; spec.md unchanged since the approved Analyze remediation.",
+      "inputs": [
+        ".specify/extensions/scope/commands/guard.md",
+        ".specify/memory/constitution.md"
+      ],
+      "evidence": [
+        "specs/001-voxcpm2-tts-engine/spec.md",
+        "specs/001-voxcpm2-tts-engine/checklists/requirements.md",
+        "specs/001-voxcpm2-tts-engine/scope-source.json"
+      ],
+      "stage": "specify",
+      "outcome": "passed",
+      "mode": "revalidate",
+      "command": "speckit.specify",
+      "dependency_digest": "e59b9f46ff13271d896bdda3fafca27f42a992823e767a359132482e0b6f7f70",
+      "fingerprints": {
+        ".specify/extensions/scope/commands/guard.md": "cd1f4e23f48873518d533880614a66b1586f749ef5ec6b8bb51ae7db6250dc12",
+        ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+        "specs/001-voxcpm2-tts-engine/checklists/requirements.md": "b0016582e81ae64efe415033bf9df044a44d6fdd91e5edba4b52960fa619f43f",
+        "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+        "specs/001-voxcpm2-tts-engine/spec.md": "b14ebfe59c84a0e5f3ab6f99c909d51906e4e6003fb9970868504d4f4bf0656d"
+      },
+      "completed_at": "2026-09-23T00:15:19.669881+00:00"
+    },
+    "clarify": {
+      "summary": "Revalidation after the user's T002 decisions on 2026-09-23: pin voxcpm==2.0.3, re-score effort 13 to 8, and move User Story 3 to P2 with FR-023 withdrawn. These changed the scope analysis, spec.md, research R5, the protocol contract, plan.md and tasks.md. The checks below were re-run, not assumed. Issue #13 comments re-read through the API: the newest is still the managed round-2 summary 5781721205, so no new answer, reply or control directive exists. All nine answers remain applied; zero unresolved.",
+      "unresolved": 0,
+      "answers_applied": true,
+      "inputs": [
+        ".specify/extensions/scope/skills/github-clarification/SKILL.md",
+        "specs/001-voxcpm2-tts-engine/scope-source.json"
+      ],
+      "evidence": [
+        ".specify/scope/clarification-13-round2.json",
+        ".specify/scope/clarification-13-review.json",
+        "specs/001-voxcpm2-tts-engine/spec.md"
+      ],
+      "stage": "clarify",
+      "outcome": "passed",
+      "mode": "revalidate",
+      "command": "speckit.superspec.brainstorm",
+      "dependency_digest": "e59b9f46ff13271d896bdda3fafca27f42a992823e767a359132482e0b6f7f70",
+      "fingerprints": {
+        ".specify/extensions/scope/skills/github-clarification/SKILL.md": "879fda1848ce4452d67fbc92cb94c38237b871022ff6f06e2d6570547849ed75",
+        ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+        ".specify/scope/clarification-13-review.json": "1afd766cfe3066b737812d181a82b188da500ad24341f76ce07bcf22359d012b",
+        ".specify/scope/clarification-13-round2.json": "cd80ed610f5c7eabefed6f0314ab5c59b5cc09795ad2584c319dc790850815e5",
+        "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+        "specs/001-voxcpm2-tts-engine/spec.md": "b14ebfe59c84a0e5f3ab6f99c909d51906e4e6003fb9970868504d4f4bf0656d"
+      },
+      "completed_at": "2026-09-23T00:15:20.857973+00:00"
+    },
+    "plan": {
+      "summary": "Revalidation after the user's T002 decisions on 2026-09-23: pin voxcpm==2.0.3, re-score effort 13 to 8, and move User Story 3 to P2 with FR-023 withdrawn. These changed the scope analysis, spec.md, research R5, the protocol contract, plan.md and tasks.md. The checks below were re-run, not assumed. Mandatory before_plan plan-gate re-run: exit 0, status In Progress with revalidation true (the feature is in execution). All Phase 0 and Phase 1 artifacts present and unchanged since the approved remediation; constitution check PASS with zero violations as previously recorded.",
+      "inputs": [
+        ".specify/memory/constitution.md",
+        ".specify/extensions/scope/commands/plan-guard.md",
+        "specs/001-voxcpm2-tts-engine/spec.md"
+      ],
+      "evidence": [
+        "specs/001-voxcpm2-tts-engine/plan.md",
+        "specs/001-voxcpm2-tts-engine/research.md",
+        "specs/001-voxcpm2-tts-engine/data-model.md",
+        "specs/001-voxcpm2-tts-engine/quickstart.md",
+        "specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md",
+        "specs/001-voxcpm2-tts-engine/contracts/tts-backend-protocol.md"
+      ],
+      "stage": "plan",
+      "outcome": "passed",
+      "mode": "revalidate",
+      "command": "speckit.plan",
+      "dependency_digest": "e59b9f46ff13271d896bdda3fafca27f42a992823e767a359132482e0b6f7f70",
+      "fingerprints": {
+        ".specify/extensions/scope/commands/plan-guard.md": "0134e14a924c9444efd87ff83ddf70b1f3f0e38aa3376014c9fc4d752fd41d5c",
+        ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+        "specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md": "6582bb0fd5a07efacc7c93730d34833f480fbbd865b2e030bb137f1bb9a42965",
+        "specs/001-voxcpm2-tts-engine/contracts/tts-backend-protocol.md": "30019c63953b35729741e3f4bca035342f765b92921bd584a89f74b5f5d4e151",
+        "specs/001-voxcpm2-tts-engine/data-model.md": "c065ed1d808c2f5a20ad0466048c623d7e3b9d32f53ce574c097b59e9b45cddb",
+        "specs/001-voxcpm2-tts-engine/plan.md": "f1b9f5671892bb309162e3284b959b5dd232b5216a112d567dffcbdb686965b1",
+        "specs/001-voxcpm2-tts-engine/quickstart.md": "9a2ec39af786160a6e4e97debe49f26500d5e12212f901d316eda6496f1c996f",
+        "specs/001-voxcpm2-tts-engine/research.md": "15e27e472a12b964fdf5b954177a9bcd2090773f08cb3f77e414236426e87fac",
+        "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+        "specs/001-voxcpm2-tts-engine/spec.md": "b14ebfe59c84a0e5f3ab6f99c909d51906e4e6003fb9970868504d4f4bf0656d"
+      },
+      "completed_at": "2026-09-23T00:15:43.685332+00:00"
+    },
+    "tasks": {
+      "summary": "Revalidation after the user's T002 decisions on 2026-09-23: pin voxcpm==2.0.3, re-score effort 13 to 8, and move User Story 3 to P2 with FR-023 withdrawn. These changed the scope analysis, spec.md, research R5, the protocol contract, plan.md and tasks.md. The checks below were re-run, not assumed. 47 unique task IDs T001-T047; T001 and T002 checked after review, with the T002 decisions recorded in evidence/probe.md; all 24 functional requirements present in Covers tags; tasks.md unchanged since issue creation.",
+      "inputs": [
+        "specs/001-voxcpm2-tts-engine/plan.md",
+        ".specify/templates/tasks-template.md"
+      ],
+      "evidence": [
+        "specs/001-voxcpm2-tts-engine/tasks.md"
+      ],
+      "task_count": 47,
+      "stage": "tasks",
+      "outcome": "passed",
+      "mode": "revalidate",
+      "command": "speckit.superspec.tasks",
+      "dependency_digest": "e59b9f46ff13271d896bdda3fafca27f42a992823e767a359132482e0b6f7f70",
+      "fingerprints": {
+        ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+        ".specify/templates/tasks-template.md": "fc29a233f6f5a27ca31f1aa46b596af6500c627441c6e62b2bc4a1d721525842",
+        "specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md": "6582bb0fd5a07efacc7c93730d34833f480fbbd865b2e030bb137f1bb9a42965",
+        "specs/001-voxcpm2-tts-engine/contracts/tts-backend-protocol.md": "30019c63953b35729741e3f4bca035342f765b92921bd584a89f74b5f5d4e151",
+        "specs/001-voxcpm2-tts-engine/data-model.md": "c065ed1d808c2f5a20ad0466048c623d7e3b9d32f53ce574c097b59e9b45cddb",
+        "specs/001-voxcpm2-tts-engine/plan.md": "f1b9f5671892bb309162e3284b959b5dd232b5216a112d567dffcbdb686965b1",
+        "specs/001-voxcpm2-tts-engine/quickstart.md": "9a2ec39af786160a6e4e97debe49f26500d5e12212f901d316eda6496f1c996f",
+        "specs/001-voxcpm2-tts-engine/research.md": "15e27e472a12b964fdf5b954177a9bcd2090773f08cb3f77e414236426e87fac",
+        "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+        "specs/001-voxcpm2-tts-engine/spec.md": "b14ebfe59c84a0e5f3ab6f99c909d51906e4e6003fb9970868504d4f4bf0656d",
+        "specs/001-voxcpm2-tts-engine/tasks.md": "2fbc429b469a1d94e5bff19827aa204c8443bac52fd0c8fbe0384743f64dde43"
+      },
+      "completed_at": "2026-09-23T00:15:44.565135+00:00"
+    },
+    "analyze": {
+      "summary": "Revalidation after the user's T002 decisions on 2026-09-23: pin voxcpm==2.0.3, re-score effort 13 to 8, and move User Story 3 to P2 with FR-023 withdrawn. These changed the scope analysis, spec.md, research R5, the protocol contract, plan.md and tasks.md. The checks below were re-run, not assumed. Mechanical re-check of all ten resolved findings: none reintroduced; offline-load tasks present; 24 of 24 requirements covered.",
+      "blocking_findings": 0,
+      "inputs": [
+        ".specify/memory/constitution.md",
+        "specs/001-voxcpm2-tts-engine/plan.md",
+        "specs/001-voxcpm2-tts-engine/data-model.md",
+        "specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md"
+      ],
+      "evidence": [
+        "specs/001-voxcpm2-tts-engine/spec.md",
+        "specs/001-voxcpm2-tts-engine/tasks.md"
+      ],
+      "stage": "analyze",
+      "outcome": "passed",
+      "mode": "revalidate",
+      "command": "speckit.analyze",
+      "dependency_digest": "e59b9f46ff13271d896bdda3fafca27f42a992823e767a359132482e0b6f7f70",
+      "fingerprints": {
+        ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+        "specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md": "6582bb0fd5a07efacc7c93730d34833f480fbbd865b2e030bb137f1bb9a42965",
+        "specs/001-voxcpm2-tts-engine/contracts/tts-backend-protocol.md": "30019c63953b35729741e3f4bca035342f765b92921bd584a89f74b5f5d4e151",
+        "specs/001-voxcpm2-tts-engine/data-model.md": "c065ed1d808c2f5a20ad0466048c623d7e3b9d32f53ce574c097b59e9b45cddb",
+        "specs/001-voxcpm2-tts-engine/plan.md": "f1b9f5671892bb309162e3284b959b5dd232b5216a112d567dffcbdb686965b1",
+        "specs/001-voxcpm2-tts-engine/quickstart.md": "9a2ec39af786160a6e4e97debe49f26500d5e12212f901d316eda6496f1c996f",
+        "specs/001-voxcpm2-tts-engine/research.md": "15e27e472a12b964fdf5b954177a9bcd2090773f08cb3f77e414236426e87fac",
+        "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+        "specs/001-voxcpm2-tts-engine/spec.md": "b14ebfe59c84a0e5f3ab6f99c909d51906e4e6003fb9970868504d4f4bf0656d",
+        "specs/001-voxcpm2-tts-engine/tasks.md": "2fbc429b469a1d94e5bff19827aa204c8443bac52fd0c8fbe0384743f64dde43"
+      },
+      "completed_at": "2026-09-23T00:15:45.505135+00:00"
+    },
+    "taskstoissues": {
+      "summary": "Revalidation after the user's T002 decisions on 2026-09-23: pin voxcpm==2.0.3, re-score effort 13 to 8, and move User Story 3 to P2 with FR-023 withdrawn. These changed the scope analysis, spec.md, research R5, the protocol contract, plan.md and tasks.md. The checks below were re-run, not assumed. Idempotent adapter re-run with --apply: 47 reuse, 0 create, 47 native sub-issue links re-verified against parent #13 (issues #17-#63).",
+      "parent_issue": "samykabu/voicebox#13",
+      "native_links_verified": true,
+      "inputs": [
+        ".specify/extensions/workflow/scripts/task_issues.py",
+        "specs/001-voxcpm2-tts-engine/tasks.md"
+      ],
+      "evidence": [
+        "specs/001-voxcpm2-tts-engine/workflow/task-dependencies.json",
+        "specs/001-voxcpm2-tts-engine/workflow/task-issues-result.json",
+        "specs/001-voxcpm2-tts-engine/workflow/task-issues.json"
+      ],
+      "stage": "taskstoissues",
+      "outcome": "passed",
+      "mode": "revalidate",
+      "command": "speckit.taskstoissues",
+      "dependency_digest": "e59b9f46ff13271d896bdda3fafca27f42a992823e767a359132482e0b6f7f70",
+      "fingerprints": {
+        ".specify/extensions/workflow/scripts/task_issues.py": "7abbe9370a5f1b8c0c82e04f6f1dc1ee8ac3084ced96bb15024cddcaa9984649",
+        ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+        "specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md": "6582bb0fd5a07efacc7c93730d34833f480fbbd865b2e030bb137f1bb9a42965",
+        "specs/001-voxcpm2-tts-engine/contracts/tts-backend-protocol.md": "30019c63953b35729741e3f4bca035342f765b92921bd584a89f74b5f5d4e151",
+        "specs/001-voxcpm2-tts-engine/data-model.md": "c065ed1d808c2f5a20ad0466048c623d7e3b9d32f53ce574c097b59e9b45cddb",
+        "specs/001-voxcpm2-tts-engine/plan.md": "f1b9f5671892bb309162e3284b959b5dd232b5216a112d567dffcbdb686965b1",
+        "specs/001-voxcpm2-tts-engine/quickstart.md": "9a2ec39af786160a6e4e97debe49f26500d5e12212f901d316eda6496f1c996f",
+        "specs/001-voxcpm2-tts-engine/research.md": "15e27e472a12b964fdf5b954177a9bcd2090773f08cb3f77e414236426e87fac",
+        "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+        "specs/001-voxcpm2-tts-engine/spec.md": "b14ebfe59c84a0e5f3ab6f99c909d51906e4e6003fb9970868504d4f4bf0656d",
+        "specs/001-voxcpm2-tts-engine/tasks.md": "2fbc429b469a1d94e5bff19827aa204c8443bac52fd0c8fbe0384743f64dde43",
+        "specs/001-voxcpm2-tts-engine/workflow/task-dependencies.json": "45f2226a1f41d672a5b7498598c30aa0b56a2ce0dc0c53410db16d7281a8e9ee",
+        "specs/001-voxcpm2-tts-engine/workflow/task-issues-result.json": "936de8483a4dc8a57840e20fab216c3c59ade4ee10f5450fa88c119410c6c01c",
+        "specs/001-voxcpm2-tts-engine/workflow/task-issues.json": "8b3de0e1afe0a6a023331709e925bd5f87bb7f8476fb2cff53c9ba61c67da824"
+      },
+      "completed_at": "2026-09-23T00:16:17.411318+00:00"
+    }
+  },
+  "generation": 76,
+  "active": {
+    "stage": "execute",
+    "token": "c56a1c6527b242288b49f92f0ed58964",
+    "claimed_at": "2026-09-23T00:16:34.211289+00:00",
+    "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+    "context": {
+      "pause": false,
+      "method": "unavailable",
+      "guaranteed": false,
+      "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+      "reason": "context-monitoring-unavailable: CONTEXT_METHOD_REQUIRED"
+    },
+    "mode": "initial",
+    "baseline": {
+      ".specify/extensions/scope/commands/guard.md": "cd1f4e23f48873518d533880614a66b1586f749ef5ec6b8bb51ae7db6250dc12",
+      ".specify/extensions/scope/commands/plan-guard.md": "0134e14a924c9444efd87ff83ddf70b1f3f0e38aa3376014c9fc4d752fd41d5c",
+      ".specify/extensions/scope/skills/github-clarification/SKILL.md": "879fda1848ce4452d67fbc92cb94c38237b871022ff6f06e2d6570547849ed75",
+      ".specify/extensions/scope/skills/scope-analyst/SKILL.md": "0b6826b65fc7776b219ed22041888ccd2506e3d0efd293890e4aa71859412b4e",
+      ".specify/extensions/workflow/scripts/task_issues.py": "7abbe9370a5f1b8c0c82e04f6f1dc1ee8ac3084ced96bb15024cddcaa9984649",
+      ".specify/extensions/workflow/skills/workflow/SKILL.md": "a312c80c02fc6126d2c8e2e46881ed49f030d02009eba3f24b2947c5e5ca063a",
+      ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+      ".specify/scope/approvals/13-baseline.json": "1fa22526e1c414130370189bd3c6d6221a64b64eef1710173cc4b9c303b33180",
+      ".specify/scope/clarification-13-review.json": "1afd766cfe3066b737812d181a82b188da500ad24341f76ce07bcf22359d012b",
+      ".specify/scope/clarification-13-round2.json": "cd80ed610f5c7eabefed6f0314ab5c59b5cc09795ad2584c319dc790850815e5",
+      ".specify/scope/issue-13-analysis.json": "f4f8d9e9d4115d39dc8ab32d2c672b81ecd5acd1bb6364b1ac952bb6a0847252",
+      ".specify/scope/issue-13-publish.json": "e5439471711354e599912f58c86118118e99d69530d8c4e809a15073766cd928",
+      ".specify/templates/tasks-template.md": "fc29a233f6f5a27ca31f1aa46b596af6500c627441c6e62b2bc4a1d721525842",
+      "specs/001-voxcpm2-tts-engine/checklists/requirements.md": "b0016582e81ae64efe415033bf9df044a44d6fdd91e5edba4b52960fa619f43f",
+      "specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md": "6582bb0fd5a07efacc7c93730d34833f480fbbd865b2e030bb137f1bb9a42965",
+      "specs/001-voxcpm2-tts-engine/contracts/tts-backend-protocol.md": "30019c63953b35729741e3f4bca035342f765b92921bd584a89f74b5f5d4e151",
+      "specs/001-voxcpm2-tts-engine/data-model.md": "c065ed1d808c2f5a20ad0466048c623d7e3b9d32f53ce574c097b59e9b45cddb",
+      "specs/001-voxcpm2-tts-engine/evidence/probe.md": "fcbab0e305d93b3b752345ee308226b88e560c5a613978d1513255dd70276239",
+      "specs/001-voxcpm2-tts-engine/plan.md": "f1b9f5671892bb309162e3284b959b5dd232b5216a112d567dffcbdb686965b1",
+      "specs/001-voxcpm2-tts-engine/quickstart.md": "9a2ec39af786160a6e4e97debe49f26500d5e12212f901d316eda6496f1c996f",
+      "specs/001-voxcpm2-tts-engine/research.md": "15e27e472a12b964fdf5b954177a9bcd2090773f08cb3f77e414236426e87fac",
+      "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+      "specs/001-voxcpm2-tts-engine/spec.md": "b14ebfe59c84a0e5f3ab6f99c909d51906e4e6003fb9970868504d4f4bf0656d",
+      "specs/001-voxcpm2-tts-engine/tasks.md": "2fbc429b469a1d94e5bff19827aa204c8443bac52fd0c8fbe0384743f64dde43",
+      "specs/001-voxcpm2-tts-engine/workflow/task-dependencies.json": "45f2226a1f41d672a5b7498598c30aa0b56a2ce0dc0c53410db16d7281a8e9ee",
+      "specs/001-voxcpm2-tts-engine/workflow/task-issues-result.json": "936de8483a4dc8a57840e20fab216c3c59ade4ee10f5450fa88c119410c6c01c",
+      "specs/001-voxcpm2-tts-engine/workflow/task-issues.json": "8b3de0e1afe0a6a023331709e925bd5f87bb7f8476fb2cff53c9ba61c67da824"
+    }
+  },
+  "status": "in-progress",
+  "dependency_digest": "e59b9f46ff13271d896bdda3fafca27f42a992823e767a359132482e0b6f7f70",
+  "updated_at": "2026-09-23T00:16:34.238838+00:00",
+  "head": "4eb2a6431b416df9940831bb5f14fff34b00c059",
+  "branch_history": [
+    {
+      "from": "main",
+      "to": "feature/001-voxcpm2-tts-engine",
+      "at": "2026-09-22T18:06:01.758778+00:00"
+    }
+  ],
+  "pause": {
+    "reason": "The revalidation driver's plan check wrongly required status Ready. plan-gate correctly returned In Progress with revalidation true and exit 0 for an in-progress feature. Recovering the plan claim so the corrected check can re-run. No artifacts changed.",
+    "context": null,
+    "at": "2026-09-23T00:15:40.136763+00:00"
+  },
+  "recoveries": [
+    {
+      "claim": {
+        "stage": "clarify",
+        "token": "5abe88b1f2194354ba78f1003c877a21",
+        "claimed_at": "2026-09-22T18:07:42.760841+00:00",
+        "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+        "context": {
+          "pause": false,
+          "method": "unavailable",
+          "guaranteed": false,
+          "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+          "reason": "context-monitoring-unavailable: CONTEXT_METHOD_REQUIRED"
+        },
+        "mode": "revalidate",
+        "baseline": {
+          ".claude/skills/speckit-scope-guard/SKILL.md": "b90cddc1e7150219b15b51b14f2f110b80a7c12e027f7037933a920c7dc18975",
+          ".claude/skills/speckit-scope-run/SKILL.md": "61b311752e30c6a39f916cbc33899e8ac03c93a36f6dea250fa5a50e25e483a1",
+          ".claude/skills/speckit-specify/SKILL.md": "974fda5104f6df12f622f8ae03025b6aa45d61a52485f6a6e7708f441f9b3f35",
+          ".specify/extensions.yml": "6435249d6170bc90ae8856995e1de0790e6251bae359842193086fac9e075f21",
+          ".specify/extensions/project/commands/speckit.project.sync.md": "a1b26f81659efb56ada6825dacda06ee9ddd4129f6aeea41507f3d495623dd7b",
+          ".specify/extensions/project/config.json": "0a07fd142d147ec13d025155d9c4fe247bd02e11dfd5b3be6845b2c819e02162",
+          ".specify/extensions/scope/commands/bind.md": "c8a1fe448814178571a0750647921089413dd990a95267de209009c0bb834dc9",
+          ".specify/extensions/scope/commands/guard.md": "cd1f4e23f48873518d533880614a66b1586f749ef5ec6b8bb51ae7db6250dc12",
+          ".specify/extensions/scope/commands/run.md": "d108ddb86319fa40fab664f6ac0973f10b7a0ef065099777408ac3695a5e987a",
+          ".specify/extensions/scope/examples/analysis.json": "91819bf1c36a702da529ab5e3175928775249751a70f15bafe6696807c16e580",
+          ".specify/extensions/scope/references/analysis-contract.md": "837201d6ae00458d5e46b8b0607af6d8894129d426903322f0ea18e9a203e69b",
+          ".specify/extensions/scope/skills/scope-analyst/SKILL.md": "0b6826b65fc7776b219ed22041888ccd2506e3d0efd293890e4aa71859412b4e",
+          ".specify/extensions/workflow/skills/workflow/SKILL.md": "83cbc17cb33182016ce51a18748292fab9b12f1bd629ed6628f03ba5e22045c0",
+          ".specify/feature.json": "1a3b7bf81f85b38bb5713ace12502577a0ba85ce98d5b0fb569df8b6a6d4e4d6",
+          ".specify/init-options.json": "1f5fa45ac3f21e3b95745fbaa479eb771e6dd73eab53a7fc495a00eeedbe82b2",
+          ".specify/integration.json": "6c8360419221f109e5f0493855bb43cfe763b2f44dc78e2e3d2baf4daa9bfbae",
+          ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+          ".specify/presets/workflow/preset.yml": "ecfda8b2809a4433f51814a45aa77fab460af630f7c78d60bb468e670e7fe42e",
+          ".specify/project-sync-state.json": "f0cc3c8e447329d36a4274804a0d1852d918e86158888959285ea121f8d5bac8",
+          ".specify/scope/approvals/13-baseline.json": "1fa22526e1c414130370189bd3c6d6221a64b64eef1710173cc4b9c303b33180",
+          ".specify/scope/approvals/13-feca4105ffd7e470caa9fd5b68bd5b112ef95105c70e83bca7ad74679415403f.json": "f38137336dab8f3d597bdc88c2b2043bba7acee3df3764d864848904127af6d9",
+          ".specify/scope/issue-13-analysis.json": "796a43c14420c917ead325f8948a485bc517ba8432c057449d75627d70904de6",
+          ".specify/scope/issue-13-publish.json": "02fa4360b137a7071bc316838280dc3b1ec331b962b30e373de4680d6a0d55d1",
+          ".specify/scope/issue-13-snapshot.json": "5d698b87c664cb645353fd9d8252b45d348c106f9b80eecdf4447bd13214cca6",
+          ".specify/scope/runs/13-feca4105ffd7e470/analysis.json": "796a43c14420c917ead325f8948a485bc517ba8432c057449d75627d70904de6",
+          ".specify/scope/runs/13-feca4105ffd7e470/catalog-before.json": "8783ac5790c938aa7ea683df5f7b30e6f1faa364fd145dbe8ab26985d07a6bfc",
+          ".specify/scope/runs/13-feca4105ffd7e470/issue-map-before.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+          ".specify/scope/runs/13-feca4105ffd7e470/journal.json": "50d9cb818a6e60d38009393ddaa14bdd248401f2d7a42b60137bbc0d5d153cb4",
+          ".specify/scope/runs/13-feca4105ffd7e470/snapshot.json": "30dfdde4773f587d30570521db6c9b34143feb920a088367203fae38c77a399a",
+          ".specify/templates/spec-template.md": "3945437fc35cd30a5b2bf7beea680337c3516826d3efa5a6b92c4a7eca1ba28e",
+          ".specify/workflow.yml": "84f98fec050199d2a08e68dd35914425aaa8de51e5e438f608b1c0c1016d9180",
+          "app/src/components/Generation/EngineModelSelector.tsx": "02251f6c1d73dd13f7d51ad275050c06dc7adb24e01474b42b7bf70b3508d8c8",
+          "app/src/components/ServerSettings/GpuAcceleration.tsx": "a7de514f9475d4f7982b5f39245c3e6c79935506d012a1617f17db1fc7680d3e",
+          "app/src/lib/api/types.ts": "4976e530367a60e673ccbfab0f1ce083403f79f0d08a11ff101c65401c7143a5",
+          "app/src/lib/constants/languages.ts": "dc9f579f04a9e7da07414053749a5af20b308a5f51e717824f9876a5495ec7d4",
+          "backend/backends/__init__.py": "bb8bc265e274c2f93e006c2c7b2acfddf9eb77ca9ac0db12624267624fdcd09e",
+          "backend/backends/base.py": "3c801ce7ee91d254dd053dcd5225baa36694cb0a2dec179c5189e0453247a973",
+          "backend/backends/luxtts_backend.py": "4700bac393ca9f45e6ae6962f42b9602a29b817847871891ed27243fbfb471e3",
+          "backend/models.py": "fa716af9cf4ec95a0f746cac3df7198816637621672f0dc93c00511c806716e5",
+          "backend/pyproject.toml": "d8a35dfaba0ce1d459a6e0fc6778def464f8919c1e4cf0bbabb9275802abcda2",
+          "backend/requirements.txt": "098f4fbcf9b9bb4b37521cbc881fd1401d7b47d5aa60275076545b77e7cd81f3",
+          "backend/routes/cuda.py": "dd52db693937e7ee69f84af135f60d772a20982bfaa9abfe0fe6348e507c90e5",
+          "backend/routes/models.py": "233f17bc4d433c439b489b5979fb8087ce8dd0dc0ce97465f50649956386099c",
+          "backend/services/profiles.py": "2ca80c57e4b6d6b3eece5aaed33d3d435c16e8c33723072dfe7dd2bd58b84213",
+          "backend/tests/test_all_models_e2e.py": "188e9412877b12649aed0f42456bd305703f9e6617b2ebd2ae26ec3d2f93db7d",
+          "docs/content/docs/developer/tts-engines.mdx": "414c4ba69720ab5370bd383b21e29294b08c9da7dd08e9270330fb8e684a1ea7",
+          "justfile": "54203e40ecbf0d2212cdf816e0abe8378cf512ff3d4b467490241a3d0e89ec67",
+          "package.json": "323ef6fc1a85500426304a4f7d17c8f00ddc57f1e4ea9091ce5b96d51c6a6653",
+          "specs/001-voxcpm2-tts-engine/checklists/requirements.md": "5b47d7820730cd6d4c16eac6232299514a3892d47825986eafb18766a8710a17",
+          "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+          "specs/001-voxcpm2-tts-engine/spec.md": "0685d53cfd9af94c2fa3f12c38dc79bcf017fa88e3cd1ccd119ce7aacf390e47"
+        }
+      },
+      "reason": "Same session reclaiming its own paused clarify stage after all 9 round-1 questions were answered on GitHub. The claim's baseline was captured before this stage's own board move, so .specify/project-sync-state.json now differs from it (Feature Specification -> Need Clarifications, written by the round-1 clarification publish). That file is a legitimate side effect of the clarify stage but is not in the runtime's permitted-change list, which allows only spec.md, so completing against the stale baseline would fail UPSTREAM_INPUT_CHANGED_DURING_STAGE for a change this stage itself correctly made. Recovering and reclaiming recaptures the baseline against current reality; no stage work is discarded and no receipt is rewritten.",
+      "at": "2026-09-22T18:18:26.442000+00:00"
+    },
+    {
+      "claim": {
+        "stage": "clarify",
+        "token": "fbd8998675494a329ff5eff4c0ca97d0",
+        "claimed_at": "2026-09-22T18:19:49.288846+00:00",
+        "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+        "context": {
+          "pause": false,
+          "method": "unavailable",
+          "guaranteed": false,
+          "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+          "reason": "context-monitoring-unavailable: CONTEXT_METHOD_REQUIRED"
+        },
+        "mode": "revalidate",
+        "baseline": {
+          ".claude/skills/speckit-scope-run/SKILL.md": "61b311752e30c6a39f916cbc33899e8ac03c93a36f6dea250fa5a50e25e483a1",
+          ".claude/skills/speckit-specify/SKILL.md": "974fda5104f6df12f622f8ae03025b6aa45d61a52485f6a6e7708f441f9b3f35",
+          ".specify/extensions.yml": "6435249d6170bc90ae8856995e1de0790e6251bae359842193086fac9e075f21",
+          ".specify/extensions/scope/commands/guard.md": "cd1f4e23f48873518d533880614a66b1586f749ef5ec6b8bb51ae7db6250dc12",
+          ".specify/extensions/scope/commands/run.md": "d108ddb86319fa40fab664f6ac0973f10b7a0ef065099777408ac3695a5e987a",
+          ".specify/extensions/scope/examples/analysis.json": "91819bf1c36a702da529ab5e3175928775249751a70f15bafe6696807c16e580",
+          ".specify/extensions/scope/references/analysis-contract.md": "837201d6ae00458d5e46b8b0607af6d8894129d426903322f0ea18e9a203e69b",
+          ".specify/extensions/scope/skills/scope-analyst/SKILL.md": "0b6826b65fc7776b219ed22041888ccd2506e3d0efd293890e4aa71859412b4e",
+          ".specify/extensions/workflow/skills/workflow/SKILL.md": "83cbc17cb33182016ce51a18748292fab9b12f1bd629ed6628f03ba5e22045c0",
+          ".specify/feature.json": "1a3b7bf81f85b38bb5713ace12502577a0ba85ce98d5b0fb569df8b6a6d4e4d6",
+          ".specify/integration.json": "6c8360419221f109e5f0493855bb43cfe763b2f44dc78e2e3d2baf4daa9bfbae",
+          ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+          ".specify/project-sync-state.json": "f476b2833ff4aa10ed62b67f6c1ac251ee73fb4bfcf44b7467ef30748f923fe3",
+          ".specify/scope/approvals/13-baseline.json": "1fa22526e1c414130370189bd3c6d6221a64b64eef1710173cc4b9c303b33180",
+          ".specify/scope/approvals/13-feca4105ffd7e470caa9fd5b68bd5b112ef95105c70e83bca7ad74679415403f.json": "f38137336dab8f3d597bdc88c2b2043bba7acee3df3764d864848904127af6d9",
+          ".specify/scope/clarification-13-snapshot.json": "83c3c3af1db1112f82b68ec8ade5ae5c18dadcf47fc9673639b328be2cda78e1",
+          ".specify/scope/issue-13-analysis.json": "796a43c14420c917ead325f8948a485bc517ba8432c057449d75627d70904de6",
+          ".specify/scope/issue-13-publish.json": "02fa4360b137a7071bc316838280dc3b1ec331b962b30e373de4680d6a0d55d1",
+          ".specify/scope/issue-13-snapshot.json": "5d698b87c664cb645353fd9d8252b45d348c106f9b80eecdf4447bd13214cca6",
+          ".specify/scope/runs/13-feca4105ffd7e470/analysis.json": "796a43c14420c917ead325f8948a485bc517ba8432c057449d75627d70904de6",
+          ".specify/scope/runs/13-feca4105ffd7e470/catalog-before.json": "8783ac5790c938aa7ea683df5f7b30e6f1faa364fd145dbe8ab26985d07a6bfc",
+          ".specify/scope/runs/13-feca4105ffd7e470/issue-map-before.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+          ".specify/scope/runs/13-feca4105ffd7e470/journal.json": "50d9cb818a6e60d38009393ddaa14bdd248401f2d7a42b60137bbc0d5d153cb4",
+          ".specify/scope/runs/13-feca4105ffd7e470/snapshot.json": "30dfdde4773f587d30570521db6c9b34143feb920a088367203fae38c77a399a",
+          ".specify/templates/spec-template.md": "3945437fc35cd30a5b2bf7beea680337c3516826d3efa5a6b92c4a7eca1ba28e",
+          ".specify/workflow.yml": "84f98fec050199d2a08e68dd35914425aaa8de51e5e438f608b1c0c1016d9180",
+          "app/src/components/Generation/EngineModelSelector.tsx": "02251f6c1d73dd13f7d51ad275050c06dc7adb24e01474b42b7bf70b3508d8c8",
+          "app/src/components/ServerSettings/GpuAcceleration.tsx": "a7de514f9475d4f7982b5f39245c3e6c79935506d012a1617f17db1fc7680d3e",
+          "app/src/lib/api/types.ts": "4976e530367a60e673ccbfab0f1ce083403f79f0d08a11ff101c65401c7143a5",
+          "app/src/lib/constants/languages.ts": "dc9f579f04a9e7da07414053749a5af20b308a5f51e717824f9876a5495ec7d4",
+          "backend/backends/__init__.py": "bb8bc265e274c2f93e006c2c7b2acfddf9eb77ca9ac0db12624267624fdcd09e",
+          "backend/backends/base.py": "3c801ce7ee91d254dd053dcd5225baa36694cb0a2dec179c5189e0453247a973",
+          "backend/backends/luxtts_backend.py": "4700bac393ca9f45e6ae6962f42b9602a29b817847871891ed27243fbfb471e3",
+          "backend/models.py": "fa716af9cf4ec95a0f746cac3df7198816637621672f0dc93c00511c806716e5",
+          "backend/pyproject.toml": "d8a35dfaba0ce1d459a6e0fc6778def464f8919c1e4cf0bbabb9275802abcda2",
+          "backend/requirements.txt": "098f4fbcf9b9bb4b37521cbc881fd1401d7b47d5aa60275076545b77e7cd81f3",
+          "backend/routes/cuda.py": "dd52db693937e7ee69f84af135f60d772a20982bfaa9abfe0fe6348e507c90e5",
+          "backend/routes/models.py": "233f17bc4d433c439b489b5979fb8087ce8dd0dc0ce97465f50649956386099c",
+          "backend/services/profiles.py": "2ca80c57e4b6d6b3eece5aaed33d3d435c16e8c33723072dfe7dd2bd58b84213",
+          "backend/tests/test_all_models_e2e.py": "188e9412877b12649aed0f42456bd305703f9e6617b2ebd2ae26ec3d2f93db7d",
+          "docs/content/docs/developer/tts-engines.mdx": "414c4ba69720ab5370bd383b21e29294b08c9da7dd08e9270330fb8e684a1ea7",
+          "justfile": "54203e40ecbf0d2212cdf816e0abe8378cf512ff3d4b467490241a3d0e89ec67",
+          "package.json": "323ef6fc1a85500426304a4f7d17c8f00ddc57f1e4ea9091ce5b96d51c6a6653",
+          "specs/001-voxcpm2-tts-engine/checklists/requirements.md": "5b47d7820730cd6d4c16eac6232299514a3892d47825986eafb18766a8710a17",
+          "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+          "specs/001-voxcpm2-tts-engine/spec.md": "ea61902f0ae1c405726f1a8f3de80644906a6350fb64d7b17eb1cfbe0cbc7d61"
+        }
+      },
+      "reason": "Rebaselining the clarify claim after its own mandated side effects. All round-2 domain work is finished and correct: 9 answers integrated, 12 spec edits applied, 0 markers left, board advanced to Ready, next_action /speckit-plan returned. Three baseline files changed during the claim but the runtime's permitted-change list for clarify contains only spec.md, so completion would fail UPSTREAM_INPUT_CHANGED_DURING_STAGE on two files this stage is contractually required to change: .specify/project-sync-state.json (the board move to Ready, written by the clarification publish) and specs/001-voxcpm2-tts-engine/checklists/requirements.md (the quality-checklist re-validation the clarification skill mandates after successful spec edits, 13/16 -> 16/16). Both are in the baseline only because the earlier Specify receipt listed them as evidence, which makes volatile stage outputs immutable upstream inputs. Recovering and reclaiming recaptures the baseline against the finished state. No work is discarded, no receipt is rewritten, and no GitHub or board state is touched.",
+      "at": "2026-09-22T18:23:49.843394+00:00"
+    },
+    {
+      "claim": {
+        "stage": "analyze",
+        "token": "9543bcdd94d5404686a04251cd9d4fef",
+        "claimed_at": "2026-09-22T22:10:52.923354+00:00",
+        "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+        "context": {
+          "pause": false,
+          "method": "unavailable",
+          "guaranteed": false,
+          "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+          "reason": "context-monitoring-unavailable: CONTEXT_METHOD_REQUIRED"
+        },
+        "mode": "initial",
+        "baseline": {
+          ".claude/skills/speckit-clarify/SKILL.md": "0326f5c9f010d63ced9265385d801ebdde623d89c55c29eba2ac8b4ca7bad54a",
+          ".claude/skills/speckit-plan/SKILL.md": "1e4f4c08649c37640e1d716401a9ab91dc08be4a0514045e75068a501f941f56",
+          ".claude/skills/speckit-scope-run/SKILL.md": "61b311752e30c6a39f916cbc33899e8ac03c93a36f6dea250fa5a50e25e483a1",
+          ".claude/skills/speckit-specify/SKILL.md": "974fda5104f6df12f622f8ae03025b6aa45d61a52485f6a6e7708f441f9b3f35",
+          ".claude/skills/speckit-superspec-brainstorm/SKILL.md": "0ccd21fb16c70c3869bd392bf8a626d0d5d4a743ae18ff720ed60304f3950ba7",
+          ".claude/skills/speckit-superspec-tasks/SKILL.md": "ba0f58d15127fc6b8b71ebbd3f12081c55fe3f5f73f99dfa84ee84c81c8156db",
+          ".specify/extensions.yml": "6435249d6170bc90ae8856995e1de0790e6251bae359842193086fac9e075f21",
+          ".specify/extensions/project/config.json": "0a07fd142d147ec13d025155d9c4fe247bd02e11dfd5b3be6845b2c819e02162",
+          ".specify/extensions/scope/commands/plan-guard.md": "0134e14a924c9444efd87ff83ddf70b1f3f0e38aa3376014c9fc4d752fd41d5c",
+          ".specify/extensions/scope/commands/run.md": "d108ddb86319fa40fab664f6ac0973f10b7a0ef065099777408ac3695a5e987a",
+          ".specify/extensions/scope/examples/analysis.json": "91819bf1c36a702da529ab5e3175928775249751a70f15bafe6696807c16e580",
+          ".specify/extensions/scope/examples/clarification.json": "13650ce7693f930ceadd695800ce5e5989a248ba3648d34ead991b24a3124041",
+          ".specify/extensions/scope/references/analysis-contract.md": "837201d6ae00458d5e46b8b0607af6d8894129d426903322f0ea18e9a203e69b",
+          ".specify/extensions/scope/skills/github-clarification/SKILL.md": "879fda1848ce4452d67fbc92cb94c38237b871022ff6f06e2d6570547849ed75",
+          ".specify/extensions/scope/skills/scope-analyst/SKILL.md": "0b6826b65fc7776b219ed22041888ccd2506e3d0efd293890e4aa71859412b4e",
+          ".specify/extensions/superspec/references/superpowers-bridge.md": "3977dbfe18ae81654a4e2ee20c3a71886d5a890da57eb88db3d2436d28fd5ecd",
+          ".specify/extensions/workflow/skills/workflow/SKILL.md": "83cbc17cb33182016ce51a18748292fab9b12f1bd629ed6628f03ba5e22045c0",
+          ".specify/integration.json": "6c8360419221f109e5f0493855bb43cfe763b2f44dc78e2e3d2baf4daa9bfbae",
+          ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+          ".specify/project-sync-state.json": "51eab950e634f4e23934bd8e42b5977ae955d4474a250bff574205eeb6bfffd6",
+          ".specify/scope/approvals/13-baseline.json": "1fa22526e1c414130370189bd3c6d6221a64b64eef1710173cc4b9c303b33180",
+          ".specify/scope/approvals/13-feca4105ffd7e470caa9fd5b68bd5b112ef95105c70e83bca7ad74679415403f.json": "f38137336dab8f3d597bdc88c2b2043bba7acee3df3764d864848904127af6d9",
+          ".specify/scope/clarification-13-review.json": "1afd766cfe3066b737812d181a82b188da500ad24341f76ce07bcf22359d012b",
+          ".specify/scope/clarification-13-round2.json": "cd80ed610f5c7eabefed6f0314ab5c59b5cc09795ad2584c319dc790850815e5",
+          ".specify/scope/clarification-13-snapshot.json": "83c3c3af1db1112f82b68ec8ade5ae5c18dadcf47fc9673639b328be2cda78e1",
+          ".specify/scope/issue-13-analysis.json": "796a43c14420c917ead325f8948a485bc517ba8432c057449d75627d70904de6",
+          ".specify/scope/issue-13-publish.json": "02fa4360b137a7071bc316838280dc3b1ec331b962b30e373de4680d6a0d55d1",
+          ".specify/scope/issue-13-snapshot.json": "5d698b87c664cb645353fd9d8252b45d348c106f9b80eecdf4447bd13214cca6",
+          ".specify/scope/runs/13-feca4105ffd7e470/analysis.json": "796a43c14420c917ead325f8948a485bc517ba8432c057449d75627d70904de6",
+          ".specify/scope/runs/13-feca4105ffd7e470/catalog-before.json": "8783ac5790c938aa7ea683df5f7b30e6f1faa364fd145dbe8ab26985d07a6bfc",
+          ".specify/scope/runs/13-feca4105ffd7e470/issue-map-before.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+          ".specify/scope/runs/13-feca4105ffd7e470/journal.json": "50d9cb818a6e60d38009393ddaa14bdd248401f2d7a42b60137bbc0d5d153cb4",
+          ".specify/scope/runs/13-feca4105ffd7e470/snapshot.json": "30dfdde4773f587d30570521db6c9b34143feb920a088367203fae38c77a399a",
+          ".specify/templates/plan-template.md": "7e637502d41eccf0ca672496636365691fdca62ef37b27ec07fcb412dbfa90d4",
+          ".specify/templates/spec-template.md": "3945437fc35cd30a5b2bf7beea680337c3516826d3efa5a6b92c4a7eca1ba28e",
+          ".specify/templates/tasks-template.md": "fc29a233f6f5a27ca31f1aa46b596af6500c627441c6e62b2bc4a1d721525842",
+          ".specify/workflow.yml": "84f98fec050199d2a08e68dd35914425aaa8de51e5e438f608b1c0c1016d9180",
+          "app/src/components/Generation/EngineModelSelector.tsx": "02251f6c1d73dd13f7d51ad275050c06dc7adb24e01474b42b7bf70b3508d8c8",
+          "app/src/components/ServerSettings/GpuAcceleration.tsx": "a7de514f9475d4f7982b5f39245c3e6c79935506d012a1617f17db1fc7680d3e",
+          "app/src/components/ServerSettings/ModelManagement.tsx": "82e67780f303e359250ccd3b3689d633af43aa661df20f9c29ad6a5d79b12d3e",
+          "app/src/lib/api/types.ts": "4976e530367a60e673ccbfab0f1ce083403f79f0d08a11ff101c65401c7143a5",
+          "app/src/lib/constants/languages.ts": "dc9f579f04a9e7da07414053749a5af20b308a5f51e717824f9876a5495ec7d4",
+          "backend/backends/__init__.py": "bb8bc265e274c2f93e006c2c7b2acfddf9eb77ca9ac0db12624267624fdcd09e",
+          "backend/backends/base.py": "3c801ce7ee91d254dd053dcd5225baa36694cb0a2dec179c5189e0453247a973",
+          "backend/backends/luxtts_backend.py": "4700bac393ca9f45e6ae6962f42b9602a29b817847871891ed27243fbfb471e3",
+          "backend/build_binary.py": "453449e32a64ed5f4d3f7978c31b37952d3711139e2087e29a3a0bb5c625ea0b",
+          "backend/models.py": "fa716af9cf4ec95a0f746cac3df7198816637621672f0dc93c00511c806716e5",
+          "backend/pyproject.toml": "d8a35dfaba0ce1d459a6e0fc6778def464f8919c1e4cf0bbabb9275802abcda2",
+          "backend/requirements.txt": "098f4fbcf9b9bb4b37521cbc881fd1401d7b47d5aa60275076545b77e7cd81f3",
+          "backend/routes/cuda.py": "dd52db693937e7ee69f84af135f60d772a20982bfaa9abfe0fe6348e507c90e5",
+          "backend/routes/generations.py": "72365391ea7a5aaf8a680f819e2cb52f296ec779d34f8a1a616834a6e864e50b",
+          "backend/routes/models.py": "233f17bc4d433c439b489b5979fb8087ce8dd0dc0ce97465f50649956386099c",
+          "backend/services/profiles.py": "2ca80c57e4b6d6b3eece5aaed33d3d435c16e8c33723072dfe7dd2bd58b84213",
+          "backend/tests/test_all_models_e2e.py": "188e9412877b12649aed0f42456bd305703f9e6617b2ebd2ae26ec3d2f93db7d",
+          "backend/tests/test_f5tts_backend.py": "2898fe7489fbd42528fb244e99ecd36d0aff6899c063af479d232ad7d6e91fa3",
+          "docs/content/docs/developer/tts-engines.mdx": "414c4ba69720ab5370bd383b21e29294b08c9da7dd08e9270330fb8e684a1ea7",
+          "justfile": "54203e40ecbf0d2212cdf816e0abe8378cf512ff3d4b467490241a3d0e89ec67",
+          "package.json": "323ef6fc1a85500426304a4f7d17c8f00ddc57f1e4ea9091ce5b96d51c6a6653",
+          "scripts/generate-api.sh": "f5b0aecf5f9d2508881ef6a0c9f4c44551dd03571cf04e120dc00933b2c6712d",
+          "specs/001-voxcpm2-tts-engine/checklists/requirements.md": "b0016582e81ae64efe415033bf9df044a44d6fdd91e5edba4b52960fa619f43f",
+          "specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md": "d9c69354eed65ba5eebbf787287a2888868e9926d3bcb89007de10c6aa5eeb7e",
+          "specs/001-voxcpm2-tts-engine/contracts/tts-backend-protocol.md": "14ec70570814e6b14f9557b1874345003cdab749cac6c0f6ccc1c35f6afc77ec",
+          "specs/001-voxcpm2-tts-engine/data-model.md": "48f01095bf45bdee29f4b8e1b788ae15136f4a0fca7f2265c0c7eace4236546f",
+          "specs/001-voxcpm2-tts-engine/plan.md": "92ae66eef8b8aae82e0dc2d42d10eac0b02dade91f62a133f5a6b04b50d8ddb1",
+          "specs/001-voxcpm2-tts-engine/quickstart.md": "1879fede0f47018150c144c64f5e9c78de47f95a0b3d1e6b7500668fc100c903",
+          "specs/001-voxcpm2-tts-engine/research.md": "2b58b2a1cdb8aa8cd64c792eb805b6e8c82c14989096d431d23e1295584b8dab",
+          "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+          "specs/001-voxcpm2-tts-engine/spec.md": "c17f676c1554f8518eb733e04af356e43395cf45447ada92a55a37c33067b30c",
+          "specs/001-voxcpm2-tts-engine/tasks.md": "280339a9469abbd201b7f169b4d0e4c19f6add6664ca4dd627ed906d44469751"
+        }
+      },
+      "reason": "User approved Analyze remediation of all 10 findings (C1, H1-H5, M1-M3, L1). Remediation edited spec.md, plan.md, data-model.md, both contracts, quickstart.md and tasks.md, which are upstream inputs of Specify, Clarify, Plan and Tasks. Recovering so the dispatcher revalidates those stages in order before Analyze re-runs against the corrected artifacts. No receipt is rewritten.",
+      "at": "2026-09-22T22:20:47.273801+00:00"
+    },
+    {
+      "claim": {
+        "stage": "taskstoissues",
+        "token": "dce599ff6a5a43579220e8ad6bef06b1",
+        "claimed_at": "2026-09-22T22:22:48.027834+00:00",
+        "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+        "context": {
+          "pause": false,
+          "method": "unavailable",
+          "guaranteed": false,
+          "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+          "reason": "context-monitoring-unavailable: CONTEXT_METHOD_REQUIRED"
+        },
+        "mode": "initial",
+        "baseline": {
+          ".claude/skills/speckit-analyze/SKILL.md": "206b7c11b8f6e7c6c9c05bf3d11a6f605469e799eea65a8aa2827802b30fab9c",
+          ".claude/skills/speckit-scope-run/SKILL.md": "61b311752e30c6a39f916cbc33899e8ac03c93a36f6dea250fa5a50e25e483a1",
+          ".specify/extensions.yml": "6435249d6170bc90ae8856995e1de0790e6251bae359842193086fac9e075f21",
+          ".specify/extensions/scope/commands/guard.md": "cd1f4e23f48873518d533880614a66b1586f749ef5ec6b8bb51ae7db6250dc12",
+          ".specify/extensions/scope/commands/plan-guard.md": "0134e14a924c9444efd87ff83ddf70b1f3f0e38aa3376014c9fc4d752fd41d5c",
+          ".specify/extensions/scope/commands/run.md": "d108ddb86319fa40fab664f6ac0973f10b7a0ef065099777408ac3695a5e987a",
+          ".specify/extensions/scope/examples/analysis.json": "91819bf1c36a702da529ab5e3175928775249751a70f15bafe6696807c16e580",
+          ".specify/extensions/scope/references/analysis-contract.md": "837201d6ae00458d5e46b8b0607af6d8894129d426903322f0ea18e9a203e69b",
+          ".specify/extensions/scope/skills/github-clarification/SKILL.md": "879fda1848ce4452d67fbc92cb94c38237b871022ff6f06e2d6570547849ed75",
+          ".specify/extensions/scope/skills/scope-analyst/SKILL.md": "0b6826b65fc7776b219ed22041888ccd2506e3d0efd293890e4aa71859412b4e",
+          ".specify/extensions/workflow/skills/workflow/SKILL.md": "83cbc17cb33182016ce51a18748292fab9b12f1bd629ed6628f03ba5e22045c0",
+          ".specify/integration.json": "6c8360419221f109e5f0493855bb43cfe763b2f44dc78e2e3d2baf4daa9bfbae",
+          ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+          ".specify/project-sync-state.json": "51eab950e634f4e23934bd8e42b5977ae955d4474a250bff574205eeb6bfffd6",
+          ".specify/scope/approvals/13-baseline.json": "1fa22526e1c414130370189bd3c6d6221a64b64eef1710173cc4b9c303b33180",
+          ".specify/scope/approvals/13-feca4105ffd7e470caa9fd5b68bd5b112ef95105c70e83bca7ad74679415403f.json": "f38137336dab8f3d597bdc88c2b2043bba7acee3df3764d864848904127af6d9",
+          ".specify/scope/clarification-13-review.json": "1afd766cfe3066b737812d181a82b188da500ad24341f76ce07bcf22359d012b",
+          ".specify/scope/clarification-13-round2.json": "cd80ed610f5c7eabefed6f0314ab5c59b5cc09795ad2584c319dc790850815e5",
+          ".specify/scope/issue-13-analysis.json": "796a43c14420c917ead325f8948a485bc517ba8432c057449d75627d70904de6",
+          ".specify/scope/issue-13-publish.json": "02fa4360b137a7071bc316838280dc3b1ec331b962b30e373de4680d6a0d55d1",
+          ".specify/scope/issue-13-snapshot.json": "5d698b87c664cb645353fd9d8252b45d348c106f9b80eecdf4447bd13214cca6",
+          ".specify/scope/runs/13-feca4105ffd7e470/analysis.json": "796a43c14420c917ead325f8948a485bc517ba8432c057449d75627d70904de6",
+          ".specify/scope/runs/13-feca4105ffd7e470/catalog-before.json": "8783ac5790c938aa7ea683df5f7b30e6f1faa364fd145dbe8ab26985d07a6bfc",
+          ".specify/scope/runs/13-feca4105ffd7e470/issue-map-before.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+          ".specify/scope/runs/13-feca4105ffd7e470/journal.json": "50d9cb818a6e60d38009393ddaa14bdd248401f2d7a42b60137bbc0d5d153cb4",
+          ".specify/scope/runs/13-feca4105ffd7e470/snapshot.json": "30dfdde4773f587d30570521db6c9b34143feb920a088367203fae38c77a399a",
+          ".specify/templates/tasks-template.md": "fc29a233f6f5a27ca31f1aa46b596af6500c627441c6e62b2bc4a1d721525842",
+          ".specify/workflow.yml": "84f98fec050199d2a08e68dd35914425aaa8de51e5e438f608b1c0c1016d9180",
+          "app/src/components/Generation/EngineModelSelector.tsx": "02251f6c1d73dd13f7d51ad275050c06dc7adb24e01474b42b7bf70b3508d8c8",
+          "app/src/components/Generation/FloatingGenerateBox.tsx": "22d3f19d5dfe0026651fdd26234ea6a5f300ae583933ead5fb3a4dd60d14f95d",
+          "app/src/components/ServerSettings/GpuAcceleration.tsx": "a7de514f9475d4f7982b5f39245c3e6c79935506d012a1617f17db1fc7680d3e",
+          "app/src/lib/api/types.ts": "4976e530367a60e673ccbfab0f1ce083403f79f0d08a11ff101c65401c7143a5",
+          "app/src/lib/constants/languages.ts": "dc9f579f04a9e7da07414053749a5af20b308a5f51e717824f9876a5495ec7d4",
+          "app/src/lib/hooks/useGenerationForm.ts": "025e31aad6a732aa2dd7b36622c6dddc37de80f43cef9d091fffef874282d5f8",
+          "backend/backends/__init__.py": "bb8bc265e274c2f93e006c2c7b2acfddf9eb77ca9ac0db12624267624fdcd09e",
+          "backend/backends/base.py": "3c801ce7ee91d254dd053dcd5225baa36694cb0a2dec179c5189e0453247a973",
+          "backend/backends/luxtts_backend.py": "4700bac393ca9f45e6ae6962f42b9602a29b817847871891ed27243fbfb471e3",
+          "backend/mcp_server/tools.py": "44ffea0e0c2ec6b0bdaca1e3f9101b14ff6cc2de54ae112cc05efaea282f38bf",
+          "backend/models.py": "fa716af9cf4ec95a0f746cac3df7198816637621672f0dc93c00511c806716e5",
+          "backend/pyproject.toml": "d8a35dfaba0ce1d459a6e0fc6778def464f8919c1e4cf0bbabb9275802abcda2",
+          "backend/requirements.txt": "098f4fbcf9b9bb4b37521cbc881fd1401d7b47d5aa60275076545b77e7cd81f3",
+          "backend/routes/cuda.py": "dd52db693937e7ee69f84af135f60d772a20982bfaa9abfe0fe6348e507c90e5",
+          "backend/routes/models.py": "233f17bc4d433c439b489b5979fb8087ce8dd0dc0ce97465f50649956386099c",
+          "backend/services/profiles.py": "2ca80c57e4b6d6b3eece5aaed33d3d435c16e8c33723072dfe7dd2bd58b84213",
+          "backend/tests/test_all_models_e2e.py": "188e9412877b12649aed0f42456bd305703f9e6617b2ebd2ae26ec3d2f93db7d",
+          "backend/utils/hf_offline_patch.py": "d2f5b68dc567a0e9657b9d4f571c7d8ec2a51ab24916b5793dea83f616127bf4",
+          "docs/content/docs/developer/tts-engines.mdx": "414c4ba69720ab5370bd383b21e29294b08c9da7dd08e9270330fb8e684a1ea7",
+          "justfile": "54203e40ecbf0d2212cdf816e0abe8378cf512ff3d4b467490241a3d0e89ec67",
+          "package.json": "323ef6fc1a85500426304a4f7d17c8f00ddc57f1e4ea9091ce5b96d51c6a6653",
+          "specs/001-voxcpm2-tts-engine/checklists/requirements.md": "b0016582e81ae64efe415033bf9df044a44d6fdd91e5edba4b52960fa619f43f",
+          "specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md": "6582bb0fd5a07efacc7c93730d34833f480fbbd865b2e030bb137f1bb9a42965",
+          "specs/001-voxcpm2-tts-engine/contracts/tts-backend-protocol.md": "b1b8f52fdd7bfa45c05d4639dd10720b9f18cd4835d40d996d92056a7b748d85",
+          "specs/001-voxcpm2-tts-engine/data-model.md": "c065ed1d808c2f5a20ad0466048c623d7e3b9d32f53ce574c097b59e9b45cddb",
+          "specs/001-voxcpm2-tts-engine/plan.md": "1a03f5c9fb8d4b0b098b4fffceb1d42686042d9563d42761a6eaf58767862cab",
+          "specs/001-voxcpm2-tts-engine/quickstart.md": "9a2ec39af786160a6e4e97debe49f26500d5e12212f901d316eda6496f1c996f",
+          "specs/001-voxcpm2-tts-engine/research.md": "2b58b2a1cdb8aa8cd64c792eb805b6e8c82c14989096d431d23e1295584b8dab",
+          "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+          "specs/001-voxcpm2-tts-engine/spec.md": "4f60225b420edd1455301a3fae9319241be9e35640657180c35007bb5f52fe60",
+          "specs/001-voxcpm2-tts-engine/tasks.md": "23cd4927378999d948c92da9765083d1959e69dc203120557ead1dd51fbd7648"
+        }
+      },
+      "reason": "Tasks-to-Issues dry run failed TASK_TITLE_TOO_LONG: the adapter titles each issue \"TNNN: <whole task line>\" with a 256-character limit, and many task lines carried their full detail. tasks.md was restructured so each task line is a short headline and the unchanged detail sits on an indented line below. That changes an upstream input, so Tasks and Analyze revalidate before issue creation. No issue was created; the dry run made no GitHub write.",
+      "at": "2026-09-22T22:24:38.167850+00:00"
+    },
+    {
+      "claim": {
+        "stage": "execute",
+        "token": "7110c3a69ec5473c9768d3719560b8ed",
+        "claimed_at": "2026-09-22T22:39:12.453865+00:00",
+        "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+        "context": {
+          "pause": false,
+          "method": "unavailable",
+          "guaranteed": false,
+          "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+          "reason": "context-monitoring-unavailable: CONTEXT_METHOD_REQUIRED"
+        },
+        "mode": "initial",
+        "baseline": {
+          ".specify/extensions/scope/commands/guard.md": "cd1f4e23f48873518d533880614a66b1586f749ef5ec6b8bb51ae7db6250dc12",
+          ".specify/extensions/scope/commands/plan-guard.md": "0134e14a924c9444efd87ff83ddf70b1f3f0e38aa3376014c9fc4d752fd41d5c",
+          ".specify/extensions/scope/skills/github-clarification/SKILL.md": "879fda1848ce4452d67fbc92cb94c38237b871022ff6f06e2d6570547849ed75",
+          ".specify/extensions/scope/skills/scope-analyst/SKILL.md": "0b6826b65fc7776b219ed22041888ccd2506e3d0efd293890e4aa71859412b4e",
+          ".specify/extensions/workflow/scripts/task_issues.py": "7abbe9370a5f1b8c0c82e04f6f1dc1ee8ac3084ced96bb15024cddcaa9984649",
+          ".specify/extensions/workflow/skills/workflow/SKILL.md": "a312c80c02fc6126d2c8e2e46881ed49f030d02009eba3f24b2947c5e5ca063a",
+          ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+          ".specify/scope/approvals/13-baseline.json": "1fa22526e1c414130370189bd3c6d6221a64b64eef1710173cc4b9c303b33180",
+          ".specify/scope/clarification-13-review.json": "1afd766cfe3066b737812d181a82b188da500ad24341f76ce07bcf22359d012b",
+          ".specify/scope/clarification-13-round2.json": "cd80ed610f5c7eabefed6f0314ab5c59b5cc09795ad2584c319dc790850815e5",
+          ".specify/scope/issue-13-analysis.json": "796a43c14420c917ead325f8948a485bc517ba8432c057449d75627d70904de6",
+          ".specify/scope/issue-13-publish.json": "02fa4360b137a7071bc316838280dc3b1ec331b962b30e373de4680d6a0d55d1",
+          ".specify/scope/issue-13-snapshot.json": "5d698b87c664cb645353fd9d8252b45d348c106f9b80eecdf4447bd13214cca6",
+          ".specify/templates/tasks-template.md": "fc29a233f6f5a27ca31f1aa46b596af6500c627441c6e62b2bc4a1d721525842",
+          ".specify/workflow.yml": "84f98fec050199d2a08e68dd35914425aaa8de51e5e438f608b1c0c1016d9180",
+          "specs/001-voxcpm2-tts-engine/checklists/requirements.md": "b0016582e81ae64efe415033bf9df044a44d6fdd91e5edba4b52960fa619f43f",
+          "specs/001-voxcpm2-tts-engine/contracts/engine-capabilities.md": "6582bb0fd5a07efacc7c93730d34833f480fbbd865b2e030bb137f1bb9a42965",
+          "specs/001-voxcpm2-tts-engine/contracts/tts-backend-protocol.md": "b1b8f52fdd7bfa45c05d4639dd10720b9f18cd4835d40d996d92056a7b748d85",
+          "specs/001-voxcpm2-tts-engine/data-model.md": "c065ed1d808c2f5a20ad0466048c623d7e3b9d32f53ce574c097b59e9b45cddb",
+          "specs/001-voxcpm2-tts-engine/plan.md": "1a03f5c9fb8d4b0b098b4fffceb1d42686042d9563d42761a6eaf58767862cab",
+          "specs/001-voxcpm2-tts-engine/quickstart.md": "9a2ec39af786160a6e4e97debe49f26500d5e12212f901d316eda6496f1c996f",
+          "specs/001-voxcpm2-tts-engine/research.md": "2b58b2a1cdb8aa8cd64c792eb805b6e8c82c14989096d431d23e1295584b8dab",
+          "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+          "specs/001-voxcpm2-tts-engine/spec.md": "4f60225b420edd1455301a3fae9319241be9e35640657180c35007bb5f52fe60",
+          "specs/001-voxcpm2-tts-engine/tasks.md": "4d5db2ea75b44a3be689bdab970c71b9f892271f95646297fd78e3829ca105de",
+          "specs/001-voxcpm2-tts-engine/workflow/task-dependencies.json": "45f2226a1f41d672a5b7498598c30aa0b56a2ce0dc0c53410db16d7281a8e9ee",
+          "specs/001-voxcpm2-tts-engine/workflow/task-issues-result.json": "936de8483a4dc8a57840e20fab216c3c59ade4ee10f5450fa88c119410c6c01c",
+          "specs/001-voxcpm2-tts-engine/workflow/task-issues.json": "8b3de0e1afe0a6a023331709e925bd5f87bb7f8476fb2cff53c9ba61c67da824"
+        }
+      },
+      "reason": "The user decided T002 on 2026-09-23: pin voxcpm==2.0.3, re-score effort 13 to 8, and move User Story 3 to P2 with FR-023 withdrawn. These change upstream artifacts: the scope analysis, spec.md, the seed wording in the contracts and tasks, and research R5. Earlier stages must revalidate before Execute resumes. T001's evidence and closed issue #17 stand. The orchestrator a84da14fd8a1b2bec is retained for the Phase 1 commit.",
+      "at": "2026-09-23T00:12:34.284134+00:00"
+    },
+    {
+      "claim": {
+        "stage": "plan",
+        "token": "411fcacdedfb4a519b5bfd92dd9b5c52",
+        "claimed_at": "2026-09-23T00:15:21.271055+00:00",
+        "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+        "context": {
+          "pause": false,
+          "method": "unavailable",
+          "guaranteed": false,
+          "session_id": "930ef2a0-dd0d-4a44-a944-6b0a6c359932",
+          "reason": "context-monitoring-unavailable: CONTEXT_METHOD_REQUIRED"
+        },
+        "mode": "revalidate",
+        "baseline": {
+          ".specify/extensions/scope/commands/guard.md": "cd1f4e23f48873518d533880614a66b1586f749ef5ec6b8bb51ae7db6250dc12",
+          ".specify/extensions/scope/skills/github-clarification/SKILL.md": "879fda1848ce4452d67fbc92cb94c38237b871022ff6f06e2d6570547849ed75",
+          ".specify/extensions/scope/skills/scope-analyst/SKILL.md": "0b6826b65fc7776b219ed22041888ccd2506e3d0efd293890e4aa71859412b4e",
+          ".specify/extensions/workflow/skills/workflow/SKILL.md": "a312c80c02fc6126d2c8e2e46881ed49f030d02009eba3f24b2947c5e5ca063a",
+          ".specify/memory/constitution.md": "98eca6167e05c0f93f38f3ef82349c494956d90f0e8503e9ee08fbc0d7d0e0d1",
+          ".specify/scope/approvals/13-baseline.json": "1fa22526e1c414130370189bd3c6d6221a64b64eef1710173cc4b9c303b33180",
+          ".specify/scope/clarification-13-review.json": "1afd766cfe3066b737812d181a82b188da500ad24341f76ce07bcf22359d012b",
+          ".specify/scope/clarification-13-round2.json": "cd80ed610f5c7eabefed6f0314ab5c59b5cc09795ad2584c319dc790850815e5",
+          ".specify/scope/issue-13-analysis.json": "f4f8d9e9d4115d39dc8ab32d2c672b81ecd5acd1bb6364b1ac952bb6a0847252",
+          ".specify/scope/issue-13-publish.json": "e5439471711354e599912f58c86118118e99d69530d8c4e809a15073766cd928",
+          "specs/001-voxcpm2-tts-engine/checklists/requirements.md": "b0016582e81ae64efe415033bf9df044a44d6fdd91e5edba4b52960fa619f43f",
+          "specs/001-voxcpm2-tts-engine/evidence/probe.md": "fcbab0e305d93b3b752345ee308226b88e560c5a613978d1513255dd70276239",
+          "specs/001-voxcpm2-tts-engine/scope-source.json": "01dd54a67ac8373fe74fa38270bf7004f9d826ff7415db4697489ab366f2fca9",
+          "specs/001-voxcpm2-tts-engine/spec.md": "b14ebfe59c84a0e5f3ab6f99c909d51906e4e6003fb9970868504d4f4bf0656d"
+        }
+      },
+      "reason": "The revalidation driver's plan check wrongly required status Ready. plan-gate correctly returned In Progress with revalidation true and exit 0 for an in-progress feature. Recovering the plan claim so the corrected check can re-run. No artifacts changed.",
+      "at": "2026-09-23T00:15:40.136749+00:00"
+    }
+  ],
+  "migrations": [
+    {
+      "reason": "Reviewed upgrade of the Sanduq workflow package 1.0.0 -> 1.2.0, approved by the user on 2026-09-23. The package had been dropped in with specify extension add --force outside the installer; all 61 workflow files were verified identical to the official release workflow-v1.2.0. Adopted via install.py --apply --preserve-ci: five QA/User Manual hooks re-enabled by the direct install were returned to disabled per policy (qa and user_manual off) after confirming each differed from the reconcile journal only in enabled and matched its package declaration verbatim; a 1.2.0 installer ordering defect (doctor reads preserved_ci from the on-disk receipt before the receipt is written) was worked around by seeding the preserved_ci record the installer then wrote itself. The project CI file is byte-identical. Doctor --project is clean. No stage work is repeated by this migration.",
+      "from": "cbe49c54173803273109984b75d2a078de661d2a3d88389641a490d374554b65",
+      "at": "2026-09-22T22:36:02.583991+00:00",
+      "invalidated": [],
+      "preserved_as_historical": [
+        "scope",
+        "specify",
+        "clarify",
+        "plan",
+        "tasks",
+        "analyze",
+        "taskstoissues"
+      ]
+    }
+  ],
+  "policy_changes": [
+    {
+      "from": "bb3c9927c75fdb9aed7785a8a73d03ff8c2108eed55b9d5e8f4fafc2bdad9c7a",
+      "to": "54f0c0d66e0922e5b7f067672eb7c1f58c23c0403faaeec938f7823e8f6c53a6",
+      "at": "2026-09-22T22:36:34.145557+00:00"
+    }
+  ]
+}
